@@ -1,0 +1,49 @@
+%saves the data
+%%%%%%%%%%%%%%%%%%%%%%LTSA controls%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% LTSA Start frequency %%%% PARAMS.ltsa.freq0 = 0;  %HANDLES.ltsa.stfreq.edtxt
+  
+
+%% LTSA End frequency %%%%%% PARAMS.ltsa.freq1 = PARAMS.ltsa.fmax;  %HANDLES.ltsa.endfreq.edtxt 
+
+
+%% LTSA Brightness value %%% PARAMS.ltsa.bright = 0;	%HANDLES.ltsa.amp.bredt
+
+
+%% LTSA Contrast value %%%%% PARAMS.ltsa.contrast = 100;   %HANDLES.ltsa.amp.conedt  
+
+  
+%% LTSA CMap controls %%%%%% PARAMS.ltsa.cmap = jet;     %HANDLES.amp.cmap
+
+
+%% LTSA Plot Length(hr) %%%%%% PARAMS.ltsa.tseg.hr = 2;	%HANDLES.ltsa.time.edtxt3
+
+%%%%%%%%%%%%%%%%% Xwav and Wav controls%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Start frequency (wav) %%%% PARAMS.freq0 = 0; %HANDLES.stfreq.edtxt
+
+
+%% End frequency (wav) %%%%%% PARAMS.freq1 = PARAMS.fmax;  %HANDLES.endfreq.edtxt
+
+
+%% FFT Length (wav) %%%%%%%% PARAMS.nfft = 1000; %HANDLES.specnfft.edtxt
+
+
+%% Spectral Overlap (wav) %%% PARAMS.overlap = 0; %HANDLES.specol.edtxt
+
+
+%% CMap controls (wav) %%%%%% PARAMS.cmap = jet;    %HANDLES.amp.cmap
+
+
+%% Plot Length(s) (wav) %%%%%% PARAMS.tseg.sec = 1;	%HANDLES.ltsa.time.edtxt4
+
+%%%%%%%%%%%%%%%%%%%%Brightness and contrast%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Brightness value (wav) %%% PARAMS.bright = 0;   %HANDLES.amp.bredt
+
+
+%% Contrast value (wav) %%%%% PARAMS.contrast = 100;   %HANDLES.amp.conedt 
+
+
+%% Speed Factor (wav) %%%%%%% PARAMS.speedFactor = 1;  %HANDLES.snd.edtxt 
+

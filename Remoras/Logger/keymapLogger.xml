@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keymap><!--This xml document is what holds the hotkey map for triton.--><!--Hotkeys that have the modifier key control-->
+   <DefaultKeys>
+      <Key>
+         <name>rightarrow</name>
+         <fn>motion('forward')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV ahead one unit</description>
+      </Key>
+      <Key>
+         <name>leftarrow</name>
+         <fn>motion('back')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV back one unit</description>
+      </Key>
+      <Key>
+         <name>uparrow</name>
+         <fn>motion('autof')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV ahead automatically</description>
+      </Key>
+      <Key>
+         <name>downarrow</name>
+         <fn>motion('autob')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV back automatically</description>
+      </Key>
+      <Key>
+         <name>space</name>
+         <fn>motion('stop')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Stop automatic moving</description>
+      </Key>
+      <Key>
+         <name>b</name>
+         <fn>control_log('pickboth')</fn>
+         <param>~isempty(handles)</param>
+         <description>Pick both start and end time</description>
+      </Key>
+      <Key>
+         <name>s</name>
+         <fn>control_log('pickstart')</fn>
+         <param>~isempty(handles)</param>
+         <description>Pick start time</description>
+      </Key>
+      <Key>
+         <name>e</name>
+         <fn>control_log('pickend')</fn>
+         <param>~isempty(handles)</param>
+         <description>Pick end time</description>
+      </Key>
+      <Key>
+         <name>l</name>
+         <fn>control_log('log')</fn>
+         <param>~isempty(handles)</param>
+         <description>Log selection</description>
+      </Key>
+      <Key>
+         <name>1</name>
+         <fn>control_log(handles.freq(1), [], 'set_parameter');</fn>
+         <param>~isempty(handles)</param>
+         <description>Set parameter 1</description>
+      </Key>
+      <Key>
+         <name>2</name>
+         <fn>control_log(handles.freq(2), [], 'set_parameter');</fn>
+         <param>~isempty(handles)</param>
+         <description>Set parameter 2</description>
+      </Key>
+      <Key>
+         <name>3</name>
+         <fn>control_log(handles.freq(3), [], 'set_parameter');</fn>
+         <param>~isempty(handles)</param>
+         <description>Set parameter 3</description>
+      </Key>
+      <Key>
+         <name>4</name>
+         <fn>control_log(handles.freq(4), [], 'set_parameter');</fn>
+         <param>~isempty(handles)</param>
+         <description>Set parameter 4</description>
+      </Key>
+      <Key>
+         <name>5</name>
+         <fn>control_log(handles.freq(5), [], 'set_parameter');</fn>
+         <param>~isempty(handles)</param>
+         <description>Set parameter 5</description>
+      </Key>
+      <Key>
+         <name>6</name>
+         <fn>control_log(handles.freq(6), [], 'set_parameter');</fn>
+         <param>~isempty(handles)</param>
+         <description>Set parameter 6</description>
+      </Key>
+      <Key>
+         <name>f</name>
+         <fn>value = get(handles.pkfreq, 'Value'); set(handles.pkfreq, 'Value', ~value);</fn>
+         <param>~isempty(handles)</param>
+         <description>Toggle picking frequency</description>
+      </Key>
+   </DefaultKeys>
+   <CtrlKeys>
+      <Key>
+         <name>rightarrow</name>
+         <fn>motion_ltsa('forward')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA ahead one unit</description>
+      </Key>
+      <Key>
+         <name>leftarrow</name>
+         <fn>motion_ltsa('back')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA back one unit</description>
+      </Key>
+      <Key>
+         <name>uparrow</name>
+         <fn>motion_ltsa('autof')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA ahead automatically</description>
+      </Key>
+      <Key>
+         <name>downarrow</name>
+         <fn>motion_ltsa('autob')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA back automatically</description>
+      </Key>
+      <Key>
+         <name>space</name>
+         <fn>motion_ltsa('stop')</fn>
+         <param>savalue == 1</param>
+         <description>Stop automatic LTSA movment</description>
+      </Key>
+   </CtrlKeys>
+   <AltKeys/>
+   <ShiftKeys>
+      <Key>
+         <name>s</name>
+         <fn>bringToFront</fn>
+         <param>'1'</param>
+         <description>Bring open Matlab windows to front</description>
+      </Key>
+      <Key>
+         <name>l</name>
+         <fn>bringToFront('Log Calls')</fn>
+         <param>'1'</param>
+         <description>Bring open Matlab windows to front</description>
+      </Key>
+   </ShiftKeys>
+</Keymap>

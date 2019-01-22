@@ -1,0 +1,18 @@
+% Example.hdr 
+% hdrfile for hrp2xwavs input for generating xwavs from hrp files
+% experiment specific 
+% file is run through eval(), so other PARAMS can be set via this file
+%
+
+% These two parameters set the XWAV file name:
+PARAMS.xhd.ExperimentName = 'EXAMPLE1'; % experiment name - 8 chars
+PARAMS.xhd.SiteName = 'EXs1';           % site name - 4 chars
+
+PARAMS.xhd.InstrumentID = 'HRP5';       % harp instrument number - 4 chars
+
+% set location DECIMAL DEGREES
+PARAMS.xhd.Longitude = -11722859;	% deg, min & decimal min * 10^3
+PARAMS.xhd.Latitude = 3253550;		% deg, min & decimal min * 10^3
+PARAMS.xhd.Depth = 999;			% meters down is positive
+
+

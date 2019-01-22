@@ -1,0 +1,15 @@
+BBThresholdEdtxt
+String
+17
+MinBBFreqEdtxt
+String
+10000
+MaxBBFreqEdtxt
+String
+100000
+MinBBSatEdtxt
+String
+20000
+MaxBBSatEdtxt
+String
+90000

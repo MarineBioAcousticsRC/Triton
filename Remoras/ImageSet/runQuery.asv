@@ -1,0 +1,90 @@
+function ims_runQuery(varargin)
+
+global PARAMS REMORA
+
+REMORA.image_set.sp_list = {'Kogia sp.';'Dolphin clicks';'Dolphin whistles';'Sperm whale';...
+    'Beaked whale';'Boat';'Echosounder';'Noise';'Rain';'Data gap';...
+    'Quiet'};
+
+query_words = {{'Kspp'};
+    {'Gg','UO'};
+    {'UO'};
+    {'Pm'};
+    {'Zc','Md','Me','UBW','Bb1'};
+    {'Anthro'};
+    {'Anthro'};
+    {'Other'}};
+
+query_call = {'Clicks';
+    'Clicks';
+    'Whistles';
+    'Clicks';
+    'Clicks';
+    'Ship';
+    'Active Sonar';
+    'Masking'};
+
+this_project = REMORA.image_set.project;
+site = REMORA.image_set.site;
+deployment = REMORA.image_set.deployment;
+start_time = REMORA.image_set.start_time;
+end_time = REMORA.image_set.end_time;
+start_string = datestr(start_time,'yyyy-mm-ddTHH:MM:SSZ');
+end_string = datestr(end_time,'yyyy-mm-ddTHH:MM:SSZ');
+
+dbInitArgs = {};
+queries =[];
+% Get detections for this LTSA        
+if isempty(queries)
+    queries = dbInit(dbInitArgs{:});
+end
+dbSpeciesFmt('Input', 'Abbrev', 'SIO.SWAL.v1');
+dbSpeciesFmt('Output', 'Vernacular', 'English');
+timestamps = cell(size(REMORA.image_set.sp_list));
+for iSp1 = 1:length(query_words)
+    merged_timestamps = [];
+    for iSp2 = 1:length(query_words{iSp1})
+        % Get effort for the project, deployment, and site
+        [detections, endP] = dbGetDetections(queries, 'Project', this_project, ...
+            'Deployment', deployment, 'Site',site,'SpeciesID',...
+        	query_words{iSp1}{iSp2}, 'Call',query_call{iSp1});
+        merged_timestamps = [merged_timestamps;detections];
+    end
+    timestamps{iSp1,1} = merged_timestamps;
+end
+REMORA.image_set.timestamps = timestamps;
+
+% 
+% create list of checkboxes and species
+halfList = round(length(REMORA.image_set.sp_list)/2);
+for iBox = 1:length(REMORA.image_set.sp_list)
+    if iBox>halfList
+        horz_pos = .5;
+        vert_pos = .8-((iBox-halfList)*.1);
+    else
+        horz_pos = .1;
+        vert_pos = .8-(iBox*.1);
+    end
+    REMORA.image_set.handles.check_box(iBox,1) =... 
+        uicontrol(REMORA.image_set.setMetadataGui,'style','checkbox',...
+        'string', REMORA.image_set.sp_list{iBox},...
+        'Position',[horz_pos,vert_pos,.3,.08],...
+        'Units','normalized');
+
+end
+
+% Make big button to press to confirm inputs
+labelStr = 'Save Image';
+btnpos = [.6, .1,.2, .1];
+REMORA.image_set.handles.save_image = uicontrol(REMORA.image_set.setMetadataGui,...
+    'style', 'pushbutton',...
+    'string', labelStr,...
+    'units', 'normalized',...
+    'FontSize', 10,...
+    'FontWeight','bold',...
+    'position', btnpos, ...
+    'HorizontalAlignment', 'left',...
+    'BackgroundColor', [.75 .875 1],...
+    'Callback', @saveImageToSet);
+
+

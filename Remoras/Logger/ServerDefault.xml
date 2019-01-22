@@ -1,0 +1,7 @@
+<Server>
+ <!-- DNS name or IP address !-->
+ <Name>bandolero.ucsd.edu</Name>
+ <!-- If running on a router with NAT, add local network IP addr,
+    e.g. <NATIP>192.168.0.129</NATIP> !-->
+ <Port>9779</Port>
+</Server>

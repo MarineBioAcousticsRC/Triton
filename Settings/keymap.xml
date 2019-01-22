@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keymap><!--This xml document is what holds the hotkey map for triton.--><!--Hotkeys that have the modifier key control-->
+   <DefaultKeys>
+      <Key>
+         <name>rightarrow</name>
+         <fn>motion('forward')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV ahead one unit</description>
+      </Key>
+      <Key>
+         <name>leftarrow</name>
+         <fn>motion('back')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV back one unit</description>
+      </Key>
+      <Key>
+         <name>uparrow</name>
+         <fn>motion('autof')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV ahead automatically</description>
+      </Key>
+      <Key>
+         <name>downarrow</name>
+         <fn>motion('autob')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Move XWAV back automatically</description>
+      </Key>
+      <Key>
+         <name>space</name>
+         <fn>motion('stop')</fn>
+         <param>(sgvalue + tsvalue + spvalue) &gt; 0</param>
+         <description>Stop automatic moving</description>
+      </Key>
+   </DefaultKeys>
+   <CtrlKeys>
+      <Key>
+         <name>rightarrow</name>
+         <fn>motion_ltsa('forward')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA ahead one unit</description>
+      </Key>
+      <Key>
+         <name>leftarrow</name>
+         <fn>motion_ltsa('back')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA back one unit</description>
+      </Key>
+      <Key>
+         <name>uparrow</name>
+         <fn>motion_ltsa('autof')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA ahead automatically</description>
+      </Key>
+      <Key>
+         <name>downarrow</name>
+         <fn>motion_ltsa('autob')</fn>
+         <param>savalue == 1</param>
+         <description>Move LTSA back automatically</description>
+      </Key>
+      <Key>
+         <name>space</name>
+         <fn>motion_ltsa('stop')</fn>
+         <param>savalue == 1</param>
+         <description>Stop automatic LTSA movment</description>
+      </Key>
+   </CtrlKeys>
+   <AltKeys/>
+   <ShiftKeys>
+      <Key>
+         <name>s</name>
+         <fn>bringToFront</fn>
+         <param>'1'</param>
+         <description>Bring open Matlab windows to front</description>
+      </Key>
+   </ShiftKeys>
+</Keymap>
