@@ -159,7 +159,7 @@ while vidx <= length(varargin)
             vidx = vidx+2;
         case 'Call'
             if iscell(varargin{vidx+1})
-                call_cells = varargin{vidx+1};
+                call_cells = varargin(vidx+1);
             else
                 call_cells = {varargin(vidx+1)};
             end

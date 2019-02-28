@@ -63,8 +63,8 @@ if firstlast
     else
         idx = length(xml.te_COLON_TransferFunction);
     end
-    tf = [xml.te_COLON_Calibration(idx).FrequencyResponse.Hz(:), xml.te_COLON_Calibration(idx).FrequencyResponse.dB(:)];
-    date = dbISO8601toSerialDate(xml.te_COLON_Calibration(idx).TimeStamp);
+    tf = [xml.ty_COLON_Calibration(idx).FrequencyResponse.Hz(:), xml.ty_COLON_Calibration(idx).FrequencyResponse.dB(:)];
+    date = dbISO8601toSerialDate(xml.ty_COLON_Calibration(idx).TimeStamp);
     1;
 else
     error('More than one calibration selected')

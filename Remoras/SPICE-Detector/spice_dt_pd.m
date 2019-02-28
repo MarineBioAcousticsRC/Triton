@@ -13,16 +13,21 @@ global HANDLES PARAMS DATA REMORA
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % dialog box - interactive spectrogram detector 
 if strcmp(action, 'xwav')
+    if ~isfield(PARAMS, 'xhd')
+        % no data loaded, display message to load data.
+        disp_msg('Please load audio data before launching detector gui')
+        return
+    end
     spice_setpointers('watch');
     
-    if ~isfield(REMORA.fig, 'spice_dt') % if figure name hasn't been created
+    %if ~isfield(REMORA.fig, 'spice_dt') || ~ishandle(REMORA.fig.spice_dt) % if figure name hasn't been created
         spice_dt_initwins;
         spice_dt_initcontrol;
-    else
-        % if the name exists, is it an active figure handle?
-        if ~ishandle(REMORA.fig.spice_dt) 
-            spice_dt_initwins;
-            spice_dt_initcontrol;
+%     else
+%         % if the name exists, is it an active figure handle?
+%         if ~ishandle(REMORA.fig.spice_dt) 
+%             spice_dt_initwins;
+%             spice_dt_initcontrol;
             
             % Detection Parameters pulldown 
             % make sure that the save/load params pd is recreated after
@@ -36,13 +41,13 @@ if strcmp(action, 'xwav')
             uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Save Detector ParamFile',...
                 'Callback','spice_dt_paramspd(''spice_dt_paramsave'')');
             
-        end
-    end
+%        end
+%    end
      
-    if isfield(PARAMS, 'xhd')
-        set(REMORA.spice_dt.MinBBFreqEdtxt, 'Enable', 'on');
-        set(REMORA.spice_dt.MaxBBFreqEdtxt, 'Enable', 'on');
-    end
+%     if isfield(PARAMS, 'xhd')
+%         set(REMORA.spice_dt.MinBBFreqEdtxt, 'Enable', 'on');
+%         set(REMORA.spice_dt.MaxBBFreqEdtxt, 'Enable', 'on');
+%     end
     
     set(REMORA.fig.spice_dt,'Visible','on');
     

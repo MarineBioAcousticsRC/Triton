@@ -86,7 +86,7 @@ queryStr = sprintf(['collection("ext:horizons%s")/', ...
     datestr(start, 'yyyy-mm-ddTHH:MM:SS'), ...
     datestr(stop, 'yyyy-mm-ddTHH:MM:SS'));
 
-import org.apache.xmlrpc.XmlRpcException;
+% import org.apache.xmlrpc.XmlRpcException;
 
 % Run XML query to retrieve ephemeris information
 try
