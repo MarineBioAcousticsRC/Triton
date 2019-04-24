@@ -5,11 +5,11 @@ global PARAMS REMORA HANDLES
 % back button
 if strcmp(action, 'back')
     motion('back');
-    
+    dt_gui
 % forward button
 elseif strcmp(action, 'forward')
     motion('forward');
-    
+    dt_gui
 elseif strcmp(action, 'refresh')
     % check if xwav has been loaded and enable editing if so
     % set back/fwd buttons to corresponding handles on control panel
@@ -29,8 +29,8 @@ set(REMORA.spice_dt.back, 'Enable', ...
 % next part runs for everything, which is why refresh will work
 % Run detection on current spectrogram plot (if spectrogram open)
 if get(HANDLES.display.specgram, 'Value') == 1
-    if ~ isempty(REMORA.spice_dt.params.Ranges)
-        plot_triton;
+    if ~isempty(REMORA.spice_dt.guiDets)
+        sp_plot_detections;
 %         dtST_signal(PARAMS.pwr, PARAMS.fs, PARAMS.nfft, PARAMS.overlap, ...
 %             PARAMS.f, true, 'Ranges', REMORA.dt.params.Ranges , ...
 %             'MinClickSaturation', REMORA.dt.params.MinClickSaturation, ...

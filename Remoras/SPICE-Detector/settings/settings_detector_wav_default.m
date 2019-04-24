@@ -27,7 +27,7 @@ detParams.depl = [];
 detParams.channel = 1; % which channel do you want to look at?
 detParams.bpRanges = [10000,80000]; % Bandpass filter parameters in Hz [min,max]
 detParams.filterOrder = 5; % butterworth filter order used for band pass
-detParams.dBppThreshold = []; % minimum amplitude threshold in dB. 
+detParams.dBppThreshold = 60; % minimum amplitude threshold in dB. 
 detParams.frameLengthUs = 2000; % For fft computation
 detParams.clipThreshold = 0.98;%  Normalized clipping threshold btwn 0 and 1.  If empty, 
 % assumes no clipping. 

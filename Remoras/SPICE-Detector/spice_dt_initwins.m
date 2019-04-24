@@ -29,6 +29,10 @@ PARAMS.scrnsz = get(0,'ScreenSize');
 % window placement & size on screen
 defaultPos = [0.005,0.035,0.15,0.25];
 % open and setup figure window
+if ishghandle(REMORA.fig.spice_dt)
+     close(REMORA.fig.spice_dt)
+end
+
 REMORA.fig.spice_dt = figure( ...
     'NumberTitle','off', ...
     'Name','Spice Detector Control - v1.0',...

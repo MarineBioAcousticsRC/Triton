@@ -35,6 +35,7 @@ bgColor = [1 1 1];  % white
 bgColor2 = [.75 1 .875]; % light green for LTSA
 bgColor3 = [.75 .875 1]; % light blue for XWAV
 
+REMORA.spice_dt = [];
 % is an xwav file open? (There are some callbacks that depend on this!)
 if isfield(PARAMS, 'xhd')
     enbl = 'on';
