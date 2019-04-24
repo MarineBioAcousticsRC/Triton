@@ -10,7 +10,7 @@ stopCtr = 1;
 while iT1 <= length(starts)
     k = 0;
     mergeI = iT1;
-    while (k+iT1)<(length(starts)) && starts(iT1+k+1,1) - stops(iT1+k,1)< mergeThr    
+    while (k+iT1)<(length(starts)) && starts(iT1+k+1,1) - stops(iT1+k,1)<= mergeThr    
         k = k+1;
         mergeI = [mergeI,iT1+k];
     end

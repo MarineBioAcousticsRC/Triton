@@ -98,18 +98,16 @@ if p.guidedDetector
 end
 
 clickTimesPruned = clickTimes(delFlag==1,:); % apply deletions
-if ~isempty(outFileName)
-    fidOut = fopen(strcat(outFileName(1:end-1),p.ppExt),'w+');
-    
-    
-    if ~isempty(clickTimesPruned)
-        for itr3 = 1:size(clickTimesPruned,1)
-            % Write post-processed click annotations to .cHR file
-            fprintf(fidOut, '%f %f\n', clickTimesPruned(itr3,1),clickTimesPruned(itr3,2));
-        end
-    else
-        fprintf(fidOut, 'No clicks detected.');
+
+fidOut = fopen(outFileName,'w+');
+
+if ~isempty(clickTimesPruned)
+    for itr3 = 1:size(clickTimesPruned,1)
+        % Write post-processed click annotations to .cHR file
+        fprintf(fidOut, '%f %f\n', clickTimesPruned(itr3,1),clickTimesPruned(itr3,2));
     end
-    
-    fclose(fidOut);
+else
+    fprintf(fidOut, 'No clicks detected.');
 end
+
+fclose(fidOut);

@@ -1,37 +1,42 @@
 function dt_HR_batch(fullFiles,fullLabels,p,encounterTimes)
 
 N = size(fullFiles,1);
-previousFs = 0; % make sure we build filters on first pass
+p.previousFs = 0; % make sure we build filters on first pass
 
 % get file type list
 fTypes = io_getFileType(fullFiles);
-
-for idx1 = 1:N % for each data file
+parfor idx1 = 1:N % for each data file
     fprintf('beginning file %d of %d \n',idx1,N)
     %(has to be inside loop for parfor, ie, filters are rebuilt every time,
     % can be outside for regular for)
-    
+    pTemp = p;
     recFile = fullFiles{idx1};
     labelFile = fullLabels{idx1};
-    
+    matFileOut = strrep(labelFile,'.c','.mat');
+    if ~pTemp.overwrite && exist(matFileOut, 'file') == 2
+        fprintf('DetectionFile %s already exists.\n',matFileOut)
+        fprintf('Overwrite option is false, skipping to next file.\n')
+        continue
+    end
     % read file header
-    hdr = io_readXWAVHeader(fullFiles{idx1}, p,'fType', fTypes(idx1));
+    hdr = io_readXWAVHeader(fullFiles{idx1}, pTemp,'fType', fTypes(idx1));
 
     if isempty(hdr)
         continue % skip if you couldn't read a header
-    elseif hdr.fs ~= previousFs
+    elseif hdr.fs ~= pTemp.previousFs
         % otherwise, if this is the first time through, build your filters,
         % only need to do this once though, so if you already have this
         % info, this step is skipped
         
-        [previousFs,p] = fn_buildFilters(p,hdr.fs);
+        [previousFs,pTemp] = fn_buildFilters(pTemp,hdr.fs);
+        pTemp.previousFs = previousFs;
         
-        p = fn_interp_tf(p);
-        if ~exist('p.countThresh') || isempty(p.countThresh)
-            p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;
+        pTemp = fn_interp_tf(pTemp);
+        if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
+            pTemp.countThresh = (10^((pTemp.dBppThreshold - median(pTemp.xfrOffset))/20))/2;
         end
     end
-    
+    starts = [];stops = [];
     if exist(labelFile,'file')
         % Read in the .c file produced by the short term detector.
         [starts,stops] = io_readLabelFile(labelFile);
@@ -44,7 +49,7 @@ for idx1 = 1:N % for each data file
     
     % Look for clicks, hand back parameters of retained clicks
     [cParams,f] = dt_processHRstarts(fid,starts,stops,...
-        p,hdr,recFile);
+        pTemp,hdr,recFile);
     
     % Done with that file
     fclose(fid);
@@ -79,5 +84,5 @@ for idx1 = 1:N % for each data file
         cParams.yFiltBuffVec = {};
     end
     
-    fn_saveDets2mat(strrep(labelFile,'.c','.mat'),cParams,f,hdr,p);
+    fn_saveDets2mat(matFileOut,cParams,f,hdr,p);
 end

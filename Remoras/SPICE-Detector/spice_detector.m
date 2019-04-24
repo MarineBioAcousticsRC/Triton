@@ -9,7 +9,7 @@ function spice_detector(varargin)
 
 % Load detector settings
 detParamsFile = [];
-
+runMode = 'batchRun'; % default to batch. Need to implement guiRun.
 if nargin == 1
     % Check if settings file was passed in function call
     if ischar(varargin{1})
@@ -24,7 +24,7 @@ if nargin == 1
         % parameters detParams
         detParams = varargin{1};
     end
-    
+
 else
     % If no settings file provided, prompt for input
     currentDir = mfilename('fullpath');
@@ -34,8 +34,8 @@ else
         settingsFullFile = fullfile(settingsFilePath,settingsFileName);
         fprintf('Loading settings file %s\n\n',settingsFullFile)
         run(settingsFullFile);
-        
-    else
+
+    else 
         error('No settings file selected')
     end
 end
@@ -86,7 +86,7 @@ if ~isempty(fullFileNames)
     %         toc
     %     end
     fprintf('Beginning detection\n\n')
-    dt_batch(fullFileNames,fullLabels,detParams,encounterTimes);
+    dt_batch(fullFileNames,fullLabels,detParams,encounterTimes,runMode);
     
 else
     disp('Error: No wav/xwav files found')

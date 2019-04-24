@@ -1,36 +1,33 @@
-% settings_detector_array
+% settings_detectorDefault
 
 % Settings script for spice_detector
 
 % Parameters for both detector steps (low & high resolution):
-detParams.lowResDet = false; % run low resolution detector.
+detParams.lowResDet = true; % run low resolution detector.
 detParams.highResDet = true; % run high resolution detector.
 
-% Control amount of messaging displayed in console.
-detParams.verbose = true;
-
 % Location of base directory containing directories of files to be analyzed
-detParams.baseDir = 'I:\GU1703\500kHz4ch';
+detParams.baseDir = 'C:\Users\Kait\Downloads\';
 
 % Optional output directory location. Metadata directory will be created in 
 % outDir if specified, otherwise it will be created in baseDir.
-detParams.outDir  = 'E:\test'; 
+detParams.outDir  = 'C:\Users\Kait\Downloads\'; 
 
 % Set transfer function location
-detParams.tfFullFile = [];
+detParams.tfFullFile = 'E:\TFs\578_090917\578_090917_HARP.tf';
 % Note, if no transfer function use: parametersLR.tfFullFile = [];
 
 % Name of the deployment. This should be the first few characters in the 
 % directory(ies) you want to look in you want to look at. For now, 
 % directory hierarchy is expected to be: basedir>depl*>*.x.wav
-detParams.depl = 'SEFSC';
+% TODO: implement recursive directory search for more flexibility.
+detParams.depl = 'Arctic_C2';
 
 detParams.channel = 1; % which channel do you want to look at?
-detParams.bpRanges = [5000 100000]; % Bandpass filter parameters in Hz [min,max]
+detParams.bpRanges = [10000 100000]; % Bandpass filter parameters in Hz [min,max]
 detParams.filterOrder = 5; % butterworth filter order used for band pass
-detParams.dBppThreshold = 50; % minimum amplitude threshold in dB. 
+detParams.dBppThreshold = 118; % minimum amplitude threshold in dB. 
 detParams.frameLengthUs = 2000; % For fft computation
-detParams.overlap = 0.50; % fft overlap
 detParams.clipThreshold = 0.98;%  Normalized clipping threshold btwn 0 and 1.  If empty, 
 % assumes no clipping. 
 
@@ -53,7 +50,8 @@ detParams.DateRegExp = '_(\d*)_(\d*)';
 %%%%% GUIDED DETECTIONS? %%%%
 detParams.guidedDetector = false; % flag to 1 if guided
 % Name of spreadsheet containing target detection times. Required if guidedDetector = true
-detParams.gDxls = 'E:\Code\SPICE-box\SPICE-Detector\settings\guidedDets_example.csv';
+% parametersLR.gDxls = 'E:\Data\John Reports\DCLDEdata\WAT_NC_guidedDets.xlsx';
+detParams.gDxls = [];
 detParams.diary = false; % set to true if you want a diary output. Warning: text file can get large
 
 %%%%%%%%%%%%%%%%%% Low resolution only settings %%%%%%%%%%%%%%%%
@@ -61,15 +59,6 @@ detParams.LRbuffer = 0.0025; % # of seconds to add on either side of area of int
 
 %%%%%%%%%%%%%%%%%% High resolution only settings %%%%%%%%%%%%%%%%
 %%% OTHER DETECTION THRESHOLD PARAMS %%%
-
-detParams.HRbuffer = 0.00025; % # of seconds to add on either side of area of interest
-detParams.delphClickDurLims = [30,1200];% [min,max] duration in microsec 
-
-% allowed for high energy envelope of click
-detParams.cutPeakBelowKHz = 10; % discard click if peak frequency below X kHz
-detParams.cutPeakAboveKHz = 100; % discard click if peak frequency above Y kHz 
-detParams.minClick_us = 16; % Minimum duration of a click in us 
-detParams.maxClick_us = 1500; % Max duration of a click including echos
 detParams.energyThr = 0.25; % n-percent energy threshold for envelope duration
 detParams.dEvLims = [-.5,.9];  % [min,max] Envelope energy distribution comparing 
 % first half to second half of high energy envelope of click. If there is
@@ -77,10 +66,13 @@ detParams.dEvLims = [-.5,.9];  % [min,max] Envelope energy distribution comparin
 % in the second half (boats?) dEv<0. If it's about the same (beaked whale)
 % dEnv ~= 0 , but still allow a range...
 
-detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring 
-% clicks. Clicks that are far from neighbors can be rejected using this parameter,
-% good for dolphins in noisy environments because lone clicks or pairs of
-% clicks are likely false positives
+detParams.HRbuffer = 0.00025; % # of seconds to add on either side of area of interest
+detParams.delphClickDurLims = [30,1200];% [min,max] duration in microsec 
+% allowed for high energy envelope of click
+detParams.cutPeakBelowKHz = 15; % discard click if peak frequency below X kHz
+detParams.cutPeakAboveKHz = 80; % discard click if peak frequency above Y kHz 
+% detParams.minClick_us = 16;% Minimum duration of a click in us 
+% detParams.maxClick_us = 1500; % Max duration of a click including echos
 
 detParams.mergeThr = 100;% min gap between energy peaks in us. Anything less
 % will be merged into one detection the beginning of the next is fewer
@@ -96,14 +88,17 @@ detParams.energyPrctile = 70; % sets the threshold at which click start
 detParams.rmLonerClicks = false;
 detParams.rmEchos = false;
 detParams.lockOut = 0.01; % min gap between clicks in seconds, only used if rmEchos=TRUE
+detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring 
+% clicks. Clicks that are far from neighbors can be rejected using this parameter,
+% good for dolphins in noisy environments because lone clicks or pairs of
+% clicks are likely false positives
 
 %%% Saving options %%%
-detParams.saveNoise = 1; % Make 1 if you want to save noise samples with each click. 
+detParams.saveNoise = 0; % Make 1 if you want to save noise samples with each click. 
 % Beware: this can make big files if you have a lot of detections.
 detParams.saveForTPWS = 1; % Save just enough data to build TPWS files. Should help
 % limit metadata size.
-detParams.overwrite = false; % overwrite any existing detection files? 
-% Useful in case of a crash.
-
+detParams.verbose = 0;
+detParams.overwrite = 1;
 %%% Output file extensions. Probably don't need to be changed %%%
 detParams.ppExt = 'cHR';

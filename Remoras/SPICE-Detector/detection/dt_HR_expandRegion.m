@@ -5,8 +5,6 @@ N = length(energy);
 c_starts = nan(length(sStarts),1);   % init complete clicks to single/partial clicks
 c_stops = nan(length(sStarts),1);
 k=1;
-clickSampleLims = ceil((hdr.fs./1e6).*[p.delphClickDurLims(1)*.75,...
-    p.delphClickDurLims(2)*1.25]);
 
 dataSmooth = fn_fastSmooth(energy,15);
 
@@ -53,8 +51,8 @@ end
 throwIdx = zeros(size(c_stops));
 for k2 = 1:length(c_stops)
     % Discard short signals or those that run past end of signal
-    if c_stops(k2) >= N-2 || c_stops(k2) - c_starts(k2) < clickSampleLims(1) ||...
-            c_stops(k2) - c_starts(k2) > clickSampleLims(2)
+    if c_stops(k2) >= N-2 || c_stops(k2) - c_starts(k2) < p.clickSampleLims(1) ||...
+            c_stops(k2) - c_starts(k2) > p.clickSampleLims(2)
         
         throwIdx(k2,1) = 1;
     end

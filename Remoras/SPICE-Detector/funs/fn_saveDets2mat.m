@@ -5,10 +5,15 @@ clickTimes = cParams.clickTimes;
 ppSignal = cParams.ppSignalVec;
 yFiltBuff = cParams.yFiltBuffVec;
 specClickTf = cParams.specClickTfVec;
-
 if p.saveForTPWS % only save what you need to build a TPWS file
-    save(fileName,'clickTimes','ppSignal','f','hdr','specClickTf',...
-        'yFiltBuff','p','-mat','-v7.3');
+    if p.saveNoise
+        yNFilt = cParams.yNFiltVec;
+        save(fileName,'clickTimes','ppSignal','f','hdr','specClickTf',...
+            'yFiltBuff','yNFilt','p','-mat','-v7.3');
+    else
+        save(fileName,'clickTimes','ppSignal','f','hdr','specClickTf',...
+            'yFiltBuff','p','-mat','-v7.3');
+    end
 else 
     durClick = cParams.durClickVec;
     nDur = cParams.nDurVec;

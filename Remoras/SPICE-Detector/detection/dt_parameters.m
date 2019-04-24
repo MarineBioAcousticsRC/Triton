@@ -39,15 +39,15 @@ if p.saveNoise
     
     if ~isempty(noiseIn)
         yNFilt = filteredData(noiseIn(1):noiseIn(2));
-    
-    noiseWLen = length(yNFilt);
-    noiseWin = hann(noiseWLen);
-    wNoise = zeros(1,N);
-    wNoise(1:noiseWLen) = noiseWin.*yNFilt';
-    spNoise = 20*log10(abs(fft(wNoise,N)));
-    spNoiseSub = spNoise-sub;
-    spNoiseSub = spNoiseSub(:,1:N/2);
-    specNoiseTf = spNoiseSub(p.specRange)+p.xfrOffset;
+        
+        noiseWLen = length(yNFilt);
+        noiseWin = hann(noiseWLen);
+        wNoise = zeros(1,N);
+        wNoise(1:noiseWLen) = noiseWin.*yNFilt';
+        spNoise = 20*log10(abs(fft(wNoise,N)));
+        spNoiseSub = spNoise-sub;
+        spNoiseSub = spNoiseSub(:,1:N/2);
+        specNoiseTf = spNoiseSub(p.specRange)+p.xfrOffset;
     else
         yNFilt = [];
         specNoiseTf = [];

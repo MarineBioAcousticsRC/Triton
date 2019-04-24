@@ -3,7 +3,7 @@
 % Settings script for spice_detector
 
 % Parameters for both detector steps (low & high resolution):
-detParams.lowResDet = false; % run low resolution detector.
+detParams.lowResDet = true; % run low resolution detector.
 detParams.highResDet = true; % run high resolution detector.
 
 % Location of base directory containing directories of files to be analyzed

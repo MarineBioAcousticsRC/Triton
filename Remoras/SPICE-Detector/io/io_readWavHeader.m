@@ -103,9 +103,18 @@ else
     % determine timestamp
     [~,~,~,~,k] = regexp(shortName, DateRE);
     catDate = cell2mat(k{1});
-    hdr.start.dvec = [str2double(catDate(1:4)),str2double(catDate(5:6)),...
+    if length(catDate)==12
+        hdr.start.dvec = [str2double(catDate(1:2))+2000,str2double(catDate(3:4)),...
+        str2double(catDate(5:6)),str2double(catDate(7:8)),...
+        str2double(catDate(9:10)),str2double(catDate(11:12))];
+    elseif length(catDate)==14
+        hdr.start.dvec = [str2double(catDate(1:4)),str2double(catDate(5:6)),...
         str2double(catDate(7:8)),str2double(catDate(9:10)),...
         str2double(catDate(11:12)),str2double(catDate(13:14))];
+    else
+        error('Problem interpreting date from wave file name. Expected 12 or 14 digits.')
+    end
+
     hdr.start.dnum = datenum(hdr.start.dvec);
     hdr.xhd.year = hdr.start.dvec(1);          % Year
     hdr.xhd.month = hdr.start.dvec(2);         % Month

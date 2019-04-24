@@ -6,23 +6,29 @@ function dt_LR_batch(fullLabels,fullFiles,p)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 N = size(fullFiles,1);
-previousFs = 0; % make sure we build filters on first pass
+p.previousFs = 0; % make sure we build filters on first pass
 
 % get file type list
 fTypes = io_getFileType(fullFiles);
 
-for idx = 1:N  % "parfor" works here, parallellizing the process across as
+parfor idx = 1:N  % "parfor" works here, parallellizing the process across as
     % many cores as your machine has available.
     % It's faster, but the drawback is that if the code crashes,
     % it's hard to figure out where it was, and how many files
     % have been completed. It will also eat up your cpu.
     % You can use regular "for" too.
+    pTemp = p;
     outFileName = fullLabels{idx};
+    if ~pTemp.overwrite && exist(outFileName, 'file') == 2
+        fprintf('DetectionFile %s already exists.\n',outFileName)
+        fprintf('Overwrite option is false, skipping to next file.\n')
+        continue
+    end
     detections = []; % initialize
     
     % Pull in a file to examine
     currentRecFile = fullFiles{idx};
-    hdr = io_readXWAVHeader(currentRecFile,p,'fType',fTypes(idx));
+    hdr = io_readXWAVHeader(currentRecFile,pTemp,'fType',fTypes(idx));
     
     if isempty(hdr)
         warning(fprintf('No header info returned for file %s',...
@@ -33,28 +39,28 @@ for idx = 1:N  % "parfor" works here, parallellizing the process across as
     
     % Read the file header info
     if fTypes(idx) == 1 
-        [startsSec,stopsSec,p] = dt_LR_chooseSegments(p,hdr);
+        [startsSec,stopsSec,pTemp] = dt_LR_chooseSegments(pTemp,hdr);
     else
         % divide xwav by raw file
         [startsSec,stopsSec] = dt_chooseSegmentsRaw(hdr);
     end    
 
     % Build a bandpass filter on first pass or if sample rate has changed
-    if hdr.fs ~= previousFs
-        [previousFs,p] = fn_buildFilters(p,hdr.fs);
-        
+    if hdr.fs ~= pTemp.previousFs
+        [previousFs,pTemp] = fn_buildFilters(pTemp,hdr.fs);
+        pTemp.previousFs = previousFs;
         % also need to compute an amplitude threshold cutoff in counts
         % keep it conservative for now by using the transfer function
         % maximum across the band of interest
-        p = fn_interp_tf(p);
-        if ~isfield(p,'countThresh') || isempty(p.countThresh)
-            p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;
+        pTemp = fn_interp_tf(pTemp);
+        if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
+            pTemp.countThresh = (10^((pTemp.dBppThreshold - median(pTemp.xfrOffset))/20))/2;
         end
     end
     
     % Open audio file
     fid = fopen(currentRecFile, 'r');
-    buffSamples = p.LRbuffer*hdr.fs;
+    buffSamples = pTemp.LRbuffer*hdr.fs;
     % Loop through search area, running short term detectors
     for k = 1:length(startsSec)
         % Select iteration start and end
@@ -64,24 +70,24 @@ for idx = 1:N  % "parfor" works here, parallellizing the process across as
         % Read in data segment
         if strncmp(hdr.fType,'wav',3)
             data = io_readWav(fid, hdr, startK, stopK, 'Units', 's',...
-                'Channels', p.channel, 'Normalize', 'unscaled')';
+                'Channels', pTemp.channel, 'Normalize', 'unscaled')';
         else
-            data = io_readRaw(fid, hdr, k, p.channel);
+            data = io_readRaw(fid, hdr, k, pTemp.channel);
         end
         if isempty(data)
             warning('No data read from current file segment. Skipping.')
             continue
         end
         % bandpass
-        if p.filterSignal
-            filtData = filtfilt(p.fB,p.fA,data);
+        if pTemp.filterSignal
+            filtData = filtfilt(pTemp.fB,pTemp.fA,data);
         else
             filtData = data;
         end
         energy = filtData.^2;
         
         % Flag times when the amplitude rises above a threshold
-        aboveThreshold = find(energy>((p.countThresh^2)));        
+        aboveThreshold = find(energy>((pTemp.countThresh^2)));        
         
         % add a buffer on either side of detections.
         detStart = max((((aboveThreshold - buffSamples)/hdr.fs) + startK), startK);

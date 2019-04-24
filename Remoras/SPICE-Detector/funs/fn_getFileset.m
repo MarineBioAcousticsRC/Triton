@@ -1,18 +1,23 @@
 function fullLabels = fn_getFileset(p,detFiles)
 % Make list of what you're going to name your output files, for easy
-% reference later.
+% reference later. 
+% mimics file structure of original recordings
 fullLabels = cell(size(detFiles)); % .c files
 
 for f2 = 1:size(detFiles,1)
     thisFile = detFiles{f2,1};
-    [~, thisName, ext] = fileparts(thisFile);
-    thisName2 = [thisName,ext];
-    if strfind(thisName2,'.x.wav')
-        thisLabel = strrep(thisName2,'.x.wav','.c');
-    elseif strfind(thisName2,'.wav')
-        thisLabel = strrep(thisName2,'.wav','.c');
-    elseif strfind(thisName2,'.WAV')
-        thisLabel = strrep(thisName2,'.WAV','.c');
+    thisName = strrep(thisFile,p.baseDir,'');
+    if strfind(thisName,'.x.wav')
+        thisLabel = strrep(thisName,'.x.wav',['.',p.ppExt]);
+    elseif strfind(thisName,'.wav')
+        thisLabel = strrep(thisName,'.wav',['.',p.ppExt]);
+    elseif strfind(thisName,'.WAV')
+        thisLabel = strrep(thisName,'.WAV',['.',p.ppExt]);
     end
     fullLabels{f2,1} = fullfile(p.metaDir,thisLabel);
+    if ~isdir(fileparts(fullLabels{f2,1}))
+        mkdir(fileparts(fullLabels{f2,1}))
+    end
 end
+
+
