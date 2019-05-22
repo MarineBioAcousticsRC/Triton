@@ -25,11 +25,13 @@ elseif strcmp(action,'SetMaxClickDur')
 elseif strcmp(action,'SetMinBandpass')
     valuekHz = str2double(get(REMORA.spice_dt.MinBandPassEdText,'String'));
     REMORA.spice_dt.detParams.bpRanges(1,1) = max(valuekHz,0);
+    REMORA.spice_dt.detParams.rebuildFilter = 1;
     
 % Set high end of bandpass filter 
 elseif strcmp(action,'SetMaxBandpass')
     valuekHz = str2double(get(REMORA.spice_dt.MaxBandPassEdText,'String'));
     REMORA.spice_dt.detParams.bpRanges(1,2) = max(valuekHz,0); 
+    REMORA.spice_dt.detParams.rebuildFilter = 1;
 
 % Set minimum click peak frequency for detector
 elseif strcmp(action,'SetMinPeakFreq')
@@ -40,7 +42,7 @@ elseif strcmp(action,'SetMinPeakFreq')
 elseif strcmp(action,'SetMaxPeakFreq')
     valueKHz = str2double(get(REMORA.spice_dt.MaxPeakFreqEdTxt,'String'));
     REMORA.spice_dt.detParams.cutPeakAbovewKHz = max(valueKHz,0);
-    p.rebuildFilter
+    
 % Set maximum click peak frequency for detector
 elseif strcmp(action,'SetMinEnvRatio')
     valueERatio = str2double(get(REMORA.spice_dt.MinEvEdTxt,'String'));
@@ -51,10 +53,60 @@ elseif strcmp(action,'SetMaxEnvRatio')
     valueERatio = str2double(get(REMORA.spice_dt.MaxEvEdTxt,'String'));
     REMORA.spice_dt.detParams.dEvLims(2) = min(valueERatio,1);
     
-% Set maximum saturation of click detections 
+% Set maximum saturation of click detections
 elseif strcmp(action,'SetClipThreshold')
     maxSaturationRatio = str2double(get(REMORA.spice_dt.clipThresholdEdTxt, 'string'));
     REMORA.spice_dt.detParams.clipThreshold = max(min(maxSaturationRatio,1),0);
+    
+elseif strcmp(action,'setBaseDir')
+    baseDir = get(REMORA.spice_dt_verify.baseDirEdTxt, 'string');
+    REMORA.spice_dt.detParams.baseDir = baseDir;
+
+elseif strcmp(action,'setOutDir')
+    outDir = get(REMORA.spice_dt_verify.outDirEdTxt, 'string');
+    REMORA.spice_dt.detParams.outDir = outDir;
+    
+elseif strcmp(action,'setTFPath')
+    tfFullFile = get(REMORA.spice_dt_verify.TFPathEdTxt, 'string');
+    REMORA.spice_dt.detParams.tfFullFile = tfFullFile;   
+    
+elseif strcmp(action,'setDeployName')
+    deployName = get(REMORA.spice_dt_verify.deployNameEdTxt, 'string');
+    REMORA.spice_dt.detParams.depl = deployName;   
+    
+elseif strcmp(action,'setChannel')
+    channelNum = str2double(get(REMORA.spice_dt_verify.channelEdTxt, 'string'));
+    % TODO add check to verify valid channel
+    REMORA.spice_dt.detParams.channel = channelNum;   
+    
+elseif strcmp(action,'setOverwrite')
+    overWrite = get(REMORA.spice_dt_verify.overwriteCheck, 'Value');
+    REMORA.spice_dt.detParams.channel = overWrite;  
+    
+elseif strcmp(action,'SetRmIsolated')
+    rmLonerClicks = get(REMORA.spice_dt_verify.rmIsolatedCheckbox, 'Value');
+    REMORA.spice_dt.detParams.rmLonerClicks = rmLonerClicks; 
+    
+elseif strcmp(action,'SetMaxNeighbor')
+    maxNeighbor = str2double(get(REMORA.spice_dt_verify.maxNeighborEdTxt, 'string'));
+    REMORA.spice_dt.detParams.maxNeighbor = maxNeighbor;
+    
+elseif strcmp(action,'SetRmEcho')
+    rmLonerClicks = get(REMORA.spice_dt_verify.rmIsolatedCheckbox, 'Value');
+    REMORA.spice_dt.detParams.rmLonerClicks = rmLonerClicks;  
+elseif strcmp(action,'SetLockout')
+    
+elseif strcmp(action,'SetNoise')
+    
+elseif strcmp(action,'SetSaveforTPWS')
+elseif strcmp(action,'SetGuidedDetFile')
+elseif strcmp(action,'SetWaveRegExp')
+elseif strcmp(action,'SetLRBuffer')
+elseif strcmp(action,'SetMergeThreshold')
+elseif strcmp(action,'SetEnergyPercentile')
+elseif strcmp(action,'SetEnergyThr')
+elseif strcmp(action,'SetFilterOrder')
+elseif strcmp(action,'RunBatchDetection')
 end
 end
 

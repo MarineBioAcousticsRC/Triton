@@ -49,7 +49,7 @@ end
 if PARAMS.ltsa.nch(1) > 1
 
     prompt={['Enter which channel to LTSA from 1 to ',...
-        num2str(PARAMS.ltsa.nch),' : ']};
+        num2str(max(PARAMS.ltsa.nch)),' : ']};
 
     def={num2str(1)};
 

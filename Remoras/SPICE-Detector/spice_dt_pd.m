@@ -57,10 +57,9 @@ if strcmp(action, 'xwav')
 % dialog box - run full detector
 elseif strcmp(action,'full_detector')
     spice_setpointers('watch');
-    dt_runFullDetector;
+    ui_select_detector_settings;
     spice_setpointers('arrow');
 
-    
 end
 
 

@@ -99,6 +99,7 @@ end
 
 clickTimesPruned = clickTimes(delFlag==1,:); % apply deletions
 
+if ~isempty(outFileName)
 fidOut = fopen(outFileName,'w+');
 
 if ~isempty(clickTimesPruned)
@@ -111,3 +112,6 @@ else
 end
 
 fclose(fidOut);
+else
+    % fprintf('No output file written in gui mode.');
+end 

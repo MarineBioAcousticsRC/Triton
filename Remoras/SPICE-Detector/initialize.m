@@ -15,7 +15,7 @@ uimenu(REMORA.spice_dt.menu, 'Label', 'Batch run detector', ...
 
 spice_dt_initparams;  
 spice_dt_initwins;
-%spice_dt_initcontrol;
+spice_dt_initcontrol;
 %spice_dt_initconst;
 
 

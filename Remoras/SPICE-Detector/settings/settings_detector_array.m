@@ -2,13 +2,6 @@
 
 % Settings script for spice_detector
 
-% Parameters for both detector steps (low & high resolution):
-detParams.lowResDet = false; % run low resolution detector.
-detParams.highResDet = true; % run high resolution detector.
-
-% Control amount of messaging displayed in console.
-detParams.verbose = true;
-
 % Location of base directory containing directories of files to be analyzed
 detParams.baseDir = 'I:\GU1703\500kHz4ch';
 
@@ -30,7 +23,7 @@ detParams.bpRanges = [5000 100000]; % Bandpass filter parameters in Hz [min,max]
 detParams.filterOrder = 5; % butterworth filter order used for band pass
 detParams.dBppThreshold = 50; % minimum amplitude threshold in dB. 
 detParams.frameLengthUs = 2000; % For fft computation
-detParams.overlap = 0.50; % fft overlap
+% detParams.overlap = 0.50; % fft overlap
 detParams.clipThreshold = 0.98;%  Normalized clipping threshold btwn 0 and 1.  If empty, 
 % assumes no clipping. 
 
@@ -68,19 +61,14 @@ detParams.delphClickDurLims = [30,1200];% [min,max] duration in microsec
 % allowed for high energy envelope of click
 detParams.cutPeakBelowKHz = 10; % discard click if peak frequency below X kHz
 detParams.cutPeakAboveKHz = 100; % discard click if peak frequency above Y kHz 
-detParams.minClick_us = 16; % Minimum duration of a click in us 
-detParams.maxClick_us = 1500; % Max duration of a click including echos
+% detParams.minClick_us = 16; % Minimum duration of a click in us 
+% detParams.maxClick_us = 1500; % Max duration of a click including echos
 detParams.energyThr = 0.25; % n-percent energy threshold for envelope duration
 detParams.dEvLims = [-.5,.9];  % [min,max] Envelope energy distribution comparing 
 % first half to second half of high energy envelope of click. If there is
 % more energy in the first half of the click (dolphin) dEv >0, If it's more
 % in the second half (boats?) dEv<0. If it's about the same (beaked whale)
 % dEnv ~= 0 , but still allow a range...
-
-detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring 
-% clicks. Clicks that are far from neighbors can be rejected using this parameter,
-% good for dolphins in noisy environments because lone clicks or pairs of
-% clicks are likely false positives
 
 detParams.mergeThr = 100;% min gap between energy peaks in us. Anything less
 % will be merged into one detection the beginning of the next is fewer
@@ -94,6 +82,11 @@ detParams.energyPrctile = 70; % sets the threshold at which click start
 
 %%% POST PROCESSING FLAGS %%%%%%%%
 detParams.rmLonerClicks = false;
+detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring 
+% clicks. Clicks that are far from neighbors can be rejected using this parameter,
+% good for dolphins in noisy environments because lone clicks or pairs of
+% clicks are likely false positives
+
 detParams.rmEchos = false;
 detParams.lockOut = 0.01; % min gap between clicks in seconds, only used if rmEchos=TRUE
 
@@ -104,6 +97,9 @@ detParams.saveForTPWS = 1; % Save just enough data to build TPWS files. Should h
 % limit metadata size.
 detParams.overwrite = false; % overwrite any existing detection files? 
 % Useful in case of a crash.
+
+% Control amount of messaging displayed in console.
+detParams.verbose = true;
 
 %%% Output file extensions. Probably don't need to be changed %%%
 detParams.ppExt = 'cHR';

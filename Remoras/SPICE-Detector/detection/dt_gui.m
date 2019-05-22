@@ -9,7 +9,7 @@ if isempty(REMORA.spice_dt.detParams.tfFullFile)
     % if the user changes the tf, this will not update it.
 end
 
-if REMORA.spice_dt.detParams.rebuildFilter
+if isfield(REMORA.spice_dt.detParams,'rebuildFilter')&&(REMORA.spice_dt.detParams.rebuildFilter)
     % triggers if band pass is changed
     [~,REMORA.spice_dt.detParams] = fn_buildFilters(REMORA.spice_dt.detParams,PARAMS.fs);
     REMORA.spice_dt.detParams.rebuildFilter = 0;
@@ -26,8 +26,12 @@ end
 cParams = dt_init_cParams(p); % set up storage for HR output.
 sIdx = 1;
 buffSamples = p.LRbuffer*PARAMS.fs;
-filtData = filtfilt(p.fB,p.fA,DATA');
-
+if size(DATA,1)> size(DATA,2)
+    filtData = filtfilt(p.fB,p.fA,DATA(:,PARAMS.ch));
+    filtData = filtData';
+else
+    filtData = filtfilt(p.fB,p.fA,DATA(PARAMS.ch,:)');
+end
 energy = filtData.^2;
 
 [detectionsSample,detectionsSec] =  dt_LR(energy,PARAMS,buffSamples,...
@@ -52,7 +56,7 @@ if ~isempty(detectionsSample)
             [clickDets,f] = dt_parameters(noise,filtSegment,p,clicks,PARAMS);
             if ~isempty(clickDets.clickInd)
                 [cParams,sIdx] = dt_populate_cParams(clicks,p,clickDets,...
-                    0,PARAMS,sIdx,cParams);
+                    detectionsSample(iD,1)./PARAMS.fs,PARAMS,sIdx,cParams);
                 
             end
         end

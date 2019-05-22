@@ -2,7 +2,8 @@ function ui_select_detector_settings
 
 global PARAMS
 
-hFigure = figure('Position',[560,528,200,200]);
+hFigure = figure('Position',[560,528,200,200],...
+    'NumberTitle','off','Name','Spice Detector Batch Run - v1.0');
 clf
 set(hFigure, 'MenuBar', 'none');
 set(hFigure, 'ToolBar', 'none');
@@ -14,26 +15,27 @@ t1 = uicontrol('Style','text',...
     'FontSize',10);
 
 bg = uibuttongroup('Visible','on',...
-    'Position',[0 0 1 1],...
+    'Position',[0 0 1 .70],...
     'SelectionChangedFcn',@bselection);
 
 b1 = uicontrol(bg,'Style','pushbutton',...
     'String','Load from file',...
-    'Position',[10 105 180 30],...
+    'Position',[10 100 180 30],...
     'HandleVisibility','off',...
-    'Callback',{@load_params_from_mfile,hFigure});
+    'Callback',{@ui_load_params_from_mfile,hFigure});
 
 
 b2 = uicontrol(bg,'Style','pushbutton',...
     'String','Use current (interactive) settings',...
-    'Position',[10 15 180 30],...
-    'HandleVisibility','off');
+    'Position',[10 50 180 30],...
+    'HandleVisibility','off',...
+    'Callback',{@ui_check_detParams,hFigure});
 % need to add callback here
 
 bg.Visible = 'on';
 end
 
-function load_params_from_mfile(hObject,eventdata,hFigure)
+function ui_load_params_from_mfile(hObject,eventdata,hFigure)
  
 dialogTitle = 'Choose detector settings file';
 
@@ -46,4 +48,5 @@ run(detParamsFile)
 global REMORA
 REMORA.spice_dt.detParams = detParams;
 close(hFigure)
+ui_check_detParams
 end

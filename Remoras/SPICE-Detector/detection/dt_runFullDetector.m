@@ -2,14 +2,11 @@ function dt_runFullDetector()
 
 global REMORA
 
-% Load settings or use current settings
-ui_select_detector_settings;
-
 
 detParams = REMORA.spice_dt.detParams;
+disp_msg('Starting detector on directory of files');
+disp_msg('Detector progress will appear in Matlab console');
 
-% Fill in folders, transfer function info
-
-
+disp('Starting Spice detector')
 % Call spice detector 
 spice_detector(detParams);

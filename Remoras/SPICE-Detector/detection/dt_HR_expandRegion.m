@@ -51,8 +51,8 @@ end
 throwIdx = zeros(size(c_stops));
 for k2 = 1:length(c_stops)
     % Discard short signals or those that run past end of signal
-    if c_stops(k2) >= N-2 || c_stops(k2) - c_starts(k2) < p.clickSampleLims(1) ||...
-            c_stops(k2) - c_starts(k2) > p.clickSampleLims(2)
+    if c_stops(k2) >= N-2 || c_stops(k2) - c_starts(k2) < p.delphClickDurLims(1) ||...
+            c_stops(k2) - c_starts(k2) > p.delphClickDurLims(2)
         
         throwIdx(k2,1) = 1;
     end
