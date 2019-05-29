@@ -1,16 +1,15 @@
-function dt_control(action)
-global REMORA PARAMS HANDLES
+function dt_control(action,mySource)
+global REMORA
 
 if strcmp(action, '')
+% Note: could make this have an option to just refresh everything by making
+% these all into if rather than elseif
 
 % Set RL threshold for detector
 elseif strcmp(action,'setPPThreshold')
     valueDBpp = str2double(get(REMORA.spice_dt.PPThresholdEdTxt,'String'));
     REMORA.spice_dt.detParams.dBppThreshold = max(valueDBpp,1);
-%     REMORA.spice_dt.params.Ranges(REMORA.spice_dt.params.ClickPos,1) = ...
-%         dt_verifyRange('Min Broadband freq', 0, PARAMS.fmax, ValueHz, 0, ...
-%         REMORA.dt.MinBBFreqEdtxt);
-%               
+    
 % Set minimum click duration for detector  
 elseif strcmp(action,'SetMinClickDur')
     valueMuSec = str2double(get(REMORA.spice_dt.MinClickDurEdText,'String'));
@@ -146,5 +145,9 @@ elseif strcmp(action,'SetFilterOrder')
 elseif strcmp(action,'RunBatchDetection')
     dt_runFullDetector()
 end
+
+if strcmp(mySource, 'gui')
+    dt_gui
+    sp_plot_detections
 end
 

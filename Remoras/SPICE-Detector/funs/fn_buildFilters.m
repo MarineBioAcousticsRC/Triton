@@ -22,7 +22,7 @@ if p.bpRanges(1)== 0
     end
 end
 % 2) High passs
-if p.bpRanges(2)== fs/2 && p.filterSignal
+if p.bpRanges(2)>= fs/2 && p.filterSignal
     % they only specified a lower freqency cutoff, so we need a high pass
     % filter
     bandPassRange = p.bpRanges(1);
@@ -45,7 +45,7 @@ end
 p.fftWindow = hann(p.fftSize)';
 
 lowSpecIdx = round(p.bpRanges(1)/fs*p.fftSize);
-highSpecIdx = round(p.bpRanges(2)/fs*p.fftSize);
+highSpecIdx = round(min(p.bpRanges(2),fs/2)/fs*p.fftSize);
 
 p.specRange = lowSpecIdx:highSpecIdx;
 p.binWidth_Hz = fs / p.fftSize;

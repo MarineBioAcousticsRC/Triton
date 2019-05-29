@@ -23,7 +23,6 @@ detParams.bpRanges = [5000 100000]; % Bandpass filter parameters in Hz [min,max]
 detParams.filterOrder = 5; % butterworth filter order used for band pass
 detParams.dBppThreshold = 50; % minimum amplitude threshold in dB. 
 detParams.frameLengthUs = 2000; % For fft computation
-% detParams.overlap = 0.50; % fft overlap
 detParams.clipThreshold = 0.98;%  Normalized clipping threshold btwn 0 and 1.  If empty, 
 % assumes no clipping. 
 
@@ -69,6 +68,14 @@ detParams.dEvLims = [-.5,.9];  % [min,max] Envelope energy distribution comparin
 % more energy in the first half of the click (dolphin) dEv >0, If it's more
 % in the second half (boats?) dEv<0. If it's about the same (beaked whale)
 % dEnv ~= 0 , but still allow a range...
+
+detParams.HRbuffer = 0.00025; % # of seconds to add on either side of area of interest
+detParams.delphClickDurLims = [30,1200];% [min,max] duration in microsec 
+% allowed for high energy envelope of click
+detParams.cutPeakBelowKHz = 5; % discard click if peak frequency below X kHz
+detParams.cutPeakAboveKHz = 100; % discard click if peak frequency above Y kHz 
+% detParams.minClick_us = 16;% Minimum duration of a click in us 
+% detParams.maxClick_us = 1500; % Max duration of a click including echos
 
 detParams.mergeThr = 100;% min gap between energy peaks in us. Anything less
 % will be merged into one detection the beginning of the next is fewer

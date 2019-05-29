@@ -1,7 +1,7 @@
 function noiseTimes = dt_getNoise(candidatesRel,dataLen,p,hdr)
 % Get noise
 
-maxClickSamples = p.clickSampleLims(2);
+maxClickSamples = p.delphClickDurLims(2);
 noiseTimes = [];
 candidatesRelwEnds = [1,candidatesRel,dataLen];
 dCR = diff(candidatesRelwEnds);

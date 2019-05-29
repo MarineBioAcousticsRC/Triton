@@ -4,7 +4,7 @@ global PARAMS REMORA DATA
 REMORA.spice_dt.guiDets = [];
 
 if isempty(REMORA.spice_dt.detParams.tfFullFile)
-    disp_msg('loading transfer function')
+    %disp_msg('loading transfer function')
     REMORA.spice_dt.detParams.tfFullFile = PARAMS.tf.filename;
     % if the user changes the tf, this will not update it.
 end
@@ -13,12 +13,13 @@ if isfield(REMORA.spice_dt.detParams,'rebuildFilter')&&(REMORA.spice_dt.detParam
     % triggers if band pass is changed
     [~,REMORA.spice_dt.detParams] = fn_buildFilters(REMORA.spice_dt.detParams,PARAMS.fs);
     REMORA.spice_dt.detParams.rebuildFilter = 0;
-    
+    p = REMORA.spice_dt.detParams;
+    p = fn_interp_tf(p);
+    REMORA.spice_dt.detParams = p;
+else
+    p = REMORA.spice_dt.detParams;
 end
 
-p = REMORA.spice_dt.detParams;
-
-p = fn_interp_tf(p);
 
 if ~isfield(p,'countThresh') || isempty(p.countThresh)
     p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;

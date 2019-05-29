@@ -28,8 +28,8 @@ set(REMORA.spice_dt.back, 'Enable', ...
 
 % next part runs for everything, which is why refresh will work
 % Run detection on current spectrogram plot (if spectrogram open)
-if ~isempty(REMORA.spice_dt.guiDets)
-    sp_plot_detections;
+%if ~isempty(REMORA.spice_dt.guiDets)
+sp_plot_detections;
 %         dtST_signal(PARAMS.pwr, PARAMS.fs, PARAMS.nfft, PARAMS.overlap, ...
 %             PARAMS.f, true, 'Ranges', REMORA.dt.params.Ranges , ...
 %             'MinClickSaturation', REMORA.dt.params.MinClickSaturation, ...
@@ -40,7 +40,7 @@ if ~isempty(REMORA.spice_dt.guiDets)
 %             'MeanAve_s', REMORA.dt.params.MeanAve_s, ...
 %             'WhistlePos', REMORA.dt.params.WhistlePos, ...
 %             'ClickPos', REMORA.dt.params.ClickPos);
-    end
+%    end
 end
 
 % check for classification labels

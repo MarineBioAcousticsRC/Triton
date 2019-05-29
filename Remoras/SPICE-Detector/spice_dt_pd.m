@@ -29,18 +29,18 @@ if strcmp(action, 'xwav')
 %             spice_dt_initwins;
 %             spice_dt_initcontrol;
             
-            % Detection Parameters pulldown 
-            % make sure that the save/load params pd is recreated after
-            % closing/reopening interactive detector
-            REMORA.spice_dt.fig.filemenu = uimenu(REMORA.fig.spice_dt,'Label','Save/Load Params',...
-                'Enable','on','Visible','on');
-
-            % Spectrogram load/save params
-            uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Load Detector ParamFile',...
-                'Callback','spice_dt_paramspd(''spice_dt_paramload'')');
-            uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Save Detector ParamFile',...
-                'Callback','spice_dt_paramspd(''spice_dt_paramsave'')');
-            
+%             % Detection Parameters pulldown 
+%             % make sure that the save/load params pd is recreated after
+%             % closing/reopening interactive detector
+%             REMORA.spice_dt.fig.filemenu = uimenu(REMORA.fig.spice_dt,'Label','Save/Load Params',...
+%                 'Enable','on','Visible','on');
+% 
+%             % Spectrogram load/save params
+%             uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Load Detector ParamFile',...
+%                 'Callback','spice_dt_paramspd(''spice_dt_paramload'')');
+%             uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Save Detector ParamFile',...
+%                 'Callback','spice_dt_paramspd(''spice_dt_paramsave'')');
+%             
 %        end
 %    end
      

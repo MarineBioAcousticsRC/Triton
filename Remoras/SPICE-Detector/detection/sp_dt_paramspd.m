@@ -15,23 +15,20 @@ function sp_dt_paramspd(action)
 global PARAMS HANDLES REMORA
 
 % load a saved parameters file (spectrogram)
-if strcmp(action,'STparamload')
+if strcmp(action,'spice_settingsLoad')
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    boxTitle1 = 'Open Triton Spectrogram Parameter File';
-    filterSpec1 = '*.spec.prm';
-    [REMORA.dt.paramfile,REMORA.dt.parampath]=uigetfile(filterSpec1,boxTitle1);
+    dialogTitle1 = 'Open Detector Settings File';
+    thisPath = mfilename('fullpath');
+    [REMORA.spice_dt.paramfile,REMORA.spice_dt.parampath] = ...
+        uigetfile(fullfile(fileparts(fileparts(thisPath)),...
+        'settings\*.m*'),dialogTitle1);
     % give user some feedback
-    if isscalar(REMORA.dt.paramfile)
-      return    % User canceled
+    if isscalar(REMORA.spice_dt.paramfile)
+      return    % User cancelled
     end
-    fname = fullfile(REMORA.dt.parampath,REMORA.dt.paramfile);
-    1;
-    
-    ioLoadSpecgramParams(fname, REMORA.dt);
-
-    
+    sp_dt_load_settings
 % save a parameters file (spectrogram)
-elseif strcmp(action,'STparamsave')
+elseif strcmp(action,'spice_settingsSave')
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
     % user interface retrieve file to open through a dialog box
     boxTitle1 = 'Parameter Save As';
