@@ -6,7 +6,7 @@ function ui_check_detParams
 % Verify settings in GUI before running on entire drive.
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global REMORA PARAMS HANDLES DATA
+global REMORA
 
 defaultPos = [0.25,0.25,0.5,0.5];
 REMORA.fig.spice_dt_verify = figure( ...
@@ -24,7 +24,7 @@ c = 4;  % columns
 h = 1/r;
 w = 1/c;
 dy = h * 0.8;
-dx = 0.008;
+% dx = 0.008;
 ybuff = h*.2;
 % y position (relative units)
 y = 1:-h:0;
