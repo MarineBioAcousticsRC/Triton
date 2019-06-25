@@ -6,7 +6,7 @@ global REMORA HANDLES
 if get(HANDLES.display.specgram, 'Value') == 1
     specH = HANDLES.subplt.specgram;
     if isfield(REMORA.spice_dt,'specMarkerHandle')
-        delete(REMORA.spice_dt.specMarkerHandle);
+        % delete(REMORA.spice_dt.specMarkerHandle);
         REMORA.spice_dt.specMarkerHandle = [];
     end
     if ~isempty(REMORA.spice_dt.guiDets)
@@ -22,7 +22,7 @@ end
 if get(HANDLES.display.timeseries, 'Value') == 1
     specTS = HANDLES.subplt.timeseries;
     if isfield(REMORA.spice_dt,'timeMarkerHandle')
-        delete(REMORA.spice_dt.timeMarkerHandle);
+        %delete(REMORA.spice_dt.timeMarkerHandle);
         REMORA.spice_dt.timeMarkerHandle = [];
     end
     if ~isempty(REMORA.spice_dt.guiDets)
