@@ -25,7 +25,7 @@ function spWriteFeatureDataHTK(File, FramesByRow, FrameAdvanceMS, Kind)
         end
         
         % Reset field
-        encoding = bitand(encoding, bitcmp(BitMasks(field), 32));
+        encoding = bitand(encoding, 2^32 - BitMasks(field));
         % Set to user specified value
         if nargin == 3
             % Take advantage of the only non flag value
