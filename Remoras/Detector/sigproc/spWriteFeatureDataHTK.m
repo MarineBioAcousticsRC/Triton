@@ -85,7 +85,7 @@ ParamKinds = {
 BitShifts = cumsum(FieldSize);
 BitShifts = [0; BitShifts(1:end-1)];
 % Construct bit masks
-BitMasks = bitshift(bitcmp(zeros(size(FieldSize)), FieldSize), BitShifts);
+BitMasks = bitshift(2.^FieldSize-1, BitShifts);
 encoding = 0;
 
 if isstruct(Kind)

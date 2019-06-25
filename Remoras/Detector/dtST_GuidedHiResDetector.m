@@ -21,7 +21,7 @@ end
 % default window size too small for this dialog, currently specifying
 % position in normalized space but we might want to do it pixels...
 handles.ContainingFig = figure( ...
-    'Name', 'Short Time Guided High Resolution Click Detection V2', ...
+    'Name', 'Short Time Guided High Resolution Click Detection', ...
     'Toolbar', 'None', 'Units', 'normalized', 'Position', [.1 .1 .7 .7], ...
     'MenuBar', 'none', 'NumberTitle', 'off');
 
@@ -29,7 +29,7 @@ handles.ContainingFig = figure( ...
 handles = guComponentLoad(handles.ContainingFig, [], handles, ...
     'guGetDir', BaseDir);
 handles = guComponentLoad(handles.ContainingFig, [], handles, ...
-    'guFeatureExtractionComponent_v2');
+    'guFeatureExtractionComponent');
 handles = guComponentLoad(handles.ContainingFig, [], handles, ...
     'guConfirmComponent');
 
@@ -45,7 +45,7 @@ if ishandle(handles.ContainingFig)
   handles = guidata(handles.ContainingFig);     % get fresh copy of handles 
   % User did not press close box
   if ~ handles.guConfirmComponent.canceled
-    FeatParams = guFeatureExtractionComponent_v2('OutputFcn', handles.ContainingFig, ...
+    FeatParams = guFeatureExtractionComponent('OutputFcn', handles.ContainingFig, ...
         [], handles);
     % Where will metadata be stored
     metaDir = guGetDir('guGetDir_OutputFcn', handles.ContainingFig, [], handles);
@@ -69,24 +69,24 @@ if ishandle(handles.ContainingFig)
     OptArgs = {};
     
     group = false;
-%     if isfield(FeatParams, 'maxsep_s')
-%       if FeatParams.maxsep_s > 0
-%           OptArgs{end+1} = 'MaxSep_s';
-%           OptArgs{end+1} = FeatParams.maxsep_s;
-%           group = true;
-%       end
-%     end
-%     if isfield(FeatParams, 'maxlen_s')
-%         if FeatParams.maxlen_s > 0
-%             OptArgs{end+1} = 'MaxClickGroup_s';
-%             OptArgs{end+1} = FeatParams.maxlen_s;
-%             group = true;
-%         end
-%     end
-%     if group
-%         OptArgs{end+1} = 'GroupAnnotExt';
-%         OptArgs{end+1} = 'gTg';
-%     end
+    if isfield(FeatParams, 'maxsep_s')
+      if FeatParams.maxsep_s > 0
+          OptArgs{end+1} = 'MaxSep_s';
+          OptArgs{end+1} = FeatParams.maxsep_s;
+          group = true;
+      end
+    end
+    if isfield(FeatParams, 'maxlen_s')
+        if FeatParams.maxlen_s > 0
+            OptArgs{end+1} = 'MaxClickGroup_s';
+            OptArgs{end+1} = FeatParams.maxlen_s;
+            group = true;
+        end
+    end
+    if group
+        OptArgs{end+1} = 'GroupAnnotExt';
+        OptArgs{end+1} = 'gTg';
+    end
 
     if isfield(FeatParams, 'meanssub')
       OptArgs{end+1} = 'MeansSub';
@@ -107,39 +107,37 @@ if ishandle(handles.ContainingFig)
         OptArgs{end+1} = 'MaxFramesPerClick';
         OptArgs{end+1} = FeatParams.MaxFramesPerClick;
     end
-%     if isfield(FeatParams, 'Narrowband')
-%         OptArgs{end+1} = 'FilterNarrowband';
-%         OptArgs{end+1} = FeatParams.Narrowband;
-%     end
+    if isfield(FeatParams, 'Narrowband')
+        OptArgs{end+1} = 'FilterNarrowband';
+        OptArgs{end+1} = FeatParams.Narrowband;
+    end
      
-    if isfield(FeatParams, 'SpecAnalyRng')
-        OptArgs{end+1} = 'LowFreq';
-        OptArgs{end+1} = FeatParams.SpecAnalyRng(1)*1000;  % kHz -> Hz
-        OptArgs{end+1} = 'HighFreq';
-        OptArgs{end+1} = FeatParams.SpecAnalyRng(2)*1000;
-    end
+%     if isfield(FeatParams, 'SpecAnalyRng')
+%         OptArgs{end+1} = 'LowFreq';
+%         OptArgs{end+1} = FeatParams.SpecAnalyRng(1)*1000;  % kHz -> Hz
+%         OptArgs{end+1} = 'HighFreq';
+%         OptArgs{end+1} = FeatParams.SpecAnalyRng(2)*1000;
+%     end
     if isfield(FeatParams, 'PeakRange')
-        OptArgs{end+1} = 'LowPeakLimitHz';
-        OptArgs{end+1} = FeatParams.PeakRange(1)*1000; % kHz -> Hz
-        OptArgs{end+1} = 'HighPeakLimitHz';
-        OptArgs{end+1} = FeatParams.PeakRange(2)*1000; % kHz -> Hz
+        OptArgs{end+1} = 'PeakFreqLim';
+        OptArgs{end+1} = FeatParams.PeakRange*1000; % kHz -> Hz
     end
 	
-    if isfield(FeatParams, 'Saturation')
-        OptArgs{end+1} = 'MinSaturationPerc';
-        OptArgs{end+1} = FeatParams.Saturation(1); % kHz -> Hz
-        OptArgs{end+1} = 'MaxSaturationPerc';
-        OptArgs{end+1} = FeatParams.Saturation(2); % kHz -> Hz
-        OptArgs{end+1} = 'ClickThreshold';
-        OptArgs{end+1} = FeatParams.Saturation(3); % kHz -> Hz
-    end
+%     if isfield(FeatParams, 'Saturation')
+%         OptArgs{end+1} = 'MinSaturationPerc';
+%         OptArgs{end+1} = FeatParams.Saturation(1); % kHz -> Hz
+%         OptArgs{end+1} = 'MaxSaturationPerc';
+%         OptArgs{end+1} = FeatParams.Saturation(2); % kHz -> Hz
+%         OptArgs{end+1} = 'ClickThreshold';
+%         OptArgs{end+1} = FeatParams.Saturation(3); % kHz -> Hz
+%     end
 	
-    if isfield(FeatParams, 'Saturation')
-		if FeatParams.EchoSounder
-			OptArgs{end+1} = 'PingAnnotExt';
-			OptArgs{end+1} = 'ech';
-		end
-    end
+%     if isfield(FeatParams, 'Saturation')
+% 		if FeatParams.EchoSounder
+% 			OptArgs{end+1} = 'PingAnnotExt';
+% 			OptArgs{end+1} = 'ech';
+% 		end
+%     end
     
     debug = false;
     if debug
@@ -148,9 +146,10 @@ if ishandle(handles.ContainingFig)
     end
 
     FeatureType = FeatParams.FeatureType;
-    dtShortHighRes(Files, ...
+    dtHighResClickBatch(Files, labels, ...
                         'DateRegexp', TimeRE, ...
                         'FeatureExt', FeatureType, ...
+                        'FeatureId', FeatParams.FeatureID, ...
                         'ClickAnnotExt', 'cTg', ...
                         'Viewpath', {metaDir, BaseDir}, ...
                         OptArgs{:});
