@@ -1,4 +1,4 @@
-function dtShip_batch
+function dt_ship_batch
 % dtShip_batch(BaseDir, DataFiles, PARAMS, DetParams, varargin)
 %
 % Run the long time ship detection algorithm on a set of files which are
@@ -21,24 +21,15 @@ function dtShip_batch
 global REMORA PARAMS
 
 % detection parameters (%%%%%%%%% parameters to add in the settings file)
-REMORA.ship_dt.settings.REWavExt= '(\.x)?\.wav';   % data files must end in this regular expression
-REMORA.ship_dt.settings.RELtsaExt = '.s';   % Ship - Long term detection label extension
-REMORA.ship_dt.settings.thrClose = 150;
-REMORA.ship_dt.settings.thrDistant = 250;
-REMORA.ship_dt.settings.thrRL = 0.1;
+% % % % REMORA.ship_dt.settings.REWavExt= '(\.x)?\.wav';   % data files must end in this regular expression
+% % % % REMORA.ship_dt.settings.RELtsaExt = '.s';   % Ship - Long term detection label extension
 
-% get detection parameters (%%%%%%%%% parameters to add in the settings file)
-durWind = REMORA.ship_dt.ltsa.tseg.sec; % window length in seconds
+% get detection parameters
+durWind = REMORA.ship_dt.settings.durWind;
+slide = REMORA.ship_dt.settings.slide;
+errorRange = REMORA.ship_dt.settings.errorRange;
 
-% overlap between windows, get it from user for now
-SecPerHr = 3600;    % secs per hour
 sec2dnum = 60*60*24; % conversion factor to get from seconds to matlab datenum
-prompt = {sprintf(['Ship detector performs over 3 overlapping windows.',...
-    '\nWindow sliding time (in hours):'])};
-answer = inputdlg(prompt,'UserInput',1,{num2str(REMORA.ship_dt.ltsa.tseg.hr/4)});
-REMORA.ship_dt.ltsa.slide = str2num(answer{:});
-slide_s = REMORA.ship_dt.ltsa.slide * SecPerHr;
-
 tic;  % Note start time
 
 % Initialize
@@ -58,10 +49,7 @@ fileEnds = [fileStarts(2:end) - 1, size(REMORA.ship_dt.ltsahd.rfileid, 2)];
 fileDur = arrayfun(@(x) sum(REMORA.ship_dt.ltsa.dur(1:x)),fileEnds-fileStarts+1);
 
 % create s. files in output directory
-fn_creatTxtFiles(wavNames,REMORA.ship_dt.settings)
-
-% 25% error of start/end time between overlays of a 2h window
-errorRange = (.25*durWind)/REMORA.ship_dt.ltsa.tave;
+% fn_creatTxtFiles(wavNames,REMORA.ship_dt.settings)
 
 % how many windows will be used to process ltsa
 TotalWindows = ceil(REMORA.ship_dt.ltsa.durtot/durWind);
@@ -84,7 +72,7 @@ for itr1 = 1:TotalWindows
     pwr = fn_readPwrSnippet(sSnippet,eSnippet);
     
     % Find ship passages from the snipped of data
-    [ships,labels,RL] = dtShip_signal(pwr,'all',0);
+    [ships,labels,RL] = dt_ship_signal(pwr,0);
     
     %%% Overlapping windows
     % Previous window
@@ -107,7 +95,7 @@ for itr1 = 1:TotalWindows
     pwr = fn_readPwrSnippet(prevStart,prevStop);
     
     % Find ship passages from the snipped of data
-    [shipsPrev,labelsPrev,~] = dtShip_signal(pwr,'all',0);
+    [shipsPrev,labelsPrev,~] = dt_ship_signal(pwr,0);
     
     % Get corresponding time to central window
     shipsPrev = shipsPrev - sum(REMORA.ship_dt.ltsa.nave(1:prevStart-sSnippet));
@@ -132,7 +120,7 @@ for itr1 = 1:TotalWindows
     pwr = fn_readPwrSnippet(postStart,postStop);
     
     % Find ship passages from the snipped of data
-    [shipsPost,labelsPost,~] = dtShip_signal(pwr,'all',0);
+    [shipsPost,labelsPost,~] = dt_ship_signal(pwr,0);
     
     % Get corresponding time to central window
     shipsPost = shipsPost + sum(REMORA.ship_dt.ltsa.nave(1:postStart-sSnippet));
@@ -214,30 +202,30 @@ for itr1 = 1:TotalWindows
             ifiles = sidx:eidx;
             detLabel = selectLabels{itr5};
             
-            if length(ifiles) == 1
-                
-                det = [shipRef_s(itr5,1) + sRefWavdur, shipRef_s(itr5,2) + eRefWavdur];
-                fn_saveDets2txt(det,detLabel,ifiles,wavNames,REMORA.ship_dt.settings)
-                
-            elseif length(ifiles) > 1
-                % detection spans multiple files
-                % start time
-                det = [shipRef_s(itr5,1) + sRefWavdur,fileDur(ifiles(1))];
-                fn_saveDets2txt(det,detLabel,ifiles(1),wavNames,REMORA.ship_dt.settings)
-                
-                % end time
-                det = [0,shipRef_s(itr5,2) + eRefWavdur];
-                fn_saveDets2txt(det,detLabel,ifiles(end),wavNames,REMORA.ship_dt.settings)
-                
-                % files between, detection span the entire file
-                if length(ifiles) >= 3
-                    for itr6 = 2:length(ifiles)-1
-                        det = [0,fileDur(ifiles(itr6))];
-                        fn_saveDets2txt(det,detLabel,ifiles(itr6),wavNames,...
-                            REMORA.ship_dt.settings)
-                    end
-                end
-            end
+%             if length(ifiles) == 1
+%                 
+%                 det = [shipRef_s(itr5,1) + sRefWavdur, shipRef_s(itr5,2) + eRefWavdur];
+%                 fn_saveDets2txt(det,detLabel,ifiles,wavNames,REMORA.ship_dt.settings)
+%                 
+%             elseif length(ifiles) > 1
+%                 % detection spans multiple files
+%                 % start time
+%                 det = [shipRef_s(itr5,1) + sRefWavdur,fileDur(ifiles(1))];
+%                 fn_saveDets2txt(det,detLabel,ifiles(1),wavNames,REMORA.ship_dt.settings)
+%                 
+%                 % end time
+%                 det = [0,shipRef_s(itr5,2) + eRefWavdur];
+%                 fn_saveDets2txt(det,detLabel,ifiles(end),wavNames,REMORA.ship_dt.settings)
+%                 
+%                 % files between, detection span the entire file
+%                 if length(ifiles) >= 3
+%                     for itr6 = 2:length(ifiles)-1
+%                         det = [0,fileDur(ifiles(itr6))];
+%                         fn_saveDets2txt(det,detLabel,ifiles(itr6),wavNames,...
+%                             REMORA.ship_dt.settings)
+%                     end
+%                 end
+%             end
             
         end
         
@@ -263,14 +251,16 @@ if ~isempty(populateTimes)
     % save all detections with real datenums in a mat file
     filename = split(REMORA.ship_dt.ltsa.infile,'.ltsa');
     matname = ['Ship_detections_',filename{1},'.mat'];
-    save(fullfile(REMORA.ship_dt.settings.outpath,matname),'shipTimes',...
+    save(fullfile(REMORA.ship_dt.settings.outDir,matname),'shipTimes',...
         'shipLabels','shipRL','-mat','-v7.3');
-    fprintf('Detections saved at: %s\n',fullfile(REMORA.ship_dt.settings.outpath,matname));
+    fprintf('Detections saved at: %s\n',fullfile(REMORA.ship_dt.settings.outDir,matname));
     
     % save labels
-    labelname = ['Ship_labels_',filename{1},'.tlab'];
-    ioWriteLabel(fullfile(REMORA.ship_dt.settings.outpath,labelname), shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
-    fprintf('Labels saved at: %s\n',fullfile(REMORA.ship_dt.settings.outpath,labelname));
+    if REMORA.ship_dt.settings.saveLabels
+        labelname = ['Ship_labels_',filename{1},'.tlab'];
+        ioWriteLabel(fullfile(REMORA.ship_dt.settings.outDir,labelname), shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+        fprintf('Labels saved at: %s\n',fullfile(REMORA.ship_dt.settings.outDir,labelname));
+    end
 
 else
     fprintf('No detections in file: %s\n',...
@@ -279,11 +269,4 @@ end
 
 fprintf('LTSA batch detection completed (%d files, processing time: %s)\n', ...
     REMORA.ship_dt.ltsa.nxwav, sectohhmmss(toc));
-
-% %
-% %
-% %
-% %     % sort detections
-% %     [ships_s,isort] = sort(ships_s,1);
-% %
 

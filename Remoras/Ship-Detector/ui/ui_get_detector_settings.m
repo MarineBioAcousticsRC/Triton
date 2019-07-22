@@ -2,7 +2,7 @@ function ui_get_detector_settings
 
 global PARAMS
 
-hFigure = figure('Position',[560,528,200,200],...
+hFigure = figure('Position',[760,828,200,200],...
     'NumberTitle','off','Name','Spice Detector Batch Run - v1.0');
 clf
 set(hFigure, 'MenuBar', 'none');
@@ -49,6 +49,5 @@ run(settingsFile)
 global REMORA
 REMORA.ship_dt.settings = settings;
 close(hFigure)
-% ui_check_detParams
-dtLTSAShipDetector;
+ui_check_settings
 end

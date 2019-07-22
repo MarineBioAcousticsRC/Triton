@@ -1,32 +1,27 @@
-function [noise,labels,RL] = dtShip_signal(pwr,candidates,wIdx)
+function [noise,labels,RL] = dt_ship_signal(pwr,wIdx)
 
-% tbin      - time bin average for spectra (s)
-% nave      - number of spectral averages
-% freqvec   - frequency band
-% freqBinSz - frequency bin size
-% stimRaw   - start raw file
+% tbin          - time bin average for spectra (s)
+% nave          - number of spectral averages
+% freqvec       - frequency band
+% freqBinSz     - frequency bin size
+% stimRaw       - start raw file
 % thrClose      - threshold for close noise
-% thr2      - threshold for distant ships
-% candidates    - which detection to get
-%                 'close' only close ships
-%                 'distant' only distant ships
-%                 'all' close and distant ships
+% thrDistant    - threshold for distant ships
+% thrRL         - threshold received levels to distinguish weather noise
 
 global REMORA
 
+% ltsa file parameters
 tbin = REMORA.ship_dt.ltsa.tave;
 nave = REMORA.ship_dt.ltsa.nave;
 freqvec = REMORA.ship_dt.ltsa.fimin:REMORA.ship_dt.ltsa.fmax;
 freqBinSz = REMORA.ship_dt.ltsa.dfreq;
 f = REMORA.ship_dt.ltsa.freq;
-thrClose = REMORA.ship_dt.settings.thrClose; % threshold for closer detections
-thrDistant = REMORA.ship_dt.settings.thrDistant; % threshold for distant detections
-thrRL = REMORA.ship_dt.settings.thrRL; 
 
-% Get transfer function
-fidtf = fopen(REMORA.ship_dt.settings.tfFullFile,'r');
-[transferFn,~] = fscanf(fidtf,'%f %f',[2,inf]);
-fclose(fidtf);
+% user settings
+thrClose = REMORA.ship_dt.settings.thrClose;
+thrDistant = REMORA.ship_dt.settings.thrDistant;
+thrRL = REMORA.ship_dt.settings.thrRL; 
 
 % add time (5min - 300s) to start/end ship detected time
 addtim = 300/tbin;
@@ -63,11 +58,28 @@ pwrB2 = pwr(lowB2:hiB2,:);
 pwrB3 = pwr(lowB3:hiB3,:);
 
 %apply appropriate transfer function to the data
-tf = interp1(transferFn(1,:),transferFn(2,:),freqvec,'linear','extrap');
-for i=1:size(pwr,2)
-    pwrB1(:,i) = pwrB1(:,i)+tf(lowB1:hiB1).';
-    pwrB2(:,i) = pwrB2(:,i)+tf(lowB2:hiB2).';
-    pwrB3(:,i) = pwrB3(:,i)+tf(lowB3:hiB3).';
+% Get transfer function
+if ischar(REMORA.ship_dt.settings.tfFullFile)
+    fidtf = fopen(REMORA.ship_dt.settings.tfFullFile,'r');
+    [transferFn,~] = fscanf(fidtf,'%f %f',[2,inf]);
+    fclose(fidtf);
+    
+    tf = interp1(transferFn(1,:),transferFn(2,:),freqvec,'linear','extrap');
+    for i=1:size(pwr,2)
+        pwrB1(:,i) = pwrB1(:,i)+tf(lowB1:hiB1).';
+        pwrB2(:,i) = pwrB2(:,i)+tf(lowB2:hiB2).';
+        pwrB3(:,i) = pwrB3(:,i)+tf(lowB3:hiB3).';
+    end
+elseif isnumeric(REMORA.ship_dt.settings.tfFullFile)
+    % singular gain
+    tf = REMORA.ship_dt.settings.tfFullFile;
+    for i=1:size(pwr,2)
+        pwrB1(:,i) = pwrB1(:,i)+tf;
+        pwrB2(:,i) = pwrB2(:,i)+tf;
+        pwrB3(:,i) = pwrB3(:,i)+tf;
+    end
+else
+    error('Provide a transfer function file or a singular gain value')
 end
 
 avg_pwrB1 = nanmean(pwrB1);
@@ -266,17 +278,11 @@ for i = 1: length(sB1far)
 end
 % -------------------------------------
 
-switch candidates
-    case 'close'
-        noise = [sCloseShip,eCloseShip];
-    case 'distant'
-        noise = [sFarShip,eFarShip];
-    otherwise
-        s = sort([sCloseShip; sFarShip]);
-        e = sort([eCloseShip; eFarShip]);
-        noise = [s,e];
-        noise = unique(noise,'rows');
-end
+% populate close and distant detections
+s = sort([sCloseShip; sFarShip]);
+e = sort([eCloseShip; eFarShip]);
+noise = [s,e];
+noise = unique(noise,'rows');
 
 if size(noise,1) > 1
     comb = find(noise(2:length(noise),1)-noise(1:length(noise)-1,2) < 60);
@@ -406,14 +412,14 @@ if wIdx
             'Threshold','Crossing','Passage','Close det.'},...
             'Location','best')
     end
-    title(sprintf('Low band (%d-%d kHz)',lowBand(1),lowBand(2)))
+    title(sprintf('Low band (%d-%d kHz)',fLowB1,fHiB1))
     set(gca, 'FontName', 'Times New Roman','FontSize',10)
     
     subplot(3,1,2)
     plot(reltim,fillavg_pwrB2,'Color',gray)
     hold on
     plot(reltim,avg_pwrB2,'Color',blue)
-    title('Medium band (5-10 kHz)')
+    title(sprintf('Medium band (%d-%d kHz)',fLowB2,fHiB2))
     plot(reltim,linspace(stateLevsB2(1),stateLevsB2(1),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(stateLevsB2(2),stateLevsB2(2),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(midRefB2,midRefB2,length(reltim)),'Color',red, 'LineWidth',2)
@@ -433,7 +439,7 @@ if wIdx
     plot(reltim,fillavg_pwrB3,'Color',gray)
     hold on
     plot(reltim,avg_pwrB3,'Color',blue)
-    title('High band (10-50 kHz)')
+    title(sprintf('High band (%d-%d kHz)',fLowB3,fHiB3))
     plot(reltim,linspace(stateLevsB3(1),stateLevsB3(1),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(stateLevsB3(2),stateLevsB3(2),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(midRefB3,midRefB3,length(reltim)),'Color',red, 'LineWidth',2)
