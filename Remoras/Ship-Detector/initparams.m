@@ -149,9 +149,9 @@ PARAMS.rec.nch = 1;
 REMORA.pick.value = 0;
 REMORA.pick.fcn = {};   % create cell array
 
-% initialize Remora params/handles structure
-REMORA.pick.value = 0;
-REMORA.pick.fcn = {};   % create cell array
+% Default label parameters
+REMORA.ship_dt.class.ValidLabels = false;  % available labels to plot?
+REMORA.ship_dt.class.PlotLabels = false;   % plot control
 
 % Check to make sure java is in path.
 % triton_java = fullfile(fileparts(which('triton')), 'java');

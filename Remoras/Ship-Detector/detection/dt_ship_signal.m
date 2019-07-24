@@ -91,12 +91,14 @@ avg_pwrB3 = nanmean(pwrB3,1);
 
 % exclude gaps with missing data (it can vary). Outlier considered as value
 % 50% less than the average dB
-% outliersB1 = nanmean(avg_pwrB1) - (nanmean(avg_pwrB1)*0.5);
-% outliersB2 = nanmean(avg_pwrB2) - (nanmean(avg_pwrB2)*0.5);
-% outliersB3 = nanmean(avg_pwrB3) - (nanmean(avg_pwrB3)*0.5);
-% avg_pwrB1(avg_pwrB1 <= outliersB1) = nan;
-% avg_pwrB2(avg_pwrB2 <= outliersB2) = nan;
-% avg_pwrB3(avg_pwrB3 <= outliersB3) = nan;
+if REMORA.ship_dt.settings.dutyCycle
+    outliersB1 = nanmean(avg_pwrB1) - (nanmean(avg_pwrB1)*0.5);
+    outliersB2 = nanmean(avg_pwrB2) - (nanmean(avg_pwrB2)*0.5);
+    outliersB3 = nanmean(avg_pwrB3) - (nanmean(avg_pwrB3)*0.5);
+    avg_pwrB1(avg_pwrB1 <= outliersB1) = nan;
+    avg_pwrB2(avg_pwrB2 <= outliersB2) = nan;
+    avg_pwrB3(avg_pwrB3 <= outliersB3) = nan;
+end
 
 % fill missing data
 fillavg_pwrB1 = fn_fillmiss(avg_pwrB1);

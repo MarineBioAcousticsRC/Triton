@@ -64,6 +64,10 @@ elseif strcmp(action,'setSlide')
 elseif strcmp(action,'setErrorRange')
     ErrorRangeEdTxt = get(REMORA.ship_dt_verify.ErrorRangeEdTxt, 'string');
     REMORA.ship_dt.settings.errorRange = ErrorRangeEdTxt;
+
+elseif strcmp(action,'setDutyCycle')
+    dutyCycleCheckbox = get(REMORA.ship_dt_verify.dutyCycleCheckbox, 'string');
+    REMORA.ship_dt.settings.dutyCycle = dutyCycleCheckbox;
     
 elseif strcmp(action,'setDiskWrite')
     diskWriteCheckbox = get(REMORA.ship_dt_verify.diskWriteCheckbox, 'string');
