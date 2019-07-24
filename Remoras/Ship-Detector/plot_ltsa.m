@@ -6,7 +6,7 @@ function plot_ltsa
 % Plots ltsa on main window
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global PARAMS HANDLES
+global PARAMS HANDLES REMORA
 
 % get which figures plotted
 savalue = get(HANDLES.display.ltsa,'Value');
@@ -142,8 +142,7 @@ if PARAMS.ltsa.delimit.value
 end
 
 if REMORA.ship_dt.class.PlotLabels
-  dt_plotLabels('ltsa', ...
-               PARAMS.ltsa.f(1)+.9*(PARAMS.ltsa.f(end)-PARAMS.ltsa.f(1)));
+  dt_plotLabels(PARAMS.ltsa.f(1)+.9*(PARAMS.ltsa.f(end)-PARAMS.ltsa.f(1)));
 end
 
 % change time in control window to data time in plot window
