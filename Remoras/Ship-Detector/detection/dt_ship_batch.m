@@ -72,7 +72,7 @@ for itr1 = 1:TotalWindows
     pwr = fn_readPwrSnippet(sSnippet,eSnippet);
     
     % Find ship passages from the snipped of data
-    [ships,labels,RL] = dt_ship_signal(pwr,1);
+    [ships,labels,RL] = dt_ship_signal(pwr,0);
     
     %%% Overlapping windows
     % Previous window
