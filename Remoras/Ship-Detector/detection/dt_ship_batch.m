@@ -42,7 +42,6 @@ newperc = 0;
 fStart = 1;
 fEnd = REMORA.ship_dt.ltsa.nrftot; % Number of raw files
 cumDur = cumsum(REMORA.ship_dt.ltsa.dur)' - REMORA.ship_dt.ltsa.dur(1);
-sSnippet = fStart;
 wavNames = REMORA.ship_dt.ltsahd.fname;
 fileStarts = find(REMORA.ship_dt.ltsahd.rfileid == 1);
 fileEnds = [fileStarts(2:end) - 1, size(REMORA.ship_dt.ltsahd.rfileid, 2)];
@@ -57,73 +56,43 @@ TotalWindows = ceil(REMORA.ship_dt.ltsa.durtot/durWind);
 disp('Start processing...')
 fprintf('Running Ship batch detection for %d files\n',REMORA.ship_dt.ltsa.nxwav)
 
+% sSnippet = fStart;
+cumSecWind = 0;
 for itr1 = 1:TotalWindows
     
-    %%% Central window
-    eSnippet = sSnippet;
-    CumPast = 0;
-    while eSnippet <= fEnd && CumPast < durWind
-        CumPast = CumPast + REMORA.ship_dt.ltsa.dur(eSnippet);
-        eSnippet = eSnippet + 1;
+    %%% Detect ships 
+    % Apply detector to the central window (of size durWind) and to the
+    % overlapping windows of "slide" seconds before and after start of the 
+    % central window
+    
+    % Read the spectral data of the snippet of data and apply detector
+    % Central Window
+    dnumSnippet = REMORA.ship_dt.ltsa.start.dnum + datenum([0 0 0 0 0 cumSecWind]);
+    pwr = fn_pwrSnippet(dnumSnippet);    
+    [ships,labels,RL] = dt_ship_signal(pwr,1);
+    dnumShips = ships./sec2dnum + dnumSnippet; % convert to actual times
+    
+    % Previous Window
+    dnumPrevSnippet = dnumSnippet - datenum([0 0 0 0 0 slide]);
+    
+    % If earlier than start of ltsa, previous window will be the same like the central window
+    if dnumPrevSnippet < REMORA.ship_dt.ltsa.start.dnum
+       dnumPrevSnippet = REMORA.ship_dt.ltsa.start.dnum; 
     end
-    eSnippet = eSnippet - 1; % compansate last sum
-    
-    % Read the spectral data of the snippet of data
-    pwr = fn_readPwrSnippet(sSnippet,eSnippet);
-    
-    % Find ship passages from the snipped of data
-    [ships,labels,RL] = dt_ship_signal(pwr,0);
-    
-    %%% Overlapping windows
-    % Previous window
-    prevStart = sSnippet;
-    CumPrev = 0;
-    while prevStart > fStart && CumPrev < slide
-        CumPrev = CumPrev + REMORA.ship_dt.ltsa.dur(prevStart);
-        prevStart = prevStart - 1;
-    end
-    
-    prevStop = prevStart;
-    CumPast = 0;
-    while prevStop <= fEnd && CumPast < durWind
-        CumPast = CumPast + REMORA.ship_dt.ltsa.dur(prevStop);
-        prevStop = prevStop + 1;
-    end
-    prevStop = prevStop - 1; % compansate last sum
-    
-    % Read the spectral data of the snippet of data
-    pwr = fn_readPwrSnippet(prevStart,prevStop);
-    
-    % Find ship passages from the snipped of data
+    pwr = fn_pwrSnippet(dnumPrevSnippet); 
     [shipsPrev,labelsPrev,~] = dt_ship_signal(pwr,0);
-    
-    % Get corresponding time to central window
-    shipsPrev = shipsPrev - sum(REMORA.ship_dt.ltsa.nave(1:prevStart-sSnippet));
+    dnumShipsPrev = shipsPrev./sec2dnum + dnumPrevSnippet; % convert to actual times
     
     % Posterior window
-    postStart = sSnippet;
-    CumPrev = 0;
-    while postStart < fEnd && CumPrev < slide
-        CumPrev = CumPrev + REMORA.ship_dt.ltsa.dur(postStart);
-        postStart = postStart + 1;
+    dnumPostSnippet = dnumSnippet + datenum([0 0 0 0 0 slide]);
+    
+    % If past the end of ltsa, posterior window will be the same like the central window
+    if dnumPostSnippet > REMORA.ship_dt.ltsa.end.dnum
+       dnumPostSnippet = dnumSnippet; 
     end
-    
-    postStop = postStart;
-    CumPast = 0;
-    while postStop <= fEnd && CumPast < durWind
-        CumPast = CumPast + REMORA.ship_dt.ltsa.dur(postStop);
-        postStop = postStop + 1;
-    end
-    postStop = postStop - 1; % compansate last sum
-    
-    % Read the spectral data of the snippet of data
-    pwr = fn_readPwrSnippet(postStart,postStop);
-    
-    % Find ship passages from the snipped of data
+    pwr = fn_pwrSnippet(dnumPostSnippet); 
     [shipsPost,labelsPost,~] = dt_ship_signal(pwr,0);
-    
-    % Get corresponding time to central window
-    shipsPost = shipsPost + sum(REMORA.ship_dt.ltsa.nave(1:postStart-sSnippet));
+    dnumShipsPost = shipsPost./sec2dnum + dnumPostSnippet;
     
     
     %%% Compare overlapping windows
@@ -202,31 +171,6 @@ for itr1 = 1:TotalWindows
             ifiles = sidx:eidx;
             detLabel = selectLabels{itr5};
             
-%             if length(ifiles) == 1
-%                 
-%                 det = [shipRef_s(itr5,1) + sRefWavdur, shipRef_s(itr5,2) + eRefWavdur];
-%                 fn_saveDets2txt(det,detLabel,ifiles,wavNames,REMORA.ship_dt.settings)
-%                 
-%             elseif length(ifiles) > 1
-%                 % detection spans multiple files
-%                 % start time
-%                 det = [shipRef_s(itr5,1) + sRefWavdur,fileDur(ifiles(1))];
-%                 fn_saveDets2txt(det,detLabel,ifiles(1),wavNames,REMORA.ship_dt.settings)
-%                 
-%                 % end time
-%                 det = [0,shipRef_s(itr5,2) + eRefWavdur];
-%                 fn_saveDets2txt(det,detLabel,ifiles(end),wavNames,REMORA.ship_dt.settings)
-%                 
-%                 % files between, detection span the entire file
-%                 if length(ifiles) >= 3
-%                     for itr6 = 2:length(ifiles)-1
-%                         det = [0,fileDur(ifiles(itr6))];
-%                         fn_saveDets2txt(det,detLabel,ifiles(itr6),wavNames,...
-%                             REMORA.ship_dt.settings)
-%                     end
-%                 end
-%             end
-            
         end
         
     end
@@ -241,6 +185,7 @@ for itr1 = 1:TotalWindows
 
     sSnippet = eSnippet + 1;
     itr1 = itr1 + 1;
+    cumSecWind = cumSecWind + durWind;
 end
 
 if ~isempty(populateTimes)
