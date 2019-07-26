@@ -19,15 +19,15 @@ settings.lowBand = [100,1000]; % [min,max] Lower band frequency ranges in Hz
 settings.mediumBand = [1000,3000]; % [min,max] Medium band frequency ranges in Hz
 settings.highBand = [3000,15000]; % [min,max] Higher band frequency ranges in Hz
 
-settings.thrClose = 150*3; % minimum duration in seconds allowed above the time-dependent  
+settings.thrClose = 150; % minimum duration in seconds allowed above the time-dependent  
 % threshold for averaged power spectral densities at the three frequency bands
-settings.thrDistant = 250*3; % minimum duration in seconds above the time-dependent  
+settings.thrDistant = 250; % minimum duration in seconds above the time-dependent  
 % threshold for averaged power spectral densities at the low and medium frequency bands
 settings.thrRL = 0.10; % percentage above mean received levels to distinguish
 % ship passages from ambient noise (e.g. weather noise)
 
-settings.durWind = 7200*3; % minimum duration in seconds of the exploratory window
-settings.slide = 1800*3; % seconds allowed to slide overlapping windows before and after
+settings.durWind = 7200; % minimum duration in seconds of the exploratory window
+settings.slide = 1800; % seconds allowed to slide overlapping windows before and after
 % start of the central exploratory window
 settings.errorRange = 0.25; % n-percent start and end time difference between 
 % overlapping windows
