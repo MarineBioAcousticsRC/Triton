@@ -4,10 +4,10 @@
 
 % Optional output directory location. Metadata directory will be created in 
 % outDir if specified, otherwise it will be created in baseDir.
-settings.outDir  = 'E:\evaluate_ship_detector\metadata';
+settings.outDir  = 'C:\Users\albas\Documents\evaluate_ship_detector\metadata';
 
 % Set transfer function location (calibration/sensitivity gain)
-settings.tfFullFile = 'E:\evaluate_ship_detector\tfs\656_130221_HARP.tf';
+settings.tfFullFile = 'C:\Users\albas\Documents\evaluate_ship_detector\656_130221_HARP.tf';
 % Note, if no transfer function but singular gain use:
 % settings.tfFullFile = 0; % m-gain in dB
  

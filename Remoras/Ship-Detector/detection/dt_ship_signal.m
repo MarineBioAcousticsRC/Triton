@@ -374,7 +374,7 @@ if wIdx
     green = [0.4660    0.6740    0.1880];%[0.9290    0.6940    0.1250];
     
     reltim = (1:length(fillavg_pwrB1))*tbin/3600; % in hours
-    figure('Position', [50, 100, 600, 800]);
+    figure%('Position', [50, 70, 600, 700]);
     subplot(3,1,1);
     p1 = plot(reltim,fillavg_pwrB1,'Color',gray);
     hold on
