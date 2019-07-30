@@ -18,6 +18,14 @@ if strcmp(action,'cluster_bins')
     
     ct_setpointers('arrow');
     
+elseif strcmp(action,'composite_clusters')
+    
+    ct_setpointers('watch');
+    REMORA.ct.CC_params = ct_init_composite_clusters_settings;
+    ct_init_compClust_window
+    
+    ct_setpointers('arrow');
+    
     
 end
 
