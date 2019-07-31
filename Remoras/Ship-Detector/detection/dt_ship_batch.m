@@ -58,9 +58,6 @@ for itr1 = 1:TotalWindows
     % Central Window
     dnumSnippet = REMORA.ship_dt.ltsa.start.dnum + datenum([0 0 0 0 0 cumSecWind]);
     pwr = fn_pwrSnippet(dnumSnippet); 
-    datevec(dnumSnippet)
-    endDnumWind = dnumSnippet + datenum([0 0 0 0 0 durWind]);
-    datevec(endDnumWind)
     [ships,labels,RL] = dt_ship_signal(pwr,0);
     dnumShips = (ships./sec2dnum)*tave + dnumSnippet; % convert to actual times
     
