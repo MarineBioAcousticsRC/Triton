@@ -339,15 +339,15 @@ if ~isempty(noise)
     RLB3thr = mean(RLsB3) + (mean(RLsB3) * thrRL); 
     labels =  repmat({'unknown'},size(noise,1),1);
     for m = 1:size(noise,1)
-        RLs(m,:) = [mean(RLsB1(noise(m,1):noise(m,2))), mean(RLsB2(noise(m,1):noise(m,2))),...
+        RLs= [mean(RLsB1(noise(m,1):noise(m,2))), mean(RLsB2(noise(m,1):noise(m,2))),...
             mean(RLsB3(noise(m,1):noise(m,2)))];
         
-        if RLs(m,1) > RLB1thr && RLs(m,2) > RLB2thr && RLs(m,3) > RLB3thr % %RLs(m,1)>80 & (RLs(m,2)<60 | RLs(m,3)<60)
+        if RLs (1) > RLB1thr %&& RLs(2) > RLB2thr && RLs(3) > RLB3thr % %RLs(m,1)>80 & (RLs(m,2)<60 | RLs(m,3)<60)
             labels{m} = 'ship';
         else
-            if (RLs(m,2)< 0 || RLs(m,3)<0)
+            if (RLs(2)< 0 || RLs(3)<0)
                 noise(m,:) = [0 0];
-            elseif (RLs(m,1) - mean(RLs(m,2:3))) > 15
+            elseif (RLs(1) - mean(RLs(2:3))) > 15
                 labels{m} = 'ship';
             else
                 labels{m} = 'ambient';

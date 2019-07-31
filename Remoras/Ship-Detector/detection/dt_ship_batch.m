@@ -57,7 +57,10 @@ for itr1 = 1:TotalWindows
     % Read the spectral data of the snippet of data and apply detector
     % Central Window
     dnumSnippet = REMORA.ship_dt.ltsa.start.dnum + datenum([0 0 0 0 0 cumSecWind]);
-    pwr = fn_pwrSnippet(dnumSnippet);    
+    pwr = fn_pwrSnippet(dnumSnippet); 
+    datevec(dnumSnippet)
+    endDnumWind = dnumSnippet + datenum([0 0 0 0 0 durWind]);
+    datevec(endDnumWind)
     [ships,labels,RL] = dt_ship_signal(pwr,0);
     dnumShips = (ships./sec2dnum)*tave + dnumSnippet; % convert to actual times
     
@@ -105,7 +108,7 @@ for itr1 = 1:TotalWindows
     elseif isequal(comb,[0 1 0])
         % detection at the left edge of the window
         for itr3 = 1:size(dnumShipsPrev,1)
-            onEdge = find(dnumShipsPrev(itr3,1) < 1 &dnumShipsPrev(itr3,2) > 1); % start before the central window and the end in the central window
+            onEdge = find(dnumShipsPrev(itr3,1) < dnumSnippet & dnumShipsPrev(itr3,2) > dnumSnippet); % start before the central window and the end in the central window
             if onEdge
                 selectShips = [selectShips; zeros(1),dnumShipsPrev(itr3,2)]; 
                 selectLabels = [selectLabels; labelsPrev{itr3}];
@@ -115,7 +118,8 @@ for itr1 = 1:TotalWindows
         % detection at the right edge of the window
         maxEnd = durWind/tave;
         for itr4 = 1:size(dnumShipsPost,1)
-            onEdge = find(dnumShipsPost(itr4,1) <= maxEnd & dnumShipsPost(itr4,2) > maxEnd); % the start have to be in the central window and the end passed
+            endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
+            onEdge = find(dnumShipsPost(itr4,1) <= endSnippet & dnumShipsPost(itr4,2) > endSnippet); % the start have to be in the central window and the end passed
             if onEdge
                 selectShips = [selectShips; dnumShipsPost(itr4,1), maxEnd]; 
                 selectLabels = [selectLabels; labelsPost{itr4}];
@@ -130,11 +134,6 @@ for itr1 = 1:TotalWindows
         % Convert all ship_s from matlab times to real times
         populateTimes = [populateTimes; selectShips + datenum([2000,0,0])];
         populateLabels = [populateLabels; selectLabels];
-        
-        if ~isempty(RL)
-        RL.times = selectShips;
-        end
-        populateRL = [populateRL;RL];
     end
     
     % only text will be displayed in command window if number increased
