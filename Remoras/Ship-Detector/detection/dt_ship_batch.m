@@ -45,8 +45,19 @@ TotalWindows = ceil(REMORA.ship_dt.ltsa.durtot/durWind);
 disp('Start processing...')
 fprintf('Running Ship batch detection for %d files\n',REMORA.ship_dt.ltsa.nxwav)
 
-% sSnippet = fStart;
 cumSecWind = 0;
+
+% get ltsa window motion parameters
+dnumSnippet = REMORA.ship_dt.ltsa.dnumStart(1);
+% find raw file index at start time
+startIndex = find(dnumSnippet >= REMORA.ship_dt.ltsa.dnumStart ...
+     & dnumSnippet + datenum([0 0 0 0 0 REMORA.ship_dt.ltsa.tave])...
+     <= REMORA.ship_dt.ltsa.dnumEnd, 1);
+% find time bin number at start time within rawfile
+startBin = floor((dnumSnippet - ....
+    REMORA.ship_dt.ltsa.dnumStart(startIndex)) * 24 * 60 * 60 ...
+    / REMORA.ship_dt.ltsa.tave) + 1;
+
 for itr1 = 1:TotalWindows
     
     %%% Detect ships 
@@ -56,9 +67,9 @@ for itr1 = 1:TotalWindows
     
     % Read the spectral data of the snippet of data and apply detector
     % Central Window
-    dnumSnippet = REMORA.ship_dt.ltsa.start.dnum + datenum([0 0 0 0 0 cumSecWind]);
-    pwr = fn_pwrSnippet(dnumSnippet); 
-    [ships,labels,RL] = dt_ship_signal(pwr,0);
+    dnumSnippet = fn_getTimeWindow(startIndex,startBin);
+    [pwr,startIndex,startBin] = fn_pwrSnippet(dnumSnippet); 
+    [ships,labels,~] = dt_ship_signal(pwr,0);
     dnumShips = (ships./sec2dnum)*tave + dnumSnippet; % convert to actual times
     
     % Previous Window
