@@ -49,3 +49,5 @@ if status == -1
 end
 
 pwr = fread(fid,[REMORA.ship_dt.ltsa.nf,nbin],'int8');   % read data
+
+fclose(fid);

@@ -18,7 +18,7 @@ function dt_ship_batch
 %
 % Maintained by CVS - do not modify
 % $Id: dtShip_batch.m,v 1 2017/28/02 asolsonaberga
-global REMORA PARAMS
+global REMORA
 
 % detection parameters (%%%%%%%%% parameters to add in the settings file)
 % % % % REMORA.ship_dt.settings.REWavExt= '(\.x)?\.wav';   % data files must end in this regular expression
@@ -45,18 +45,8 @@ TotalWindows = ceil(REMORA.ship_dt.ltsa.durtot/durWind);
 disp('Start processing...')
 fprintf('Running Ship batch detection for %d files\n',REMORA.ship_dt.ltsa.nxwav)
 
-cumSecWind = 0;
-
 % get ltsa window motion parameters
 dnumSnippet = REMORA.ship_dt.ltsa.dnumStart(1);
-% find raw file index at start time
-startIndex = find(dnumSnippet >= REMORA.ship_dt.ltsa.dnumStart ...
-     & dnumSnippet + datenum([0 0 0 0 0 REMORA.ship_dt.ltsa.tave])...
-     <= REMORA.ship_dt.ltsa.dnumEnd, 1);
-% find time bin number at start time within rawfile
-startBin = floor((dnumSnippet - ....
-    REMORA.ship_dt.ltsa.dnumStart(startIndex)) * 24 * 60 * 60 ...
-    / REMORA.ship_dt.ltsa.tave) + 1;
 
 for itr1 = 1:TotalWindows
     
@@ -67,7 +57,6 @@ for itr1 = 1:TotalWindows
     
     % Read the spectral data of the snippet of data and apply detector
     % Central Window
-    dnumSnippet = fn_getTimeWindow(startIndex,startBin);
     [pwr,startIndex,startBin] = fn_pwrSnippet(dnumSnippet); 
     [ships,labels,~] = dt_ship_signal(pwr,0);
     dnumShips = (ships./sec2dnum)*tave + dnumSnippet; % convert to actual times
@@ -79,7 +68,7 @@ for itr1 = 1:TotalWindows
     if dnumPrevSnippet < REMORA.ship_dt.ltsa.start.dnum
        dnumPrevSnippet = REMORA.ship_dt.ltsa.start.dnum; 
     end
-    pwr = fn_pwrSnippet(dnumPrevSnippet); 
+    [pwr,~,~] = fn_pwrSnippet(dnumPrevSnippet); 
     [shipsPrev,labelsPrev,~] = dt_ship_signal(pwr,0);
     dnumShipsPrev = (shipsPrev./sec2dnum)*tave + dnumPrevSnippet; % convert to actual times
     
@@ -90,7 +79,7 @@ for itr1 = 1:TotalWindows
     if dnumPostSnippet > REMORA.ship_dt.ltsa.end.dnum
        dnumPostSnippet = dnumSnippet; 
     end
-    pwr = fn_pwrSnippet(dnumPostSnippet); 
+    [pwr,~,~] = fn_pwrSnippet(dnumPostSnippet); 
     [shipsPost,labelsPost,~] = dt_ship_signal(pwr,0);
     dnumShipsPost = (shipsPost./sec2dnum)*tave + dnumPostSnippet;
     
@@ -113,16 +102,16 @@ for itr1 = 1:TotalWindows
                 selectLabels = [selectLabels; labels{itr2}];
             end
         end
-    elseif isequal(comb,[0 1 0])
+    elseif isequal(comb,[0 1 0]) || isequal(comb,[0 1 1])
         % detection at the left edge of the window
         for itr3 = 1:size(dnumShipsPrev,1)
             onEdge = find(dnumShipsPrev(itr3,1) < dnumSnippet & dnumShipsPrev(itr3,2) > dnumSnippet); % start before the central window and the end in the central window
             if onEdge
-                selectShips = [selectShips; zeros(1),dnumShipsPrev(itr3,2)]; 
+                selectShips = [selectShips; dnumSnippet,dnumShipsPrev(itr3,2)]; 
                 selectLabels = [selectLabels; labelsPrev{itr3}];
             end
         end
-    elseif isequal(comb,[0 0 1])
+    elseif isequal(comb,[0 0 1]) || isequal(comb,[0 1 1])
         % detection at the right edge of the window
         maxEnd = durWind/tave;
         for itr4 = 1:size(dnumShipsPost,1)
@@ -153,10 +142,11 @@ for itr1 = 1:TotalWindows
     end
 
     itr1 = itr1 + 1;
-    cumSecWind = cumSecWind + durWind + tave; % add time to get to next window 
+    dnumSnippet = fn_getNextTimeWindow(startIndex,startBin);
 end
 
 if ~isempty(populateTimes)
+
     shipTimes = populateTimes;
     shipLabels = populateLabels;
     shipRL = populateRL;

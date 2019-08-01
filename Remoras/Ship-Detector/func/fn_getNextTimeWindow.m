@@ -1,4 +1,4 @@
-function dnumSnippet = fn_getTimeWindow(startIndex,startBin)
+function dnumSnippet = fn_getNextTimeWindow(startIndex,startBin)
 
 global REMORA
 
@@ -8,8 +8,7 @@ tbin = REMORA.ship_dt.settings.durWind / REMORA.ship_dt.ltsa.tave;
 % forward motion case (add backward option for interactive detector)
 % difference in time bins between the current plotStartBin location and
 % the end of the current plotStartRawIndex
-d1_tbin = REMORA.ship_dt.ltsa.nave(startIndex)...
-    - startBin;
+d1_tbin = REMORA.ship_dt.ltsa.nave(startIndex)- startBin;
 % count the number of time bins by looping over the full raw files
 % increment plotStartRawIndex & plotStartBin
 if tbin > d1_tbin
