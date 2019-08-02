@@ -25,18 +25,18 @@ global REMORA
 % % % % REMORA.ship_dt.settings.RELtsaExt = '.s';   % Ship - Long term detection label extension
 
 % get detection parameters
+sec2dnum = 60*60*24; % conversion factor to get from seconds to matlab datenum
 durWind = REMORA.ship_dt.settings.durWind;
 slide = REMORA.ship_dt.settings.slide;
 errorRange = REMORA.ship_dt.settings.errorRange;
 tave = REMORA.ship_dt.ltsa.tave;
+minPassage = REMORA.ship_dt.settings.minPassage/sec2dnum;
 
-sec2dnum = 60*60*24; % conversion factor to get from seconds to matlab datenum
 tic;  % Note start time
 
 % Initialize
 populateTimes = [];
 populateLabels = {};
-populateRL = [];
 newperc = 0;
 
 % how many windows will be used to process ltsa
@@ -102,7 +102,29 @@ for itr1 = 1:TotalWindows
                 selectLabels = [selectLabels; labels{itr2}];
             end
         end
-    elseif isequal(comb,[0 1 0]) || isequal(comb,[0 1 1])
+        % if there are detection at the edges include them as well
+        if size(dnumShips,1) ~= size(dnumShipsPrev,1)
+            for itr2prev = 1: size(dnumShipsPrev,1)
+                onEdge = find(dnumShipsPrev(itr2prev,1) < dnumSnippet & dnumShipsPrev(itr2prev,2) > dnumSnippet); % start before the central window and the end in the central window
+                if onEdge
+                    selectShips = [selectShips; dnumSnippet,dnumShipsPrev(itr2prev,2)];
+                    selectLabels = [selectLabels; labelsPrev{itr2prev}];
+                end
+            end
+        end
+        % if there are detection at the edges include them as well
+        if size(dnumShips,1) ~= size(dnumShipsPost,1)
+           for itr2post = 1: size(dnumShipsPost,1) 
+               endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
+               onEdge = find(dnumShipsPost(itr2post,1) <= endSnippet & dnumShipsPost(itr2post,2) > endSnippet); % the start have to be in the central window and the end passed
+               if onEdge
+                   selectShips = [selectShips; dnumShipsPost(itr2post,1), endSnippet];
+                   selectLabels = [selectLabels; labelsPost{itr2post}];
+               end
+           end
+        end
+    end
+    if isequal(comb,[0 1 0]) || isequal(comb,[0 1 1])
         % detection at the left edge of the window
         for itr3 = 1:size(dnumShipsPrev,1)
             onEdge = find(dnumShipsPrev(itr3,1) < dnumSnippet & dnumShipsPrev(itr3,2) > dnumSnippet); % start before the central window and the end in the central window
@@ -111,19 +133,17 @@ for itr1 = 1:TotalWindows
                 selectLabels = [selectLabels; labelsPrev{itr3}];
             end
         end
-    elseif isequal(comb,[0 0 1]) || isequal(comb,[0 1 1])
+    end
+    if isequal(comb,[0 0 1]) || isequal(comb,[0 1 1])
         % detection at the right edge of the window
-        maxEnd = durWind/tave;
         for itr4 = 1:size(dnumShipsPost,1)
             endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
             onEdge = find(dnumShipsPost(itr4,1) <= endSnippet & dnumShipsPost(itr4,2) > endSnippet); % the start have to be in the central window and the end passed
             if onEdge
-                selectShips = [selectShips; dnumShipsPost(itr4,1), maxEnd]; 
+                selectShips = [selectShips; dnumShipsPost(itr4,1), endSnippet]; 
                 selectLabels = [selectLabels; labelsPost{itr4}];
             end
         end
-    else
-        % no ships detected
     end
 
     if ~isempty(selectShips)
@@ -146,16 +166,31 @@ for itr1 = 1:TotalWindows
 end
 
 if ~isempty(populateTimes)
-
-    shipTimes = populateTimes;
-    shipLabels = populateLabels;
-    shipRL = populateRL;
+    [~,I] = sort(populateTimes(:,1));
+    shipTimes = populateTimes(I,:);
+    shipLabels = populateLabels(I);
     
+    if size(shipTimes,1) > 1
+        remove = find((shipTimes(2:end,1) - shipTimes(1:end-1,2)) < minPassage)';
+        if ~isempty(remove)
+            selStart = shipTimes(:,1); selStart(remove+1) = [];
+            selEnd = shipTimes(:,2); selEnd(remove) = [];
+            shipTimes = [selStart, selEnd];
+            % compare if labels are different
+            reLabel = ~strcmp(shipLabels(remove+1),shipLabels(remove));
+            % different label, one was detected as ship, so keep it as
+            % ship, end is deleted
+            shipLabels(remove(reLabel == 1)) = {'ship'};
+            shipLabels(remove(reLabel == 1)+1) = [];
+            % same label
+            shipLabels(remove(reLabel == 0)+1) = [];    
+        end
+    end
     % save all detections with real datenums in a mat file
     filename = split(REMORA.ship_dt.ltsa.infile,'.ltsa');
     matname = ['Ship_detections_',filename{1},'.mat'];
     save(fullfile(REMORA.ship_dt.settings.outDir,matname),'shipTimes',...
-        'shipLabels','shipRL','-mat','-v7.3');
+        'shipLabels','-mat','-v7.3');
     fprintf('Detections saved at: %s\n',fullfile(REMORA.ship_dt.settings.outDir,matname));
     
     % save labels
