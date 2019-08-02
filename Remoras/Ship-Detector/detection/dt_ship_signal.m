@@ -22,9 +22,8 @@ f = REMORA.ship_dt.ltsa.freq;
 thrClose = REMORA.ship_dt.settings.thrClose;
 thrDistant = REMORA.ship_dt.settings.thrDistant;
 thrRL = REMORA.ship_dt.settings.thrRL; 
-
-% add time (5min - 300s) to start/end ship detected time
-addtim = 300/tbin;
+addtime = REMORA.ship_dt.settings.buffer/tbin;
+minPassage = REMORA.ship_dt.settings.minPassage/tbin;
 
 %identify disk writing noise
 if REMORA.ship_dt.settings.diskWrite
@@ -221,8 +220,8 @@ for i = 1: length(sB1)
         % (if cetacean present, 3rd band has longer durations).
         if length(seldurB3) == length(seldurB2)
             if sum(seldurB3 <= seldurB2) && sum(seldurB2*2/3 <= durB1(i))
-                s= sB1(i)-addtim;
-                e = eB1(i)+addtim-1;
+                s= sB1(i)-addtime;
+                e = eB1(i)+addtime-1;
                 if s<=0;s = 1;end
                 if e>size(pwr,2);e = size(pwr,2);end
                 sCloseShip = [sCloseShip; s];
@@ -271,8 +270,8 @@ for i = 1: length(sB1far)
         % ship duration in 2nd band must be smaller than 1st band
         % (if sperm whale present, 2nd band could have longer durations).
         if seldurB2far*2/3 <= durB1far(i)
-            sfar = sB1far(i)-addtim;
-            efar = eB1far(i)+addtim-1;
+            sfar = sB1far(i)-addtime;
+            efar = eB1far(i)+addtime-1;
             if sfar<=0;sfar = 1;end
             if efar>size(pwr,2);efar = size(pwr,2);end
             sFarShip = [sFarShip; sfar];
@@ -290,12 +289,15 @@ noise = [s,e];
 noise = unique(noise,'rows');
 
 if size(noise,1) > 1
-    comb = find(noise(2:length(noise),1)-noise(1:length(noise)-1,2) < 60);
-    noise(comb,2) = noise(comb+1,2);
-    noise(comb+1,:) = [];
+    comb = find((noise(2:end,1) - noise(1:end-1,2)) < minPassage)';
+    if ~isempty(comb)
+    col1 = sub2ind(size(noise),comb+1,ones(1,length(comb)));
+    col2 = sub2ind(size(noise),comb,ones(1,length(comb))*2);
+    remove = sort([col1,col2]);
+    noise(remove) = [];
+    end
 end
 
-RLs = [];
 RL = {};
 if ~isempty(noise)
     % Received Levels (RL)
@@ -391,12 +393,12 @@ if wIdx
             add = add + 0.1;
         end
         if ~isempty (sCloseShip)
-            p7 = plot(reltim(sCloseShip+addtim+1),midRefB1,'o','Color',black,'MarkerSize',6);
-                 plot(reltim(eCloseShip-addtim-1),midRefB1,'o','Color',black,'MarkerSize',6);
+            p7 = plot(reltim(sCloseShip+addtime+1),midRefB1,'o','Color',black,'MarkerSize',6);
+                 plot(reltim(eCloseShip-addtime-1),midRefB1,'o','Color',black,'MarkerSize',6);
         end
         if ~isempty (sFarShip)
-            p9 = plot(reltim(sFarShip+addtim+1),midRefB1,'x','Color',black,'MarkerSize',6);
-            	 plot(reltim(eFarShip-addtim-1),midRefB1,'x','Color',black,'MarkerSize',6);
+            p9 = plot(reltim(sFarShip+addtime+1),midRefB1,'x','Color',black,'MarkerSize',6);
+            	 plot(reltim(eFarShip-addtime-1),midRefB1,'x','Color',black,'MarkerSize',6);
         end
     end
     

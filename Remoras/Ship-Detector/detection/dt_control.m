@@ -49,6 +49,14 @@ elseif strcmp(action,'setThrRL')
     ThrRLEdTxt = str2double(get(REMORA.ship_dt_verify.ThrDistantEdTxt, 'string'));
     REMORA.ship_dt.settings.thrRL = ThrRLEdTxt; 
     
+elseif strcmp(action,'setMinPassage')
+    MinPassageEdTxt = str2double(get(REMORA.ship_dt_verify.MinPassageEdTxt, 'string'));
+    REMORA.ship_dt.settings.minPassage = MinPassageEdTxt;     
+
+elseif strcmp(action,'setBuffer')
+    BufferEdTxt = str2double(get(REMORA.ship_dt_verify.BufferEdTxt, 'string'));
+    REMORA.ship_dt.settings.buffer = BufferEdTxt;   
+    
 elseif strcmp(action,'setLabelsFile')
     labelsCheckbox = get(REMORA.ship_dt_verify.labelsCheckbox, 'Value');
     REMORA.ship_dt.settings.saveLabels = labelsCheckbox;
