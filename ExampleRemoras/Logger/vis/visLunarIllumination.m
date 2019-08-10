@@ -138,7 +138,7 @@ end
         patch_idx = patch_idx + 1;
         
         alpha = row(2)/100;
-        alpha = .1 + alpha*.3;
+        alpha = .1 + alpha*.005; %.3
         
         lunarH(patch_idx) = patch([x; xt; xt; x], ...
             [y; y; y+1; y+1], cGrad(floor(row(2) * sizeGrad / 101) + 1,:), ...

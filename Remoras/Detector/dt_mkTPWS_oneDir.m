@@ -1,20 +1,99 @@
-function dt_mkTPWS_oneDir(detDir,fileExt,letterCode,ppThresh)
+function dt_mkTPWS_oneDir(folder,path,fileExt,letterCode,ppThresh)
 
 letterFlag = 0; % flag for knowing if a letter should be appended to disk name
-% inDir = fullfile(baseDir,dirSet(itr0).name);
-fileSet = dir(fullfile(inDir,['*',fileExt]));
-lfs = length(fileSet.mat);
+fileSet = dir(fullfile(folder.det,['*',fileExt.det]));
+fileSet = fileSet(cellfun(@(x) x>0, {fileSet.bytes})); % exclude empty files
+lfs = length(fileSet);
+
+% file type
+if strcmp(fileExt.audio,'.x.wav')
+    ftype = 2;
+elseif strcmp(fileExt.audio,'.wav')
+    ftype = 1;
+else
+    error('Audio file type not supported')
+end
+
+% constant parameters
+dnum2sec = 60*60*24;
+Y2K = datenum([ 2000 0 0 0 0 0 ]);
+
+% initialize
 clickTimesVec = [];
 ppSignalVec = [];
 specClickTfVec = [];
 tsVecStore = [];
 subTP = 1;
 fSave = [];
-for itr2 = 1:lfs
-    thisFile = fileSet.mat(itr2);
+for itr1 = 1:lfs % for each detection file
+    detFile = fileSet(itr1).name;
     
-    load(char(fullfile(detDir,thisFile)),'-mat','clickTimes','hdr',...
-        'ppSignal','specClickTf','yFiltBuff','f','durClick')
+    %     load(char(fullfile(detDir,thisFile)),'-mat','clickTimes','hdr',...
+    %         'ppSignal','specClickTf','yFiltBuff','f','durClick')
+    
+    % read text file
+    if strcmp(fileExt.det,'.pgdf')
+        % add:  [dataSet, fileInfo] = loadPamguardBinaryFile(fileName);
+        error('Not available yet')
+    else
+        pTemp = p;
+        % get audio file header
+        audioFileName = strrep(detFile,fileExt.det,fileExt.audio);
+        if exist(fullfile(folder.audio,audioFileName),'file')
+            hdr = ioReadXWAVHeader(fullfile(folder.audio,audioFileName),'ftype',ftype);
+            
+            % Build filter on first pass, rebuild if file has different
+            % sampling rate
+            if isempty(hdr)
+                continue % skip if you couldn't read a header
+            elseif hdr.fs ~= pTemp.previousFs
+                % otherwise, if this is the first time through, build your filters,
+                % only need to do this once though, so if you already have this
+                % info, this step is skipped
+                
+                [previousFs,pTemp] = dt_buildFilters(pTemp,hdr.fs);
+                pTemp.previousFs = previousFs;
+                
+                pTemp = dt_interp_tf(pTemp);
+            end
+            
+
+            %%%%%%%%%%%%%%%%%
+            % read detection file and get first column with start times of
+            % detections
+            detID = fopen(fullfile(folder.det,detFile));
+            if detID ~=-1
+                [detText] = textscan(detID,'%f %f %s'); % load text file
+                fclose(detID);
+            else
+                msg = sprintf('Unable to open detection file %s\n',fullfile(folder.det,detFile));
+                error(msg);
+            end
+            
+            startTimes = detText{:,1};
+            %%%%%%%%%%%%%%%%
+            % to move to a separate function
+            % convert times into matlab date
+            
+            durRaw = (hdr.raw.dnumEnd - hdr.raw.dnumStart)'*dnum2sec;
+            cumDur = cumsum(durRaw) - durRaw(1); % extract first dur to have dur from start of file
+            
+            % find the correct raw file and extract the duration
+            rawIdx = arrayfun(@(x) find(x >= cumDur,1,'last'),startTimes,...
+                'UniformOutput',false);
+            rawIdx( cellfun(@isempty, rawIdx) ) = {0}; % fill empty cells with 0
+            rawIdx = cell2mat(rawIdx);
+            
+            % extract previous time and add raw file start time
+            refRawTime = (hdr.raw.dnumStart(rawIdx)' + Y2K)*dnum2sec;
+            posDnum = (startTimes - cumDur(rawIdx) + refRawTime)/dnum2sec;
+            %%%%%%%%%%%%%%%%%%%
+        else
+            fprintf('No audio file matching %s\n',detFile)
+        end
+    end
+    
+    
     if exist('clickTimes','var') && ~isempty(clickTimes)&& size(specClickTf,2)>1
         % specClickTf = specClickTfHR;
         keepers = find(ppSignal >= ppThresh);
@@ -27,9 +106,9 @@ for itr2 = 1:lfs
         clickTimes = clickTimes(keepers2,:);
         ppSignal = ppSignal(keepers2);
         
-        fileStart = datenum(hdr.start.dvec);
-        posDnum = (clickTimes(:,1)/(60*60*24)) + fileStart +...
-            datenum([2000,0,0,0,0,0]);
+        % % % % % % % % %         fileStart = datenum(hdr.start.dvec);
+        % % % % % % % % %         posDnum = (clickTimes(:,1)/(60*60*24)) + fileStart +...
+        % % % % % % % % %             datenum([2000,0,0,0,0,0]);
         clickTimesVec = [clickTimesVec; posDnum];
         ppSignalVec = [ppSignalVec; ppSignal];
         tsWin = 200;
@@ -79,15 +158,15 @@ for itr2 = 1:lfs
         specClickTf = [];
         ppSignal = [];
     end
-    fprintf('Done with file %d of %d \n',itr2,lfs)
+    fprintf('Done with file %d of %d \n',itr1,lfs)
     
-    if (size(clickTimesVec,1)>= 1800000 && (lfs-itr2>=10))|| itr2 == lfs
+    if (size(clickTimesVec,1)>= 1800000 && (lfs-itr1>=10))|| itr1 == lfs
         
         MSN = tsVecStore;
         MTT = clickTimesVec;
         MPP = ppSignalVec;
         MSP = specClickTfVec;
-        if itr2 == lfs && letterFlag == 0
+        if itr1 == lfs && letterFlag == 0
             ttppOutName =  [fullfile(outDir,dirSet(itr0).name),'_Delphin_TPWS1','.mat'];
             fprintf('Done with directory %d of %d \n',itr0,length(dirSet))
             subTP = 1;

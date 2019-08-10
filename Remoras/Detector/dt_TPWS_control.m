@@ -20,6 +20,10 @@ elseif strcmp(action, 'setDetFileExt')
 elseif strcmp(action, 'setXwavDir')
     xwavDir = get(REMORA.dt_mkTPWS.xwavDirEdTxt,'String');
     REMORA.dt.mkTPWS.xwavDir = xwavDir;
+
+elseif strcmp(action, 'setXwavFileExt')
+    xwavExt = get(REMORA.dt_mkTPWS.xwavExtPopup,'String');
+    REMORA.dt.mkTPWS.xwavExt = xwavExt;
     
 elseif strcmp(action, 'setTPWSOutDir')
     outDir = get(REMORA.dt_mkTPWS.outDirEdTxt,'String');
