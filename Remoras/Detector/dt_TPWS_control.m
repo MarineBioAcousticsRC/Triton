@@ -29,6 +29,18 @@ elseif strcmp(action, 'setTPWSOutDir')
     outDir = get(REMORA.dt_mkTPWS.outDirEdTxt,'String');
     REMORA.dt.mkTPWS.outDir = outDir;
     
+elseif strcmp(action, 'setbpEdgeMin')
+    bpEdgeMin = get(REMORA.dt_mkTPWS.bpEdgeMinEdTxt,'String');
+    REMORA.dt.mkTPWS.bpRange(1) = bpEdgeMin;
+    
+elseif strcmp(action, 'setbpEdgeMax')
+    bpEdgeMax = get(REMORA.dt_mkTPWS.bpEdgeMaxEdTxt,'String');
+    REMORA.dt.mkTPWS.bpRange(2) = bpEdgeMax;
+
+elseif strcmp(action, 'setbpEdgeMax')
+    bpEdgeMax = get(REMORA.dt_mkTPWS.bpEdgeMaxEdTxt,'String');
+    REMORA.dt.mkTPWS.bpRange(2) = bpEdgeMax;    
+    
 elseif strcmp(action, 'setTFPath')
     tfFullFile = get(REMORA.dt_mkTPWS.tfPathEdTxt,'String');
     REMORA.dt.mkTPWS.tfFullFile = tfFullFile;
