@@ -6,7 +6,7 @@ p.previousFs = 0; % make sure we build filters on first pass
 
 % get file type list
 fTypes = io_getFileType(fullFiles);
-
+f = [];
 cParams = [];
 for idx1 = 1:N % for each data file
     pTemp = p;
