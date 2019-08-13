@@ -109,9 +109,13 @@ elseif strcmp(action,'setICIDist')
 
 elseif strcmp(action,'runCompositeClusters')
     dh = ct_CB_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
+    jObj = com.mathworks.widgets.BusyAffordance;
+    [~,spinnerH] = javacomponent(jObj.getComponent, [200,10,40,40], gcf);
+    set(spinnerH,'units','norm', 'position',[0.45,0.3,0.1,0.15])
+    jObj.start;
     ct_composite_clusters(REMORA.ct.CC_params)
     dh = ct_CB_status_dialog('Composite clustering complete.');
-
+    jObj.stop;
 elseif strcmp(action,'ct_CC_settingsLoad')
     thisPath = mfilename('fullpath');
     settingsPath = fullfile(fileparts(fileparts(thisPath)),'settings');
