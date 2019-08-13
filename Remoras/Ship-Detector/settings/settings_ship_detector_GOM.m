@@ -17,7 +17,7 @@ settings.REWavExt = '(\.x)?\.wav'; % Expression to match .wav or .x.wav
 
 settings.lowBand = [1000,5000]; % [min,max] Lower band frequency ranges in Hz
 settings.mediumBand = [5000,10000]; % [min,max] Medium band frequency ranges in Hz
-settings.highBand = [10000,48000]; % [min,max] Higher band frequency ranges in Hz
+settings.highBand = [10000,50000]; % [min,max] Higher band frequency ranges in Hz
 
 settings.thrClose = 150; % minimum duration in seconds allowed above the time-dependent  
 % threshold for averaged power spectral densities at the three frequency bands
@@ -25,11 +25,11 @@ settings.thrDistant = 250; % minimum duration in seconds above the time-dependen
 % threshold for averaged power spectral densities at the low and medium frequency bands
 settings.thrRL = 0.10; % percentage above mean received levels to distinguish
 % ship passages from ambient noise (e.g. weather noise)
-settings.minPassage = 1800; % minimum time between passages, if not will be merged
-settings.buffer = 300; % add seconds before and after detected times
+settings.minPassage = 0.5; % minimum time in hours between passages, if not will be merged
+settings.buffer = 5; % add minutes before and after detected times
 
-settings.durWind = 7200; % minimum duration in seconds of the exploratory window
-settings.slide = 1800; % seconds allowed to slide overlapping windows before and after
+settings.durWind = 2; % minimum duration in hours of the exploratory window
+settings.slide = 0.5; % hours allowed to slide overlapping windows before and after
 % start of the central exploratory window
 settings.errorRange = 0.1; % n-percent start and end time difference between 
 % overlapping windows

@@ -289,12 +289,11 @@ noise = [s,e];
 noise = unique(noise,'rows');
 
 if size(noise,1) > 1
-    comb = find((noise(2:end,1) - noise(1:end-1,2)) < minPassage)';
-    if ~isempty(comb)
-    col1 = sub2ind(size(noise),comb+1,ones(1,length(comb)));
-    col2 = sub2ind(size(noise),comb,ones(1,length(comb))*2);
-    remove = sort([col1,col2]);
-    noise(remove) = [];
+    remove = find((noise(2:end,1) - noise(1:end-1,2)) < minPassage)';
+    if ~isempty(remove)
+        selStart = noise(:,1); selStart(remove+1) = [];
+        selEnd = noise(:,2); selEnd(remove) = [];
+        noise = [selStart, selEnd];
     end
 end
 
@@ -419,14 +418,14 @@ if wIdx
             'Threshold','Crossing','Passage','Close det.'},...
             'Location','best')
     end
-    title(sprintf('Low band (%d-%d kHz)',f(lowB1),f(hiB1)))
+    title(sprintf('Low band (%d-%d Hz)',f(lowB1),f(hiB1)))
     set(gca, 'FontName', 'Times New Roman','FontSize',10)
     
     subplot(3,1,2)
     plot(reltim,fillavg_pwrB2,'Color',gray)
     hold on
     plot(reltim,avg_pwrB2,'Color',blue)
-    title(sprintf('Medium band (%d-%d kHz)',f(lowB2),f(hiB2)))
+    title(sprintf('Medium band (%d-%d Hz)',f(lowB2),f(hiB2)))
     plot(reltim,linspace(stateLevsB2(1),stateLevsB2(1),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(stateLevsB2(2),stateLevsB2(2),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(midRefB2,midRefB2,length(reltim)),'Color',red, 'LineWidth',2)
@@ -446,7 +445,7 @@ if wIdx
     plot(reltim,fillavg_pwrB3,'Color',gray)
     hold on
     plot(reltim,avg_pwrB3,'Color',blue)
-    title(sprintf('High band (%d-%d kHz)',f(lowB3),f(hiB3)))
+    title(sprintf('High band (%d-%d Hz)',f(lowB3),f(hiB3)))
     plot(reltim,linspace(stateLevsB3(1),stateLevsB3(1),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(stateLevsB3(2),stateLevsB3(2),length(reltim)),'--','Color',red, 'LineWidth',.5)
     plot(reltim,linspace(midRefB3,midRefB3,length(reltim)),'Color',red, 'LineWidth',2)

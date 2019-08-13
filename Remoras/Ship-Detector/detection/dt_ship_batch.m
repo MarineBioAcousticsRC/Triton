@@ -181,9 +181,7 @@ if ~isempty(populateTimes)
             % different label, one was detected as ship, so keep it as
             % ship, end is deleted
             shipLabels(remove(reLabel == 1)) = {'ship'};
-            shipLabels(remove(reLabel == 1)+1) = [];
-            % same label
-            shipLabels(remove(reLabel == 0)+1) = [];    
+            shipLabels(remove+1) = []; % remove second
         end
     end
     % save all detections with real datenums in a mat file

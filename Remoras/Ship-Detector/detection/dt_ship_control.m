@@ -87,11 +87,16 @@ elseif strcmp(action,'setLabelFile')
     
 elseif strcmp(action,'RunBatchDetection')
     close(REMORA.fig.ship_dt_verify)
+    settings_in_seconds
     dt_runLtsaDetector()    
 end
 
-% if strcmp(mySource, 'gui')
-%     dt_gui
-%     sp_plot_detections
-% end
+function settings_in_seconds
+
+global REMORA
+
+REMORA.ship_dt.settings.minPassage = REMORA.ship_dt.settings.minPassage * 60*60;
+REMORA.ship_dt.settings.buffer = REMORA.ship_dt.settings.buffer * 60;
+REMORA.ship_dt.settings.durWind = REMORA.ship_dt.settings.durWind * 60*60;
+REMORA.ship_dt.settings.slide = REMORA.ship_dt.settings.slide * 60*60;
 

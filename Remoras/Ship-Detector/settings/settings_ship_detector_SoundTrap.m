@@ -25,11 +25,11 @@ settings.thrDistant = 250; % minimum duration in seconds above the time-dependen
 % threshold for averaged power spectral densities at the low and medium frequency bands
 settings.thrRL = 0.10; % percentage above mean received levels to distinguish
 % ship passages from ambient noise (e.g. weather noise)
-settings.minPassage = 1800; % minimum time between passages, if not will be merged
-settings.buffer = 300; % add seconds before and after detected times
+settings.minPassage = 0.5; % minimum time in hours between passages, if not will be merged
+settings.buffer = 5; % add minutes before and after detected times
 
-settings.durWind = 7200*2; % minimum duration in seconds of the exploratory window
-settings.slide = 1800*2; % seconds allowed to slide overlapping windows before and after
+settings.durWind = 4; % minimum duration in hours of the exploratory window
+settings.slide = 1; % hours allowed to slide overlapping windows before and after
 % start of the central exploratory window
 settings.errorRange = 0.05; % n-percent start and end time difference between 
 % overlapping windows
