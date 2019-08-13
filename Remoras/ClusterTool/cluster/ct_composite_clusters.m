@@ -126,8 +126,8 @@ else
     useBins = (nSpecMat >= s.minClicks);
 end
 
-[~,s.stIdx] = min(abs(f-s.startFreq));
-[~,s.edIdx] = min(abs(f-s.endFreq));
+[~,s.stIdx] = min(abs(f(p.stIdx:p.edIdx)-s.startFreq));
+[~,s.edIdx] = min(abs(f(p.stIdx:p.edIdx)-s.endFreq));
 [specNorm,diffNormSpec] = spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
 
 [~,s.maxICIidx] = min(abs(p.barInt-s.maxICI));
