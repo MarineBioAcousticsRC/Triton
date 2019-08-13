@@ -1,4 +1,4 @@
-function [ind,t0,s0,t0close,s0close] = fn_crossing(S,t,level,imeth)
+function [ind,t0,s0,t0close,s0close] = sh_get_crossing(S,t,level,imeth)
 % CROSSING find the crossings of a given level of a signal
 %   ind = CROSSING(S) returns an index vector ind, the signal
 %   S crosses zero at ind or at between ind and ind+1

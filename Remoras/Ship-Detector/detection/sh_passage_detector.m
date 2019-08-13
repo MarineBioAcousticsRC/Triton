@@ -1,4 +1,4 @@
-function [noise,labels,RL] = dt_ship_signal(pwr,wIdx)
+function [noise,labels,RL] = sh_passage_detector(pwr,wIdx)
 
 % tbin          - time bin average for spectra (s)
 % nave          - number of spectral averages
@@ -12,21 +12,21 @@ function [noise,labels,RL] = dt_ship_signal(pwr,wIdx)
 global REMORA
 
 % ltsa file parameters
-tbin = REMORA.ship_dt.ltsa.tave;
-nave = REMORA.ship_dt.ltsa.nave;
-freqvec = REMORA.ship_dt.ltsa.fimin:REMORA.ship_dt.ltsa.fmax;
-freqBinSz = REMORA.ship_dt.ltsa.dfreq;
-f = REMORA.ship_dt.ltsa.freq;
+tbin = REMORA.sh.ltsa.tave;
+nave = REMORA.sh.ltsa.nave;
+freqvec = REMORA.sh.ltsa.fimin:REMORA.sh.ltsa.fmax;
+freqBinSz = REMORA.sh.ltsa.dfreq;
+f = REMORA.sh.ltsa.freq;
 
 % user settings
-thrClose = REMORA.ship_dt.settings.thrClose;
-thrDistant = REMORA.ship_dt.settings.thrDistant;
-thrRL = REMORA.ship_dt.settings.thrRL; 
-addtime = REMORA.ship_dt.settings.buffer/tbin;
-minPassage = REMORA.ship_dt.settings.minPassage/tbin;
+thrClose = REMORA.sh.settings.thrClose;
+thrDistant = REMORA.sh.settings.thrDistant;
+thrRL = REMORA.sh.settings.thrRL; 
+addtime = REMORA.sh.settings.buffer/tbin;
+minPassage = REMORA.sh.settings.minPassage/tbin;
 
 %identify disk writing noise
-if REMORA.ship_dt.settings.diskWrite
+if REMORA.sh.settings.diskWrite
     ipeak = (round(7.5/tbin):nave:size(pwr,2));
     ipeak(ipeak<0) = 0;
     exclude = sort([ipeak-2,ipeak-1, ipeak,ipeak+1, ipeak+2 ]);
@@ -47,12 +47,12 @@ pwr = pwr - sub;
 % -|Band 2: 5-10 kHz
 %  |Band 3: 10-50 kHz
 % get edges of bands
-[~,lowB1] = min(abs(f-REMORA.ship_dt.settings.lowBand(1)));
-[~,hiB1] = min(abs(f-REMORA.ship_dt.settings.lowBand(2)));
-[~,lowB2] = min(abs(f-REMORA.ship_dt.settings.mediumBand(1)));
-[~,hiB2] = min(abs(f-REMORA.ship_dt.settings.mediumBand(2)));
-[~,lowB3] = min(abs(f-REMORA.ship_dt.settings.highBand(1)));
-[~,hiB3] = min(abs(f-REMORA.ship_dt.settings.highBand(2)));
+[~,lowB1] = min(abs(f-REMORA.sh.settings.lowBand(1)));
+[~,hiB1] = min(abs(f-REMORA.sh.settings.lowBand(2)));
+[~,lowB2] = min(abs(f-REMORA.sh.settings.mediumBand(1)));
+[~,hiB2] = min(abs(f-REMORA.sh.settings.mediumBand(2)));
+[~,lowB3] = min(abs(f-REMORA.sh.settings.highBand(1)));
+[~,hiB3] = min(abs(f-REMORA.sh.settings.highBand(2)));
 
 
 pwrB1 = pwr(lowB1:hiB1,:);
@@ -61,8 +61,8 @@ pwrB3 = pwr(lowB3:hiB3,:);
 
 %apply appropriate transfer function to the data
 % Get transfer function
-if ischar(REMORA.ship_dt.settings.tfFullFile)
-    fidtf = fopen(REMORA.ship_dt.settings.tfFullFile,'r');
+if ischar(REMORA.sh.settings.tfFullFile)
+    fidtf = fopen(REMORA.sh.settings.tfFullFile,'r');
     [transferFn,~] = fscanf(fidtf,'%f %f',[2,inf]);
     fclose(fidtf);
     
@@ -72,9 +72,9 @@ if ischar(REMORA.ship_dt.settings.tfFullFile)
         pwrB2(:,i) = pwrB2(:,i)+tf(lowB2:hiB2).';
         pwrB3(:,i) = pwrB3(:,i)+tf(lowB3:hiB3).';
     end
-elseif isnumeric(REMORA.ship_dt.settings.tfFullFile)
+elseif isnumeric(REMORA.sh.settings.tfFullFile)
     % singular gain
-    tf = REMORA.ship_dt.settings.tfFullFile;
+    tf = REMORA.sh.settings.tfFullFile;
     for i=1:size(pwr,2)
         pwrB1(:,i) = pwrB1(:,i)+tf;
         pwrB2(:,i) = pwrB2(:,i)+tf;
@@ -90,7 +90,7 @@ avg_pwrB3 = nanmean(pwrB3,1);
 
 % exclude gaps with missing data (it can vary). Outlier considered as value
 % 50% less than the average dB
-if REMORA.ship_dt.settings.dutyCycle
+if REMORA.sh.settings.dutyCycle
     outliersB1 = nanmean(avg_pwrB1) - (nanmean(avg_pwrB1)*0.5);
     outliersB2 = nanmean(avg_pwrB2) - (nanmean(avg_pwrB2)*0.5);
     outliersB3 = nanmean(avg_pwrB3) - (nanmean(avg_pwrB3)*0.5);
@@ -100,9 +100,9 @@ if REMORA.ship_dt.settings.dutyCycle
 end
 
 % fill missing data
-fillavg_pwrB1 = fn_fillmiss(avg_pwrB1);
-fillavg_pwrB3 = fn_fillmiss(avg_pwrB3);
-fillavg_pwrB2 = fn_fillmiss(avg_pwrB2);
+fillavg_pwrB1 = sh_get_missing(avg_pwrB1);
+fillavg_pwrB3 = sh_get_missing(avg_pwrB3);
+fillavg_pwrB2 = sh_get_missing(avg_pwrB2);
 % -------------------------------------
 
 % obtain reference value - to select relevant noise
@@ -116,9 +116,9 @@ midRefB2 = mean(stateLevsB2);
 midRefB3 = mean(stateLevsB3);
 
 % get crossing positions from reference level(midRef)
-icrB1 = fn_crossing(fillavg_pwrB1,[],midRefB1);
-icrB2 = fn_crossing(fillavg_pwrB2,[],midRefB2);
-icrB3 = fn_crossing(fillavg_pwrB3,[],midRefB3);
+icrB1 = sh_get_crossing(fillavg_pwrB1,[],midRefB1);
+icrB2 = sh_get_crossing(fillavg_pwrB2,[],midRefB2);
+icrB3 = sh_get_crossing(fillavg_pwrB3,[],midRefB3);
 % -------------------------------------
 
 % select times on each band:

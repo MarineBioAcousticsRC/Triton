@@ -141,8 +141,8 @@ if PARAMS.ltsa.delimit.value
     ltsa_delimiter
 end
 
-if REMORA.ship_dt.class.PlotLabels
-  dt_plotLabels(PARAMS.ltsa.f(1)+.9*(PARAMS.ltsa.f(end)-PARAMS.ltsa.f(1)));
+if REMORA.sh.class.PlotLabels
+  sh_plot_labels(PARAMS.ltsa.f(1)+.9*(PARAMS.ltsa.f(end)-PARAMS.ltsa.f(1)));
 end
 
 % change time in control window to data time in plot window

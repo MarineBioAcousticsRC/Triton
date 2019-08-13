@@ -1,33 +1,21 @@
-function dt_plotLabels(freq)
-% dt_plotLabels(freq)
+function sh_plot_labels(freq)
+% sh_plot_labels(freq)
 % Plot the class labels for the currently active window.
-%
-
-% start time of the window where plots are desired.  Duration_s
-% is the amount of time displayed in the window, measured in s.
-%
-% Detections are plotted at the designated frequency Freq.
-%
-% The labels themselves are stored in the detection section
-% of the global PARAMS structure.
-%
-% Do not modify the following line, maintained by CVS
-% $Id: dtPlotLabels.m,v 1.4 2007/09/14 18:42:28 mroch Exp $
 
 % CAVEATS:  Broken for duty cycled data
 
 
 global REMORA
 
-[StartDate, StopDate] = fn_get_ltsa_range;
+[StartDate, StopDate] = sh_get_ltsa_range;
 
 % find labels that lie within plot region
-StartIndices = find(REMORA.ship_dt.class.starts > StartDate & ...
-                    REMORA.ship_dt.class.starts < StopDate);
-StopIndices = find(REMORA.ship_dt.class.stops > StartDate & ...
-                   REMORA.ship_dt.class.stops < StopDate);
-FullPlotIndex = find(REMORA.ship_dt.class.starts < StartDate & ...
-                    REMORA.ship_dt.class.stops > StopDate);
+StartIndices = find(REMORA.sh.class.starts > StartDate & ...
+                    REMORA.sh.class.starts < StopDate);
+StopIndices = find(REMORA.sh.class.stops > StartDate & ...
+                   REMORA.sh.class.stops < StopDate);
+FullPlotIndex = find(REMORA.sh.class.starts < StartDate & ...
+                    REMORA.sh.class.stops > StopDate);
 
 Complete = intersect(StartIndices, StopIndices);
 StartOnly = setdiff(StartIndices, StopIndices);
@@ -51,20 +39,20 @@ TruncStop = 2;
 TruncBoth = 3;
 
 if StartOnly
-  PlotInfo = [REMORA.ship_dt.class.starts(StartOnly),  StopDate * ...
+  PlotInfo = [REMORA.sh.class.starts(StartOnly),  StopDate * ...
               ones(length(StartOnly), 1), StartOnly, ...
               ones(size(StartOnly))*TruncStop];
 end
 
 if Complete
   PlotInfo = [PlotInfo;
-              REMORA.ship_dt.class.starts(Complete),  REMORA.ship_dt.class.stops(Complete), ...
+              REMORA.sh.class.starts(Complete),  REMORA.sh.class.stops(Complete), ...
               Complete, ones(size(Complete))*TruncNone];
 end
 
 if StopOnly
 PlotInfo = [PlotInfo;
-            StartDate*ones(length(StopOnly), 1), REMORA.ship_dt.class.stops(StopOnly), ...
+            StartDate*ones(length(StopOnly), 1), REMORA.sh.class.stops(StopOnly), ...
             StopOnly, ones(size(StopOnly))*TruncStart];
 
 end
@@ -78,8 +66,8 @@ end
 
 if ~isempty(PlotInfo)
   % convert dates to offset from starting time in units appropriate for plot.
-  Offsets = fn_date_to_xaxis([StartDate; StopDate]);
-  PlotTime = fn_date_to_xaxis(PlotInfo(:,[Start Stop]));
+  Offsets = sh_date_to_xaxis([StartDate; StopDate]);
+  PlotTime = sh_date_to_xaxis(PlotInfo(:,[Start Stop]));
   
   % Extend PlotTime to contain the following information
   MidPt = 3;    % midpoint between start & stop
@@ -116,7 +104,7 @@ if ~isempty(PlotInfo)
           (PlotTime(idx, Previous) > TextThresh && ...
            PlotTime(idx, Next) > TextThresh)
       text(PlotTime(idx, MidPt), LowFreq, ...
-           REMORA.ship_dt.class.labels(PlotInfo(idx, DetectIdx)), ...
+           REMORA.sh.class.labels(PlotInfo(idx, DetectIdx)), ...
            'Rotation', 90, 'HorizontalAlignment', 'Right', 'Color', 'w', ...
            'HitTest', 'off');
     end

@@ -1,36 +1,36 @@
 
 global REMORA HANDLES
 
-REMORA.ship_dt.menu = uimenu(HANDLES.remmenu,'Label','&Ship-Detector',...
+REMORA.sh.menu = uimenu(HANDLES.remmenu,'Label','&Ship-Detector',...
     'Enable','on','Visible','on');
 
 % interactive ltsa detector
-uimenu(REMORA.ship_dt.menu, 'Label', 'Interactive detector (LTSA)', ...
-    'Enable','off','Callback', 'ship_dt_pd(''interactive'')');
+uimenu(REMORA.sh.menu, 'Label', 'Interactive detector (LTSA)', ...
+    'Enable','off','Callback', 'sh_pulldown(''interactive'')');
 % Run ship detector
-uimenu(REMORA.ship_dt.menu, 'Label', 'Batch run detector', ...
-    'Callback', 'ship_dt_pd(''full_detector'')');
+uimenu(REMORA.sh.menu, 'Label', 'Batch run detector', ...
+    'Callback', 'sh_pulldown(''full_detector'')');
 % Visualize labels
-REMORA.ship_dt.labelmenu = uimenu(REMORA.ship_dt.menu, 'Label', 'Visualize detections');
-uimenu(REMORA.ship_dt.labelmenu, 'Label', 'Create labels', ...
-    'Enable','off','Callback', 'ship_dt_pd(''create_labels'')');
-uimenu(REMORA.ship_dt.labelmenu, 'Label', 'Load labels', ...
-    'Enable','on','Callback', 'ship_dt_pd(''load_labels'')');
-% REMORA.ship_dt.labelplot = uimenu(REMORA.ship_dt.labelmenu, 'Separator','off','Label', ...
+REMORA.sh.labelmenu = uimenu(REMORA.sh.menu, 'Label', 'Visualize detections');
+uimenu(REMORA.sh.labelmenu, 'Label', 'Create labels', ...
+    'Enable','off','Callback', 'sh_pulldown(''create_labels'')');
+uimenu(REMORA.sh.labelmenu, 'Label', 'Load labels', ...
+    'Enable','on','Callback', 'sh_pulldown(''load_labels'')');
+% REMORA.sh.labelplot = uimenu(REMORA.sh.labelmenu, 'Separator','off','Label', ...
 %        'Display labels', 'Checked', 'off', ...
-%        'Enable', 'off', 'Callback', 'ship_dt_pd(''display_labels'')');
+%        'Enable', 'off', 'Callback', 'sh_pulldown(''display_labels'')');
 
 % Run evaluate interface
-uimenu(REMORA.ship_dt.menu, 'Label', 'Evaluate detections', ...
-    'Enable','off','Callback', 'ship_dt_pd(''evaluate_detections'')');
+uimenu(REMORA.sh.menu, 'Label', 'Evaluate detections', ...
+    'Enable','off','Callback', 'sh_pulldown(''evaluate_detections'')');
 
 
 
 
-% ship_dt_initparams;  
-% ship_dt_initwins;
-% ship_dt_initcontrol;
-% ship_dt_initconst;
+% sh_initparams;  
+% sh_initwins;
+% sh_initcontrol;
+% sh_initconst;
 
 
 

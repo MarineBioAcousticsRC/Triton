@@ -1,8 +1,8 @@
-function ship_dt_pd(action)
+function sh_pulldown(action)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% ship_dt_pd.m
-% initializes pulldowns for detector
+% sh_pulldown.m
+% initializes pulldowns for ship detector
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,16 +32,12 @@ if strcmp(action, 'interactive')
 elseif strcmp(action,'full_detector')
     % dialog box - run full detector
     ship_setpointers('watch');
-    ui_get_detector_settings
-%     dtLTSAShipDetector;
-    %in some point will do it like the spice detector
-%     ui_select_detector_settings;
+    sh_load_settings
     ship_setpointers('arrow');
 
-elseif strcmp(action,'create_labels')
-    ship_setpointers('watch');
-    fn_createShipLabels
-    ship_setpointers('arrow');
+% elseif strcmp(action,'create_labels')
+%     ship_setpointers('watch');
+%     ship_setpointers('arrow');
     
 elseif strcmp(action,'load_labels')
     [basename, path] = uigetfile('*.tlab', 'Set detection label file');
@@ -53,34 +49,33 @@ elseif strcmp(action,'load_labels')
     if ~ exist(file,'file')
         disp_msg(sprintf('Detection file %s does not exist', file));
     else
-        [Starts, Stops, Labels] = ioReadLabelFile(file, 'Binary', true);
-        REMORA.ship_dt.class.starts = Starts;
-        REMORA.ship_dt.class.stops = Stops;
-        REMORA.ship_dt.class.labels = Labels;
-        REMORA.ship_dt.class.files = {file}; % May want to add display
+        [Starts, Stops, Labels] = sh_read_TLABFile(file, 'Binary', true);
+        REMORA.sh.class.starts = Starts;
+        REMORA.sh.class.stops = Stops;
+        REMORA.sh.class.labels = Labels;
+        REMORA.sh.class.files = {file}; % May want to add display
                                         % filename later on...
-        REMORA.ship_dt.class.ValidLabels = true;
-        REMORA.ship_dt.class.PlotLabels = true; % Assume they want to see them.
+        REMORA.sh.class.ValidLabels = true;
+        REMORA.sh.class.PlotLabels = true; % Assume they want to see them.
 %         set(HANDLES.labelplot, 'Checked', 'on');
         disp_msg(sprintf('Detection file %s read', file));
     end
     plot_triton;        % Replot showing labels
 
 elseif strcmp(action, 'display_labels')
-    if REMORA.ship_dt.class.ValidLabels
+    if REMORA.sh.class.ValidLabels
         % toggle plot status & flag
-%         if REMORA.ship_dt.class.PlotLabels
+%         if REMORA.sh.class.PlotLabels
 %             set(HANDLES.labelplot, 'Checked', 'off');
 %         else
 %             set(HANDLES.labelplot, 'Checked', 'on');
 %         end
-        REMORA.ship_dt.class.PlotLabels = ~ REMORA.ship_dt.class.PlotLabels;
+        REMORA.sh.class.PlotLabels = ~ REMORA.sh.class.PlotLabels;
         plot_triton;   % Replot with/without labels
     else
-        ship_dt_pd('load_labels');        % No valid label set, ask for one
+        sh_pd('load_labels');        % No valid label set, ask for one
     end
 elseif strcmp(action,'evaluate_detections')
-%     sp_dt_mkTPWS_gui
     warning('Under construction')
 end
 

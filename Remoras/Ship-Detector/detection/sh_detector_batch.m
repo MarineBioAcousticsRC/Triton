@@ -1,36 +1,19 @@
-function dt_ship_batch
-% dtShip_batch(BaseDir, DataFiles, PARAMS, DetParams, varargin)
-%
-% Run the long time ship detection algorithm on a set of files which are
-% members of the LTSA
-%
-% BaseDir - common prefix for all files, use '' or [] for no prefix
-% DataFiles - List of files to be processed
-% PARAMS - Structure representing an LTSA
-%
-% Optional arguments:
-% 'Viewpath', {'dir1', 'dir2', ... }
-%               List of directories to be viewpathed.  When searching
-%               for files, each directory in the cell array is examined
-%               for the file, and the first one encountered is used.
-%               New files are always written relative to the first
-%               directory in the viewpath.
-%
-% Maintained by CVS - do not modify
-% $Id: dtShip_batch.m,v 1 2017/28/02 asolsonaberga
+function sh_detector_batch
+% sh_detector_batch.m
+
 global REMORA
 
 % detection parameters (%%%%%%%%% parameters to add in the settings file)
-% % % % REMORA.ship_dt.settings.REWavExt= '(\.x)?\.wav';   % data files must end in this regular expression
-% % % % REMORA.ship_dt.settings.RELtsaExt = '.s';   % Ship - Long term detection label extension
+% % % % REMORA.sh.settings.REWavExt= '(\.x)?\.wav';   % data files must end in this regular expression
+% % % % REMORA.sh.settings.RELtsaExt = '.s';   % Ship - Long term detection label extension
 
 % get detection parameters
 sec2dnum = 60*60*24; % conversion factor to get from seconds to matlab datenum
-durWind = REMORA.ship_dt.settings.durWind;
-slide = REMORA.ship_dt.settings.slide;
-errorRange = REMORA.ship_dt.settings.errorRange;
-tave = REMORA.ship_dt.ltsa.tave;
-minPassage = REMORA.ship_dt.settings.minPassage/sec2dnum;
+durWind = REMORA.sh.settings.durWind;
+slide = REMORA.sh.settings.slide;
+errorRange = REMORA.sh.settings.errorRange;
+tave = REMORA.sh.ltsa.tave;
+minPassage = REMORA.sh.settings.minPassage/sec2dnum;
 
 tic;  % Note start time
 
@@ -40,13 +23,13 @@ populateLabels = {};
 newperc = 0;
 
 % how many windows will be used to process ltsa
-TotalWindows = ceil(REMORA.ship_dt.ltsa.durtot/durWind);
+TotalWindows = ceil(REMORA.sh.ltsa.durtot/durWind);
 
 disp('Start processing...')
-fprintf('Running Ship batch detection for %d files\n',REMORA.ship_dt.ltsa.nxwav)
+fprintf('Running Ship batch detection for %d files\n',REMORA.sh.ltsa.nxwav)
 
 % get ltsa window motion parameters
-dnumSnippet = REMORA.ship_dt.ltsa.dnumStart(1);
+dnumSnippet = REMORA.sh.ltsa.dnumStart(1);
 
 for itr1 = 1:TotalWindows
     
@@ -57,30 +40,30 @@ for itr1 = 1:TotalWindows
     
     % Read the spectral data of the snippet of data and apply detector
     % Central Window
-    [pwr,startIndex,startBin] = fn_pwrSnippet(dnumSnippet); 
-    [ships,labels,~] = dt_ship_signal(pwr,0);
+    [pwr,startIndex,startBin] = sh_get_pwr_window(dnumSnippet); 
+    [ships,labels,~] = sh_passage_detector(pwr,0);
     dnumShips = (ships./sec2dnum)*tave + dnumSnippet; % convert to actual times
     
     % Previous Window
     dnumPrevSnippet = dnumSnippet - datenum([0 0 0 0 0 slide]);
     
     % If earlier than start of ltsa, previous window will be the same like the central window
-    if dnumPrevSnippet < REMORA.ship_dt.ltsa.start.dnum
-       dnumPrevSnippet = REMORA.ship_dt.ltsa.start.dnum; 
+    if dnumPrevSnippet < REMORA.sh.ltsa.start.dnum
+       dnumPrevSnippet = REMORA.sh.ltsa.start.dnum; 
     end
-    [pwr,~,~] = fn_pwrSnippet(dnumPrevSnippet); 
-    [shipsPrev,labelsPrev,~] = dt_ship_signal(pwr,0);
+    [pwr,~,~] = sh_get_pwr_window(dnumPrevSnippet); 
+    [shipsPrev,labelsPrev,~] = sh_passage_detector(pwr,0);
     dnumShipsPrev = (shipsPrev./sec2dnum)*tave + dnumPrevSnippet; % convert to actual times
     
     % Posterior window
     dnumPostSnippet = dnumSnippet + datenum([0 0 0 0 0 slide]);
     
     % If past the end of ltsa, posterior window will be the same like the central window
-    if dnumPostSnippet > REMORA.ship_dt.ltsa.end.dnum
+    if dnumPostSnippet > REMORA.sh.ltsa.end.dnum
        dnumPostSnippet = dnumSnippet; 
     end
-    [pwr,~,~] = fn_pwrSnippet(dnumPostSnippet); 
-    [shipsPost,labelsPost,~] = dt_ship_signal(pwr,0);
+    [pwr,~,~] = sh_get_pwr_window(dnumPostSnippet); 
+    [shipsPost,labelsPost,~] = sh_passage_detector(pwr,0);
     dnumShipsPost = (shipsPost./sec2dnum)*tave + dnumPostSnippet;
     
     
@@ -162,7 +145,7 @@ for itr1 = 1:TotalWindows
     end
 
     itr1 = itr1 + 1;
-    dnumSnippet = fn_getNextTimeWindow(startIndex,startBin);
+    dnumSnippet = sh_read_time_window(startIndex,startBin);
 end
 
 if ~isempty(populateTimes)
@@ -185,24 +168,24 @@ if ~isempty(populateTimes)
         end
     end
     % save all detections with real datenums in a mat file
-    filename = split(REMORA.ship_dt.ltsa.infile,'.ltsa');
+    filename = split(REMORA.sh.ltsa.infile,'.ltsa');
     matname = ['Ship_detections_',filename{1},'.mat'];
-    save(fullfile(REMORA.ship_dt.settings.outDir,matname),'shipTimes',...
+    save(fullfile(REMORA.sh.settings.outDir,matname),'shipTimes',...
         'shipLabels','-mat','-v7.3');
-    fprintf('Detections saved at: %s\n',fullfile(REMORA.ship_dt.settings.outDir,matname));
+    fprintf('Detections saved at: %s\n',fullfile(REMORA.sh.settings.outDir,matname));
     
     % save labels
-    if REMORA.ship_dt.settings.saveLabels
+    if REMORA.sh.settings.saveLabels
         labelname = ['Ship_labels_',filename{1},'.tlab'];
-        ioWriteLabel(fullfile(REMORA.ship_dt.settings.outDir,labelname), shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
-        fprintf('Labels saved at: %s\n',fullfile(REMORA.ship_dt.settings.outDir,labelname));
+        sh_write_labels(fullfile(REMORA.sh.settings.outDir,labelname), shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+        fprintf('Labels saved at: %s\n',fullfile(REMORA.sh.settings.outDir,labelname));
     end
 
 else
     fprintf('No detections in file: %s\n',...
-        fullfile(REMORA.ship_dt.ltsa.inpath,REMORA.ship_dt.ltsa.infile))
+        fullfile(REMORA.sh.ltsa.inpath,REMORA.sh.ltsa.infile))
 end
 
 fprintf('LTSA batch detection completed (%d files, processing time: %s)\n', ...
-    REMORA.ship_dt.ltsa.nxwav, sectohhmmss(toc));
+    REMORA.sh.ltsa.nxwav, sectohhmmss(toc));
 

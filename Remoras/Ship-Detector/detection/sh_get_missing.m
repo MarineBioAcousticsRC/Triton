@@ -1,4 +1,4 @@
-function Mf = fn_fillmiss(M)
+function Mf = sh_get_missing(M)
 
 % FILLMISS Interpolation values in a matrix.
 %	MF = FILLMISS(M) Interpolates missing values

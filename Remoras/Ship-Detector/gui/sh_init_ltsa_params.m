@@ -1,6 +1,6 @@
-function dt_runLtsaDetector()
-% dt_runLtsaDetector()
-% Run Ltsa Ship Detection.
+function sh_init_ltsa_params
+% sh_init_ltsa_params()
+% Initialize LTSA parameters.
 
 global PARAMS REMORA
 
@@ -13,10 +13,7 @@ else
     BaseDir = PARAMS.ltsa.inpath;
 end
 
+REMORA.sh.ltsa.inpath = PARAMS.ltsa.inpath;
+REMORA.sh.ltsa.infile = PARAMS.ltsa.infile;
 
-REMORA.ship_dt.ltsa.inpath = PARAMS.ltsa.inpath;
-REMORA.ship_dt.ltsa.infile = PARAMS.ltsa.infile;
-
-fn_getLTSAHeader;
-
-dt_ship_batch;
+sh_read_ltsa_header;
