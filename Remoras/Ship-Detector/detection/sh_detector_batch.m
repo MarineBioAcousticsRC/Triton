@@ -25,12 +25,13 @@ newperc = 0;
 % how many windows will be used to process ltsa
 TotalWindows = ceil(REMORA.sh.ltsa.durtot/durWind);
 
-disp('Start processing...')
 fprintf('Running Ship batch detection for %d files\n',REMORA.sh.ltsa.nxwav)
+disp('Check bar progress window')
 
 % get ltsa window motion parameters
 dnumSnippet = REMORA.sh.ltsa.dnumStart(1);
-
+progressh = waitbar(0,'Start processing...','Name',sprintf('Processing file: %s',REMORA.sh.ltsa.infile));
+t = toc;
 for itr1 = 1:TotalWindows
     
     %%% Detect ships 
@@ -140,14 +141,21 @@ for itr1 = 1:TotalWindows
     perc = round(itr1/TotalWindows*100);
     if perc ~= newperc
         newperc = perc; 
-        progress = [num2str(newperc),'%'];
-        fprintf('   %s completed\n',progress)
+        % calculate time remaining
+%         trem = t/(newperc/100)-t;
+%         Hrs=floor(trem/3600);
+%         Min=floor((trem-Hrs*3600)/60);
+%         Sec = rem(trem,60);
+%         waitbar(newperc/100,progressh,sprintf('%d%% completed, estimated 00:%02.0f:%02.0f remaining',newperc,Min,Sec))
+    waitbar(newperc/100,progressh,sprintf('%d%% completed',newperc))
     end
 
     itr1 = itr1 + 1;
     dnumSnippet = sh_read_time_window(startIndex,startBin);
 end
 
+close(progressh);
+disp('Prepare to store detections....')
 if ~isempty(populateTimes)
     [~,I] = sort(populateTimes(:,1));
     shipTimes = populateTimes(I,:);

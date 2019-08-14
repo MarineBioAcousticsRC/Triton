@@ -8,9 +8,7 @@ global PARAMS REMORA
 % to the metadata directory, save other directory in case user switches
 
 if isempty(PARAMS.ltsa.inpath) || isempty(PARAMS.ltsa.infile)
-    BaseDir = pwd;  % No LTSA, use current directory
-else
-    BaseDir = PARAMS.ltsa.inpath;
+    error('Load first an LTSA file');  % No LTSA, use current directory
 end
 
 REMORA.sh.ltsa.inpath = PARAMS.ltsa.inpath;
