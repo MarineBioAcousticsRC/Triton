@@ -37,9 +37,9 @@ elseif strcmp(action, 'setbpEdgeMax')
     bpEdgeMax = get(REMORA.dt_mkTPWS.bpEdgeMaxEdTxt,'String');
     REMORA.dt.mkTPWS.bpRange(2) = bpEdgeMax;
 
-elseif strcmp(action, 'setbpEdgeMax')
-    bpEdgeMax = get(REMORA.dt_mkTPWS.bpEdgeMaxEdTxt,'String');
-    REMORA.dt.mkTPWS.bpRange(2) = bpEdgeMax;    
+elseif strcmp(action, 'setFft')
+    fftSize = get(REMORA.dt_mkTPWS.bpEdgeMaxEdTxt,'String');
+    REMORA.dt.mkTPWS.fftSize = fftSize;    
     
 elseif strcmp(action, 'setTFPath')
     tfFullFile = get(REMORA.dt_mkTPWS.tfPathEdTxt,'String');
