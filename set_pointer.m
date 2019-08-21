@@ -24,9 +24,9 @@ if ~ strcmp(old, new)  % Any need to actually change it?
         % fullcross will not always erase itself when the focus
         % is on the current window.  We select another window,
         % set the pointer, hide the window, then restore focus.
-        figure(HANDLES.fig.fullcrossbug);
+%        figure(HANDLES.fig.fullcrossbug);
         set(figH, 'Pointer', new);
-        set(HANDLES.fig.fullcrossbug, 'Visible', 'off');
+%        set(HANDLES.fig.fullcrossbug, 'Visible', 'off');
         figure(figH);
     else
         set(figH, 'Pointer', new);  % Set new pointer type
