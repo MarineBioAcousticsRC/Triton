@@ -1,10 +1,6 @@
-% settings_detectorDefault
+% settings_detector_xwav_default
 
 % Settings script for spice_detector
-
-% Parameters for both detector steps (low & high resolution):
-detParams.lowResDet = true; % run low resolution detector.
-detParams.highResDet = true; % run high resolution detector.
 
 % Location of base directory containing directories of files to be analyzed
 detParams.baseDir = [];
@@ -24,14 +20,15 @@ detParams.tfFullFile = [];
 detParams.depl = [];
 
 detParams.channel = 1; % which channel do you want to look at?
-detParams.bpRanges = [10000 100000]; % Bandpass filter parameters in Hz [min,max]
+detParams.bpRanges = [5000 100000]; % Bandpass filter parameters in Hz [min,max]
 detParams.filterOrder = 5; % butterworth filter order used for band pass
 detParams.dBppThreshold = 118; % minimum amplitude threshold in dB. 
 detParams.frameLengthUs = 2000; % For fft computation
 detParams.clipThreshold = 0.98;%  Normalized clipping threshold btwn 0 and 1.  If empty, 
 % assumes no clipping. 
 
-detParams.REWavExt = '(\.x)?\.wav';%  expression to match .wav or .x.wav
+
+detParams.REWavExt = '(\.x)?\.wav';% Only used for array. Expression to match .wav or .x.wav
 % If you are using wav files that have a time stamp in the name, put a
 % regular expression for extracting that here:
 detParams.DateRegExp = '_(\d*)_(\d*)';
@@ -50,7 +47,6 @@ detParams.DateRegExp = '_(\d*)_(\d*)';
 %%%%% GUIDED DETECTIONS? %%%%
 detParams.guidedDetector = false; % flag to 1 if guided
 % Name of spreadsheet containing target detection times. Required if guidedDetector = true
-% parametersLR.gDxls = 'E:\Data\John Reports\DCLDEdata\WAT_NC_guidedDets.xlsx';
 detParams.gDxls = [];
 detParams.diary = false; % set to true if you want a diary output. Warning: text file can get large
 
@@ -59,6 +55,15 @@ detParams.LRbuffer = 0.0025; % # of seconds to add on either side of area of int
 
 %%%%%%%%%%%%%%%%%% High resolution only settings %%%%%%%%%%%%%%%%
 %%% OTHER DETECTION THRESHOLD PARAMS %%%
+
+detParams.HRbuffer = 0.00025; % # of seconds to add on either side of area of interest
+detParams.delphClickDurLims = [30,500];% [min,max] duration in microsec 
+
+% allowed for high energy envelope of click
+detParams.cutPeakBelowKHz = 10; % discard click if peak frequency below X kHz
+detParams.cutPeakAboveKHz = 100; % discard click if peak frequency above Y kHz 
+% detParams.minClick_us = 16; % Minimum duration of a click in us 
+% detParams.maxClick_us = 1500; % Max duration of a click including echos
 detParams.energyThr = 0.25; % n-percent energy threshold for envelope duration
 detParams.dEvLims = [-.5,.9];  % [min,max] Envelope energy distribution comparing 
 % first half to second half of high energy envelope of click. If there is
@@ -69,8 +74,8 @@ detParams.dEvLims = [-.5,.9];  % [min,max] Envelope energy distribution comparin
 detParams.HRbuffer = 0.00025; % # of seconds to add on either side of area of interest
 detParams.delphClickDurLims = [30,1200];% [min,max] duration in microsec 
 % allowed for high energy envelope of click
-detParams.cutPeakBelowKHz = 15; % discard click if peak frequency below X kHz
-detParams.cutPeakAboveKHz = 80; % discard click if peak frequency above Y kHz 
+detParams.cutPeakBelowKHz = 5; % discard click if peak frequency below X kHz
+detParams.cutPeakAboveKHz = 100; % discard click if peak frequency above Y kHz 
 % detParams.minClick_us = 16;% Minimum duration of a click in us 
 % detParams.maxClick_us = 1500; % Max duration of a click including echos
 
@@ -87,17 +92,23 @@ detParams.energyPrctile = 70; % sets the threshold at which click start
 %%% POST PROCESSING FLAGS %%%%%%%%
 detParams.rmLonerClicks = false;
 detParams.rmEchos = false;
-detParams.lockOut = 0.01; % min gap between clicks in seconds, only used if rmEchos=TRUE
+detParams.lockOut = 0.001; % min gap between clicks in seconds, only used if rmEchos=TRUE
 detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring 
 % clicks. Clicks that are far from neighbors can be rejected using this parameter,
 % good for dolphins in noisy environments because lone clicks or pairs of
 % clicks are likely false positives
 
 %%% Saving options %%%
-detParams.saveNoise = 0; % Make 1 if you want to save noise samples with each click. 
+detParams.saveNoise = 0; % Make 1 if you want to save noise samples with each click.
+ 
 % Beware: this can make big files if you have a lot of detections.
 detParams.saveForTPWS = 1; % Save just enough data to build TPWS files. Should help
 % limit metadata size.
+detParams.overwrite = false; % overwrite any existing detection files? 
+% Useful in case of a crash.
+
+% Control amount of messaging displayed in console.
+detParams.verbose = true;
 
 %%% Output file extensions. Probably don't need to be changed %%%
 detParams.ppExt = 'cHR';

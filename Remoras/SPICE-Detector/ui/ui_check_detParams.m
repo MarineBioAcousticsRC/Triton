@@ -1,4 +1,4 @@
-function ui_check_detParams
+function ui_check_detParams(hObject,eventdata,hFigure)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 % ui_check_detParams.m
@@ -8,6 +8,9 @@ function ui_check_detParams
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global REMORA
 
+if ishandle(hFigure) && isvalid(hFigure)
+    close(hFigure)
+end
 defaultPos = [0.25,0.25,0.5,0.5];
 REMORA.fig.spice_dt_verify = figure( ...
     'NumberTitle','off', ...

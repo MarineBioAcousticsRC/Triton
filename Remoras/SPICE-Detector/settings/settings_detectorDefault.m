@@ -95,9 +95,6 @@ detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring
 % good for dolphins in noisy environments because lone clicks or pairs of
 % clicks are likely false positives
 
-detParams.rmEchos = false;
-detParams.lockOut = 0.01; % min gap between clicks in seconds, only used if rmEchos=TRUE
-
 %%% Saving options %%%
 detParams.saveNoise = 1; % Make 1 if you want to save noise samples with each click. 
 % Beware: this can make big files if you have a lot of detections.

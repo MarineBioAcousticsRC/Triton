@@ -1,6 +1,10 @@
 function dt_control(action,mySource)
 global REMORA
 
+if ~exist('mySource','var')
+    mySource = 'null';
+    
+end
 if strcmp(action, '')
 % Note: could make this have an option to just refresh everything by making
 % these all into if rather than elseif

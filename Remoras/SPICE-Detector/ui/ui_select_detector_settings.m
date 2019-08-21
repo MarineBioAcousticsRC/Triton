@@ -1,7 +1,11 @@
 function ui_select_detector_settings
 
-global PARAMS
+global REMORA
 
+if ~isfield(REMORA.spice_dt,'detParams')
+    settings_detector_xwav_default
+    REMORA.spice_dt.detParams = detParams;
+end
 hFigure = figure('Position',[560,528,200,200],...
     'NumberTitle','off','Name','Spice Detector Batch Run - v1.0');
 clf
@@ -33,10 +37,13 @@ b2 = uicontrol(bg,'Style','pushbutton',...
 % need to add callback here
 
 bg.Visible = 'on';
+
+
 end
 
 function ui_load_params_from_mfile(hObject,eventdata,hFigure)
- 
+global REMORA
+
 dialogTitle = 'Choose detector settings file';
 
 thisPath = mfilename('fullpath');
@@ -45,8 +52,12 @@ detParamsFile = uigetfile(fullfile(fileparts(fileparts(thisPath)),...
     'settings\*.m'),dialogTitle);
 detParams = [];
 run(detParamsFile)
-global REMORA
+
+% merge imported params with existing params
+if isfield(REMORA.spice_dt,'detParams')
+    detParams = sp_merge_detParams(detParams,REMORA.spice_dt.detParams);
+end
 REMORA.spice_dt.detParams = detParams;
-close(hFigure)
-ui_check_detParams
+%close(hFigure)
+ui_check_detParams([],[],hFigure)
 end
