@@ -15,5 +15,6 @@ txt = uicontrol('Parent',d,...
        'String',sprintf(dispMessage)); 
        
 drawnow
+figure(d)
 1;
    

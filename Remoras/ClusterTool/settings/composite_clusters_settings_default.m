@@ -1,4 +1,4 @@
-function s = composite_clusters_settings_default
+% composite_clusters_settings_default
 
 % Settings for running composite_clusters.m
 % Consider making separate versions to keep track of settings used on

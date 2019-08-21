@@ -1,4 +1,4 @@
-function cluster_tool_pulldown(action)
+function ct_pulldown(action)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % cluster_tool_pulldown.m

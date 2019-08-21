@@ -113,8 +113,17 @@ elseif strcmp(action,'runCompositeClusters')
     [~,spinnerH] = javacomponent(jObj.getComponent, [200,10,40,40], gcf);
     set(spinnerH,'units','norm', 'position',[0.45,0.3,0.1,0.15])
     jObj.start;
-    ct_composite_clusters(REMORA.ct.CC_params)
-    dh = ct_CB_status_dialog('Composite clustering complete.');
+    drawnow
+    
+    [exitCode,ccOutput] = ct_composite_clusters(REMORA.ct.CC_params);
+    REMORA.ct.CC.output = ccOutput;
+    if exitCode
+        dh = ct_CB_status_dialog('Composite clustering complete.');
+        % show post-clustering menu
+        ct_post_cluster_ui
+    else
+        dh = ct_CB_status_dialog('Composite clustering failed. See Matlab console for details.');   
+    end
     jObj.stop;
 elseif strcmp(action,'ct_CC_settingsLoad')
     thisPath = mfilename('fullpath');

@@ -1,5 +1,7 @@
-function ct_composite_clusters(varargin)
+function [exitCode,ccOutput] = ct_composite_clusters(varargin)
 
+exitCode = 0;
+ccOutput = [];
 % Cluster binned averages using a range of possible features
 if nargin == 1
     % Check if settings file was passed in function call
@@ -45,7 +47,7 @@ if s.diary
     diary(fullfile(s.outDir,sprintf('composite_clust_diary_%s.txt',datestr(now,'YYYYMMDD'))))
 end
 disp(s)
-
+disp('Loading inputs...')
 % load data from folder of files
 inFileList = dir(fullfile(s.inDir,s.inFileString));
 if isempty(inFileList)
@@ -369,13 +371,22 @@ for iTF = 1:length(nodeSet)
 end
 bestWNodeDeg = wNodeDeg{bokIdx};
 s.barAdj = .5*mode(diff(p.barInt));%p.stIdx = 2;
+exitCode = 1; % Call it a success if you made it this far.
+
+% make default cluster names
+labelStr = {};
+for iEd = 1:length(nodeSet)
+    % Make editable name field
+    labelStr{iEd} = sprintf('Cluster%0.0f',iEd);
+end
+
 if s.subPlotSet
     fprintf('Plotting inter cluster comparisons\n')
-    intercluster_plots(p,s,f,nodeSet,compositeData,Tfinal);
+    intercluster_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr);
 end
 
 if s.indivPlots
-    individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal)
+    individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr)
 end
 % binDataUsed = binDataPruned(binIdx(useBins));
 % for iR = 1:length(binDataUsed)
@@ -383,18 +394,18 @@ end
 % end
 
 if s.saveOutput
-    outputDataFile = fullfile(s.outDir,[s.outputName,'_typesHR']);
+    outputDataFile = fullfile(s.outDir,[s.outputName,'_types_all']);
     fprintf('Saving data file to %s\n',outputDataFile)
     save(outputDataFile,'inputSet','nodeSet','NMIList','bokVal','bokIdx','f',...
         'p','s','nList','ka','naiItr','isolatedSet','compositeData','Tfinal',...
         'specNorm','dTTmatNorm','iciModes','diffNormSpec','cRateNorm','fileNumExpand',...
-        'bestWNodeDeg','prunedNodeSet','tIntMat','subOrder','binIdx','inFileList','clickTimes')
+        'bestWNodeDeg','prunedNodeSet','tIntMat','subOrder','binIdx','inFileList','clickTimes','labelStr')
     for iType = 1:size(Tfinal,1)
         thisType = [];
         outputTypeFile = fullfile(s.outDir,[s.outputName,'_type',num2str(iType)]);
         fprintf('Saving type file to %s\n',outputTypeFile)
         thisType.Tfinal = Tfinal(iType,:);
-        %[~,~,bin2Nodes] = intersect(thisType.Tfinal{1,7},tIntMat,'stable');
+        % [~,~,bin2Nodes] = intersect(thisType.Tfinal{1,7},tIntMat,'stable');
         thisType.tIntMat = tIntMat(Tfinal{iType,8});
         thisType.clickTimes = vertcat(clickTimes{Tfinal{iType,8}});
         thisType.fileNumExpand = fileNumExpand(Tfinal{iType,8});
@@ -403,6 +414,18 @@ if s.saveOutput
     end
     
 end
+
+ccOutput.outputDataFile = outputDataFile;
+ccOutput.p = p;
+ccOutput.s = s;
+ccOutput.f = f;
+ccOutput.nodeSet = nodeSet;
+ccOutput.compositeData = compositeData;
+ccOutput.Tfinal = Tfinal;
+ccOutput.tIntMat = tIntMat;
+ccOutput.clickTimes = clickTimes;
+ccOutput.fileNumExpand = fileNumExpand;
+ccOutput.labelStr = labelStr; 
 
 if s.diary
     diary('off')
