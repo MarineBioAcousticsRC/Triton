@@ -6,62 +6,76 @@ if strcmp(action, '')
 % Note: could make this have an option to just refresh everything by making
 % these all into if rather than elseif
 elseif strcmp(action, 'setDetDir')
-    detDir = get(REMORA.dt_mkTPWS.detDirEdTxt,'String');
-    REMORA.dt.mkTPWS.detDir = detDir;
-
-elseif strcmp(action, 'setSubDirTF')
-    subDirTF = get(REMORA.dt_mkTPWS.subDirCheckBox,'Value');
-    REMORA.dt.mkTPWS.subDirTF = subDirTF;
+    detDir = get(REMORA.dt_TPWS_verify.detDirEdTxt,'String');
+    REMORA.dt.TPWS.detDir = detDir;
     
 elseif strcmp(action, 'setDetFileExt')
-    fileExt = get(REMORA.dt_mkTPWS.detExtPopup,'String');
-    REMORA.dt.mkTPWS.fileExt = fileExt;
+    detExtString = get(REMORA.dt_TPWS_verify.detFileExtPopup,'String');
+    detExtValue = get(REMORA.dt_TPWS_verify.detFileExtPopup,'Value');
+    REMORA.dt.TPWS.detFileExt = detExtString{detExtValue};
 
-elseif strcmp(action, 'setXwavDir')
-    xwavDir = get(REMORA.dt_mkTPWS.xwavDirEdTxt,'String');
-    REMORA.dt.mkTPWS.xwavDir = xwavDir;
+elseif strcmp(action, 'setRecDir')
+    recDir = get(REMORA.dt_TPWS_verify.recDirEdTxt,'String');
+    REMORA.dt.TPWS.recDir = recDir;
 
-elseif strcmp(action, 'setXwavFileExt')
-    xwavExt = get(REMORA.dt_mkTPWS.xwavExtPopup,'String');
-    REMORA.dt.mkTPWS.xwavExt = xwavExt;
+elseif strcmp(action, 'setRecFileExt')
+    recExtString = get(REMORA.dt_TPWS_verify.recFileExtPopup,'String');
+    recExtValue = get(REMORA.dt_TPWS_verify.recFileExtPopup,'Value');
+    REMORA.dt.TPWS.recFileExt = recExtString{recExtValue};
     
 elseif strcmp(action, 'setTPWSOutDir')
-    outDir = get(REMORA.dt_mkTPWS.outDirEdTxt,'String');
-    REMORA.dt.mkTPWS.outDir = outDir;
+    outDir = get(REMORA.dt_TPWS_verify.outDirEdTxt,'String');
+    REMORA.dt.TPWS.outDir = outDir;
+    
+elseif strcmp(action, 'setByFolder')
+    byFolder = get(REMORA.dt_TPWS_verify.byFolderCheckBox,'Value');
+    REMORA.dt.TPWS.byFolder = byFolder;
     
 elseif strcmp(action, 'setbpEdgeMin')
-    bpEdgeMin = get(REMORA.dt_mkTPWS.bpEdgeMinEdTxt,'String');
-    REMORA.dt.mkTPWS.bpRange(1) = bpEdgeMin;
+    bpEdgeMin = get(REMORA.dt_TPWS_verify.bpEdgeMinEdTxt,'String');
+    REMORA.dt.TPWS.bpRange(1) = bpEdgeMin;
     
 elseif strcmp(action, 'setbpEdgeMax')
-    bpEdgeMax = get(REMORA.dt_mkTPWS.bpEdgeMaxEdTxt,'String');
-    REMORA.dt.mkTPWS.bpRange(2) = bpEdgeMax;
+    bpEdgeMax = get(REMORA.dt_TPWS_verify.bpEdgeMaxEdTxt,'String');
+    REMORA.dt.TPWS.bpRange(2) = bpEdgeMax;
 
 elseif strcmp(action, 'setFft')
-    fftSize = get(REMORA.dt_mkTPWS.bpEdgeMaxEdTxt,'String');
-    REMORA.dt.mkTPWS.fftSize = fftSize;    
+    fftSize = get(REMORA.dt_TPWS_verify.bpEdgeMaxEdTxt,'String');
+    REMORA.dt.TPWS.fftSize = fftSize;    
     
 elseif strcmp(action, 'setTFPath')
-    tfFullFile = get(REMORA.dt_mkTPWS.tfPathEdTxt,'String');
-    REMORA.dt.mkTPWS.tfFullFile = tfFullFile;
+    tfFullFile = get(REMORA.dt_TPWS_verify.tfPathEdTxt,'String');
+    REMORA.dt.TPWS.tfFullFile = tfFullFile;
     
 elseif strcmp(action, 'setTPWSFilterString')
-    filterString = get(REMORA.dt_mkTPWS.filterStringEdTxt,'String');
-    REMORA.dt.mkTPWS.filterString = filterString;
+    filterString = get(REMORA.dt_TPWS_verify.filterStringEdTxt,'String');
+    REMORA.dt.TPWS.filterString = filterString;
     
 elseif strcmp(action, 'setTPWSminRL')
-    ppThresh = get(REMORA.dt_mkTPWS.minRLTxt,'String');
+    ppThresh = get(REMORA.dt_TPWS_verify.minRLTxt,'String');
     if ~isempty(ppThresh)
         ppThresh = str2num(ppThresh);
-        REMORA.dt.mkTPWS.ppThresh = ppThresh;
+        REMORA.dt.TPWS.ppThresh = ppThresh;
     else
-        REMORA.dt.mkTPWS.ppThresh = [];
+        REMORA.dt.TPWS.ppThresh = [];
     end
     
-elseif strcmp(action, 'setStoreFeat')
-    saveFeat = get(REMORA.dt_mkTPWS.featCheckBox,'String');
-    REMORA.dt.mkTPWS.saveFeat = saveFeat;
+elseif strcmp(action, 'setExclDet')
+    exclDet = get(REMORA.dt_TPWS_verify.exclDetCheckbox,'Value');
+    REMORA.dt.TPWS.exclDetections = exclDet;
     
 elseif strcmp(action, 'run_mkTPWS')
-    dt_mkTPWS
+    settings = settings_in_seconds(REMORA.dt.TPWS);
+    dt_mkTPWS(settings)
 end
+
+function p = settings_in_seconds(settings)
+
+p = settings;
+p.frameLength = p.frameLength / 1000; 
+p.timeseriesLength = p.timeseriesLength / 1000; 
+p.framebuffer = p.framebuffer / 1000; 
+p.clickbuffer = p.clickbuffer / 1000; 
+
+
+

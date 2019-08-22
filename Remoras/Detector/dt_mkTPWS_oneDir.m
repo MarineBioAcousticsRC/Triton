@@ -1,31 +1,55 @@
-function dt_mkTPWS_oneDir(folder,path,fileExt,letterCode,ppThresh)
+function dt_mkTPWS_oneDir(detFiles,recFiles,p)
 
-letterFlag = 0; % flag for knowing if a letter should be appended to disk name
-fileSet = dir(fullfile(folder.det,['*',fileExt.det]));
-fileSet = fileSet(cellfun(@(x) x>0, {fileSet.bytes})); % exclude empty files
-lfs = length(fileSet);
+lfs = length(detFiles); % number of files
 
 % file type
-if strcmp(fileExt.audio,'.x.wav')
+if strcmp(p.recFileExt,'.x.wav')
     ftype = 2;
-elseif strcmp(fileExt.audio,'.wav')
+elseif strcmp(p.recFileExt,'.wav')
     ftype = 1;
 else
     error('Audio file type not supported')
 end
 
-% constant parameters
-dnum2sec = 60*60*24;
-Y2K = datenum([ 2000 0 0 0 0 0 ]);
+% Initialize temporal settings,to track sampling frequency and only rebuild
+% the filters if the sampling frequency changes. 
+pTemp = p;
 
-% initialize
-clickTimesVec = [];
-ppSignalVec = [];
-specClickTfVec = [];
-tsVecStore = [];
-subTP = 1;
-fSave = [];
+% initialize TPWS variables
+detParams = dt_init_detParams(p);
+
 for itr1 = 1:lfs % for each detection file
+    
+    currentRecFile = recFiles{itr1};
+    currentDetFile = detFiles{itr1};
+    
+% % % %     % read file header info
+% % % %     hdr = ioReadXWAVHeader(currentRecFile,'fType', ftype);
+% % % %     
+% % % %     if isempty(hdr)
+% % % %         warning('No header info returned for file %s',currentRecFile);
+% % % %         disp('Moving on to next file')
+% % % %         continue % skip if you couldn't read a header
+% % % %     else
+% % % %         if fTypes(idx1) == 1
+% % % %             [startsSec,stopsSec,pTemp] = dt_LR_chooseSegments(pTemp,hdr);
+% % % %         else
+% % % %             % divide xwav by raw file
+% % % %             [startsSec,stopsSec] = dt_chooseSegmentsRaw(hdr);
+% % % %         end
+% % % %         
+% % % %     end
+    
+    if hdr.fs ~= pTemp.previousFs
+        % otherwise, if this is the first time through, build your filters,
+        % only need to do this once though, so if you already have this
+        % info, this step is skipped
+        [previousFs,pTemp] = dt_buildFilters(pTemp,hdr.fs);
+        pTemp.previousFs = previousFs;
+        pTemp = dt_interp_tf(pTemp);
+    end
+    
+    
     detFile = fileSet(itr1).name;
     
     %     load(char(fullfile(detDir,thisFile)),'-mat','clickTimes','hdr',...

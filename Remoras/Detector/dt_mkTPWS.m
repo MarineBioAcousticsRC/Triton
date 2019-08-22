@@ -1,6 +1,5 @@
-function dt_mkTPWS
+function dt_mkTPWS (settings)
 
-global REMORA
 % Script takes output from text files (.cTg - Triton detector or 
 % .pgdf - Pamguard detector) and put it into a format for use in detEdit.
 % Output:
@@ -13,108 +12,88 @@ global REMORA
 %   normalization preferences.
 %   f = An Fx1 frequency vector associated with MSP
 
-% get folder of files
-if isfield(REMORA,'dt') && isfield(REMORA.dt,'mkTPWS')
-    if  isfield(REMORA.dt.mkTPWS,'detDir')
-        folder.det = REMORA.dt.mkTPWS.detDir;
-    else
-        folder.det = uigetdir('','Please select folder of detection files or file folders');
+% get folder of files and chech that exist
+if  ~isfield(settings,'detDir')
+    settings.detDir = uigetdir('','Please select folder of detection files or file folders');
+end
+if ~exist(settings.detDir,'dir'); error('Folder (%s) not found',settings.detDir); end
+
+if ~isfield(settings,'recDir')
+    settings.recDir = uigetdir('','Please select folder of xwav or wav files or file folders');
+end
+if ~exist(settings.recDir,'dir'); error('Folder (%s) not found',settings.recDir); end
+
+if ~isfield(settings,'outDir')
+    settings.outDir = uigetdir('','Please select folder to store TPWS files');
+end
+if ~exist(settings.outDir,'dir') % check if the output file exists, if not, make it
+    fprintf('Creating output directory %s\n',settings.outDir)
+    mkdir(settings.out)
+end
+
+if isfield(settings,'tfFullFile')
+    if ~exist(settings.tfFullFile,'file'); error('File (%s) not found',settings.tfFullFile);end
+else
+    settings.tfFullFile = [];
+    sprintf('Transfer function is not applied')
+end
+
+if ~isfield(settings,'filterString')
+    settings.siteName = '';% site name wildcard, used to restrict input files
+end
+
+if ~isfield(settings,'ppThresh')
+    settings.ppThresh = -inf;
+end
+
+if ~isfield(settings,'byFolder')
+    settings.byFolder = 0;
+end
+
+if isfield(settings,'detFileExt')
+    if strcmp(settings.detFileExt,'other')
+        prompt = 'Specify detection file extension (e.g. cTg): ';
+        settings.detFileExt = input(prompt,'s');
+        settings.detFileExt = ['.',settings.detFileExt];
     end
-    if isfield(REMORA.dt.mkTPWS,'xwavDir')
-        folder.audio = REMORA.dt.mkTPWS.xwavDir;
-    else
-        folder.audio = uigetdir('','Please select folder of xwav or wav files or file folders');
-    end
-    if isfield(REMORA.dt.mkTPWS,'outDir')
-        folder.out = REMORA.dt.mkTPWS.outDir;
-    else
-        folder.out = uigetdir('','Please select folder to store TPWS files');
-    end
-    if isfield(REMORA.dt.mkTPWS,'tfFullFile')
-        path.tf = REMORA.dt.mkTPWS.tfFullFile;
-    else
-        path.tf = [];
-        sprintf('Transfer function is not applied')
-    end
-    if isfield(REMORA.dt.mkTPWS,'filterString')
-        siteName = REMORA.dt.mkTPWS.filterString;
-    else
-        siteName = '';% site name wildcard, used to restrict input files
-    end
-    if isfield(REMORA.dt.mkTPWS,'ppThresh')
-        % minimum RL in dBpp. If detections have RL below this
-        % threshold, they will be excluded from the output file. Useful if you have
-        % an unmanageable number of detections.
-        ppThresh = REMORA.dt.mkTPWS.ppThresh;
-        if isempty(ppThresh)
-            ppThresh = -inf;
-        end
-    else
-        ppThresh = -inf;
-    end
-    if isfield(REMORA.dt.mkTPWS,'subDirTF')
-        subDir = REMORA.dt.mkTPWS.subDirTF;
-    else
-        subDir = 0;
-    end 
-    if isfield(REMORA.dt.mkTPWS,'fileExt')
-        labelStr = {'.cTg','.pgdf','.cHR','other'};
-        idxExt = REMORA.dt.mkTPWS.fileExt;
-        fileExt.det = labelStr(idxExt);
-        if idxExt == 4
-            prompt = 'Specify detection file extension (e.g. cTg): ';
-            fileExt.det = input(prompt,'s');
-            fileExt.det = ['.',fileExt.det];
-        end
-    else
-        fileExt.det = '.cTg';
-    end 
-    if isfield(REMORA.dt.mkTPWS,'wavExt')
-        labelStr2 = {'x.wav','.wav','other'};
-        idxExt2 = REMORA.dt.mkTPWS.wavExt;
-        fileExt.audio = labelStr2(idxExt2);
-        if idxExt2 == 4
-            prompt = 'Specify audio file extension (e.g. wav): ';
-            fileExt.audio  = input(prompt,'s');
-            fileExt.audio  = ['.',fileExt.audio ];
-        end
-        else
-            fileExt.audio  = '.x.wav';
-    end 
-    if isfield(REMORA.dt.mkTPWS,'saveFeat')
-        saveFeat = REMORA.dt.mkTPWS.saveFeat;
-    else
-        saveFeat = 0;
-    end 
+else
+    settings.detFileExt = '.cTg';
+end
+
+if ~isfield(settings,'recFileExt')
+    settings.recFileExt  = '.x.wav';
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% check if the output file exists, if not, make it
-if ~exist(folder.out,'dir')
-    fprintf('Creating output directory %s\n',outDir)
-    mkdir(folder.out)
-end
+
 letterCode = 97:122;
 
+% Build list of cTg files in the directory
+[fullDetFileNames,detFilePaths,detFileBytes] = dt_TPWS_findDetFile(settings);
+
+% Build list of (x)wav files in the directory that match detection files name.
+% Right now only wav and xwav files are looked for.
+fullRecFileNames = dt_TPWS_findXWAV(settings,fullDetFileNames);
+
+settings.previousFs = 0; % make sure we build filters on first pass
+
+% More than 3 miliion clicks will create to large files, so store TPWS per
+% subfolder (disk) instead
+settings.estimSize = ceil(sum(detFileBytes)/30); % estimated size of TPWS variables
+largeFile = settings.estimSize >= 3E6;
 
 % if run on folder of files
-if ~subDir
-    dt_mkTPWS_oneDir(folder,path,fileExt,letterCode,ppThresh)
+if ~settings.byFolder && largeFile
+    dt_mkTPWS_oneDir(fullDetFileNames,fullRecFileNames,settings)
 else 
-    % run on subfolders (only one layer down).
-    dirSet = folder(fullfile(folder.det,[siteName,'*']));
-    if isempty(dirSet)
-        error('No files matching criteria %s found.',....
-            fullfile(folder.det,[siteName,'*']))
-    end
-    for itr0 = 1:length(dirSet)
+    % Find how many folders to create a TPWS file per folder.
+    % Otherwise, if specified by the user, create one TPWS file for all the
+    % detections.
+    folders = unique(detFilePaths);
 
-        if dirSet(itr0).isdir &&~strcmp(dirSet(itr0).name,'.')&&...
-                ~strcmp(dirSet(itr0).name,'..')
-            folder.det = fullfile(dirSet(itr0).folder,dirSet(itr0).name);
-            
-            dt_mkTPWS_oneDir(folder,path,fileExt,letterCode,ppThresh)
-            
-        end
+    for itr1 = 1:length(folders)
+        selec = strcmp(detFilePaths,folders(itr1)); % select files for this folder
+        settings.estimSize = ceil(sum(detFileBytes(selec))/30);
+        dt_mkTPWS_oneDir(fullDetFileNames(selec),fullRecFileNames(selec),settings)
     end
 end
     

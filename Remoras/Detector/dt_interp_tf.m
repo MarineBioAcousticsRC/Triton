@@ -1,13 +1,12 @@
 function p = dt_interp_tf(p)
 
-% Given a path to a transfer function file open it and 
-% interpollate to curve to match desired frequency vector.
+% If a transfer function is provided, interpolate to desired frequency bins
 
 % Determine the frequencies for which we need the transfer function
-f_desired = (p.specRange(1)-1)*p.binWidth_Hz:p.binWidth_Hz:...
+p.xfr_f = (p.specRange(1)-1)*p.binWidth_Hz:p.binWidth_Hz:...
     (p.specRange(end)-1)*p.binWidth_Hz;
-if ~isempty(p.tfFullFile)
 
+if ~isempty(p.tfFullFile)
     fid = fopen(p.tfFullFile,'r');
     if fid ~=-1
         % read in transfer function file
@@ -18,28 +17,25 @@ if ~isempty(p.tfFullFile)
         
         % If user wants response for different frequencies than those
         % in the transfer function, use linear interpolation.
-        if nargin > 1 && ...
-                (length(f_desired) ~= length(f) || sum(f_desired ~= f))
+        if nargin > 1 && (length(f_desired) ~= length(f) || sum(f_desired ~= f))
             [~,uniqueIndex] = unique(f);
-            if length(uniqueIndex)<length(f) % check for duplicate frequencies
-                % remove if there are duplicates, otherwise interpolation will
-                % fail
+            if length(uniqueIndex)<length(f) 
+                % check for duplicate frequencies remove if there are
+                % duplicates, otherwise interpolation will fail
                 warning('Duplicate frequencies detected in transfer function.')
                 f = f(uniqueIndex);
                 uppc = uppc(uniqueIndex);
             end
             % interpolate for frequencies user wants
-            
-            p.tf = interp1(f, uppc, f_desired, 'linear', 'extrap');
-            p.tf_freq = f_desired;
-            p.tf_uppc = uppc;
+            p.xfrOffset = interp1(f, uppc, f_desired, 'linear', 'extrap');
+            p.xfr_f = f_desired;
         end
     else
-        msg = sprintf('Unable to open transfer function %s',tf_fname);
-        error(msg);
+        error('Unable to open transfer function %s',tf_fname);
     end
+    
 else
     % if you didn't provide a tf function, then just create a
     % vector of zeros of the right size.
-    p.tf = zeros(size(p.xfr_f));
+    p.xfrOffset = zeros(size(p.xfr_f));
 end

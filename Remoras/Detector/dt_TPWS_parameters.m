@@ -24,16 +24,18 @@ f = f(p.specRange);
 sub = 10*log10(hdr.fs/N);
 
 ppSignal = zeros(size(clicks,1),1);
-durClick =  zeros(size(clicks,1),1);
-bw3db = zeros(size(clicks,1),3);
 yFilt = cell(size(clicks,1),1);
-specClickTf = zeros(size(clicks,1),length(f));
 yFiltBuff = cell(size(clicks,1),1);
-peakFr = zeros(size(clicks,1),1);
-% cDLims = ceil([p.minClick_us, p.maxClick_us]./(hdr.fs/1e6));
-envDurLim = ceil(p.delphClickDurLims.*(hdr.fs/1e6));
-nDur = zeros(size(clicks,1),1);
-deltaEnv = zeros(size(clicks,1),1);
+specClickTf = zeros(size(clicks,1),length(f));
+
+if p.discrimFeat
+    durClick =  zeros(size(clicks,1),1);
+    bw3db = zeros(size(clicks,1),3);
+    peakFr = zeros(size(clicks,1),1);
+    envDurLim = ceil(p.delphClickDurLims.*(hdr.fs/1e6));
+    nDur = zeros(size(clicks,1),1);
+    deltaEnv = zeros(size(clicks,1),1);
+end
 
 if p.saveNoise
     
@@ -55,7 +57,7 @@ if p.saveNoise
 end
 
 % Add small buffer to edges of clicks
-buffVal = hdr.fs * p.HRbuffer; 
+buffVal = hdr.fs * p.prevBuffer; 
 
 for c = 1:size(clicks,1)
     % Pull out band passed click timeseries
@@ -191,38 +193,42 @@ end
 
 validClicks = ones(size(ppSignal));
 
-% Check parameter values for each click
-for idx = 1:length(ppSignal)
-    tfVec = [deltaEnv(idx) < p.dEvLims(1);...
-        peakFr(idx) < p.cutPeakBelowKHz;...
-        peakFr(idx) > p.cutPeakAboveKHz;...
-        nDur(idx)>  (envDurLim(2));...
-        nDur(idx)<  (envDurLim(1));
-        durClick(idx) < p.delphClickDurLims(1);
-        durClick(idx) > p.delphClickDurLims(2)];%...
-    %          bw3db(idx,3) < p.bw3dbMin];
-    %          plot(yFiltBuff{idx})
-    %          title(sum(tfVec))
-    if ppSignal(idx)< p.dBppThreshold
-        validClicks(idx) = 0;
-    elseif sum(tfVec)>0
-        validClicks(idx) = 0;
-        %else
-        %    1;
+if p.badClicks
+    % Check parameter values for each click and track clicks that don't
+    % fall in desired ranges
+    for idx = 1:length(ppSignal)
+        tfVec = [deltaEnv(idx) < p.dEvLims(1);...
+            peakFr(idx) < p.cutPeakBelowKHz;...
+            peakFr(idx) > p.cutPeakAboveKHz;...
+            nDur(idx)>  (envDurLim(2));...
+            nDur(idx)<  (envDurLim(1));
+            durClick(idx) < p.delphClickDurLims(1);
+            durClick(idx) > p.delphClickDurLims(2)];%...
+        %          bw3db(idx,3) < p.bw3dbMin];
+        %          plot(yFiltBuff{idx})
+        %          title(sum(tfVec))
+        if ppSignal(idx)< p.dBppThreshold
+            validClicks(idx) = 0;
+        elseif sum(tfVec)>0
+            validClicks(idx) = 0;
+            %else
+            %    1;
+        end
+        
     end
-    
 end
 clickInd = find(validClicks == 1);
 
 clickDets.clickInd = clickInd;
 % throw out clicks that don't fall in desired ranges
 clickDets.ppSignal = ppSignal(clickInd,:);
-clickDets.durClick =  durClick(clickInd,:);
-clickDets.bw3db = bw3db(clickInd,:);
-% frames = frames{clickInd};
 clickDets.yFilt = yFilt(clickInd);
 clickDets.yFiltBuff = yFiltBuff(clickInd);
 clickDets.specClickTf = specClickTf(clickInd,:);
+
+
+clickDets.durClick =  durClick(clickInd,:);
+clickDets.bw3db = bw3db(clickInd,:);
 clickDets.peakFr = peakFr(clickInd,:);
 clickDets.deltaEnv = deltaEnv(clickInd,:);
 clickDets.nDur = nDur(clickInd,:);

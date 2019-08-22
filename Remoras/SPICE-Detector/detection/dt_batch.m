@@ -27,8 +27,8 @@ for idx1 = 1:N % for each data file
     hdr = io_readXWAVHeader(fullFiles{idx1}, pTemp,'fType', fTypes(idx1));
     
     if isempty(hdr)
-        warning(fprintf('No header info returned for file %s',...
-            currentRecFile));
+        warning('No header info returned for file %s',...
+            currentRecFile);
         disp('Moving on to next file')
         continue % skip if you couldn't read a header
         % Read the file header info
