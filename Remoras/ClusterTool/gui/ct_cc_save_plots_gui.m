@@ -2,10 +2,14 @@ function ct_cc_save_plots_gui(hObject,eventdata)
 
 global REMORA
 
-if ~isfield(REMORA.ct.CC,'output')
+if ~isfield(REMORA.ct,'CC')
+    warning('No composite clusters loaded')
+    ct_load_composite_clusters
+elseif ~isfield(REMORA.ct.CC,'output')
     warning('No composite clusters loaded')
     ct_load_composite_clusters
 end
+
 initAxes = 0;
 if isfield(REMORA.fig, 'ct')
     % check if the figure already exists. If so, don't move it.
@@ -62,7 +66,8 @@ REMORA.ct.CC.saveFigs.outDirTxt = uicontrol(REMORA.fig.ct.cc_saveFigs,...
     'Visible','on');
 
 % Select output directory
-if ~isfield(REMORA.ct.CC.output,'figDir') && isfield(REMORA.ct.CC_params, 'inDir')
+if ~isfield(REMORA.ct.CC.output,'figDir') && ...
+        isfield(REMORA.ct, 'CC_params') && isfield(REMORA.ct.CC_params, 'inDir')
     % To start, assume output folder = cluster_bins folder 
     REMORA.ct.CC.output.figDir =  REMORA.ct.CC_params.inDir;
 elseif ~isfield(REMORA.ct.CC.output,'figDir') && ~isfield(REMORA.ct.CC.output,'inDir')

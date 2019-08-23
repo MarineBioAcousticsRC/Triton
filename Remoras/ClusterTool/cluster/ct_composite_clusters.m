@@ -146,7 +146,7 @@ dTTmatNorm = dTTmatNorm1./repmat(max(dTTmatNorm1,[],2),1,size(dTTmat,2));
 
 % find secondary ICI peak in saturated ICI distributions
 if s.correctForSaturation
-    iciModeIdx = correct_for_saturation(p,s.maxICIidx,dTTmatNorm,iciModeIdx);
+    iciModeIdx = ct_correct_for_saturation(p,s.maxICIidx,dTTmatNorm,iciModeIdx);
 end
 iciModes = p.barInt(iciModeIdx+s.minICIidx) + p.barInt(2)./2;
 % [iciDist,~,~] = ici_dist(dTTmatNorm);
@@ -191,26 +191,26 @@ for iEA = 1:s.N
         % Only do this on first iteration, or on every iteration if you are subsampling
         % find pairwise distances between spectra
         if s.specDiffTF
-            [specDist,~,~] = spectra_dist(diffNormSpec(excludedIn,s.stIdx:s.edIdx-1));
+            [specDist,~,~] = ct_spectra_dist(diffNormSpec(excludedIn,s.stIdx:s.edIdx-1));
         else
-            [specDist,~,~] = spectra_dist(specNorm(excludedIn,s.stIdx:s.edIdx));
+            [specDist,~,~] = ct_spectra_dist(specNorm(excludedIn,s.stIdx:s.edIdx));
         end
 %         specSetHighs = zeros(size(specNorm(excludedIn,s.stIdx:s.edIdx)));
 %         specSetHighs(specNorm(excludedIn,s.stIdx:s.edIdx)>=.5) = 1;
 %         amplitudeMatch = exp(-(pdist(specSetHighs,'seuclidean')/10));
 
         if s.iciModeTF % if true, use ici distributions for similarity calculations
-            [iciModeDist,~,~,~] = ici_dist_mode(iciModes(excludedIn),p.barInt(s.maxICIidx));
+            [iciModeDist,~,~,~] = ct_ici_dist_mode(iciModes(excludedIn),p.barInt(s.maxICIidx));
             compDist = squareform(specDist.*sqrt(iciModeDist),'tomatrix');
             disp('Clustering on modal ICI and spectral correlations')
         elseif s.iciDistTF
             % if true, use ici distributions for similarity calculations
-            [iciDist,~,~] = ici_dist(dTTmatNorm(excludedIn,s.minICIidx:s.maxICIidx));
+            [iciDist,~,~] = ct_ici_dist(dTTmatNorm(excludedIn,s.minICIidx:s.maxICIidx));
             compDist = squareform(specDist.*iciDist,'tomatrix');
             disp('Clustering on ICI distribution and spectral correlations')
         elseif s.cRateTF
             % use click rate distributions for similarity calculations
-            [cRateDist,~,~] = ici_dist(cRateNorm(excludedIn,:));
+            [cRateDist,~,~] = ct_ici_dist(cRateNorm(excludedIn,:));
             compDist = squareform(specDist.*cRateDist,'tomatrix');
             disp('Clustering on modal click rate and spectral correlations')
         else
@@ -246,7 +246,7 @@ for iEA = 1:s.N
     end
     
     if s.mergeTF
-        [mergeNodeID,uMergeNodeID,~] = merge_nodes(compDist,...
+        [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(compDist,...
             tempN,specNorm);
     end
     connectedList = nansum(compDist)>0; % isolated nodes have NAN
@@ -269,7 +269,7 @@ for iEA = 1:s.N
         clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
     end
     clusterID(connectedList==0) = NaN;
-    clusterID = run_CW_cluster(clusterID,compDist,s.maxCWIterations);
+    clusterID = ct_run_CW_cluster(clusterID,compDist,s.maxCWIterations);
     
     if s.mergeTF
         % unwind node merge by assigning nodes that were merged to the category of
@@ -328,7 +328,7 @@ end
 % Best of K partitions based on NMI filkov and Skiena 2004
 % Compute NMI
 fprintf('Calculating NMI\n')
-[NMIList] = compute_NMI(nList,ka,naiItr,inputSet);
+[NMIList] = ct_compute_NMI(nList,ka,naiItr,inputSet);
 % the one with the highest mean score is the best
 [bokVal,bokIdx] = max(sum(NMIList)./(size(NMIList,1)-1)); % account for empty diagonal.
 
@@ -382,11 +382,11 @@ end
 
 if s.subPlotSet
     fprintf('Plotting inter cluster comparisons\n')
-    intercluster_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr);
+    ct_intercluster_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,s.outDir);
 end
 
 if s.indivPlots
-    individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,s.outDir)
+    ct_individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,s.outDir)
 end
 % binDataUsed = binDataPruned(binIdx(useBins));
 % for iR = 1:length(binDataUsed)

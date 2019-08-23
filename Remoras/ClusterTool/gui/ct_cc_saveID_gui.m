@@ -61,7 +61,7 @@ REMORA.ct.CC.saveID.outDirTxt = uicontrol(REMORA.fig.ct.cc_saveID,...
 if ~isfield(REMORA.ct.CC.output,'idDir') && isfield(REMORA.ct.CC.output, 'inDir')
     % To start, assume output folder = cluster_bins folder 
     REMORA.ct.CC.output.idDir =  REMORA.ct.CC_params.inDir;
-elseif ~isfield(REMORA.ct.CC.output,'idDir')
+elseif ~isfield(REMORA.ct.CC.output,'idDir') && ~isfield(REMORA.ct.CC.output,'idDir')
     REMORA.ct.CC.output.idDir = 'C:\';
 end
 

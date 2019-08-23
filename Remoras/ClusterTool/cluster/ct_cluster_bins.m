@@ -125,7 +125,7 @@ for iDir = 1:length(inDirList)
             thisFile = fullfile(tpwsNames(itr).folder,tpwsNames(itr).name);        
             fprintf('Beginning file %s\n',thisFile)
             % Run clustering 
-            cluster_TPWS(thisFile,fdAll,p,outDir) 
+            ct_cluster_TPWS(thisFile,fdAll,p,outDir) 
         end
     end
 %     if p.diary
