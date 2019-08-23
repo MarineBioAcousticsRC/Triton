@@ -12,7 +12,6 @@ global REMORA
 %   parameters of the fft used to generate the spectra and any
 %   normalization preferences.
 %   f = An Fx1 frequency vector associated with MSP
-
 % get folder of files
 if isfield(REMORA,'spice_dt') && isfield(REMORA.spice_dt,'mkTPWS')
     if  isfield(REMORA.spice_dt.mkTPWS,'baseDir')
@@ -50,7 +49,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % check if the output file exists, if not, make it
 if ~exist(outDir,'dir')
-    fprintf('Creating output directory %s\n',outDir)
+    diso(sprintf('Creating output directory %s\n',outDir))
+    drawnow
     mkdir(outDir)
 end
 letterCode = 97:122;
@@ -58,7 +58,12 @@ letterCode = 97:122;
 
 % if run on folder of files
 if ~subDir
-    sp_dt_makeTPWS_oneDir(baseDir,letterCode,ppThresh)
+    [~,outName] = fileparts(baseDir);
+    outName = strrep(outName,'_metadata','');
+    
+    sp_dt_makeTPWS_oneDir(baseDir,letterCode,ppThresh,outDir,outName)
+    disp_msg(sprintf('Done with directory %s',baseDir))
+
 else 
     % run on subfolders (only one layer down).
     dirSet = dir(fullfile(baseDir,[siteName,'*']));
@@ -71,9 +76,10 @@ else
         if dirSet(itr0).isdir &&~strcmp(dirSet(itr0).name,'.')&&...
                 ~strcmp(dirSet(itr0).name,'..')
             inDir = fullfile(dirSet(itr0).folder,dirSet(itr0).name);
-            
-            sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh)
-            
+            outName = dirSet(itr0).name;
+            sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName)
+            disp_msg(sprintf('Done with directory %d of %d \n',itr0,length(dirSet)))
+            drawnow
         end
     end
 end

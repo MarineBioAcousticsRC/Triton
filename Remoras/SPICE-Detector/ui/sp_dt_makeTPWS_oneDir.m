@@ -1,4 +1,4 @@
-function sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh)
+function sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName)
 
 letterFlag = 0; % flag for knowing if a letter should be appended to disk name
 % inDir = fullfile(baseDir,dirSet(itr0).name);
@@ -10,6 +10,11 @@ specClickTfVec = [];
 tsVecStore = [];
 subTP = 1;
 fSave = [];
+
+if lfs == 0
+    disp_msg('no detection files found.')
+    return
+end
 for itr2 = 1:lfs
     thisFile = fileSet.mat(itr2);
     
@@ -79,7 +84,8 @@ for itr2 = 1:lfs
         specClickTf = [];
         ppSignal = [];
     end
-    fprintf('Done with file %d of %d \n',itr2,lfs)
+    disp_msg(sprintf('Done with file %d of %d',itr2,lfs))
+    drawnow
     
     if (size(clickTimesVec,1)>= 1800000 && (lfs-itr2>=10))|| itr2 == lfs
         
@@ -88,16 +94,16 @@ for itr2 = 1:lfs
         MPP = ppSignalVec;
         MSP = specClickTfVec;
         if itr2 == lfs && letterFlag == 0
-            ttppOutName =  [fullfile(outDir,dirSet(itr0).name),'_Delphin_TPWS1','.mat'];
-            fprintf('Done with directory %d of %d \n',itr0,length(dirSet))
+            ttppOutName =  [fullfile(outDir,outName),'_Delphin_TPWS1','.mat'];
             subTP = 1;
         else
             
-            ttppOutName = [fullfile(outDir,dirSet(itr0).name),char(letterCode(subTP)),'_Delphin_TPWS1','.mat'];
+            ttppOutName = [fullfile(outDir,outName),char(letterCode(subTP)),'_Delphin_TPWS1','.mat'];
             subTP = subTP+1;
             letterFlag = 1;
         end
         f = fSave;
+        disp_msg('Saving...');drawnow
         save(ttppOutName,'MTT','MPP','MSP','MSN','f','-v7.3')
         
         MTT = [];

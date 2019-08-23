@@ -30,4 +30,5 @@ elseif strcmp(action, 'setSubDirTF')
      REMORA.spice_dt.mkTPWS.subDirTF = subDirTF;
 elseif strcmp(action, 'run_mkTPWS')
     sp_dt_mkTPWS
+    %close(REMORA.fig.sp_dt_mkTPWS)
 end
