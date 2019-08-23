@@ -386,7 +386,7 @@ if s.subPlotSet
 end
 
 if s.indivPlots
-    individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr)
+    individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,s.outDir)
 end
 % binDataUsed = binDataPruned(binIdx(useBins));
 % for iR = 1:length(binDataUsed)
@@ -426,6 +426,7 @@ ccOutput.tIntMat = tIntMat;
 ccOutput.clickTimes = clickTimes;
 ccOutput.fileNumExpand = fileNumExpand;
 ccOutput.labelStr = labelStr; 
+ccOutput.inFileList = inFileList; 
 
 if s.diary
     diary('off')

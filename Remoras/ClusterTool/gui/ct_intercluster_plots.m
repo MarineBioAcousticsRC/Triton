@@ -1,4 +1,4 @@
-function hSet = ct_intercluster_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr)
+function hSet = ct_intercluster_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,figDir)
 
 n1 = 3; % number of rows of subplots, one subplot per type
 m1 = ceil(length(nodeSet)/n1); % number of columns of subplots
@@ -7,10 +7,10 @@ figure(42);clf(42);set(gcf,'Units','normalized','Position',[0.01,.52,.48,.4])
 figure(43);clf(43);set(gcf,'Units','normalized','Position',[.5,.05,.48,.4])
 figure(44);clf(44);set(gcf,'Units','normalized','Position',[.5,.52,.48,.4])
 
-figName{1} = fullfile(s.outDir,sprintf('%s_autoTypes_allMeanSpec',s.outputName));
-figName{2} = fullfile(s.outDir,sprintf('%s_autoTypes_allCatSpec',s.outputName));
-figName{3} = fullfile(s.outDir,sprintf('%s_autoTypes_allICI',s.outputName));
-figName{4} = fullfile(s.outDir,sprintf('%s_autoTypes_allcRate',s.outputName));
+figName{1} = fullfile(figDir,sprintf('%s_autoTypes_allMeanSpec',s.outputName));
+figName{2} = fullfile(figDir,sprintf('%s_autoTypes_allCatSpec',s.outputName));
+figName{3} = fullfile(figDir,sprintf('%s_autoTypes_allICI',s.outputName));
+figName{4} = fullfile(figDir,sprintf('%s_autoTypes_allcRate',s.outputName));
 
 for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles
@@ -68,5 +68,6 @@ if s.saveOutput
         set(hSet(iFig),'units','inches','PaperPositionMode','auto')%,'OuterPosition',[0.25 0.25  10  7.5])
         print(hSet(iFig),'-dtiff','-r600',[figName{iFig},'.tiff'])
         saveas(hSet(iFig),[figName{iFig},'.fig'])
+        fprintf('Done with figure %0.0f\n',iFig)
     end
 end

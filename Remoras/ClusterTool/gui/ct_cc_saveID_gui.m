@@ -33,7 +33,7 @@ clf
 
 REMORA.ct.CC.saveID = [];
 labelStr = 'ID File Saving Options';
-btnPos=[0 .8 1 .2];
+btnPos=[0.1 .7 1 .2];
 REMORA.ct.CC.saveID.headtext = uicontrol(REMORA.fig.ct.cc_saveID, ...
     'Style','text', ...
     'Units','normalized', ...
@@ -76,7 +76,7 @@ REMORA.ct.CC.saveID.outDirEdTxt = uicontrol(REMORA.fig.ct.cc_saveID,...
     'String',REMORA.ct.CC.output.idDir,...
     'FontUnits','normalized', ...
     'Visible','on',...
-    'Callback','ct_cc_saveID_control(''setOutDir'')');
+    'Callback',{@ct_cc_saveID_control,'setOutDir'});
 
 
 %% File ending
@@ -95,6 +95,7 @@ if isfield(REMORA.ct.CC.output, 'fileEnding')
     fileEnding = REMORA.ct.CC.output.fileEnding;% should use input TPWS if exists
 else
     fileEnding = 'ID1.mat';
+    REMORA.ct.CC.output.fileEnding = fileEnding;
 end
 
 btnPos=[.3 .35 .55 .15];
@@ -107,7 +108,7 @@ REMORA.ct.CC.saveID.fEndEdTxt = uicontrol(REMORA.fig.ct.cc_saveID,...
     'String',fileEnding,...
     'FontUnits','normalized', ...
     'Visible','on',...
-    'Callback','ct_cc_saveID_control(''setFileEnding'')');
+    'Callback',{@ct_cc_saveID_control,'setFileEnding'});
 
 % put a "save" button
 labelStr = 'Save';
@@ -123,7 +124,7 @@ REMORA.ct.CC.saveID.saveBtn = uicontrol(REMORA.fig.ct.cc_saveID,...
     'FontSize',.5,...
     'Visible','on',...
     'FontWeight','bold',...
-    'Callback',@ct_cc_close_ID_gui);
+    'Callback',@ct_cc_clusters_to_zID);
 
 % bring to top
 figure(REMORA.fig.ct.cc_saveID)
@@ -133,14 +134,19 @@ end
 
 function ct_cc_close_ID_gui(hObject,eventdata)
 global REMORA
+
 close(REMORA.fig.ct.cc_saveID)
 end
 
 
 function ct_cc_saveID_control(hObject,eventdata,myEvent)
+
+global REMORA
+
 if strcmp(myEvent, 'setOutDir')
     REMORA.ct.CC.output.idDir = get(REMORA.ct.CC.saveID.outDirEdTxt,'String');
 elseif strcmp(myEvent, 'setFileEnding')
     REMORA.ct.CC.output.fileEnding = get(REMORA.ct.CC.saveID.fEndEdTxt,'String');
 end
+
 end

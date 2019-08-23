@@ -94,8 +94,12 @@ elseif strcmp(action,'setNTrials')
     REMORA.ct.CC_params.N = NTrials;
 
 elseif strcmp(action,'setSingleClustTF')
-    singleClusterOnly = str2double(get(REMORA.ct.CC_verify.singleClustCheck,'String'));
+    singleClusterOnly = get(REMORA.ct.CC_verify.singleClustCheck,'Value');
     REMORA.ct.CC_params.singleClusterOnly = singleClusterOnly;
+    
+elseif strcmp(action,'setCorrectForSatTF')
+    correctForSatTF = get(REMORA.ct.CC_verify.correctForSatCheck,'Value');
+    REMORA.ct.CC_params.correctForSaturation = correctForSatTF;
 
 elseif strcmp(action,'setICIMode')
     iciModeTF = get(REMORA.ct.CC_verify.bg_r1 ,'Value');

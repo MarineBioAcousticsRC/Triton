@@ -1,61 +1,48 @@
-function ct_cc_save_plots
+function ct_cc_save_plots(hObject,eventdata)
 
 global REMORA
 
-if ~isfield(REMORA.ct.CC,'output')
-    warning('No composite clusters loaded')
-    ct_load_composite_clusters
-end
+close(REMORA.fig.ct.cc_saveFigs)
 
-if isfield(REMORA.fig, 'ct')
-    % check if the figure already exists. If so, don't move it.
-    if isfield(REMORA.fig.ct, 'cc_savefigs') && isvalid(REMORA.fig.ct.cc_savefigs)
-        defaultPos = get(REMORA.fig.ct.cc_savefigs,'Position');
+if ~isdir(REMORA.ct.CC.output.figDir)
+    mkdir(REMORA.ct.CC.output.figDir)
+end
+REMORA.ct.CC.output.s.saveOutput = 1;
+if REMORA.ct.CC.output.saveCombinedPlotsTF 
+    disp('Saving combined plots...')
+    if ishandle(41)&&ishandle(42)&&ishandle(43)&&ishandle(44)
+        % if all figs exist, just save them
+        s = REMORA.ct.CC.output.s;
+        hSet(1) = figure(41);hSet(2) = figure(42);hSet(3) = figure(43);hSet(4) = figure(44);
+        figName{1} = fullfile(REMORA.ct.CC.output.figDir,sprintf('%s_autoTypes_allMeanSpec',s.outputName));
+        figName{2} = fullfile(REMORA.ct.CC.output.figDir,sprintf('%s_auHtoTypes_allCatSpec',s.outputName));
+        figName{3} = fullfile(REMORA.ct.CC.output.figDir,sprintf('%s_autoTypes_allICI',s.outputName));
+        figName{4} = fullfile(REMORA.ct.CC.output.figDir,sprintf('%s_autoTypes_allICIgram',s.outputName));
+        for iFig = 1:length(figName)
+            set(hSet(iFig),'units','inches','PaperPositionMode','auto')%,'OuterPosition',[0.25 0.25  10  7.5])
+            print(hSet(iFig),'-dtiff','-r600',[figName{iFig},'.tiff'])
+            saveas(hSet(iFig),[figName{iFig},'.fig'])
+            fprintf('Done with figure %0.0f\n',iFig)
+        end
     else
-        initAxes = 1;
+        % otherwise make them again and save
+        ct_intercluster_plots(REMORA.ct.CC.output.p,REMORA.ct.CC.output.s,...
+            REMORA.ct.CC.output.f,REMORA.ct.CC.output.nodeSet,...
+            REMORA.ct.CC.output.compositeData,REMORA.ct.CC.output.Tfinal,...
+            REMORA.ct.CC.output.labelStr,REMORA.ct.CC.output.figDir)
     end
-else 
-    initAxes = 1;
-end
-
-if initAxes
-    REMORA.fig.ct.cc_savefigs = figure;
-    
-    set(REMORA.fig.ct.cc_savefigs,...
-        'Units','normalized',...
-        'ToolBar', 'none',...
-        'MenuBar','none',...
-        'NumberTitle','off','Name',...
-        'Composite Clustering Tool - v1.0',...
-        'Visible','on');    %
-end
-
-clf
-
-% outdir
-
-% all cluster plots checkbox
-
-% per cluster plots checkbox
-
-
-% put a "Save" button
-labelStr = 'Save';
-btnPos=[.4, 0, .2, (1/nRows)*.4];
-
-REMORA.ct.CC.apply_labels.doneBtn = uicontrol(REMORA.fig.ct.cc_applylabels,...
-    'Style','pushbutton',...
-    'Units','normalized',...
-    'Position',btnPos,...
-    'BackgroundColor','green',...
-    'String',labelStr,...
-    'FontUnits','normalized', ...
-    'FontSize',.5,...
-    'Visible','on',...
-    'FontWeight','bold',...
-    'Callback','ct_cc_exportID_gui');
-
-% bring to top
-figure(REMORA.fig.ct.cc_applylabels)
+    disp('Done saving combined plots...')
 
 end
+
+if REMORA.ct.CC.output.saveIndivPlotsTF
+    disp('Saving individual plots...')
+
+    ct_individual_click_plots(REMORA.ct.CC.output.p,REMORA.ct.CC.output.s,...
+        REMORA.ct.CC.output.f,REMORA.ct.CC.output.nodeSet,...
+        REMORA.ct.CC.output.compositeData,REMORA.ct.CC.output.Tfinal,...
+        REMORA.ct.CC.output.figDir)
+    disp('Saving individual plots...')
+
+end
+figure(REMORA.fig.ct.cc_postcluster)

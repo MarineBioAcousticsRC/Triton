@@ -1,4 +1,4 @@
-function ct_cc_save_ID
+function ct_cc_save_ID(hObject,eventdata)
 % save an ID file for detEdit
 % note that if you do this, it will not label everything, just what has
 % made it into clusters. This might confuse people...
