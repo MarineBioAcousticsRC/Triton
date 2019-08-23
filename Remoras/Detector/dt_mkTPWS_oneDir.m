@@ -14,31 +14,20 @@ end
 % Initialize temporal settings,to track sampling frequency and only rebuild
 % the filters if the sampling frequency changes. 
 pTemp = p;
-
-% initialize TPWS variables
-detParams = dt_init_detParams(p);
-
+firstloop = true;
 for itr1 = 1:lfs % for each detection file
     
     currentRecFile = recFiles{itr1};
     currentDetFile = detFiles{itr1};
     
-% % % %     % read file header info
-% % % %     hdr = ioReadXWAVHeader(currentRecFile,'fType', ftype);
-% % % %     
-% % % %     if isempty(hdr)
-% % % %         warning('No header info returned for file %s',currentRecFile);
-% % % %         disp('Moving on to next file')
-% % % %         continue % skip if you couldn't read a header
-% % % %     else
-% % % %         if fTypes(idx1) == 1
-% % % %             [startsSec,stopsSec,pTemp] = dt_LR_chooseSegments(pTemp,hdr);
-% % % %         else
-% % % %             % divide xwav by raw file
-% % % %             [startsSec,stopsSec] = dt_chooseSegmentsRaw(hdr);
-% % % %         end
-% % % %         
-% % % %     end
+    % read file header info
+    hdr = ioReadXWAVHeader(currentRecFile,'ftype', ftype);
+    
+    if isempty(hdr)
+        warning('No header info returned for file %s',currentRecFile);
+        disp('Moving on to next file')
+        continue % skip if you couldn't read a header
+    end
     
     if hdr.fs ~= pTemp.previousFs
         % otherwise, if this is the first time through, build your filters,
@@ -49,52 +38,57 @@ for itr1 = 1:lfs % for each detection file
         pTemp = dt_interp_tf(pTemp);
     end
     
+    % set up storage TPWS variables in the first run
+    if firstloop
+        detParams = dt_TPWS_initParams(pTemp);
+        firstloop = false;
+    end
     
-    detFile = fileSet(itr1).name;
-    
-    %     load(char(fullfile(detDir,thisFile)),'-mat','clickTimes','hdr',...
-    %         'ppSignal','specClickTf','yFiltBuff','f','durClick')
-    
-    % read text file
-    if strcmp(fileExt.det,'.pgdf')
-        % add:  [dataSet, fileInfo] = loadPamguardBinaryFile(fileName);
-        error('Not available yet')
+    % read detection file and get first column with start times of detections
+    detID = fopen(currentDetFile);
+    if detID ~=-1
+        [detText] = textscan(detID,'%f %f %s'); % load text file
+        fclose(detID);
     else
-        pTemp = p;
-        % get audio file header
-        audioFileName = strrep(detFile,fileExt.det,fileExt.audio);
-        if exist(fullfile(folder.audio,audioFileName),'file')
-            hdr = ioReadXWAVHeader(fullfile(folder.audio,audioFileName),'ftype',ftype);
-            
-            % Build filter on first pass, rebuild if file has different
-            % sampling rate
-            if isempty(hdr)
-                continue % skip if you couldn't read a header
-            elseif hdr.fs ~= pTemp.previousFs
-                % otherwise, if this is the first time through, build your filters,
-                % only need to do this once though, so if you already have this
-                % info, this step is skipped
-                
-                [previousFs,pTemp] = dt_buildFilters(pTemp,hdr.fs);
-                pTemp.previousFs = previousFs;
-                
-                pTemp = dt_interp_tf(pTemp);
-            end
-            
+        error('Unable to open detection file %s',currentDetFile);
+    end
+    
+    % click start/end position (sec) in reference from the beggining of the audio file
+    starts = detText{:,1}; 
+    stops = detText{:,2};
+    
+    % Open audio file
+    recID = fopen(currentRecFile, 'r');
+    
+    % Samples to on either side of click
+    buffSamples = pTemp.framebuffer*hdr.fs;
+    
+    for k = 1:length(starts)
+        
+        % Select iteration start and end
+        startClick = starts(k);
+        stopClick = stops(k);
+        
+        %%%%%%%%%% change energyyyy to length of xwav file length
+        startSample = max(((aboveThreshold - buffSamples)), 1);
+        stopSample = min(((aboveThreshold + buffSamples)), length(energy));
+        
+         % Read in data segment
+        if strncmp(hdr.filetype,'wav',3)
+            data = io_readWav(fid, hdr, startK, stopK, 'Units', 's',...
+                'Channels', pTemp.channel, 'Normalize', 'unscaled')';
+        else
+            data = ioReadXWAV(recID,hdr,startClick,stopClick,1)
+            data = io_readRaw(fid, hdr, k, pTemp.channel);
+        end
+        
+    end
+    
+    fclose(recID);
+    
 
             %%%%%%%%%%%%%%%%%
-            % read detection file and get first column with start times of
-            % detections
-            detID = fopen(fullfile(folder.det,detFile));
-            if detID ~=-1
-                [detText] = textscan(detID,'%f %f %s'); % load text file
-                fclose(detID);
-            else
-                msg = sprintf('Unable to open detection file %s\n',fullfile(folder.det,detFile));
-                error(msg);
-            end
-            
-            startTimes = detText{:,1};
+
             %%%%%%%%%%%%%%%%
             % to move to a separate function
             % convert times into matlab date
@@ -112,10 +106,7 @@ for itr1 = 1:lfs % for each detection file
             refRawTime = (hdr.raw.dnumStart(rawIdx)' + Y2K)*dnum2sec;
             posDnum = (startTimes - cumDur(rawIdx) + refRawTime)/dnum2sec;
             %%%%%%%%%%%%%%%%%%%
-        else
-            fprintf('No audio file matching %s\n',detFile)
-        end
-    end
+
     
     
     if exist('clickTimes','var') && ~isempty(clickTimes)&& size(specClickTf,2)>1

@@ -1,6 +1,7 @@
-function params = dt_init_detParams(p)
+function params = dt_TPWS_initParams(p)
 % Initialize vectors for main detector loop
 N = p.estimSize;
+
 params.clickTimes = nan(N,2);
 params.ppSignalVec = nan(N,1);
 params.specClickTfVec = nan(N,length(p.specRange));

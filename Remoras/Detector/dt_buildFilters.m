@@ -37,7 +37,7 @@ end
 % filtTaps = length(fB);
 previousFs = fs;
 
-p.fftSize = ceil(fs * p.frameLength / 1000);
+p.fftSize = ceil(fs * p.frameLength);
 if rem(p.fftSize, 2) == 1
     p.fftSize = p.fftSize - 1;  % Avoid odd length of fft
 end

@@ -9,6 +9,12 @@ end
 if isempty(fList)
     error('No detection files found. Check folder path and partial string to match')
 end
+
+% Exclude empty detection files
+bytes = cell2mat({fList(:).bytes}');
+emptyFiles = find(bytes == 0);
+fList(emptyFiles) = [];
+
 % Pull out files from all folders, combine full paths into one long list
 fullFileNames = {fList(:).name}';
 
