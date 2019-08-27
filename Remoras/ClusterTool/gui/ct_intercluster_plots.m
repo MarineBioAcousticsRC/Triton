@@ -16,19 +16,20 @@ for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles
     subplot(n1,m1,iF)
     hold on
-    plot(f(p.stIdx:p.edIdx),compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
+    plot(f,compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
     %xlim([f(s.stIdx),f(s.edIdx)])
     legend(num2str(size(nodeSet{iF},2)),'location','Southeast')
-    plot(f(p.stIdx:p.edIdx),compositeData(iF).specPrctile,'--k','lineWidth',2)
+    plot(f,compositeData(iF).specPrctile,'--k','lineWidth',2)
     grid on
     hold off
+    ylim([0,1])
     
     hSet(2) = figure(42); % plot spectra as heatmap
     subplot(n1,m1,iF)
-    imagesc(1:length(nodeSet{iF}),f(p.stIdx:p.edIdx),Tfinal{iF,1}')
+    imagesc(1:length(nodeSet{iF}),f(p.startFreqIdx:p.endFreqIdx),Tfinal{iF,1}')
     set(gca,'ydir','normal')
     title(labelStr{iF})
-    ylim([min(f(p.stIdx)),max(f(p.edIdx))])
+    % ylim([min(f(p.startFreqIdx)),max(f(p.endFreqIdx))])
     
     hSet(3) = figure(43); % plot ICI distributions
     subplot(n1,m1,iF)
@@ -61,6 +62,7 @@ mtit(41,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(42,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(43,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(44,strrep(s.outputName,'_',' ' ),'FontSize',12);
+colormap(jet)
 
 if s.saveOutput
     disp('Saving figures...')

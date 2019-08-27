@@ -1,9 +1,12 @@
 function ct_post_cluster_ui
 
+global REMORA
 % Shows some options for things you can do with clusters after you are
 % done.
-
-global REMORA
+if ~isfield(REMORA.ct,'CC') || ~isfield(REMORA.ct.CC,'output')
+    warning('No composite clusters loaded')
+    ct_load_composite_clusters
+end
 
 initAxes = 0;
 default_pos = [.25,.35,.2,.4];

@@ -1,4 +1,4 @@
-function ct_CC_load_settings
+function ct_cc_load_settings
 
 global REMORA
 [~,~,fileType] = fileparts(REMORA.ct.CC_settings.paramFile);

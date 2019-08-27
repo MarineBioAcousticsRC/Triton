@@ -98,6 +98,7 @@ sumSpecMat = vertcat(binDataPruned.sumSpec);
 nSpecMat = horzcat(binDataPruned.nSpec)';
 dTTmat = vertcat(binDataPruned.dTT);
 cRateMat = vertcat(binDataPruned.clickRate);
+clickTimes = horzcat(binDataPruned(:).clickTimes);
 
 clustersInBin = nan(size(dTTmat,1),1);
 tIntMat =  nan(size(dTTmat,1),1);
@@ -128,9 +129,9 @@ else
     useBins = (nSpecMat >= s.minClicks);
 end
 
-[~,s.stIdx] = min(abs(f(p.stIdx:p.edIdx)-s.startFreq));
-[~,s.edIdx] = min(abs(f(p.stIdx:p.edIdx)-s.endFreq));
-[specNorm,diffNormSpec] = spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
+[~,s.stIdx] = min(abs(f(p.startFreqIdx:p.endFreqIdx)-s.startFreq));
+[~,s.edIdx] = min(abs(f(p.startFreqIdx:p.endFreqIdx)-s.endFreq));
+[specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
 
 [~,s.maxICIidx] = min(abs(p.barInt-s.maxICI));
 [~,s.minICIidx] = min(abs(p.barInt-s.minICI));
@@ -157,7 +158,6 @@ cRateNorm1 = cRateMat./repmat(sum(cRateMat,2),1,size(cRateMat,2));
 cRateNorm = cRateNorm1./repmat(max(cRateNorm1,[],2),1,size(cRateMat,2));
 [~,cRateModeIdx] = max(cRateNorm,[],2);
 cRateModes = p.barRate(cRateModeIdx) + p.barRate(2)./2;
-clickTimes = horzcat(binDataPruned(:).clickTimes);
 clickTimes = clickTimes(useBins);
 tIntMat = tIntMat(useBins);
 subOrder = subOrder(useBins);

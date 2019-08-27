@@ -1,4 +1,4 @@
-function ct_CC_control(action)
+function ct_cc_control(action)
 % Do something in response to gui window update action
 global REMORA
 
@@ -112,7 +112,7 @@ elseif strcmp(action,'setICIDist')
     REMORA.ct.CC_params.iciModeTF = ~REMORA.ct.CC_params.iciDistTF;
 
 elseif strcmp(action,'runCompositeClusters')
-    dh = ct_CB_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
+    dh = ct_cb_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
     jObj = com.mathworks.widgets.BusyAffordance;
     [~,spinnerH] = javacomponent(jObj.getComponent, [200,10,40,40], gcf);
     set(spinnerH,'units','norm', 'position',[0.45,0.3,0.1,0.15])
@@ -122,14 +122,14 @@ elseif strcmp(action,'runCompositeClusters')
     [exitCode,ccOutput] = ct_composite_clusters(REMORA.ct.CC_params);
     REMORA.ct.CC.output = ccOutput;
     if exitCode
-        dh = ct_CB_status_dialog('Composite clustering complete.');
+        dh = ct_cb_status_dialog('Composite clustering complete.');
         % show post-clustering menu
         ct_post_cluster_ui
     else
-        dh = ct_CB_status_dialog('Composite clustering failed. See Matlab console for details.');   
+        dh = ct_cb_status_dialog('Composite clustering failed. See Matlab console for details.');   
     end
     jObj.stop;
-elseif strcmp(action,'ct_CC_settingsLoad')
+elseif strcmp(action,'ct_cc_settingsLoad')
     thisPath = mfilename('fullpath');
     settingsPath = fullfile(fileparts(fileparts(thisPath)),'settings');
     dialogTitle1 = 'Open Composite-Level Settings File';
@@ -140,9 +140,9 @@ elseif strcmp(action,'ct_CC_settingsLoad')
     if isscalar(REMORA.ct.CC_settings.paramFile)
         return    % User cancelled
     end
-    ct_CC_load_settings
+    ct_cc_load_settings
     
-elseif strcmp(action,'ct_CC_settingsSave')
+elseif strcmp(action,'ct_cc_settingsSave')
     thisPath = mfilename('fullpath');
     settingsPath = fullfile(fileparts(fileparts(thisPath)),...
         'settings');% user interface retrieve file to open through a dialog box

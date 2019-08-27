@@ -1,4 +1,4 @@
-function ctHelpStrings = ct_CC_get_help_strings
+function ctHelpStrings = ct_cc_get_help_strings
 
 %%% Clustering parameter choices %%%
 ctHelpStrings.inDir = 'Folder containing cluster bins output file(s).';

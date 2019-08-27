@@ -1,4 +1,4 @@
-function d = ct_CB_status_dialog(dispMessage)
+function d = ct_cb_status_dialog(dispMessage)
 
 d = figure(98);clf
 

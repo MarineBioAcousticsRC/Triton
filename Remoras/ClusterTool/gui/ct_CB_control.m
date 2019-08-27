@@ -1,4 +1,4 @@
-function ct_CB_control(action)
+function ct_cb_control(action)
 % Do something in response to gui window update action
 global REMORA
 
@@ -99,9 +99,9 @@ elseif strcmp(action,'recursSearch')
     REMORA.ct.CB_params.recursSearch = recursSearch;
     
 elseif strcmp(action,'runClusterBins')
-    dh = ct_CB_status_dialog('Bin-level clustering in progress.\n    Details in Matlab console.');
+    dh = ct_cb_status_dialog('Bin-level clustering in progress.\n    Details in Matlab console.');
     ct_cluster_bins(REMORA.ct.CB_params)
-    dh = ct_CB_status_dialog('Bin-level clustering complete.');
+    dh = ct_cb_status_dialog('Bin-level clustering complete.');
     
 elseif strcmp(action,'ct_clusterBins_settingsLoad')
     thisPath = mfilename('fullpath');
@@ -115,7 +115,7 @@ elseif strcmp(action,'ct_clusterBins_settingsLoad')
     if isscalar(REMORA.ct.CB_settings.paramFile)
         return    % User cancelled
     end
-    ct_CB_load_settings
+    ct_cb_load_settings
     
 elseif strcmp(action,'ct_clusterBins_settingsSave')
     thisPath = mfilename('fullpath');
