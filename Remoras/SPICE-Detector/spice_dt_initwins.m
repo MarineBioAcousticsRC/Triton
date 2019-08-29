@@ -31,11 +31,11 @@ defaultPos = [0.005,0.035,0.15,0.25];
 % open and setup figure window
 
 % If window already exists, close
-if isfield(REMORA.fig, 'spice_dt')
-    if isgraphics(REMORA.fig.spice_dt)
-        close(REMORA.fig.spice_dt)
-    end
-end
+% if isfield(REMORA.fig, 'spice_dt')
+%     if isgraphics(REMORA.fig.spice_dt)
+%         close(REMORA.fig.spice_dt)
+%     end
+% end
 
 REMORA.fig.spice_dt = figure( ...
     'NumberTitle','off', ...

@@ -21,7 +21,7 @@ f = REMORA.sh.ltsa.freq;
 % user settings
 thrClose = REMORA.sh.settings.thrClose;
 thrDistant = REMORA.sh.settings.thrDistant;
-thrRL = REMORA.sh.settings.thrRL; 
+thrRL = REMORA.sh.settings.thrRL;
 addtime = REMORA.sh.settings.buffer/tbin;
 minPassage = REMORA.sh.settings.minPassage/tbin;
 
@@ -61,10 +61,14 @@ pwrB3 = pwr(lowB3:hiB3,:);
 
 %apply appropriate transfer function to the data
 % Get transfer function
-if ischar(REMORA.sh.settings.tfFullFile)
+if ischar(REMORA.sh.settings.tfFullFile) && ~isempty(REMORA.sh.settings.tfFullFile)
     fidtf = fopen(REMORA.sh.settings.tfFullFile,'r');
-    [transferFn,~] = fscanf(fidtf,'%f %f',[2,inf]);
-    fclose(fidtf);
+    if fidtf ~=-1
+        [transferFn,~] = fscanf(fidtf,'%f %f',[2,inf]);
+        fclose(fidtf);
+    else
+        error('Unable to open transfer function file %s',REMORA.sh.settings.tfFullFile)
+    end
     
     tf = interp1(transferFn(1,:),transferFn(2,:),freqvec,'linear','extrap');
     for i=1:size(pwr,2)
@@ -80,6 +84,8 @@ elseif isnumeric(REMORA.sh.settings.tfFullFile)
         pwrB2(:,i) = pwrB2(:,i)+tf;
         pwrB3(:,i) = pwrB3(:,i)+tf;
     end
+elseif isempty(REMORA.sh.settings.tfFullFile)
+    %No transfer function is applied
 else
     error('Provide a transfer function file or a singular gain value')
 end
@@ -255,7 +261,7 @@ if ~isempty (sposB2) && ~isempty (eposB2)
     durB2far = (eB2far-sB2far)*tbin;
     centB2far = floor(mean([sB2far;eB2far]));
 else
-    sB2far = []; eB1far = []; durB2far = []; centB2far = [];
+    sB2far = []; eB2far = []; durB2far = []; centB2far = [];
 end
 
 sFarShip = [];
@@ -302,7 +308,7 @@ if ~isempty(noise)
     % Received Levels (RL)
     % calculate received levels for the 1 min period around bin
     minbin = 30;
-    RLsB1 = []; RLsB2 = []; RLsB3 = []; 
+    RLsB1 = []; RLsB2 = []; RLsB3 = [];
     
     for x = 1:size(pwr,2)
         CumPrev = 0;        % Cumulative time previous to segment of interest
@@ -335,9 +341,9 @@ if ~isempty(noise)
         RL.B3 = RLsB3;
     end
     
-    RLB1thr = mean(RLsB1) + (mean(RLsB1) * thrRL); 
-    RLB2thr = mean(RLsB2) + (mean(RLsB2) * thrRL); 
-    RLB3thr = mean(RLsB3) + (mean(RLsB3) * thrRL); 
+    RLB1thr = mean(RLsB1) + (mean(RLsB1) * thrRL);
+    RLB2thr = mean(RLsB2) + (mean(RLsB2) * thrRL);
+    RLB3thr = mean(RLsB3) + (mean(RLsB3) * thrRL);
     labels =  repmat({'unknown'},size(noise,1),1);
     for m = 1:size(noise,1)
         RLs= [mean(RLsB1(noise(m,1):noise(m,2))), mean(RLsB2(noise(m,1):noise(m,2))),...
@@ -368,95 +374,45 @@ end
 
 if wIdx
     
-    red = [.85 .325 .098];
-    blue = [0 .4470 .7410];
-    gray = [0 0 0]+0.5;
-    black = [0 0 0];
-    green = [0.4660    0.6740    0.1880];%[0.9290    0.6940    0.1250];
+    blue = [0 .4470 .7410]; % ambient
+    green = [0.4660    0.6740    0.1880]; % ship
     
     reltim = (1:length(fillavg_pwrB1))*tbin/3600; % in hours
-    figure%('Position', [50, 70, 600, 700]);
-    subplot(3,1,1);
-    p1 = plot(reltim,fillavg_pwrB1,'Color',gray);
-    hold on
-    p2 = plot(reltim,avg_pwrB1,'Color',blue);
-    p3 = plot(reltim,linspace(stateLevsB1(1),stateLevsB1(1),length(reltim)),'--','Color',red, 'LineWidth',.5);
-         plot(reltim,linspace(stateLevsB1(2),stateLevsB1(2),length(reltim)),'--','Color',red, 'LineWidth',.5);
-    p4 = plot(reltim,linspace(midRefB1,midRefB1,length(reltim)),'Color',red, 'LineWidth',2);
-    p5 = plot(reltim(icrB1),linspace(midRefB1,midRefB1,length(reltim(icrB1))),'.','Color',black,'MarkerSize',7);
+    
+    if isfield(REMORA.fig.sh,'passage') && ishandle(REMORA.fig.sh.passage)
+        close(REMORA.fig.sh.passage)
+    end
+    if ~isfield(REMORA.fig.sh,'passage') || ~isvalid(REMORA.fig.sh.passage)
+        sh_init_passage_figure
+    end
+    
+    % edges and color to plot passages
+    xpoints = [];
+    for itr1 = 1:size(noise,1)
+        xpoints = [xpoints; reltim(noise(itr1 ,1)),reltim(noise(itr1 ,1)),reltim(noise(itr1 ,2)),reltim(noise(itr1 ,2))];
+    end
+    
+    % If a passage is detected, color it according to label
+    passageColor = [];
     if ~isempty(noise)
-        p6 = plot(reltim(noise(:,1)),midRefB1,'.','Color',green,'MarkerSize',25);
-             plot(reltim(noise(:,2)),midRefB1,'.','Color',green,'MarkerSize',25);
-        add = 0;
-        for i = 1: length(labels)
-            add = add + 0.1;
-        end
-        if ~isempty (sCloseShip)
-            p7 = plot(reltim(sCloseShip+addtime+1),midRefB1,'o','Color',black,'MarkerSize',6);
-                 plot(reltim(eCloseShip-addtime-1),midRefB1,'o','Color',black,'MarkerSize',6);
-        end
-        if ~isempty (sFarShip)
-            p9 = plot(reltim(sFarShip+addtime+1),midRefB1,'x','Color',black,'MarkerSize',6);
-            	 plot(reltim(eFarShip-addtime-1),midRefB1,'x','Color',black,'MarkerSize',6);
+        passageColor = ones(size(labels))*green;
+        change = find(contains(labels,'ambient'));
+        if ~isempty(change)
+            passageColor(change,:)= blue;
         end
     end
     
-    if isempty(noise)
-        legend([p1,p2,p3,p4,p5],{'Interpolated','APSD','Levels',...
-            'Threshold','Crossing','Passage','Close det.'},...
-            'Location','best')
-    elseif ~ isempty(sFarShip) && ~isempty(sCloseShip)
-        legend([p1,p2,p3,p4,p5,p6(1),p7(1),p9(1)],{'Interpolated','APSD','Levels',...
-            'Threshold','Crossing','Passage','Close det.','Far det.'},...
-            'Location','best')
-    elseif ~isempty(sCloseShip) && isempty(sFarShip)
-        legend([p1,p2,p3,p4,p5,p6(1),p7(1)],{'Interpolated','APSD','Levels',...
-            'Threshold','Crossing','Passage','Close det.'},...
-            'Location','best')
-    elseif isempty(sCloseShip) && ~isempty(sFarShip)
-        legend([p1,p2,p3,p4,p5,p6(1),p9(1)],{'Interpolated','APSD','Levels',...
-            'Threshold','Crossing','Passage','Close det.'},...
-            'Location','best')
-    end
-    title(sprintf('Low band (%d-%d Hz)',f(lowB1),f(hiB1)))
-    set(gca, 'FontName', 'Times New Roman','FontSize',10)
+    sh_subplot_data(1,reltim,fillavg_pwrB3,avg_pwrB3,stateLevsB3,...
+        midRefB3,icrB3,sB3,eB3,[],[],noise,sCloseShip,sFarShip,f,lowB3,hiB3,...
+        xpoints,passageColor)
     
-    subplot(3,1,2)
-    plot(reltim,fillavg_pwrB2,'Color',gray)
-    hold on
-    plot(reltim,avg_pwrB2,'Color',blue)
-    title(sprintf('Medium band (%d-%d Hz)',f(lowB2),f(hiB2)))
-    plot(reltim,linspace(stateLevsB2(1),stateLevsB2(1),length(reltim)),'--','Color',red, 'LineWidth',.5)
-    plot(reltim,linspace(stateLevsB2(2),stateLevsB2(2),length(reltim)),'--','Color',red, 'LineWidth',.5)
-    plot(reltim,linspace(midRefB2,midRefB2,length(reltim)),'Color',red, 'LineWidth',2)
-    plot(reltim(icrB2),linspace(midRefB2,midRefB2,length(reltim(icrB2))),'.','Color',black,'MarkerSize',7)
-    if ~isempty(sCloseShip)
-        plot(reltim(sB2),midRefB2,'o','Color',black,'MarkerSize',6);
-        plot(reltim(eB2),midRefB2,'o','Color',black,'MarkerSize',6);
-    end
-    if ~isempty(sFarShip)
-        plot(reltim(sB2far),midRefB2,'x','Color',black,'MarkerSize',6);
-        plot(reltim(sB2far),midRefB2,'x','Color',black,'MarkerSize',6);
-    end
-    ylabel('Averaged PSD (dB re 1 \muPa^2/Hz)')
-    set(gca, 'FontName', 'Times New Roman','FontSize',10)
+    sh_subplot_data(2,reltim,fillavg_pwrB2,avg_pwrB2,stateLevsB2,...
+        midRefB2,icrB2,sB2,eB2,sB2far,eB2far,noise,sCloseShip,sFarShip,f,lowB2,hiB2,...
+        xpoints,passageColor)
     
-    subplot(3,1,3)
-    plot(reltim,fillavg_pwrB3,'Color',gray)
-    hold on
-    plot(reltim,avg_pwrB3,'Color',blue)
-    title(sprintf('High band (%d-%d Hz)',f(lowB3),f(hiB3)))
-    plot(reltim,linspace(stateLevsB3(1),stateLevsB3(1),length(reltim)),'--','Color',red, 'LineWidth',.5)
-    plot(reltim,linspace(stateLevsB3(2),stateLevsB3(2),length(reltim)),'--','Color',red, 'LineWidth',.5)
-    plot(reltim,linspace(midRefB3,midRefB3,length(reltim)),'Color',red, 'LineWidth',2)
-    plot(reltim(icrB3),linspace(midRefB3,midRefB3,length(reltim(icrB3))),'.','Color',black,'MarkerSize',7)
-    if ~isempty(sCloseShip)
-        plot(reltim(sB3),midRefB3,'o','Color',black,'MarkerSize',6);
-        plot(reltim(eB3),midRefB3,'o','Color',black,'MarkerSize',6);
-    end
-    xlabel('Time (Hours)')
-    set(gca, 'FontName', 'Times New Roman','FontSize',10)
-    hold off
+    sh_subplot_data(3,reltim,fillavg_pwrB1,avg_pwrB1,stateLevsB1,...
+        midRefB1,icrB1,sB1,eB1,sB1far,eB1far,noise,sCloseShip,sFarShip,f,lowB1,hiB1,...
+        xpoints,passageColor)
     
 end
 

@@ -3,17 +3,13 @@ function sh_detector_batch
 
 global REMORA
 
-% detection parameters (%%%%%%%%% parameters to add in the settings file)
-% % % % REMORA.sh.settings.REWavExt= '(\.x)?\.wav';   % data files must end in this regular expression
-% % % % REMORA.sh.settings.RELtsaExt = '.s';   % Ship - Long term detection label extension
-
 % get detection parameters
 sec2dnum = 60*60*24; % conversion factor to get from seconds to matlab datenum
 durWind = REMORA.sh.settings.durWind;
 slide = REMORA.sh.settings.slide;
 errorRange = REMORA.sh.settings.errorRange;
 tave = REMORA.sh.ltsa.tave;
-minPassage = REMORA.sh.settings.minPassage/sec2dnum;
+minPassage = REMORA.sh.settings.minPassage;
 
 tic;  % Note start time
 
@@ -34,14 +30,14 @@ progressh = waitbar(0,'Start processing...','Name',sprintf('Processing file: %s'
 t = toc;
 for itr1 = 1:TotalWindows
     
-    %%% Detect ships 
-    % Apply detector to the central window (of size durWind) and to the
-    % overlapping windows of "slide" seconds before and after start of the 
+    %%% Detect ships
+    % Apply detector to the central window (of size durWind and to the
+    % overlapping windows of "slide" seconds before and after start of the
     % central window
     
     % Read the spectral data of the snippet of data and apply detector
     % Central Window
-    [pwr,startIndex,startBin] = sh_get_pwr_window(dnumSnippet); 
+    [pwr,startIndex,startBin] = sh_get_pwr_window(dnumSnippet);
     [ships,labels,~] = sh_passage_detector(pwr,0);
     dnumShips = (ships./sec2dnum)*tave + dnumSnippet; % convert to actual times
     
@@ -50,9 +46,9 @@ for itr1 = 1:TotalWindows
     
     % If earlier than start of ltsa, previous window will be the same like the central window
     if dnumPrevSnippet < REMORA.sh.ltsa.start.dnum
-       dnumPrevSnippet = REMORA.sh.ltsa.start.dnum; 
+        dnumPrevSnippet = REMORA.sh.ltsa.start.dnum;
     end
-    [pwr,~,~] = sh_get_pwr_window(dnumPrevSnippet); 
+    [pwr,~,~] = sh_get_pwr_window(dnumPrevSnippet);
     [shipsPrev,labelsPrev,~] = sh_passage_detector(pwr,0);
     dnumShipsPrev = (shipsPrev./sec2dnum)*tave + dnumPrevSnippet; % convert to actual times
     
@@ -61,9 +57,9 @@ for itr1 = 1:TotalWindows
     
     % If past the end of ltsa, posterior window will be the same like the central window
     if dnumPostSnippet > REMORA.sh.ltsa.end.dnum
-       dnumPostSnippet = dnumSnippet; 
+        dnumPostSnippet = dnumSnippet;
     end
-    [pwr,~,~] = sh_get_pwr_window(dnumPostSnippet); 
+    [pwr,~,~] = sh_get_pwr_window(dnumPostSnippet);
     [shipsPost,labelsPost,~] = sh_passage_detector(pwr,0);
     dnumShipsPost = (shipsPost./sec2dnum)*tave + dnumPostSnippet;
     
@@ -98,14 +94,14 @@ for itr1 = 1:TotalWindows
         end
         % if there are detection at the edges include them as well
         if size(dnumShips,1) ~= size(dnumShipsPost,1)
-           for itr2post = 1: size(dnumShipsPost,1) 
-               endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
-               onEdge = find(dnumShipsPost(itr2post,1) <= endSnippet & dnumShipsPost(itr2post,2) > endSnippet); % the start have to be in the central window and the end passed
-               if onEdge
-                   selectShips = [selectShips; dnumShipsPost(itr2post,1), endSnippet];
-                   selectLabels = [selectLabels; labelsPost{itr2post}];
-               end
-           end
+            for itr2post = 1: size(dnumShipsPost,1)
+                endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
+                onEdge = find(dnumShipsPost(itr2post,1) <= endSnippet & dnumShipsPost(itr2post,2) > endSnippet); % the start have to be in the central window and the end passed
+                if onEdge
+                    selectShips = [selectShips; dnumShipsPost(itr2post,1), endSnippet];
+                    selectLabels = [selectLabels; labelsPost{itr2post}];
+                end
+            end
         end
     end
     if isequal(comb,[0 1 0]) || isequal(comb,[0 1 1])
@@ -113,7 +109,7 @@ for itr1 = 1:TotalWindows
         for itr3 = 1:size(dnumShipsPrev,1)
             onEdge = find(dnumShipsPrev(itr3,1) < dnumSnippet & dnumShipsPrev(itr3,2) > dnumSnippet); % start before the central window and the end in the central window
             if onEdge
-                selectShips = [selectShips; dnumSnippet,dnumShipsPrev(itr3,2)]; 
+                selectShips = [selectShips; dnumSnippet,dnumShipsPrev(itr3,2)];
                 selectLabels = [selectLabels; labelsPrev{itr3}];
             end
         end
@@ -124,14 +120,14 @@ for itr1 = 1:TotalWindows
             endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
             onEdge = find(dnumShipsPost(itr4,1) <= endSnippet & dnumShipsPost(itr4,2) > endSnippet); % the start have to be in the central window and the end passed
             if onEdge
-                selectShips = [selectShips; dnumShipsPost(itr4,1), endSnippet]; 
+                selectShips = [selectShips; dnumShipsPost(itr4,1), endSnippet];
                 selectLabels = [selectLabels; labelsPost{itr4}];
             end
         end
     end
-
+    
     if ~isempty(selectShips)
-        %%% Populate data to save to corresponding files 
+        %%% Populate data to save to corresponding files
         % Convert all ship_s from matlab times to real times
         populateTimes = [populateTimes; selectShips + datenum([2000,0,0])];
         populateLabels = [populateLabels; selectLabels];
@@ -140,16 +136,10 @@ for itr1 = 1:TotalWindows
     % only text will be displayed in command window if number increased
     perc = round(itr1/TotalWindows*100);
     if perc ~= newperc
-        newperc = perc; 
-        % calculate time remaining
-%         trem = t/(newperc/100)-t;
-%         Hrs=floor(trem/3600);
-%         Min=floor((trem-Hrs*3600)/60);
-%         Sec = rem(trem,60);
-%         waitbar(newperc/100,progressh,sprintf('%d%% completed, estimated 00:%02.0f:%02.0f remaining',newperc,Min,Sec))
-    waitbar(newperc/100,progressh,sprintf('%d%% completed',newperc))
+        newperc = perc;
+        waitbar(newperc/100,progressh,sprintf('%d%% completed',newperc))
     end
-
+    
     itr1 = itr1 + 1;
     dnumSnippet = sh_read_time_window(startIndex,startBin);
 end
@@ -188,7 +178,7 @@ if ~isempty(populateTimes)
         sh_write_labels(fullfile(REMORA.sh.settings.outDir,labelname), shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
         fprintf('Labels saved at: %s\n',fullfile(REMORA.sh.settings.outDir,labelname));
     end
-
+    
 else
     fprintf('No detections in file: %s\n',...
         fullfile(REMORA.sh.ltsa.inpath,REMORA.sh.ltsa.infile))

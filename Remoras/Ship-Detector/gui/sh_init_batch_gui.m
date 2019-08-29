@@ -1,7 +1,7 @@
-function sh_init_detector_window
+function sh_init_batch_gui
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% sh_init_detector_window.m
+% sh_init_batch_gui.m
 %
 % Verify settings in GUI before running on entire drive.
 %%
