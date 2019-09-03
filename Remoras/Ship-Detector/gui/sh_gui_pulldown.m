@@ -1,4 +1,4 @@
-function sh_motion_pulldown(action)
+function sh_gui_pulldown(action)
 
 global REMORA
 
@@ -38,7 +38,18 @@ elseif strcmp(action,'settingsSave')
     sh_create_settings_file(REMORA.sh.settings,fileName,filePath)
     
     
+elseif strcmp(action,'settingsLoadBatch')
+    settings = [];
     
+    % get settings from selected settings file 
+    dialogTitle = 'Choose detector settings file';
+    settingsFile = uigetfile(fullfile(settingsPath,'*.m'),dialogTitle);
+    run(settingsFile)
+    
+    % set new settings in motion gui
+    REMORA.sh.settings = settings;
+    sh_init_batch_gui
+    sh_settings_to_sec
     
     
 end

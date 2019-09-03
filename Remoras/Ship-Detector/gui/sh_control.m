@@ -109,12 +109,11 @@ elseif strcmp(action,'setLabelFile')
     REMORA.sh.settings.saveLabels = labelsCheckbox;
     
 elseif strcmp(action,'RunBatchDetection')
-    close(REMORA.fig.sh_verify)
+    close(REMORA.fig.sh.batch)
     sh_init_ltsa_params;
     sh_detector_batch;
 end
 
 if strcmp(mySource, 'motion')
     sh_detector_motion
-    %     sh_plot_detections
 end

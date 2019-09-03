@@ -37,8 +37,15 @@ if strcmp(action, 'interactive')
 elseif strcmp(action,'full_detector')
     % dialog box - run full detector
     sh_setpointers('watch');
-    % set up to open gui window for motion detector
-    sh_load_settings('batch')
+    
+    % set up to open gui window for batch detector
+    sh_init_batch_figure
+    sh_init_settings
+    
+    % set up all default settings to motion gui
+    sh_init_batch_gui
+    sh_settings_to_sec
+    
     sh_setpointers('arrow');
 
 % elseif strcmp(action,'create_labels')

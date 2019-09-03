@@ -17,8 +17,8 @@ REMORA.sh.menuMotion = uimenu(REMORA.fig.sh.motion,'Label','&Load/Save Settings'
 
 % Spectrogram load/save params
 uimenu(REMORA.sh.menuMotion,'Label','&Load Detector Settings File',...
-    'Callback','sh_motion_pulldown(''settingsLoad'')');
+    'Callback','sh_gui_pulldown(''settingsLoad'')');
 uimenu(REMORA.sh.menuMotion,'Label','&Save Detector Settings File',...
-    'Callback','sh_motion_pulldown(''settingsSave'')');
+    'Callback','sh_gui_pulldown(''settingsSave'')');
 
 
