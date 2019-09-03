@@ -1,4 +1,5 @@
 function spice_detector(varargin)
+%testing
 
 % All input parameters should be contained within a script
 % See detector_settings_default.m  for default settings and descriptions.
