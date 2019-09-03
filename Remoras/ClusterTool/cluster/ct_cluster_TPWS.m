@@ -58,6 +58,7 @@ outName = strrep(fNameExt,['TPWS',p.TPWSitr],fnameNewEnding);
 [~, keepIdx] = setdiff(MTT,fdAll);
 MTT = MTT(keepIdx);
 MSP = MSP(keepIdx,:);
+MSN = MSN(keepIdx,:);
 MPP = MPP(keepIdx);
 fprintf('%0.0f clicks left after removing false positives.\n',length(MTT))
 
@@ -134,10 +135,10 @@ for iC = 1:length(dateInterval)
         specSet = specSet(rList,:);
         ttSet = ttSet(rList);
         envDur = envDur(rList,:);
-        
+        envSet = envSet(rList,:);
         % Cluster
-        [spectraMean,clickAssign,~,specHolder,isolatedSet,envDistrib] = ...
-            ct_cluster_clicks_cw_merge(specSet,p,normalizeTF,envDur);
+        [spectraMean,clickAssign,~,specHolder,isolatedSet,envDistrib,envSetHolder] = ...
+            ct_cluster_clicks_cw_merge(specSet,p,normalizeTF,envDur,envSet);
         
         % If you finish clustering with populated cluster(s)
         if ~isempty(clickAssign)
@@ -177,7 +178,7 @@ for iC = 1:length(dateInterval)
             if p.plotFlag 
                 % plotting option
                 ct_plot_bin_clusters(p,f,spectraMean,envDistrib,cRate,dtt,...
-                    specHolder,sizeCA,iC,length(dateInterval)) 
+                    specHolder,envSetHolder,sizeCA,iC,length(dateInterval)) 
             end
         else
             noCluster = 1;

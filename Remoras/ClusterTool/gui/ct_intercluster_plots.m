@@ -26,7 +26,7 @@ for iF = 1:length(nodeSet)
     
     hSet(2) = figure(42); % plot spectra as heatmap
     subplot(n1,m1,iF)
-    imagesc(1:length(nodeSet{iF}),f(p.startFreqIdx:p.endFreqIdx),Tfinal{iF,1}')
+    imagesc(1:length(nodeSet{iF}),f,max(Tfinal{iF,1},0)')
     set(gca,'ydir','normal')
     title(labelStr{iF})
     % ylim([min(f(p.startFreqIdx)),max(f(p.endFreqIdx))])
@@ -52,17 +52,19 @@ mylabel(41,'Normalized Amplitude','FontSize',16);
 figure(42)
 mxlabel(42,'Click Number','FontSize',16);
 mylabel(42,'Frequency (kHz)','FontSize',16);
+colormap(jet)
 figure(43)
 mxlabel(43,'ICI (sec)','FontSize',16);
 mylabel(43,'Normalized Counts','FontSize',16);
 figure(44)
 mxlabel(44,'Click Number','FontSize',16);
 mylabel(44,'ICI (sec)','FontSize',16);
+colormap(jet)
 mtit(41,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(42,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(43,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(44,strrep(s.outputName,'_',' ' ),'FontSize',12);
-colormap(jet)
+
 
 if s.saveOutput
     disp('Saving figures...')

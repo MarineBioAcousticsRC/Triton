@@ -129,8 +129,8 @@ else
     useBins = (nSpecMat >= s.minClicks);
 end
 
-[~,s.stIdx] = min(abs(f(p.startFreqIdx:p.endFreqIdx)-s.startFreq));
-[~,s.edIdx] = min(abs(f(p.startFreqIdx:p.endFreqIdx)-s.endFreq));
+[~,s.stIdx] = min(abs(f-s.startFreq));
+[~,s.edIdx] = min(abs(f-s.endFreq));
 [specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
 
 [~,s.maxICIidx] = min(abs(p.barInt-s.maxICI));
@@ -175,10 +175,10 @@ for iEA = 1:s.N
             % set flag back to zero if you only want to subsample once,
             % rather than taking a new subsample every time.
             subSamp = 0;
-            excludedIn = sort(randperm(length(dTTmatNorm), s.maxClust));
+            excludedIn = sort(randperm(size(dTTmatNorm,1), s.maxClust));
             fprintf('Max number of bins exceeded. Selecting random subset of %d\n',s.maxClust)
         elseif ~s.subSampOnlyOnce
-            excludedIn = sort(randperm(length(dTTmatNorm), s.maxClust));
+            excludedIn = sort(randperm(size(dTTmatNorm,1), s.maxClust));
             fprintf('Max number of bins exceeded. Selecting random subset of %d\n',s.maxClust)
         end
         
@@ -392,7 +392,7 @@ end
 % for iR = 1:length(binDataUsed)
 %     binDataUsed(iR).fileNum = fileNumExpand(iR);
 % end
-
+outputDataFile = [];
 if s.saveOutput
     outputDataFile = fullfile(s.outDir,[s.outputName,'_types_all']);
     fprintf('Saving data file to %s\n',outputDataFile)

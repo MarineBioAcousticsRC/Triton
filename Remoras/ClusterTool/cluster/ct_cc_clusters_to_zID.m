@@ -7,20 +7,24 @@ allClickTimes = [];
 allClickLabels = [];
 allFileIndices = [];
 
+[mergedLabels,mergedLabelsOut,mergedLabelsIn] = unique(REMORA.ct.CC.output.labelStr);
+
+
 fileNumLarge = {};
 for iRow = 1:size(REMORA.ct.CC.output.clickTimes,2)
     fileNumLarge{iRow,1} = repmat(REMORA.ct.CC.output.fileNumExpand(iRow),...
         size(REMORA.ct.CC.output.clickTimes{iRow},1),1);
 end
     
-for iT = 1:size(REMORA.ct.CC.output.Tfinal)
+for iT = 1:size(mergedLabels,2)
+    %size(REMORA.ct.CC.output.Tfinal)
     % For each cluster:
     % For each bin in the cluster, you need the times of the clicks in the
     % bin. 
     
     % have to make fileNumExpand match clickTimes 
-
-    thisNodeSet = REMORA.ct.CC.output.Tfinal{iT, 8};
+    thisLabelSet = find(mergedLabelsIn==iT);
+    thisNodeSet = horzcat(REMORA.ct.CC.output.Tfinal{thisLabelSet, 8});
      
     theseClickTimes = vertcat(REMORA.ct.CC.output.clickTimes{thisNodeSet});
     theseClickLabels = iT*ones(size(theseClickTimes));
@@ -43,7 +47,7 @@ for iTPWS = 1:length(REMORA.ct.CC.output.inFileList)
     zID = [allClickTimes(thisIDSet), allClickLabels(thisIDSet)];
     fNameOut = fullfile(REMORA.ct.CC.output.idDir, char(strcat(TPWSNameStem{1},...
         '_', REMORA.ct.CC.output.fileEnding)));
-    labels = REMORA.ct.CC.output.labelStr;
+    labels = mergedLabels;%REMORA.ct.CC.output.labelStr;
     save(fNameOut,'zID','labels')
     fprintf('File %0.0f of %0.0f saved: %s\n',iTPWS,length(REMORA.ct.CC.output.inFileList),...
         fNameOut)

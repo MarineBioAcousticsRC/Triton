@@ -1,5 +1,5 @@
-function [spectraMean,clickAssign,clustSizes,spectraHolder,isolatedAll,envDurDistrib] = ...
-    ct_cluster_clicks_cw_merge(specClickTf,p,normalizeTF,envDur)
+function [spectraMean,clickAssign,clustSizes,spectraHolder,isolatedAll,envDurDistrib,envSetHolder] = ...
+    ct_cluster_clicks_cw_merge(specClickTf,p,normalizeTF,envDur,envSet)
 
 spectraMean = [];
 clickAssign = [];
@@ -7,7 +7,7 @@ clustSizes = 0;
 spectraHolder = [];
 isolatedAll = [];
 envDurDistrib = [];
-
+envSetHolder = [];
 if normalizeTF
     [specClickTfNorm,specClickTfNormDiff] = ct_normalize_click_spectra(specClickTf,p);
 end
@@ -112,8 +112,8 @@ clickAssign = {};
 if ~isempty(uniqueLabelsNew)
     for i4 = 1:length(uniqueLabelsNew)
         thisSpectralSet = specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:);
-        thisEnvSet = envDur(clusterIDNew==uniqueLabelsNew(i4),:);
-        envDurDistrib(i4,:) = histc(thisEnvSet,1:p.maxDur);
+        thisEnvDurSet = envDur(clusterIDNew==uniqueLabelsNew(i4),:);
+        envDurDistrib(i4,:) = histc(thisEnvDurSet,1:p.maxDur);
         
         if ~p.linearTF
             linearSpec = 10.^((thisSpectralSet+1)./20);
@@ -123,11 +123,12 @@ if ~isempty(uniqueLabelsNew)
         end
         
         %linearSpecMean = mean(specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:));
-        spectraMean(i4,:) = (meanSpectra-min(meanSpectra))...
-            ./max(meanSpectra-min(meanSpectra));
+        spectraMean(i4,:) = (meanSpectra-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)))...
+            ./max(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)));
         % spectraStd(i4,:) = std(specClickTf_norm(nodeNums(clusters==clustNums(i4)),:));
         clickAssign{i4} = find(clusterIDNew==uniqueLabelsNew(i4));
         spectraHolder{i4} = specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:);
+        envSetHolder{i4} = envSet(clusterIDNew==uniqueLabelsNew(i4),:);
         % imagesc(specClickTf_norm(clickAssign{i4},p.stIdx:p.edIdx)');set(gca,'ydir','normal')
     end
 end
