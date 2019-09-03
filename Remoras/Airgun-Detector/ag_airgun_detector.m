@@ -1,15 +1,21 @@
 function ag_airgun_detector(varargin)
 
+parm = varargin{1};
+
 SearchFileMask = {'*df100.x.wav'};
-SearchPathMask = ('H:\SOCAL_H_64_disk01_df100');
-SearchRecursiv = 0;
+SearchPathMask = parm.baseDir;
+SearchRecursiv = parm.recursSearch;
 
 currentPath = mfilename('fullpath');
 templateFilePath = fileparts(currentPath);
 templateFile = fullfile(templateFilePath,'air_template_df100.mat');
 
+if ~isdir(parm.outDir)
+    mkdir(parm.outDir)
+end
+
 [PathFileList, FileList, PathList] = ...
-    utFindFiles(SearchFileMask, SearchPathMask, SearchRecursiv);
+    ag_utFindFiles(SearchFileMask, SearchPathMask, SearchRecursiv);
 
 templateStruct = load(templateFile);
 template = templateStruct.DATA;
@@ -71,7 +77,7 @@ for fidx = 1:size(FileList,1) % Make sure to change the start of the file list s
             continue
         end % Added from explosion code when the sample size is too small (Macey - 2/13/2018).
         
-        y = wavread(filepath,[start stop]);
+        [y, ~] = audioread(filepath,[start stop]);
         %filter between 200 and 2000 Hz
         yFilt = filtfilt(B,A,y); %filter click
         fprintf('max = %0.3f\n',max(yFilt))
@@ -91,7 +97,7 @@ for fidx = 1:size(FileList,1) % Make sure to change the start of the file list s
         threshold_c2 = medianC2 + (medianC2*parm.c2_offset);
         %         thr = ones(length(y),1)*threshold;
         thr2 = ones(length(y),1)*threshold_c2;
-        if plotOn
+        if parm.plotOn
             
             figure(1)
             subplot(2,1,1)
@@ -99,6 +105,7 @@ for fidx = 1:size(FileList,1) % Make sure to change the start of the file list s
             subplot(2,1,2)
             plot(c2), hold on
             plot(thr2,'r'), hold off
+            drawnow
         end
         
         % find correlation coefficient above threshold
@@ -179,7 +186,7 @@ for fidx = 1:size(FileList,1) % Make sure to change the start of the file list s
                     %when convolusion starts being above threshold
                     s = expConv(eidx,1);%+1+round(length(template)*0.5);
                     e = expConv(eidx,2);%+round(length(template)*0.5);%-length(template)/2;  %AJD changed 1.2 to 1.5 7/13/2016
-                    if plotOn
+                    if parm.plotOn
                         hold on; plot(s,c2(s),'ro');plot(e,c2(e),'ko');hold off
                     end
                     %check if s is before segment starts
@@ -324,7 +331,7 @@ for fidx = 1:size(FileList,1) % Make sure to change the start of the file list s
                     ppNBeforeSeg(delUnion) = [];
                     ppNAfterSeg(delUnion) = [];
                     ppDetSeg(delUnion) = [];
-                    if plotOn && ~isempty(expTimes)
+                    if parm.plotOn && ~isempty(expTimes)
                         hold on; plot(expTimes(1),c2(expTimes(1)),'rx');...
                             plot(expTimes(2),c2(expTimes(2)),'kx');hold off
                     end
