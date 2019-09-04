@@ -5,7 +5,7 @@ function sh_subplot_data(nsub,reltim,fillavg_pwr,avg_pwr,stateLevs,...
 
 marker = 6;
 font = 8; % font titles
-fontL = 6; % font legend
+fontL = 8; % font legend
 alpha = .4; % transparency
 
 red = [.85 .325 .098];
@@ -59,10 +59,10 @@ switch nsub
         title(REMORA.fig.sh.passageSubplot(nsub),sprintf('High band (%d-%d Hz)',f(low),f(hi)),'FontSize',font)
     case 2
         title(REMORA.fig.sh.passageSubplot(nsub),sprintf('Medium band (%d-%d Hz)',f(low),f(hi)),'FontSize',font)
-        ylabel(REMORA.fig.sh.passageSubplot(nsub),'Averaged PSD (dB re 1 \muPa^2/Hz)')
+        ylabel(REMORA.fig.sh.passageSubplot(nsub),'Averaged PSD (dB re 1 \muPa^2/Hz)','FontSize',font)
     case 3
         title(REMORA.fig.sh.passageSubplot(nsub),sprintf('Low band (%d-%d Hz)',f(low),f(hi)),'FontSize',font)
-        xlabel(REMORA.fig.sh.passageSubplot(nsub),'Time (Hours)')
+        xlabel(REMORA.fig.sh.passageSubplot(nsub),'Time (Hours)','FontSize',font)
         
         % make some variables invisible in the legend
         childs = allchild(REMORA.fig.sh.passageSubplot(nsub));
@@ -102,9 +102,12 @@ switch nsub
                 ~isempty(findobj(childs,'DisplayName','Far detection')) || ...
                 ~isempty(findobj(childs,'DisplayName','Ship')) || ...
                 ~isempty(findobj(childs,'DisplayName','Ambient'))
-            legend(REMORA.fig.sh.passageSubplot(nsub),'show','FontSize', fontL,'Location','north','Orientation','horizontal')
-            set(REMORA.fig.sh.passageSubplot(3).Legend,'Position',[0.1443 0.96 0.7613 0.0353])
+%             legend(REMORA.fig.sh.passageSubplot(nsub),'show','FontSize', fontL,'Location','north','Orientation','horizontal')
+            legend(REMORA.fig.sh.passageSubplot(nsub),'show','Location','north','Orientation','horizontal')
+            REMORA.fig.sh.passageSubplot(3).Legend.Position = [0.1443 0.96 0.7613 0.0353];
+            REMORA.fig.sh.passageSubplot(3).Legend.FontSize = fontL;
         end
         
 end
+REMORA.fig.sh.passageSubplot(nsub).FontSize = font;
 hold (REMORA.fig.sh.passageSubplot(nsub),'off')

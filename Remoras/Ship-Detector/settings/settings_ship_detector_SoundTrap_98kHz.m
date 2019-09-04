@@ -7,9 +7,9 @@
 settings.outDir  = 'E:\evaluate_ship_detector\metadata';
 
 % Set transfer function location (calibration/sensitivity gain)
-settings.tfFullFile = 'E:\evaluate_ship_detector\tfs\656_130221_HARP.tf';
+% settings.tfFullFile = 'E:\evaluate_ship_detector\tfs\656_130221_HARP.tf';
 % Note, if no transfer function but singular gain use:
-% settings.tfFullFile = 0; % m-gain in dB
+settings.tfFullFile = 1/173.1; % m-gain in dB
  
 settings.REWavExt = '(\.x)?\.wav'; % Expression to match .wav or .x.wav
 

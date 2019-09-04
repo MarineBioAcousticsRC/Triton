@@ -349,12 +349,10 @@ if ~isempty(noise)
         RLs= [mean(RLsB1(noise(m,1):noise(m,2))), mean(RLsB2(noise(m,1):noise(m,2))),...
             mean(RLsB3(noise(m,1):noise(m,2)))];
         
-        if RLs (1) > RLB1thr %&& RLs(2) > RLB2thr && RLs(3) > RLB3thr % %RLs(m,1)>80 & (RLs(m,2)<60 | RLs(m,3)<60)
+        if RLs(1) > RLB1thr %&& RLs(2) > RLB2thr && RLs(3) > RLB3thr % %RLs(m,1)>80 & (RLs(m,2)<60 | RLs(m,3)<60)
             labels{m} = 'ship';
         else
-            if (RLs(2)< 0 || RLs(3)<0)
-                noise(m,:) = [0 0];
-            elseif (RLs(1) - mean(RLs(2:3))) > 15
+            if (RLs(1) - mean(RLs(2:3))) > 15
                 labels{m} = 'ship';
             else
                 labels{m} = 'ambient';
