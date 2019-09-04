@@ -25,7 +25,7 @@ elseif size(gDTxt,2)>= 2
     %start and end dates are formatted as text
     disp('No number columns found')
     disp('Assuming guided detection times are in MM/DD/YYYY hh:mm:ss format')
-    matlabDates = [datenum(gDTxt(2:end,1)),datenum(gDTxt(2:end,2))];
+    matlabDates = [datenum(gDTxt(2:end,1),'mm/dd/yyyy HH:MM:SS'),datenum(gDTxt(2:end,2),'mm/dd/yyyy HH:MM:SS')];
     
 end  
 
@@ -40,7 +40,7 @@ fTypes = io_getFileType(detFiles);
 
 for m = 1:size(detFiles,1)
     thisXwav = detFiles{m};   
-    fileHead = io_readXWAVHeader(thisXwav,p,'ftype',fTypes(m));
+    fileHead = io_readXWAVHeader(thisXwav,p,'fType',fTypes(m));
     startFile(m,1) = fileHead.start.dnum;
     endFile(m,1) = fileHead.end.dnum;
 end

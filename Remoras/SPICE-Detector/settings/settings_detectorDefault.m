@@ -25,6 +25,7 @@ detParams.dBppThreshold = 118; % minimum amplitude threshold in dB.
 detParams.frameLengthUs = 2000; % For fft computation
 detParams.clipThreshold = 0.98;%  Normalized clipping threshold btwn 0 and 1.  If empty, 
 % assumes no clipping. 
+detParams.snrDet = 0;
 
 detParams.REWavExt = '(\.x)?\.wav';%  expression to match .wav or .x.wav
 % If you are using wav files that have a time stamp in the name, put a
@@ -94,6 +95,8 @@ detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring
 % clicks. Clicks that are far from neighbors can be rejected using this parameter,
 % good for dolphins in noisy environments because lone clicks or pairs of
 % clicks are likely false positives
+detParams.rmEchos = 0;
+detParams.lockOut = 0;
 
 %%% Saving options %%%
 detParams.saveNoise = 1; % Make 1 if you want to save noise samples with each click. 

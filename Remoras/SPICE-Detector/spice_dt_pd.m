@@ -15,8 +15,7 @@ global PARAMS REMORA
 if strcmp(action, 'xwav')
     if ~isfield(PARAMS, 'xhd')
         % no data loaded, display message to load data.
-        disp_msg('Please load audio data before launching detector gui')
-        return
+        disp_msg('Please load audio data.')
     end
     spice_setpointers('watch');
     

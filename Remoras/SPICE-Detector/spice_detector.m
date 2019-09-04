@@ -68,23 +68,6 @@ fullLabels = fn_getFileset(detParams,fullFileNames);
 % profile on
 % profile clear
 if ~isempty(fullFileNames)
-    %     % Short time detector
-    %     if detParams.lowResDet
-    %         tic
-    %         fprintf('Beginning low-res detection\n\n')
-    %         dt_LR_batch(fullLabels,fullFileNames,detParams); % run detector
-    %         fprintf('Done with low-res detector\n\n')
-    %         toc
-    %     end
-    %
-    %     % High res detector
-    %     if detParams.highResDet
-    %         tic
-    %         fprintf('Beginning high-res detection\n\n')
-    %         dt_HR_batch(fullFileNames,fullLabels,detParams,encounterTimes)
-    %         fprintf('Done with high-res detector\n\n')
-    %         toc
-    %     end
     fprintf('Beginning detection\n\n')
     dt_batch(fullFileNames,fullLabels,detParams,encounterTimes,runMode);
     
