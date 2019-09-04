@@ -1,42 +1,52 @@
-function sh_control(action)
+function sh_control(action,mySource)
 
-global REMORA
+global REMORA HANDLES
+
+if ~exist('mySource','var')
+    mySource = 'null';
+end
 
 if strcmp(action, '')
-% Note: could make this have an option to just refresh everything by making
-% these all into if rather than elseif
-
+    % Note: could make this have an option to just refresh everything by making
+    % these all into if rather than elseif
+    
 elseif strcmp(action,'setOutDir')
     outDir = get(REMORA.sh_verify.outDirEdTxt, 'string');
     REMORA.sh.settings.outDir = outDir;
     
 elseif strcmp(action,'setTFPath')
     tfFullFile = get(REMORA.sh_verify.TFPathEdTxt, 'string');
-    REMORA.sh.settings.tfFullFile = tfFullFile;   
+    REMORA.sh.settings.tfFullFile = tfFullFile;
     
 elseif strcmp(action,'setMinLowBand')
-    MinLowBandEdText = get(REMORA.sh_verify.MinlowBandEdText, 'string');
-    REMORA.sh.settings.lowBand(1) = MinLowBandEdText;   
+    MinLowBand = str2double(get(REMORA.sh_verify.MinLowBandEdText, 'string'));
+    MaxLowBand = str2double(get(REMORA.sh_verify.MaxLowBandEdText, 'string'));
+    REMORA.sh.settings.lowBand = [MinLowBand, MaxLowBand];
     
 elseif strcmp(action,'setMaxLowBand')
-    MaxLowBandEdText = get(REMORA.sh_verify.MaxlowBandEdText, 'string');
-    REMORA.sh.settings.lowBand(2) = MaxLowBandEdText;     
+    MinLowBand = str2double(get(REMORA.sh_verify.MinLowBandEdText, 'string'));
+    MaxLowBand = str2double(get(REMORA.sh_verify.MaxLowBandEdText, 'string'));
+    REMORA.sh.settings.lowBand = [MinLowBand, MaxLowBand];
     
 elseif strcmp(action,'setMinMediumBand')
-    MinMediumBandEdText = get(REMORA.sh_verify.MinMediumBandEdText, 'string');
-    REMORA.sh.settings.mediumBand(1) = MinMediumBandEdText;   
+    MinMediumBand = str2double(get(REMORA.sh_verify.MinMediumBandEdText, 'string'));
+    MaxMediumBand = str2double(get(REMORA.sh_verify.MaxMediumBandEdText, 'string'));
+    REMORA.sh.settings.mediumBand = [MinMediumBand,MaxMediumBand];
     
 elseif strcmp(action,'setMaxMediumBand')
-    MaxMediumBandEdText = get(REMORA.sh_verify.MaxMediumBandEdText, 'string');
-    REMORA.sh.settings.mediumBand(2) = MaxMediumBandEdText;  
+    MinMediumBand = str2double(get(REMORA.sh_verify.MinMediumBandEdText, 'string'));
+    MaxMediumBand = str2double(get(REMORA.sh_verify.MaxMediumBandEdText, 'string'));
+    REMORA.sh.settings.mediumBand = [MinMediumBand,MaxMediumBand];
     
 elseif strcmp(action,'setMinHighBand')
-    MinHighBandEdText = get(REMORA.sh_verify.MinHighBandEdText, 'string');
-    REMORA.sh.settings.highBand(1) = MinHighBandEdText;   
+    MinHighBand = str2double(get(REMORA.sh_verify.MinHighBandEdText, 'string'));
+    MaxHighBand = str2double(get(REMORA.sh_verify.MaxHighBandEdText, 'string'));
+    REMORA.sh.settings.highBand = [MinHighBand,MaxHighBand];
     
 elseif strcmp(action,'setMaxHighBand')
-    MaxHighBandEdText = get(REMORA.sh_verify.MaxHighBandEdText, 'string');
-    REMORA.sh.settings.highBand(2) = MaxHighBandEdText;  
+    MinHighBand = str2double(get(REMORA.sh_verify.MinHighBandEdText, 'string'));
+    MaxHighBand = str2double(get(REMORA.sh_verify.MaxHighBandEdText, 'string'));
+    REMORA.sh.settings.highBand = [MinHighBand,MaxHighBand];
     
 elseif strcmp(action,'setThrClose')
     ThrCloseEdTxt = str2double(get(REMORA.sh_verify.ThrCloseEdTxt, 'string'));
@@ -44,36 +54,48 @@ elseif strcmp(action,'setThrClose')
     
 elseif strcmp(action,'setThrDistant')
     ThrDistantEdTxt = str2double(get(REMORA.sh_verify.ThrDistantEdTxt, 'string'));
-    REMORA.sh.settings.thrDistant = ThrDistantEdTxt; 
+    REMORA.sh.settings.thrDistant = ThrDistantEdTxt;
     
 elseif strcmp(action,'setThrRL')
-    ThrRLEdTxt = str2double(get(REMORA.sh_verify.ThrDistantEdTxt, 'string'));
-    REMORA.sh.settings.thrRL = ThrRLEdTxt; 
+    ThrRLEdTxt = str2double(get(REMORA.sh_verify.ThrRLEdTxt, 'string'));
+    REMORA.sh.settings.thrRL = ThrRLEdTxt;
     
 elseif strcmp(action,'setMinPassage')
     MinPassageEdTxt = str2double(get(REMORA.sh_verify.MinPassageEdTxt, 'string'));
-    REMORA.sh.settings.minPassage = MinPassageEdTxt;     
-
+    REMORA.sh.settings.minPassage = MinPassageEdTxt  * (60 * 60); % convert from hours to seconds
+    
 elseif strcmp(action,'setBuffer')
     BufferEdTxt = str2double(get(REMORA.sh_verify.BufferEdTxt, 'string'));
-    REMORA.sh.settings.buffer = BufferEdTxt;   
+    REMORA.sh.settings.buffer = BufferEdTxt  * 60; % convert from minutes to seconds
     
 elseif strcmp(action,'setLabelsFile')
     labelsCheckbox = get(REMORA.sh_verify.labelsCheckbox, 'Value');
     REMORA.sh.settings.saveLabels = labelsCheckbox;
     
-elseif strcmp(action,'setDurWind')    
-    DurWindEdTxt = get(REMORA.sh_verify.DurWindEdTxt, 'Value');
-    REMORA.sh.settings.durWind = DurWindEdTxt; 
+elseif strcmp(action,'setDurWind')
+    DurWindEdTxt = str2double(get(REMORA.sh_verify.DurWindEdTxt, 'string'));
+    REMORA.sh.settings.durWind = DurWindEdTxt  * (60 * 60); % convert from hours to seconds
+    if strcmp(mySource, 'motion')
+        set(HANDLES.ltsa.time.edtxt3,'string',DurWindEdTxt)
+        control_ltsa('newtseg') %change Triton window
+        % bring motion gui to front
+        figure(REMORA.fig.sh.motion);
+    end
     
 elseif strcmp(action,'setSlide')
-    SlideEdTxt = get(REMORA.sh_verify.SlideEdTxt, 'string');
-    REMORA.sh.settings.slide = SlideEdTxt;
+    SlideEdTxt = str2double(get(REMORA.sh_verify.SlideEdTxt, 'string'));
+    REMORA.sh.settings.slide = SlideEdTxt  * (60 * 60); % convert from hours to seconds
+    if strcmp(mySource, 'motion')
+        set(HANDLES.ltsa.time.edtxt4,'string',SlideEdTxt)
+        control_ltsa('newtstep') %change Triton window
+        % bring motion gui to front
+        figure(REMORA.fig.sh.motion);
+    end
     
 elseif strcmp(action,'setErrorRange')
-    ErrorRangeEdTxt = get(REMORA.sh_verify.ErrorRangeEdTxt, 'string');
+    ErrorRangeEdTxt = str2double(get(REMORA.sh_verify.ErrorRangeEdTxt, 'string'));
     REMORA.sh.settings.errorRange = ErrorRangeEdTxt;
-
+    
 elseif strcmp(action,'setDutyCycle')
     dutyCycleCheckbox = get(REMORA.sh_verify.dutyCycleCheckbox, 'string');
     REMORA.sh.settings.dutyCycle = dutyCycleCheckbox;
@@ -87,18 +109,11 @@ elseif strcmp(action,'setLabelFile')
     REMORA.sh.settings.saveLabels = labelsCheckbox;
     
 elseif strcmp(action,'RunBatchDetection')
-    close(REMORA.fig.sh_verify)
-    settings_in_seconds
+    close(REMORA.fig.sh.batch)
     sh_init_ltsa_params;
     sh_detector_batch;
 end
 
-function settings_in_seconds
-
-global REMORA
-
-REMORA.sh.settings.minPassage = REMORA.sh.settings.minPassage * 60*60;
-REMORA.sh.settings.buffer = REMORA.sh.settings.buffer * 60;
-REMORA.sh.settings.durWind = REMORA.sh.settings.durWind * 60*60;
-REMORA.sh.settings.slide = REMORA.sh.settings.slide * 60*60;
-
+if strcmp(mySource, 'motion')
+    sh_detector_motion
+end

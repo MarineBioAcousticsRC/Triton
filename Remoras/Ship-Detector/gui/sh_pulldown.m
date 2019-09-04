@@ -18,22 +18,35 @@ if strcmp(action, 'interactive')
         disp_msg('Please load ltsa file before launching detector gui')
         return
     end
-    ship_setpointers('watch');
+    sh_setpointers('watch');
     
-    warning('Under construction')
-%     ship_dt_initparams
-%     ship_dt_initwins;
-%     ship_dt_initcontrol;
-
-    set(REMORA.fig.ship_dt,'Visible','on');
+    % set up to open gui window for motion detector
+    sh_init_motion_figure
+    sh_init_settings
     
-    ship_setpointers('arrow');
+    % When, gui window open, update window and time step (sliding window) 
+    % in Control Triton window based on settings file
+    update_window_settings
+    
+    % set up all default settings to motion gui
+    sh_init_motion_gui
+    sh_settings_to_sec
+    
+    sh_setpointers('arrow');
         
 elseif strcmp(action,'full_detector')
     % dialog box - run full detector
-    ship_setpointers('watch');
-    sh_load_settings
-    ship_setpointers('arrow');
+    sh_setpointers('watch');
+    
+    % set up to open gui window for batch detector
+    sh_init_batch_figure
+    sh_init_settings
+    
+    % set up all default settings to motion gui
+    sh_init_batch_gui
+    sh_settings_to_sec
+    
+    sh_setpointers('arrow');
 
 % elseif strcmp(action,'create_labels')
 %     ship_setpointers('watch');
@@ -80,8 +93,20 @@ elseif strcmp(action,'evaluate_detections')
 end
 
 
-function ship_setpointers(icon)
+function sh_setpointers(icon)
 global HANDLES
 set(HANDLES.fig.ctrl, 'Pointer', icon);
 set(HANDLES.fig.main, 'Pointer', icon);
 set(HANDLES.fig.msg, 'Pointer', icon);
+
+function update_window_settings
+global HANDLES REMORA
+set(HANDLES.ltsa.time.edtxt3,'string',REMORA.sh.settings.durWind)
+set(HANDLES.ltsa.time.edtxt4,'string',REMORA.sh.settings.slide)
+control_ltsa('newtseg') %change Triton plot length
+control_ltsa('newtstep') %change Triton time step 
+% bring motion gui to front
+figure(REMORA.fig.sh.motion);
+
+
+

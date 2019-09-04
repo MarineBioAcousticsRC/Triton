@@ -1,4 +1,4 @@
-function sh_load_settings
+function sh_load_settings(method)
 
 hFigure = figure('Position',[760,500,200,200],...
     'NumberTitle','off','Name','Spice Detector Batch Run - v1.0');
@@ -20,7 +20,7 @@ uicontrol(bg,'Style','pushbutton',...
     'String','Load from file',...
     'Position',[10 100 180 30],...
     'HandleVisibility','off',...
-    'Callback',{@ui_load_settings_from_mfile,hFigure});
+    'Callback',{@ui_load_settings_from_mfile,hFigure,method});
 
 
 uicontrol(bg,'Style','pushbutton',...
@@ -34,7 +34,7 @@ uicontrol(bg,'Style','pushbutton',...
 bg.Visible = 'on';
 end
 
-function ui_load_settings_from_mfile(hObject,eventdata,hFigure)
+function ui_load_settings_from_mfile(hObject,eventdata,hFigure,method)
 
 dialogTitle = 'Choose detector settings file';
 
@@ -47,5 +47,12 @@ run(settingsFile)
 global REMORA
 REMORA.sh.settings = settings;
 close(hFigure)
-sh_init_detector_window
+
+% open gui window settings 
+if strcmp(method,'batch')
+    sh_init_batch_gui
+    settings_in_seconds
+    sh_settings_to_sec
+end
+
 end
