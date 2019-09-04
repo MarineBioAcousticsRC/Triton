@@ -16,10 +16,15 @@ for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles
     subplot(n1,m1,iF)
     hold on
-    plot(f,compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
+    if length(f)~=length(compositeData(iF).spectraMeanSet)
+        fpl = linspace(s.startFreq,s.endFreq,length(compositeData(iF).spectraMeanSet));
+    else
+        fpl = f;
+    end
+    plot(fpl,compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
     %xlim([f(s.stIdx),f(s.edIdx)])
     legend(num2str(size(nodeSet{iF},2)),'location','Southeast')
-    plot(f,compositeData(iF).specPrctile,'--k','lineWidth',2)
+    plot(fpl,compositeData(iF).specPrctile,'--k','lineWidth',2)
     grid on
     hold off
     ylim([0,1])
