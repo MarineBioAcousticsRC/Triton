@@ -60,6 +60,7 @@ end
 binDataPruned = [];
 fileNum = [];
 for iFile = 1:length(inFileList)
+    if inFileList(iFile).isdir == 0
     loadedData = load(fullfile(inFileList(iFile).folder,...
         inFileList(iFile).name));
     if ~isfield(loadedData,'binData')
@@ -87,6 +88,7 @@ for iFile = 1:length(inFileList)
     
     f = loadedData.f;
     p = loadedData.p;
+    end
 end
 clear('loadedData')
 
