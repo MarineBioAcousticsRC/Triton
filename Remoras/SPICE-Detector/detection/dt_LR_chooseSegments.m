@@ -16,7 +16,7 @@ p.frameAdvanceSec = p.fftSize / hdr.fs; % this should now be used instead of
 chooseMB  = 45; % Based upon empirical performance on a 1 GB machine.
 chooseSamples = chooseMB * 1024 * 1024 / 8;  % change into samples
 chooseSec = chooseSamples / hdr.fs;  % translate into time
-maxTimeSec = p.frameAdvanceSec * floor(chooseSec/hdr.nch/p.frameAdvanceSec);
+maxTimeSec = p.frameAdvanceSec * round(chooseSec/hdr.nch/p.frameAdvanceSec);
 
 labLength = stops-starts; 
 segmentsRequired = ceil(labLength/maxTimeSec);  % # segments per interval

@@ -91,8 +91,7 @@ for idx1 = 1:N % for each data file
         %%% Run LR detection to identify candidates
         [detectionsSample,detectionsSec] =  dt_LR(energy,hdr,buffSamples,...
             startK,stopK,pTemp);
-        
-        
+
         %%% start HR detection on candidates
         for iD = 1:size(detectionsSample,1)
             filtSegment = filtData(detectionsSample(iD,1):detectionsSample(iD,2));

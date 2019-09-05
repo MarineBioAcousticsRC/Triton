@@ -14,7 +14,7 @@ cParams.peakFrVec(sIdx:eIdx,1) = clickDets.peakFr;
 cParams.yFiltBuffVec(sIdx:eIdx,:) = clickDets.yFiltBuff';
 cParams.deltaEnvVec(sIdx:eIdx,1) = clickDets.deltaEnv;
 cParams.nDurVec(sIdx:eIdx,1) = clickDets.nDur;
-
+cParams.snrVec(sIdx:eIdx,1) = clickDets.snr;
 if p.saveNoise
     if ~isempty(clickDets.yNFilt{1})
         cParams.yNFiltVec = [cParams.yNFiltVec;clickDets.yNFilt];
