@@ -150,6 +150,9 @@ elseif ftype == 2               % do the following for xwavs
 
         % calculate starting time [dnum => datenum in days] for each raw
         % write/buffer flush
+        if hdr.xhd.year(i)<1900 % catch for year 2000 issue if comparing with guided detector dates.
+            hdr.xhd.year(i) = hdr.xhd.year(i)+2000;
+        end
         hdr.raw.dnumStart(i) = datenum([hdr.xhd.year(i) hdr.xhd.month(i)...
             hdr.xhd.day(i) hdr.xhd.hour(i) hdr.xhd.minute(i) ...
             hdr.xhd.secs(i)+(hdr.xhd.ticks(i)/1000)]);
