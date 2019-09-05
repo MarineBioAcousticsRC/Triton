@@ -11,7 +11,7 @@ s.inFileString = 'WAT_HZ_01_disk*incl.mat';
 s.outDir = 'D:\WAT_HZmetadata\TPWS\ClusterBins_120dB_linear\singleCluster';
 
 % Saving?
-s.saveOutput = 0; %set to 1 to save output file and figs, else 0
+s.saveOutput = 1; %set to 1 to save output file and figs, else 0
 
 %%%% Similarity %%%%
 s.useSpectraTF = 1; % compare on spectra?

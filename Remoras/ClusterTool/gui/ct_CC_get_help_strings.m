@@ -5,6 +5,7 @@ ctHelpStrings.inDir = 'Folder containing cluster bins output file(s).';
 ctHelpStrings.outDir = 'Folder where composite clusters output should be saved.';
 ctHelpStrings.inFileString = 'Recommended. Wildcard for restricting input files by name.';
 ctHelpStrings.outputName = 'A string for use in output file names. \nChange this to avoid overwriting prior runs.';
+ctHelpStrings.saveOutput = 'Check box if you want to save output files';
 
 ctHelpStrings.minClust = ['Minimum number of detections per bin required for a cluster to be used in composite step.\n', ... 
   'Higher number makes cleaner clusters, but may miss things that click slowly or rarely.'];
