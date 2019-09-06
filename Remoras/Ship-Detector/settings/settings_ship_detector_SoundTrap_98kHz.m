@@ -9,7 +9,7 @@ settings.outDir  = 'E:\evaluate_ship_detector\metadata';
 % Set transfer function location (calibration/sensitivity gain)
 % settings.tfFullFile = 'E:\evaluate_ship_detector\tfs\656_130221_HARP.tf';
 % Note, if no transfer function but singular gain use:
-settings.tfFullFile = 1/173.1; % m-gain in dB
+settings.tfFullFile = 0; % m-gain in dB
  
 settings.REWavExt = '(\.x)?\.wav'; % Expression to match .wav or .x.wav
 
@@ -25,11 +25,11 @@ settings.thrDistant = 250; % minimum duration in seconds above the time-dependen
 % threshold for averaged power spectral densities at the low and medium frequency bands
 settings.thrRL = 0.10; % percentage above mean received levels to distinguish
 % ship passages from ambient noise (e.g. weather noise)
-settings.minPassage = 0.5; % minimum time in hours between passages, if not will be merged
+settings.minPassage = 0.25; % minimum time in hours between passages, if not will be merged
 settings.buffer = 5; % add minutes before and after detected times
 
-settings.durWind = 2; % minimum duration in hours of the exploratory window
-settings.slide = 0.5; % hours allowed to slide overlapping windows before and after
+settings.durWind = 1; % minimum duration in hours of the exploratory window
+settings.slide = 0.3; % hours allowed to slide overlapping windows before and after
 % start of the central exploratory window
 settings.errorRange = 0.1; % n-percent start and end time difference between 
 % overlapping windows
