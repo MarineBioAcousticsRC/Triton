@@ -61,6 +61,12 @@ pwrB3 = pwr(lowB3:hiB3,:);
 
 %apply appropriate transfer function to the data
 % Get transfer function
+if ~isnumeric(REMORA.sh.settings.tfFullFile)
+    isNum = ~isnan(str2double(REMORA.sh.settings.tfFullFile));
+    if isNum
+      REMORA.sh.settings.tfFullFile = str2double(REMORA.sh.settings.tfFullFile);
+    end
+end
 if ischar(REMORA.sh.settings.tfFullFile) && ~isempty(REMORA.sh.settings.tfFullFile)
     fidtf = fopen(REMORA.sh.settings.tfFullFile,'r');
     if fidtf ~=-1

@@ -16,6 +16,7 @@ if strcmp(action,'settingsLoad')
     
     % set new settings in motion gui
     REMORA.sh.settings = settings;
+    update_window_settings
     sh_init_motion_gui
     sh_settings_to_sec
     
@@ -49,7 +50,14 @@ elseif strcmp(action,'settingsLoadBatch')
     % set new settings in motion gui
     REMORA.sh.settings = settings;
     sh_init_batch_gui
-    sh_settings_to_sec
-    
-    
+    sh_settings_to_sec 
 end
+
+function update_window_settings
+global HANDLES REMORA
+set(HANDLES.ltsa.time.edtxt3,'string',REMORA.sh.settings.durWind)
+set(HANDLES.ltsa.time.edtxt4,'string',REMORA.sh.settings.slide)
+control_ltsa('newtseg') %change Triton plot length
+control_ltsa('newtstep') %change Triton time step 
+% bring motion gui to front
+figure(REMORA.fig.sh.motion);
