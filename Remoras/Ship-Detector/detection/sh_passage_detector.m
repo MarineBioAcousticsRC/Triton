@@ -402,7 +402,9 @@ if wIdx
         passageColor = ones(size(labels))*green;
         change = find(contains(labels,'ambient'));
         if ~isempty(change)
-            passageColor(change,:)= blue;
+            for c = 1:length(change)
+                passageColor(change(c),:)= blue;
+            end
         end
     end
     

@@ -34,6 +34,6 @@ settings.slide = 0.3; % hours allowed to slide overlapping windows before and af
 settings.errorRange = 0.1; % n-percent start and end time difference between 
 % overlapping windows
 
-settings.diskWrite = true; % exclude disk write noise (only for HARP data)
+settings.diskWrite = false; % exclude disk write noise (only for HARP data)
 settings.dutyCycle = false; % if duty cycle data, set to true, this will ignore gaps
 settings.saveLabels = true; % save .tlab file to plot detection in Triton. 
