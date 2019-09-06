@@ -6,11 +6,14 @@ ppSignal = cParams.ppSignalVec;
 yFiltBuff = cParams.yFiltBuffVec;
 specClickTf = cParams.specClickTfVec;
 snr = cParams.snrVec;
+if p.saveNoise
+        yNFilt = cParams.yNFiltVec;
+        specNoiseTf = cParams.specNoiseTfVec;
+end
 if p.saveForTPWS % only save what you need to build a TPWS file
     if p.saveNoise
-        yNFilt = cParams.yNFiltVec;
         save(fileName,'clickTimes','ppSignal','f','hdr','specClickTf',...
-            'yFiltBuff','yNFilt','snr','p','-mat','-v7.3');
+            'specNoiseTf','yFiltBuff','yNFilt','snr','p','-mat','-v7.3');
     else
         save(fileName,'clickTimes','ppSignal','f','hdr','specClickTf',...
             'yFiltBuff','p','snr','-mat','-v7.3');
@@ -23,8 +26,6 @@ else
     yFilt = cParams.yFiltVec;
     peakFr = cParams.peakFrVec;
     if p.saveNoise
-        yNFilt = cParams.yNFiltVec;
-        specNoiseTf = cParams.yNFiltVec;
         save(fileName,'clickTimes','ppSignal','durClick','f','hdr','nDur',...
             'deltaEnv','yNFilt','specNoiseTf','bw3db','yFilt','specClickTf',...
             'peakFr','yFiltBuff','snr','p','-mat','-v7.3');
