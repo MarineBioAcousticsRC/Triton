@@ -15,7 +15,9 @@ uimenu(REMORA.spice_dt.menu, 'Label', 'Convert detections to TPWS', ...
     'Callback', 'spice_dt_pd(''make_TPWS'')');
 
 
-
+if ~isfield(REMORA,'fig')
+    REMORA.fig = [];
+end
 
 % spice_dt_initparams;  
 % spice_dt_initwins;

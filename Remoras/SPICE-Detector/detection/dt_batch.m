@@ -106,6 +106,11 @@ for idx1 = 1:N % for each data file
                 % Look at power spectrum of clicks, and remove those that don't
                 % meet peak frequency and bandwidth requirements
                 clicks = clicks(validClicks==1,:);
+                
+                if isempty(clicks)
+                    continue % go to next iteration if no clicks remain.
+                end
+                
                 % Compute click parameters to decide if the detection should be kept
                 [clickDets,f] = dt_parameters(noise,filtSegment,pTemp,clicks,hdr);
                 

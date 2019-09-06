@@ -243,7 +243,13 @@ clickDets.deltaEnv = deltaEnv(clickInd,:);
 clickDets.nDur = nDur(clickInd,:);
 clickDets.snr = snr(clickInd,:);
 
-if p.saveNoise
+if p.saveNoise && ~isempty(clickInd)
+    % save noise, as long as valid clicks were also found. 
+    % This is a redundant safety check to make sure that noise is not saved if
+    % clicks are not saved. 
     clickDets.specNoiseTf = specNoiseTf;
     clickDets.yNFilt = {yNFilt};
+elseif p.saveNoise
+    clickDets.specNoiseTf = [];
+    clickDets.yNFilt = [];
 end
