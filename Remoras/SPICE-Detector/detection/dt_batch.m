@@ -116,7 +116,7 @@ for idx1 = 1:N % for each data file
                 
                 if ~isempty(clickDets.clickInd)
                     % populate cParams
-                    [cParams,sIdx] = dt_populate_cParams(clicks,pTemp,...
+                    [cParams,sIdx] = dt_populate_cParams(clicks,noise,pTemp,...
                         clickDets,detectionsSec(iD,1),hdr,sIdx,cParams);
                 end
             end

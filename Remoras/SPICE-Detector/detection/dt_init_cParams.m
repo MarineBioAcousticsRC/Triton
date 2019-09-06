@@ -17,4 +17,5 @@ cParams.yFiltBuffVec = cell(1E5,1);
 if p.saveNoise
     cParams.yNFiltVec = [];
     cParams.specNoiseTfVec = [];
+    cParams.noiseTimes = [];
 end

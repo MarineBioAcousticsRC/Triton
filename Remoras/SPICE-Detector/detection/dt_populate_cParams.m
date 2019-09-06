@@ -1,7 +1,8 @@
-function [cParams,sIdx] = dt_populate_cParams(clicks,p,clickDets,starts,hdr,sIdx,cParams)
+function [cParams,sIdx] = dt_populate_cParams(clicks,noise,p,clickDets,starts,hdr,sIdx,cParams)
 
 [clkStarts,clkEnds] = dt_processValidClicks(clicks,clickDets,...
     starts,hdr);
+
 
 eIdx = sIdx + size(clickDets.nDur,1)-1;
 cParams.clickTimes(sIdx:eIdx,1:2) = [clkStarts,clkEnds];
@@ -17,6 +18,10 @@ cParams.nDurVec(sIdx:eIdx,1) = clickDets.nDur;
 cParams.snrVec(sIdx:eIdx,1) = clickDets.snr;
 if p.saveNoise
     if ~isempty(clickDets.yNFilt{1})
+        [noiseStarts,noiseEnds] = sp_dt_processNoiseTimes(noise,...
+            starts,hdr);
+        newNoiseTimes = [noiseStarts,noiseEnds];
+        cParams.noiseTimes = [cParams.noiseTimes;newNoiseTimes];
         cParams.yNFiltVec = [cParams.yNFiltVec;clickDets.yNFilt];
         cParams.specNoiseTfVec = [cParams.specNoiseTfVec;...
             clickDets.specNoiseTf];
