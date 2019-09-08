@@ -181,11 +181,7 @@ REMORA.ct.CC_verify.outputNameEdTxt = uicontrol(REMORA.fig.ct.CC_settings,...
 
 %% SaveOutput options
 
-if REMORA.ct.CC_params.saveOutput
-    showOutputParams = 'on';
-else
-    showOutputParams = 'off';
-end  
+showOutputParams = 'on';
 
 %REMORA.ct.CC_params_help.saveOutput = 'Check box if you want to save output files';
 
