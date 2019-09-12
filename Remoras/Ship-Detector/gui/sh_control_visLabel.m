@@ -13,39 +13,35 @@ if strcmp(action,'Load')
     fileFullPath = fullfile(path, filename);
     
     % Read detection label file and add detection times to remora
-    if ~ exist(fileFullPath,'file')
-        disp_msg(sprintf('Detection label file %s does not exist', fileFullPath));
-    else
-        [Starts, Stops, Labels] = sh_read_TLABFile(fileFullPath, 'Binary', true);
-        if strcmp(NFile,'File1')
-            REMORA.sh.detection.starts = Starts;
-            REMORA.sh.detection.stops = Stops;
-            REMORA.sh.detection.labels = Labels;
-            % set to display labels
-            REMORA.sh.detection.PlotLabels = true;
-            set(REMORA.sh_motionLabel.tlab1CheckBox,'Value',1)
-            % add file name to gui
-            REMORA.sh.detection.files = {filename};
-            set(REMORA.sh_motionLabel.tlab1CheckBox,'Enable','on')
-            set(REMORA.sh_motionLabel.tlab1CheckBox,'String',filename)
-            set(REMORA.sh_motionLabel.tlab1CheckBox,'BackgroundColor',[1 1 1])
-            
-        elseif strcmp(NFile,'File2')
-            REMORA.sh.detection2.starts = Starts;
-            REMORA.sh.detection2.stops = Stops;
-            REMORA.sh.detection2.labels = Labels;
-            REMORA.sh.detection2.files = {filename}; % May want to add display
-            % set to display labels
-            REMORA.sh.detection2.PlotLabels = true;
-            set(REMORA.sh_motionLabel.tlab2CheckBox,'Value',1)
-            % add file name to gui
-            REMORA.sh.detection2.files = {filename};
-            set(REMORA.sh_motionLabel.tlab2CheckBox,'Enable','on')
-            set(REMORA.sh_motionLabel.tlab2CheckBox,'String',filename)
-            set(REMORA.sh_motionLabel.tlab2CheckBox,'BackgroundColor',[1 .6 .6])
-        end
-        disp_msg(sprintf('Detection file %s read', fileFullPath));
+    [Starts, Stops, Labels] = sh_read_textFile(fileFullPath, 'Binary', true);
+    if strcmp(NFile,'File1')
+        REMORA.sh.detection.starts = Starts;
+        REMORA.sh.detection.stops = Stops;
+        REMORA.sh.detection.labels = Labels;
+        % set to display labels
+        REMORA.sh.detection.PlotLabels = true;
+        set(REMORA.sh_motionLabel.tlab1CheckBox,'Value',1)
+        % add file name to gui
+        REMORA.sh.detection.files = {filename};
+        set(REMORA.sh_motionLabel.tlab1CheckBox,'Enable','on')
+        set(REMORA.sh_motionLabel.tlab1CheckBox,'String',filename)
+        set(REMORA.sh_motionLabel.tlab1CheckBox,'BackgroundColor',[1 1 1])
+        
+    elseif strcmp(NFile,'File2')
+        REMORA.sh.detection2.starts = Starts;
+        REMORA.sh.detection2.stops = Stops;
+        REMORA.sh.detection2.labels = Labels;
+        REMORA.sh.detection2.files = {filename}; % May want to add display
+        % set to display labels
+        REMORA.sh.detection2.PlotLabels = true;
+        set(REMORA.sh_motionLabel.tlab2CheckBox,'Value',1)
+        % add file name to gui
+        REMORA.sh.detection2.files = {filename};
+        set(REMORA.sh_motionLabel.tlab2CheckBox,'Enable','on')
+        set(REMORA.sh_motionLabel.tlab2CheckBox,'String',filename)
+        set(REMORA.sh_motionLabel.tlab2CheckBox,'BackgroundColor',[1 .6 .6])
     end
+    disp_msg(sprintf('Detection file %s read', fileFullPath));
     % refresh window
     plot_triton
     sh_plot_labels
