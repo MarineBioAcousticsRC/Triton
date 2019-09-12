@@ -1,4 +1,4 @@
-function [Starts, Stops, Labels] = sh_read_TLABFile(Filename, varargin)
+function [Starts, Stops, Labels] = sh_read_textFile(Filename, varargin)
 % [Start, Stop, Labels] = ioReadLabelFile(Filename, Optional arguments)
 % Return the start & stop times as well as the associated labels
 % from a Wavesurfer/HTK label file.  
