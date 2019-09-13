@@ -7,7 +7,6 @@ global REMORA
 sec2dnum = 60*60*24; % conversion factor to get from seconds to matlab datenum
 durWind = REMORA.sh.settings.durWind;
 slide = REMORA.sh.settings.slide;
-errorRange = REMORA.sh.settings.errorRange;
 tave = REMORA.sh.ltsa.tave;
 minPassage = REMORA.sh.settings.minPassage;
 
