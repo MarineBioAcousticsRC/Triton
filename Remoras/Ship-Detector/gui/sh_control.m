@@ -92,10 +92,6 @@ elseif strcmp(action,'setSlide')
         figure(REMORA.fig.sh.motion);
     end
     
-elseif strcmp(action,'setErrorRange')
-    ErrorRangeEdTxt = str2double(get(REMORA.sh_verify.ErrorRangeEdTxt, 'string'));
-    REMORA.sh.settings.errorRange = ErrorRangeEdTxt;
-    
 elseif strcmp(action,'setDutyCycle')
     dutyCycleCheckbox = get(REMORA.sh_verify.dutyCycleCheckbox, 'string');
     REMORA.sh.settings.dutyCycle = dutyCycleCheckbox;
