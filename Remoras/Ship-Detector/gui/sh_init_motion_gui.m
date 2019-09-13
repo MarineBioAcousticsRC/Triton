@@ -30,13 +30,11 @@ bgColorGrayLight = [.92 .92 .92];  % gray
 bgColorGray = [.86 .86 .86];  % gray
 bgColorBlue = [.75 .875 1]; % light blue for
 
-% is an xwav file open? (There are some callbacks that depend on this!)
+% is an ltsa file open? (There are some callbacks that depend on this!)
 if isfield(PARAMS, 'ltsa')
-    enbl = 'on';
     f_enbl = get(HANDLES.ltsa.motion.fwd, 'Enable');
     b_enbl = get(HANDLES.ltsa.motion.back, 'Enable');
 else
-    enbl = 'off';
     f_enbl = 'off';
     b_enbl = 'off';
 end

@@ -7,14 +7,27 @@ fileID = fopen(fullfile(filePath,fileTxT),'w');
 fprintf(fileID,'%% Settings script for ship_detector\n\n');
 
 fprintf(fileID,'settings.outDir = '''';\n');
-fprintf(fileID,'settings.tfFullFile = '''';\n\n');
+if ~isnumeric(s.tfFullFile)
+    isNum = ~isnan(str2double(s.tfFullFile));
+    if isNum
+      s.tfFullFile = str2double(s.tfFullFile);
+    end
+end
+if ischar(s.tfFullFile) && ~isempty(s.tfFullFile)
+    fprintf(fileID,'settings.tfFullFile = ''%s'';\n\n',s.tfFullFile);
+elseif isnumeric(s.tfFullFile)
+    fprintf(fileID,'settings.tfFullFile = %s;\n\n',num2str(s.tfFullFile));
+else
+    fprintf(fileID,'settings.tfFullFile = '''';\n\n');
+end
+
 
 % fprintf(fileID,'settings.REWavExt = ''(\.x)?\.wav'';\n\n');
 fprintf(fileID,'%% DETECTOR PARAMETERS \n\n');
 
 fprintf(fileID,'settings.lowBand = [%s,%s];\n', num2str(s.lowBand(1)),num2str(s.lowBand(2)));
-fprintf(fileID,'settings.lowBand = [%s,%s];\n', num2str(s.mediumBand(1)),num2str(s.mediumBand(2)));
-fprintf(fileID,'settings.lowBand = [%s,%s];\n\n', num2str(s.highBand(1)),num2str(s.highBand(2)));
+fprintf(fileID,'settings.mediumBand = [%s,%s];\n', num2str(s.mediumBand(1)),num2str(s.mediumBand(2)));
+fprintf(fileID,'settings.highBand = [%s,%s];\n\n', num2str(s.highBand(1)),num2str(s.highBand(2)));
 
 fprintf(fileID,'settings.thrClose = %s;\n', num2str(s.thrClose));
 fprintf(fileID,'settings.thrDistant = %s;\n', num2str(s.thrDistant));

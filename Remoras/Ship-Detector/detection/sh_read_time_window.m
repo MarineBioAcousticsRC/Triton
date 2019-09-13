@@ -3,7 +3,7 @@ function dnumSnippet = sh_read_time_window(startIndex,startBin)
 global REMORA
 
 % number of time bins to step forward
-tbin = REMORA.sh.settings.durWind / REMORA.sh.ltsa.tave;
+tbin = REMORA.sh.settings.slide / REMORA.sh.ltsa.tave;
 
 % forward motion case (add backward option for interactive detector)
 % difference in time bins between the current plotStartBin location and
@@ -15,14 +15,19 @@ if tbin > d1_tbin
     cbin = d1_tbin;
     % counter for RawIndex
     cindex = startIndex + 1;
-    % sum bins over raw file indices
-    while cbin + REMORA.sh.ltsa.nave(cindex) < tbin - d1_tbin
-        cbin = cbin + REMORA.sh.ltsa.nave(cindex);
-        cindex = cindex + 1;
+    if cindex <= length(REMORA.sh.ltsa.nave)
+        % sum bins over raw file indices
+        while cbin + REMORA.sh.ltsa.nave(cindex) < tbin - d1_tbin
+            cbin = cbin + REMORA.sh.ltsa.nave(cindex);
+            cindex = cindex + 1;
+        end
+        % difference in time bins between new plotStartBin and the
+        % new plotStartRawIndex
+        d2_tbin = tbin - cbin;
+    else
+        cindex = startIndex;
+        d2_tbin = startBin + tbin;
     end
-    % difference in time bins between new plotStartBin and the
-    % new plotStartRawIndex
-    d2_tbin = tbin - cbin;
 else
     cindex = startIndex;
     d2_tbin = startBin + tbin;

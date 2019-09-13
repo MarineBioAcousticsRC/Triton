@@ -18,7 +18,7 @@ end
 
 [uFnames,uI] = unique(fileNames);
 if size(uFnames,1)<size(fileNames,1)
-    duplicateIdx = setdiff(uI,1:length(size(fileNames,1)));
+    duplicateIdx = setdiff(1:size(fileNames,1),uI);
     warning('Duplicate sound files found')
-    disp(fileNames{duplicateIdx})
+    fileNames{duplicateIdx}
 end

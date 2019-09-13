@@ -4,7 +4,14 @@ function [detectionsSample,detectionsSec] = dt_LR(energy,hdr,buffSamples,startK,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Flag times when the amplitude rises above a threshold
-aboveThreshold = find(energy>((p.countThresh^2)));
+
+if ~p.snrDet
+    aboveThreshold = find(energy>((p.countThresh^2)));
+else
+    medianNoise = sqrt(median(energy));
+    smoothEnergy = sqrt(fn_fastSmooth(energy,p.delphClickDurLims(1),1,1));
+    aboveThreshold = find(smoothEnergy>(medianNoise+10^(p.snrThresh/10)));
+end
 
 if isempty(aboveThreshold)
     detectionsSec = [];

@@ -251,7 +251,7 @@ bytes_remaining = total_bytes;  % Preset byte counter
 % Seek to correct position
 offset_bytes = BytesPerSample * (ext(1)-1) * wavefmt.nChannels;
 start_byte = datack.DataStart + offset_bytes;
-myFid = fopen(datack.fid);
+myFid = datack.fid;%fopen(datack.fid);
 if fseek(myFid, start_byte,'bof') == -1
   msg = 'Error reading PCM file format.';
   return
@@ -265,7 +265,7 @@ nSPCext    = ext(2)-ext(1)+1; % # samples per channel in extraction range
 dat        = datack;  % Copy input structure to output
 % extSamples = wavefmt.nChannels*nSPCext;
 [dat.Data, readN]   = fread(myFid, [wavefmt.nChannels nSPCext], dtype);
-fclose(myFid)
+% fclose(myFid)
 
 if readN ~= nSPCext * wavefmt.nChannels
     msg = sprintf('Only able to read %d samples, expecting %d', ...

@@ -83,3 +83,9 @@ ctHelpStrings.freqs = ['Range of frequencies you want to compare spectra across:
     'where spectra differ most.\n',...
     'If your spectra roll off at the edges, use start and end freq to \n',...
     'exclude those regions. Including roll-off will reduce overall \nspectral differences.'];
+
+ctHelpStrings.clusterPrune = ['Fraction of least-connected nodes to prune from each cluster. \n',...
+    'Results in purer, but smaller clusters and more isolated nodes.'];
+
+
+

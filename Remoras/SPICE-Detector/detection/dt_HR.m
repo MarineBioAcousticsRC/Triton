@@ -6,7 +6,13 @@ function [completeClicks, noise] = dt_HR(p,hdr,filteredData)
 
 minGapSamples = ceil(p.mergeThr*hdr.fs/1e6);
 energy = filteredData.^2;
-candidatesRel = find(energy > (p.countThresh^2));
+if ~p.snrDet
+    candidatesRel = find(energy > (p.countThresh^2));
+else
+    medianNoise = sqrt(median(energy));
+    smoothEnergy = sqrt(fn_fastSmooth(energy,p.delphClickDurLims(1),1,1));
+    candidatesRel = find(smoothEnergy>(medianNoise+10^(p.snrThresh/10)));
+end
 
 completeClicks = [];
 noise = [];

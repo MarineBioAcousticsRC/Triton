@@ -137,7 +137,7 @@ for iC = 1:length(dateInterval)
         envDur = envDur(rList,:);
         envSet = envSet(rList,:);
         % Cluster
-        [spectraMean,clickAssign,~,specHolder,isolatedSet,envDistrib,envSetHolder] = ...
+        [spectraMean,clickAssign,~,specHolder,isolatedSet,envDistrib,envSetHolder,envMean] = ...
             ct_cluster_clicks_cw_merge(specSet,p,normalizeTF,envDur,envSet);
         
         % If you finish clustering with populated cluster(s)
@@ -172,6 +172,7 @@ for iC = 1:length(dateInterval)
             binData(cIdx,1).clusteredTF = 1; % 1 means this bin was clustered
             binData(cIdx,1).clickTimes = clickTimesByCluster;
             binData(cIdx,1).envDur = envDistrib;
+            binData(cIdx,1).envMean = envMean;
             cIdx = cIdx +1;
             % meanSimilarity{cIdx,:} = meanSim;
             
@@ -203,6 +204,8 @@ for iC = 1:length(dateInterval)
         binData(cIdx,1).tInt = [dateInterval(iC),dateInterval(iC)+(p.timeStep/(24*60))]; % store start and end time of interval
         binData(cIdx,1).clickTimes = {ttSet}; % store click times.
         binData(cIdx,1).clusteredTF = 0;
+        binData(cIdx,1).envDur = envDur;
+        binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
         [binData(cIdx,1).dTT,binData(cIdx,1).clickRate] = ct_compute_rate_distributions(ttSet,p);
         
         cIdx = cIdx +1;

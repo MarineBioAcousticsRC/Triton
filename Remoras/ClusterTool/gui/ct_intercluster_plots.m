@@ -7,6 +7,7 @@ figure(42);clf(42);set(gcf,'Units','normalized','Position',[0.01,.52,.48,.4])
 figure(43);clf(43);set(gcf,'Units','normalized','Position',[.5,.05,.48,.4])
 figure(44);clf(44);set(gcf,'Units','normalized','Position',[.5,.52,.48,.4])
 
+
 figName{1} = fullfile(figDir,sprintf('%s_autoTypes_allMeanSpec',s.outputName));
 figName{2} = fullfile(figDir,sprintf('%s_autoTypes_allCatSpec',s.outputName));
 figName{3} = fullfile(figDir,sprintf('%s_autoTypes_allICI',s.outputName));
@@ -16,13 +17,18 @@ for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles
     subplot(n1,m1,iF)
     hold on
-    if length(f)~=length(compositeData(iF).spectraMeanSet)
-        fPlot = linspace(s.startFreq,s.endFreq,length(compositeData(iF).spectraMeanSet));
+
+    fPlot = f;
+    if length(fPlot)~=length(compositeData(iF).spectraMeanSet) && length(f(s.stIdx,s.edIdx)~=size(compositeData(iF).spectraMeanSet,1)
+        %Catch for backward compatibility if orignial fill spectra were not stored
+        fPlot = f(s.stIdx,s.edIdx);
     else
-        fPlot = f; %truncate f down to length of spectraMeanSet if necessary
+        warning('Frequency vector and spectra differ in length. Display errors possible in plots')
+        fPlot = linspace(s.startFreq,s.endFreq,length(compositeData(iF).spectraMeanSet));
     end
     plot(fPlot,compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
-    %xlim([f(s.stIdx),f(s.edIdx)])
+    xlim([fPlot(1),fPlot(end)])
+
     legend(num2str(size(nodeSet{iF},2)),'location','Southeast')
     plot(fPlot,compositeData(iF).specPrctile,'--k','lineWidth',2)
     grid on
@@ -47,7 +53,7 @@ for iF = 1:length(nodeSet)
     hold off
     
     hSet(4) = figure(44); % plot click rate distributions
-    subplot(n1,m1,iF)  
+    subplot(n1,m1,iF)
     imagesc(1:length(nodeSet{iF}),p.barInt(1:s.maxICIidx),[Tfinal{iF,2}./max(Tfinal{iF,2},[],2)]')
     set(gca,'ydir','normal')
 end
@@ -80,3 +86,5 @@ if s.saveOutput
         fprintf('Done with figure %0.0f\n',iFig)
     end
 end
+
+

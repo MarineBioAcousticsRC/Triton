@@ -7,7 +7,6 @@ global REMORA
 sec2dnum = 60*60*24; % conversion factor to get from seconds to matlab datenum
 durWind = REMORA.sh.settings.durWind;
 slide = REMORA.sh.settings.slide;
-errorRange = REMORA.sh.settings.errorRange;
 tave = REMORA.sh.ltsa.tave;
 minPassage = REMORA.sh.settings.minPassage;
 
@@ -16,10 +15,13 @@ tic;  % Note start time
 % Initialize
 populateTimes = [];
 populateLabels = {};
+shipTimes = [];
+shipLabels = {};
 newperc = 0;
 
 % how many windows will be used to process ltsa
-TotalWindows = ceil(REMORA.sh.ltsa.durtot/durWind);
+% TotalWindows = ceil(REMORA.sh.ltsa.durtot/durWind);
+TotalWindows = length(REMORA.sh.ltsa.dnumStart(1):datenum([0 0 0 0 0 slide]):REMORA.sh.ltsa.end.dnum);
 
 fprintf('Running Ship batch detection for %d files\n',REMORA.sh.ltsa.nxwav)
 disp('Check bar progress window')
@@ -41,96 +43,12 @@ for itr1 = 1:TotalWindows
     [ships,labels,~] = sh_passage_detector(pwr,0);
     dnumShips = (ships./sec2dnum)*tave + dnumSnippet; % convert to actual times
     
-    % Previous Window
-    dnumPrevSnippet = dnumSnippet - datenum([0 0 0 0 0 slide]);
     
-    % If earlier than start of ltsa, previous window will be the same like the central window
-    if dnumPrevSnippet < REMORA.sh.ltsa.start.dnum
-        dnumPrevSnippet = REMORA.sh.ltsa.start.dnum;
-    end
-    [pwr,~,~] = sh_get_pwr_window(dnumPrevSnippet);
-    [shipsPrev,labelsPrev,~] = sh_passage_detector(pwr,0);
-    dnumShipsPrev = (shipsPrev./sec2dnum)*tave + dnumPrevSnippet; % convert to actual times
-    
-    % Posterior window
-    dnumPostSnippet = dnumSnippet + datenum([0 0 0 0 0 slide]);
-    
-    % If past the end of ltsa, posterior window will be the same like the central window
-    if dnumPostSnippet > REMORA.sh.ltsa.end.dnum
-        dnumPostSnippet = dnumSnippet;
-    end
-    [pwr,~,~] = sh_get_pwr_window(dnumPostSnippet);
-    [shipsPost,labelsPost,~] = sh_passage_detector(pwr,0);
-    dnumShipsPost = (shipsPost./sec2dnum)*tave + dnumPostSnippet;
-    
-    
-    %%% Compare overlapping windows
-    % Select detections that appear at central window and at least in one
-    % of the overlapping windows, if not detected in the central window
-    % because is cut at the edge, get times from the overlapping window
-    selectShips = [];
-    selectLabels = {};
-    % create combination
-    comb = ~[isempty(dnumShips) isempty(dnumShipsPrev) isempty(dnumShipsPost)];
-    if isequal(comb,[1 1 1]) || isequal(comb,[1 1 0]) || isequal(comb,[1 0 1])
-        for itr2 = 1:size(dnumShips,1)
-            if  sum([~isempty(dnumShipsPrev) & abs(dnumShips(itr2,1) - dnumShipsPrev(:,1)) <= errorRange | ...
-                    abs(dnumShips(itr2,2) - dnumShipsPrev(:,2)) <= errorRange ; ...
-                    ~isempty(dnumShipsPost) & abs(dnumShips(itr2,1) - dnumShipsPost(:,1)) <= errorRange | ...
-                    abs(dnumShips(itr2,2) - dnumShipsPost(:,2)) <= errorRange])
-                selectShips = [selectShips; dnumShips(itr2,:)];
-                selectLabels = [selectLabels; labels{itr2}];
-            end
-        end
-        % if there are detection at the edges include them as well
-        if size(dnumShips,1) ~= size(dnumShipsPrev,1)
-            for itr2prev = 1: size(dnumShipsPrev,1)
-                onEdge = find(dnumShipsPrev(itr2prev,1) < dnumSnippet & dnumShipsPrev(itr2prev,2) > dnumSnippet); % start before the central window and the end in the central window
-                if onEdge
-                    selectShips = [selectShips; dnumSnippet,dnumShipsPrev(itr2prev,2)];
-                    selectLabels = [selectLabels; labelsPrev{itr2prev}];
-                end
-            end
-        end
-        % if there are detection at the edges include them as well
-        if size(dnumShips,1) ~= size(dnumShipsPost,1)
-            for itr2post = 1: size(dnumShipsPost,1)
-                endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
-                onEdge = find(dnumShipsPost(itr2post,1) <= endSnippet & dnumShipsPost(itr2post,2) > endSnippet); % the start have to be in the central window and the end passed
-                if onEdge
-                    selectShips = [selectShips; dnumShipsPost(itr2post,1), endSnippet];
-                    selectLabels = [selectLabels; labelsPost{itr2post}];
-                end
-            end
-        end
-    end
-    if isequal(comb,[0 1 0]) || isequal(comb,[0 1 1])
-        % detection at the left edge of the window
-        for itr3 = 1:size(dnumShipsPrev,1)
-            onEdge = find(dnumShipsPrev(itr3,1) < dnumSnippet & dnumShipsPrev(itr3,2) > dnumSnippet); % start before the central window and the end in the central window
-            if onEdge
-                selectShips = [selectShips; dnumSnippet,dnumShipsPrev(itr3,2)];
-                selectLabels = [selectLabels; labelsPrev{itr3}];
-            end
-        end
-    end
-    if isequal(comb,[0 0 1]) || isequal(comb,[0 1 1])
-        % detection at the right edge of the window
-        for itr4 = 1:size(dnumShipsPost,1)
-            endSnippet = dnumSnippet + datenum([0 0 0 0 0 durWind]);
-            onEdge = find(dnumShipsPost(itr4,1) <= endSnippet & dnumShipsPost(itr4,2) > endSnippet); % the start have to be in the central window and the end passed
-            if onEdge
-                selectShips = [selectShips; dnumShipsPost(itr4,1), endSnippet];
-                selectLabels = [selectLabels; labelsPost{itr4}];
-            end
-        end
-    end
-    
-    if ~isempty(selectShips)
+    if ~isempty(dnumShips)
         %%% Populate data to save to corresponding files
         % Convert all ship_s from matlab times to real times
-        populateTimes = [populateTimes; selectShips + datenum([2000,0,0])];
-        populateLabels = [populateLabels; selectLabels];
+        populateTimes = [populateTimes; dnumShips + datenum([2000,0,0])];
+        populateLabels = [populateLabels; labels];
     end
     
     % only text will be displayed in command window if number increased
@@ -140,36 +58,79 @@ for itr1 = 1:TotalWindows
         waitbar(newperc/100,progressh,sprintf('%d%% completed',newperc))
     end
     
-    itr1 = itr1 + 1;
     dnumSnippet = sh_read_time_window(startIndex,startBin);
+end
+
+if ~isempty(populateTimes)
+    
+    %%% Merge detections from overlapping windows
+    waitbar(1,progressh,'Merging detections from overlapping windows')
+    
+%     nline  = repmat((1:size(populateTimes,1))',1,2);
+%     figure,plot(populateTimes',nline','o-')
+    
+    % find union of intervals
+    populateTimes = sort(populateTimes,2);
+    nrow = size(populateTimes,1);
+    [populateTimes, ind] = sort(populateTimes(:));
+    n = [(1:nrow) (1:nrow)]';
+    n = n(ind);
+    c = [ones(1,nrow) -ones(1,nrow)]';
+    c = c(ind);
+    csc = cumsum(c); % =0 at upper end of new interval(s)
+    irit = find(csc==0);
+    ilef = [1; irit+1];
+    ilef(end) = []; % no new interval starting at the very end
+    
+    % merge detections that are separate less than minPassage
+    if length(ilef) > 1
+        remove = find(populateTimes(ilef(2:end))- populateTimes(irit(1:end-1))...
+            < datenum([0 0 0 0 0 minPassage]));
+        ilef(remove+1) = [];
+        irit(remove) = [];
+    end
+    % shipTimes is start and end points of the new intervals
+    shipTimes = [populateTimes(ilef) populateTimes(irit)];
+    
+    % shipTimesIndex is the corresponding indices of the start and end points
+    % in terms of what row of x they occurred in.
+    shipTimesIndex = [n(ilef) n(irit)];
+    
+    %%%% organize labels
+    shipLabels =  repmat({'unknown'},size(populateTimes,1),1);
+    diffCol = shipTimesIndex(:,2) - shipTimesIndex(:,1);
+    % overlapping times that have the same labels
+    idxOld = shipTimesIndex(diffCol == 0,1); % index previous matrix
+    idxNew = find(diffCol == 0); % index to new matrix
+    shipLabels(idxNew) = populateLabels(idxOld);
+    % overlapping times that have different labels, store the most frequent
+    % label
+    rowDiff = find(diffCol ~= 0);
+    for itr2 = 1:length(rowDiff)
+        ovrlapLabels = populateLabels(...
+            shipTimesIndex(rowDiff(itr2),1):shipTimesIndex(rowDiff(itr2),2));
+        caseA = sum(strcmp(ovrlapLabels,'ambient'));
+        caseS = sum(strcmp(ovrlapLabels,'ship'));
+        if caseA > caseS
+            shipLabels(rowDiff(itr2)) = {'ambient'};
+        elseif caseA < caseS
+            shipLabels(rowDiff(itr2)) = {'ship'};
+        else % if they are equal, prioritize ship (may change this to unknown)
+            shipLabels(rowDiff(itr2)) = {'ship'};
+        end
+    end 
 end
 
 close(progressh);
 disp('Prepare to store detections....')
-if ~isempty(populateTimes)
-    [~,I] = sort(populateTimes(:,1));
-    shipTimes = populateTimes(I,:);
-    shipLabels = populateLabels(I);
-    
-    if size(shipTimes,1) > 1
-        remove = find((shipTimes(2:end,1) - shipTimes(1:end-1,2)) < minPassage)';
-        if ~isempty(remove)
-            selStart = shipTimes(:,1); selStart(remove+1) = [];
-            selEnd = shipTimes(:,2); selEnd(remove) = [];
-            shipTimes = [selStart, selEnd];
-            % compare if labels are different
-            reLabel = ~strcmp(shipLabels(remove+1),shipLabels(remove));
-            % different label, one was detected as ship, so keep it as
-            % ship, end is deleted
-            shipLabels(remove(reLabel == 1)) = {'ship'};
-            shipLabels(remove+1) = []; % remove second
-        end
-    end
+
+if ~isempty(shipTimes)
     % save all detections with real datenums in a mat file
     filename = split(REMORA.sh.ltsa.infile,'.ltsa');
     matname = ['Ship_detections_',filename{1},'.mat'];
+    settings = REMORA.sh.settings;
     save(fullfile(REMORA.sh.settings.outDir,matname),'shipTimes',...
-        'shipLabels','-mat','-v7.3');
+        'shipLabels','settings','-mat','-v7.3');
     fprintf('Detections saved at: %s\n',fullfile(REMORA.sh.settings.outDir,matname));
     
     % save labels

@@ -22,6 +22,7 @@ s.iciModeTF = 1; % 1 if you want to use modal ICI (time between clicks)
 s.iciDistTF = 0;% 1 if you want to compare ici distributions
 %OR
 s.cRateTF = 0; % 1 if you want to use click rate (# of clicks per second)
+
 %%%
 s.correctForSaturation = 1; % 1 if you want to look for minor ICI peaks in 
 % cases where clicking is so dense that individual ICIs are obscured. This
@@ -58,6 +59,7 @@ s.subSampOnlyOnce = 1; % if your input contains more than maxClust clicks, they
 s.minClicks = 50; % minimum number of clicks per bin that you want to consider
 % higher number makes cleaner clusters, but may miss things that click
 % slowly.
+s.clusterPrune = 0;
 s.maxCWIterations = 30; % Maximum number of CW iterations
 % Number of clusterings to use for evidence accumulation
 s.N = 1; % bigger is theoretically more robust, but takes longer

@@ -9,7 +9,7 @@ settings.outDir  = 'G:\ShipDetector_NOAA\Tutorial_Continuous_Data\metadata';
 % Set transfer function location (calibration/sensitivity gain)
 % settings.tfFullFile = 'E:\evaluate_ship_detector\tfs\656_130221_HARP.tf';
 % Note, if no transfer function but singular gain use:
-settings.tfFullFile = 1/173.1; % m-gain in dB
+settings.tfFullFile = 0; % m-gain in dB
  
 settings.REWavExt = '(\.x)?\.wav'; % Expression to match .wav or .x.wav
 
@@ -19,13 +19,13 @@ settings.lowBand = [100,1000]; % [min,max] Lower band frequency ranges in Hz
 settings.mediumBand = [1000,3000]; % [min,max] Medium band frequency ranges in Hz
 settings.highBand = [3000,15000]; % [min,max] Higher band frequency ranges in Hz
 
-settings.thrClose = 150; % minimum duration in seconds allowed above the time-dependent  
+settings.thrClose = 100; % minimum duration in seconds allowed above the time-dependent  
 % threshold for averaged power spectral densities at the three frequency bands
-settings.thrDistant = 250; % minimum duration in seconds above the time-dependent  
+settings.thrDistant = 200; % minimum duration in seconds above the time-dependent  
 % threshold for averaged power spectral densities at the low and medium frequency bands
 settings.thrRL = 0.10; % percentage above mean received levels to distinguish
 % ship passages from ambient noise (e.g. weather noise)
-settings.minPassage = 0.5; % minimum time in hours between passages, if not will be merged
+settings.minPassage = 0.25; % minimum time in hours between passages, if not will be merged
 settings.buffer = 5; % add minutes before and after detected times
 
 settings.durWind = 4; % minimum duration in hours of the exploratory window
