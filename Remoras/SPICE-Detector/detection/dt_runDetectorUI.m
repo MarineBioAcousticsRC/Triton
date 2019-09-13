@@ -1,1 +1,0 @@
-function dt_runDetectorUI()

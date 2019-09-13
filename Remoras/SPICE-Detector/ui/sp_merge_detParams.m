@@ -9,7 +9,7 @@ mergedParams = oldParams;% start with the original params
 
 for iParam = 1:length(commonParams)
     mergedParams = setfield(mergedParams,commonParams{iParam},...
-        getfield(oldParams,commonParams{iParam}));
+        getfield(newParams,commonParams{iParam}));
 end
 
 if ~isempty(diffParams)
