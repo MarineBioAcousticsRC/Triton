@@ -15,6 +15,11 @@ ctHelpStrings.variableThreshold = ['If FALSE, all edges weaker than this thresho
     'are removed from graph. \nIf TRUE, value is interpreted as percentage of weakest edges',...
     ' to be removed from graph.'];
 
+ctHelpStrings.useSpectra = ['If TRUE, correlation distance between spectra will be used ,',...
+    'to compute detection similarities.\n You can cluster on spectra only, waveform only, or both.'];
+
+ctHelpStrings.useEnvelope = ['If TRUE, correlation distance between waveform envelopes will be used to compute detection similarities.'];
+
 ctHelpStrings.maxCWiterations = 'Maximum number of clustering iterations allowed per bin.';
 
 ctHelpStrings.mergeTF = ['If TRUE when a graph is large, we will attempt to reduce ',...
@@ -65,3 +70,4 @@ ctHelpStrings.freqs = ['Range of frequencies you want to compare clicks across:\
     'where spectra differ most.\n',...
     'If your spectra roll off at the edges, use start and end freq to \n',...
     'exclude those regions. Including roll-off will reduce overall \nspectral differences.'];
+

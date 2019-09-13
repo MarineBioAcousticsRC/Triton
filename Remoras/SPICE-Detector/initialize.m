@@ -1,6 +1,8 @@
 
 global REMORA HANDLES
 
+% initialization script for spice detector remora
+
 REMORA.spice_dt.menu = uimenu(HANDLES.remmenu,'Label','&SPICE-Detector',...
     'Enable','on','Visible','on');
 
@@ -18,11 +20,6 @@ uimenu(REMORA.spice_dt.menu, 'Label', 'Convert detections to TPWS', ...
 if ~isfield(REMORA,'fig')
     REMORA.fig = [];
 end
-
-% spice_dt_initparams;  
-% spice_dt_initwins;
-% spice_dt_initcontrol;
-% spice_dt_initconst;
 
 
 

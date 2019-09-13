@@ -3,11 +3,11 @@
 %%% Set inputs and setting values for cluster_bins %%%
 
 % Deployment info
-p.siteName = 'GofMX'; % First few letters of TPWS file names
+p.siteName = ''; % First few letters of TPWS file names
 p.TPWSitr = 1;
 
 % Folder info:
-p.inDir = 'E:\Code\Kait-Matlab-Code\tritons\triton1.93.20160524\triton1.93.20160524\Remoras\ClusterTool\test_data\dolphin'; % where the TPWS files live, 
+p.inDir = ''; % where the TPWS files live, 
 p.outDir = 'E:\ClusterTool\test_data\dolphin'; % where to save outputs
 p.recursSearch = 0; % search subfolders if true.
 
@@ -30,6 +30,7 @@ p.modular = 0; % if you use a number other than 0, modularity algorithm will be 
 % In the modularity algorithm, this parameter influences the number of
 % communities detected. 1 = no bias, >1 bias toward fewer communities, <1,
 % bias toward more communities.
+p.useSpectra = 0;
 p.useEnvelope = 0;
 
 p.mergeTF = 0; % If 1, when a graph is large, we will attempt to reduce computation time

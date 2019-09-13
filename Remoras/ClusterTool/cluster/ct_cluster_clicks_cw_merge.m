@@ -1,22 +1,29 @@
-function [spectraMean,clickAssign,clustSizes,spectraHolder,isolatedAll,envDurDistrib,envSetHolder] = ...
+function [spectraMean,clickAssign,clustSizes,spectraHolder,isolatedAll,envDurDistrib,envSetHolder,envMean] = ...
     ct_cluster_clicks_cw_merge(specClickTf,p,normalizeTF,envDur,envSet)
 
 spectraMean = [];
+envMean = [];
 clickAssign = [];
 clustSizes = 0;
 spectraHolder = [];
 isolatedAll = [];
 envDurDistrib = [];
 envSetHolder = [];
-if normalizeTF
+
+if ~p.useSpectra && p.useSpectra
+    error('Either ''Cluster on Spectra'', or ''Cluster on Waveform'', or both must be true.')
+end
+
+if normalizeTF 
     [specClickTfNorm,specClickTfNormDiff] = ct_normalize_click_spectra(specClickTf,p);
 end
-tempN = size(specClickTfNorm,1);
+tempN = size(specClickTf,1);
 
-if p.diff
+distClickE = ones(1,(tempN*(tempN-1)/2));
+if p.useSpectra && p.diff
     distClickE = ct_compute_node_dist(specClickTfNormDiff(:,...
         p.startFreqIdx:p.endFreqIdx-1),p.wcorTF);
-else
+elseif p.useSpectra 
     distClickE = ct_compute_node_dist(specClickTfNorm(:,p.startFreqIdx:p.endFreqIdx),p.wcorTF);
 end
 
@@ -28,7 +35,8 @@ end
 
 % find distance between all nodes
 if p.useEnvelope
-    [distEnv,~,~,~] = ct_ici_dist_mode(envDur',p.maxDur);
+    distEnv = ct_compute_node_dist(envSet./max(envSet,[],2),p.wcorTF);
+    % [distEnv,~,~,~] = ct_ici_dist_mode(envDur',p.maxDur);
     distClickE = distClickE.*distEnv;
 end
 
@@ -125,6 +133,7 @@ if ~isempty(uniqueLabelsNew)
         %linearSpecMean = mean(specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:));
         spectraMean(i4,:) = (meanSpectra-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)))...
             ./max(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)));
+        envMean(i4,:) = mean(envSet(clusterIDNew==uniqueLabelsNew(i4),:)./max(envSet(clusterIDNew==uniqueLabelsNew(i4),:),[],2));
         % spectraStd(i4,:) = std(specClickTf_norm(nodeNums(clusters==clustNums(i4)),:));
         clickAssign{i4} = find(clusterIDNew==uniqueLabelsNew(i4));
         spectraHolder{i4} = specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:);

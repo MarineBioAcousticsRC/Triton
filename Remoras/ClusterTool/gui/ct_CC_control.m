@@ -110,7 +110,11 @@ elseif strcmp(action,'setICIDist')
     iciDistTF = get(REMORA.ct.CC_verify.bg_r2 ,'Value');
     REMORA.ct.CC_params.iciDistTF = iciDistTF;
     REMORA.ct.CC_params.iciModeTF = ~REMORA.ct.CC_params.iciDistTF;
-
+    
+elseif strcmp(action,'setClusterPruningFactor')
+    clusterPruningFactor = str2double(get(clusterPruneEdTxt ,'String'));
+    REMORA.ct.CC_params.clusterPruningFactor = clusterPruningFactor;
+    
 elseif strcmp(action,'runCompositeClusters')
     dh = ct_cb_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
     jObj = com.mathworks.widgets.BusyAffordance;

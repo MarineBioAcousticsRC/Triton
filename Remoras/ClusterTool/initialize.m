@@ -15,3 +15,6 @@ uimenu(REMORA.ct.menu, 'Label', 'Composite Clusters', ...
 uimenu(REMORA.ct.menu, 'Label', 'Post-Clustering Options', ...
     'Callback', 'ct_pulldown(''post_cluster'')');
 
+if ~isfield(REMORA,'fig')
+    REMORA.fig = [];
+end

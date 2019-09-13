@@ -218,7 +218,7 @@ for idx = 1:length(ppSignal)
     %          title(sum(tfVec))
     if ~p.snrDet && ppSignal(idx)< p.dBppThreshold
         validClicks(idx) = 0;
-    elseif snr(idx)< p.snrThresh
+    elseif p.snrDet && snr(idx)< p.snrThresh
         validClicks(idx) = 0;
     elseif sum(tfVec)>0
         validClicks(idx) = 0;

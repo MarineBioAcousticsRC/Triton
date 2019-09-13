@@ -89,7 +89,7 @@ set(gcf,'PaperPosition', [-2.4,3.6,13.3,3.6])
 % pause
 title('Concatenated Spectra' )
 
-hMainTitle = mtit(sprintf('Bin %0.0f of %0.0f',binNum,totalBins));
+%hMainTitle = mtit(sprintf('Bin %0.0f of %0.0f',binNum,totalBins));
 
 drawnow
 % saveas(gcf,sprintf('saveFig_%0.0f.jpg',itrCounter))

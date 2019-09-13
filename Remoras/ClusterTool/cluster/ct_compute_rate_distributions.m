@@ -1,6 +1,6 @@
 function [dttTemp,cRateTemp] = ct_compute_rate_distributions(ttSet,p)
 
-% deals with wierd behavior of histc when there are few/no data points in
+% deals with weird behavior of histc when there are few/no data points in
 % ttSet
 
 dttTemp =  histc(diff(sort(ttSet))*24*60*60,p.barInt);
