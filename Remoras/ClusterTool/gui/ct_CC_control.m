@@ -19,7 +19,11 @@ elseif strcmp(action,'setInFileString')
 elseif strcmp(action,'setOutputName')
     outputName = get(REMORA.ct.CC_verify.outputNameEdTxt,'String');
     REMORA.ct.CC_params.outputName = outputName;
-    
+
+elseif strcmp(action, 'saveOutput')
+    saveOutput = get(REMORA.ct.CC_verify.saveOutput,'Value');
+    REMORA.ct.CC_params.saveOutput = saveOutput;
+   
 elseif strcmp(action,'setUseSpectraTF')
     useSpectraTF = get(REMORA.ct.CC_verify.spectraCheck,'Value');
     REMORA.ct.CC_params.useSpectraTF = useSpectraTF;

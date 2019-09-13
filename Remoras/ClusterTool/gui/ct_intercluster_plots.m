@@ -17,10 +17,20 @@ for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles
     subplot(n1,m1,iF)
     hold on
-    plot(f,compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
-    xlim([f(1),f(end)])
+
+    fPlot = f;
+    if length(fPlot)~=length(compositeData(iF).spectraMeanSet) && length(f(s.stIdx,s.edIdx)~=size(compositeData(iF).spectraMeanSet,1)
+        %Catch for backward compatibility if orignial fill spectra were not stored
+        fPlot = f(s.stIdx,s.edIdx);
+    else
+        warning('Frequency vector and spectra differ in length. Display errors possible in plots')
+        fPlot = linspace(s.startFreq,s.endFreq,length(compositeData(iF).spectraMeanSet));
+    end
+    plot(fPlot,compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
+    xlim([fPlot(1),fPlot(end)])
+
     legend(num2str(size(nodeSet{iF},2)),'location','Southeast')
-    plot(f,compositeData(iF).specPrctile,'--k','lineWidth',2)
+    plot(fPlot,compositeData(iF).specPrctile,'--k','lineWidth',2)
     grid on
     hold off
     ylim([0,1])

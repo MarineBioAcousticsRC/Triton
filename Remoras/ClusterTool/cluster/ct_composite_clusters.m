@@ -17,7 +17,7 @@ if nargin == 1
         % parameters detParams
         s = varargin{1};
     end
-
+    
 else
     % If no settings file provided, prompt for input
     currentDir = mfilename('fullpath');
@@ -27,8 +27,8 @@ else
         ccParamsFile = fullfile(settingsFilePath,settingsFileName);
         fprintf('Loading settings file %s\n\n',ccParamsFile)
         run(ccParamsFile);
-
-    else 
+        
+    else
         error('No settings file selected')
     end
 end
@@ -56,37 +56,39 @@ if isempty(inFileList)
         fullfile(s.inDir,s.inFileString))
     return
 end
-  
+
 binDataPruned = [];
 fileNum = [];
 for iFile = 1:length(inFileList)
-    loadedData = load(fullfile(inFileList(iFile).folder,...
-        inFileList(iFile).name));
-    if ~isfield(loadedData,'binData')
-        % code for backward compatibility with older input files.
-        for iTval = 1:length(loadedData.tInt)
-            if size(loadedData.dTT{iTval},1) > size(loadedData.dTT{iTval},2)
-                loadedData.dTT{iTval} = loadedData.dTT{iTval}';
-                loadedData.clickRate{iTval} = loadedData.clickRate{iTval}';
+    if ~inFileList(iFile).isdir
+        loadedData = load(fullfile(inFileList(iFile).folder,...
+            inFileList(iFile).name));
+        if ~isfield(loadedData,'binData')
+            % code for backward compatibility with older input files.
+            for iTval = 1:length(loadedData.tInt)
+                if size(loadedData.dTT{iTval},1) > size(loadedData.dTT{iTval},2)
+                    loadedData.dTT{iTval} = loadedData.dTT{iTval}';
+                    loadedData.clickRate{iTval} = loadedData.clickRate{iTval}';
+                end
+                if isempty(loadedData.dTT{iTval})
+                    loadedData.dTT{iTval} = zeros(1,51);
+                    loadedData.clickRate{iTval} = zeros(1,30);
+                end
             end
-            if isempty(loadedData.dTT{iTval})
-                loadedData.dTT{iTval} = zeros(1,51);
-                loadedData.clickRate{iTval} = zeros(1,30);
-            end
+            binData = struct('sumSpec',loadedData.sumSpec,...
+                'nSpec',loadedData.nSpec,'percSpec',loadedData.percSpec,...
+                'cInt',num2cell(loadedData.cInt),'tInt',num2cell(loadedData.tInt(:,1)),...
+                'dTT',loadedData.dTT,'clickRate',loadedData.clickRate);
+            binDataPruned = [binDataPruned;binData];
+            fileNum = [fileNum;iFile*ones(size(binData))];
+        else
+            binDataPruned = [binDataPruned;loadedData.binData];
+            fileNum = [fileNum;iFile*ones(size(loadedData.binData))];
         end
-        binData = struct('sumSpec',loadedData.sumSpec,...
-            'nSpec',loadedData.nSpec,'percSpec',loadedData.percSpec,...
-            'cInt',num2cell(loadedData.cInt),'tInt',num2cell(loadedData.tInt(:,1)),...
-            'dTT',loadedData.dTT,'clickRate',loadedData.clickRate);
-        binDataPruned = [binDataPruned;binData];
-        fileNum = [fileNum;iFile*ones(size(binData))];
-    else
-        binDataPruned = [binDataPruned;loadedData.binData];
-        fileNum = [fileNum;iFile*ones(size(loadedData.binData))];
+        
+        f = loadedData.f;
+        p = loadedData.p;
     end
-    
-    f = loadedData.f;
-    p = loadedData.p;
 end
 clear('loadedData')
 
@@ -108,19 +110,19 @@ fileNumExpand = nan(size(dTTmat,1),1);
 clickTimesExpanded = {};
 stepCounter = 1;
 for iTimes = 1:size(binDataPruned,1)
-       	nCells = size(binDataPruned(iTimes).nSpec,2);
-        clustersInBin(stepCounter:stepCounter+nCells-1) = repmat(nCells,...
-           nCells,1);
-        binIdx(stepCounter:stepCounter+nCells-1) = repmat(iTimes,...
-           nCells,1);
-        tIntMat(stepCounter:stepCounter+nCells-1) = repmat(binDataPruned(iTimes).tInt(1),...
-           nCells,1);
-        subOrder(stepCounter:stepCounter+nCells-1) = 1:size(binDataPruned(iTimes).nSpec,2);
-        fileNumExpand(stepCounter:stepCounter+nCells-1) = repmat(fileNum(iTimes),...
-           nCells,1);        
-       
-        stepCounter = stepCounter+nCells;
-
+    nCells = size(binDataPruned(iTimes).nSpec,2);
+    clustersInBin(stepCounter:stepCounter+nCells-1) = repmat(nCells,...
+        nCells,1);
+    binIdx(stepCounter:stepCounter+nCells-1) = repmat(iTimes,...
+        nCells,1);
+    tIntMat(stepCounter:stepCounter+nCells-1) = repmat(binDataPruned(iTimes).tInt(1),...
+        nCells,1);
+    subOrder(stepCounter:stepCounter+nCells-1) = 1:size(binDataPruned(iTimes).nSpec,2);
+    fileNumExpand(stepCounter:stepCounter+nCells-1) = repmat(fileNum(iTimes),...
+        nCells,1);
+    
+    stepCounter = stepCounter+nCells;
+    
 end
 
 if s.singleClusterOnly
@@ -195,10 +197,10 @@ for iEA = 1:s.N
         else
             [specDist,~,~] = ct_spectra_dist(specNorm(excludedIn,s.stIdx:s.edIdx));
         end
-%         specSetHighs = zeros(size(specNorm(excludedIn,s.stIdx:s.edIdx)));
-%         specSetHighs(specNorm(excludedIn,s.stIdx:s.edIdx)>=.5) = 1;
-%         amplitudeMatch = exp(-(pdist(specSetHighs,'seuclidean')/10));
-
+        %         specSetHighs = zeros(size(specNorm(excludedIn,s.stIdx:s.edIdx)));
+        %         specSetHighs(specNorm(excludedIn,s.stIdx:s.edIdx)>=.5) = 1;
+        %         amplitudeMatch = exp(-(pdist(specSetHighs,'seuclidean')/10));
+        
         if s.iciModeTF % if true, use ici distributions for similarity calculations
             [iciModeDist,~,~,~] = ct_ici_dist_mode(iciModes(excludedIn),p.barInt(s.maxICIidx));
             compDist = squareform(specDist.*sqrt(iciModeDist),'tomatrix');
@@ -387,9 +389,9 @@ for iTF = 1:length(nodeSet)
     Tfinal{iTF,5} = compositeData(iTF).spectraMeanSet; % mean spectrum
     Tfinal{iTF,6} = fileNumExpand(nodeSet{iTF}); % file it came from
     Tfinal{iTF,7} = tIntMat(nodeSet{iTF}); % time of bin
-    Tfinal{iTF,8} = nodeSet{iTF};% primary index of bin in 
+    Tfinal{iTF,8} = nodeSet{iTF};% primary index of bin in
     Tfinal{iTF,9} = subOrder(nodeSet{iTF}); % subIndex of bin
-
+    
 end
 bestWNodeDeg = wNodeDeg{bokIdx};
 s.barAdj = .5*mode(diff(p.barInt));%p.stIdx = 2;
@@ -447,8 +449,8 @@ ccOutput.Tfinal = Tfinal;
 ccOutput.tIntMat = tIntMat;
 ccOutput.clickTimes = clickTimes;
 ccOutput.fileNumExpand = fileNumExpand;
-ccOutput.labelStr = labelStr; 
-ccOutput.inFileList = inFileList; 
+ccOutput.labelStr = labelStr;
+ccOutput.inFileList = inFileList;
 
 if s.diary
     diary('off')
