@@ -34,6 +34,15 @@ peakFr = zeros(size(clicks,1),1);
 envDurLim = ceil(p.delphClickDurLims.*(hdr.fs/1e6));
 nDur = zeros(size(clicks,1),1);
 deltaEnv = zeros(size(clicks,1),1);
+snr = zeros(size(clicks,1),1);
+
+filteredDataNoDets = filteredData(1:clicks(1,1));
+for iNoise = 1:size(clicks,1)-1
+    filteredDataNoDets = [filteredDataNoDets,...
+        filteredData(clicks(iNoise,2):(clicks(iNoise+1,1)-1))];
+end
+filteredDataNoDets = [filteredDataNoDets,filteredData(clicks(end,2):end)];
+estNoise = sqrt(median(filteredDataNoDets.^2));
 
 if p.saveNoise
     
@@ -177,16 +186,20 @@ for c = 1:size(clicks,1)
     low = min(click.');
     ppCount = high+abs(low);
     
-    %calculate dB value of counts and add transfer function value at peak
-    %frequency to get ppSignal (dB re 1uPa)
+    % calculate dB value of counts and add transfer function value at peak
+    % frequency to get ppSignal (dB re 1uPa)
     P = 20*log10(ppCount);
     
     peakLow=floor(peakFr(c));
     fLow=find(f>=peakLow);
     
-    %add PtfN transfer function at peak frequency to P
+    % add PtfN transfer function at peak frequency to P
     tfPeak = p.xfrOffset(fLow(1));
     ppSignal(c) = P+tfPeak;
+    
+    % Calculate an snr value
+    estSignal = sqrt(mean(yFilt{c}.^2));
+    snr(c) = 10*log10(estSignal/estNoise);
 end
 
 validClicks = ones(size(ppSignal));
@@ -203,7 +216,9 @@ for idx = 1:length(ppSignal)
     %          bw3db(idx,3) < p.bw3dbMin];
     %          plot(yFiltBuff{idx})
     %          title(sum(tfVec))
-    if ppSignal(idx)< p.dBppThreshold
+    if ~p.snrDet && ppSignal(idx)< p.dBppThreshold
+        validClicks(idx) = 0;
+    elseif p.snrDet && snr(idx)< p.snrThresh
         validClicks(idx) = 0;
     elseif sum(tfVec)>0
         validClicks(idx) = 0;
@@ -226,8 +241,15 @@ clickDets.specClickTf = specClickTf(clickInd,:);
 clickDets.peakFr = peakFr(clickInd,:);
 clickDets.deltaEnv = deltaEnv(clickInd,:);
 clickDets.nDur = nDur(clickInd,:);
+clickDets.snr = snr(clickInd,:);
 
-if p.saveNoise
+if p.saveNoise && ~isempty(clickInd)
+    % save noise, as long as valid clicks were also found. 
+    % This is a redundant safety check to make sure that noise is not saved if
+    % clicks are not saved. 
     clickDets.specNoiseTf = specNoiseTf;
     clickDets.yNFilt = {yNFilt};
+elseif p.saveNoise
+    clickDets.specNoiseTf = [];
+    clickDets.yNFilt = [];
 end

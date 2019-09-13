@@ -12,3 +12,4 @@ cParams.peakFrVec = cParams.peakFrVec(1:eIdx,:);
 cParams.yFiltBuffVec = cParams.yFiltBuffVec(1:eIdx,:);
 cParams.deltaEnvVec = cParams.deltaEnvVec(1:eIdx,:);
 cParams.nDurVec = cParams.nDurVec(1:eIdx,:);
+cParams.snr = cParams.snrVec(1:eIdx,:);

@@ -183,7 +183,7 @@ for iEA = 1:s.N
         end
         
     else
-        excludedIn = 1:length(dTTmatNorm);
+        excludedIn = 1:size(dTTmatNorm,1);
         subSamp = 0;
     end
     
@@ -243,6 +243,12 @@ for iEA = 1:s.N
         % compDist = squareform(compDistVec);
         % clear compDistVec
         % compDist = compDist.*squareform(amplitudeMatch);
+%         nodeVec1 = [];
+%         nodeVec2 = [];
+%         for iR = 1:size(compDist,1)-1
+%         	nodeVec1 = [nodeVec1,iR*ones(1,size(compDist,1)-iR)];
+%             nodeVec2 = [nodeVec2,(iR+1):size(compDist,1)];
+%         end
     end
     
     if s.mergeTF
@@ -312,7 +318,7 @@ for iEA = 1:s.N
     for iCluster = 1:length(withinClusterWDegree)
         wND = withinClusterWDegree{iCluster};
         wNDnorm = wND./max(wND);
-        wNDpruned = find(wNDnorm>=.25);
+        wNDpruned = find(wNDnorm>=s.clusterPrune);
         prunedNodeSetTemp{iCluster} = nodeSet{iCluster}(wNDpruned);
     end
     
@@ -325,6 +331,8 @@ for iEA = 1:s.N
     
 end
 
+
+
 % Best of K partitions based on NMI filkov and Skiena 2004
 % Compute NMI
 fprintf('Calculating NMI\n')
@@ -333,8 +341,22 @@ fprintf('Calculating NMI\n')
 [bokVal,bokIdx] = max(sum(NMIList)./(size(NMIList,1)-1)); % account for empty diagonal.
 
 bestPrunedNodeSet = prunedNodeSet{bokIdx};
-
 nodeSet = bestPrunedNodeSet;% naiItr{bokIdx};
+
+
+if isempty(nodeSet)
+    disp('No clusters formed')
+    disp_msg('No clusters formed')
+    return
+end
+
+figure(11);clf
+G = graph(compDist);
+h = plot(G,'layout','force');
+for iClustPlot=1:size(nodeSet,2)
+    highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
+end
+
 % % Final cluster using Co-assoc mat.
 % disp('Clustering using accumulated evidence')
 % compDist2 = compDist;

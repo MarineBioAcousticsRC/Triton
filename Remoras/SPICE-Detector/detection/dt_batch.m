@@ -91,8 +91,7 @@ for idx1 = 1:N % for each data file
         %%% Run LR detection to identify candidates
         [detectionsSample,detectionsSec] =  dt_LR(energy,hdr,buffSamples,...
             startK,stopK,pTemp);
-        
-        
+
         %%% start HR detection on candidates
         for iD = 1:size(detectionsSample,1)
             filtSegment = filtData(detectionsSample(iD,1):detectionsSample(iD,2));
@@ -107,12 +106,17 @@ for idx1 = 1:N % for each data file
                 % Look at power spectrum of clicks, and remove those that don't
                 % meet peak frequency and bandwidth requirements
                 clicks = clicks(validClicks==1,:);
+                
+                if isempty(clicks)
+                    continue % go to next iteration if no clicks remain.
+                end
+                
                 % Compute click parameters to decide if the detection should be kept
                 [clickDets,f] = dt_parameters(noise,filtSegment,pTemp,clicks,hdr);
                 
                 if ~isempty(clickDets.clickInd)
                     % populate cParams
-                    [cParams,sIdx] = dt_populate_cParams(clicks,pTemp,...
+                    [cParams,sIdx] = dt_populate_cParams(clicks,noise,pTemp,...
                         clickDets,detectionsSec(iD,1),hdr,sIdx,cParams);
                 end
             end

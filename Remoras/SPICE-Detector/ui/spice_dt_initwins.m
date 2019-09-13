@@ -27,7 +27,7 @@ PARAMS.scrnsz = get(0,'ScreenSize');
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % window placement & size on screen
-defaultPos = [0.005,0.035,0.15,0.25];
+defaultPos = [0.005,0.035,0.2,0.25];
 % open and setup figure window
 REMORA.fig.spice_dt = figure( ...
     'NumberTitle','off', ...

@@ -53,10 +53,15 @@ if ~isempty(detectionsSample)
             % Look at power spectrum of clicks, and remove those that don't
             % meet peak frequency and bandwidth requirements
             clicks = clicks(validClicks==1,:);
+            
+            if isempty(clicks)
+                continue % go to next iteration if no clicks remain.
+            end
+            
             % Compute click parameters to decide if the detection should be kept
             [clickDets,f] = dt_parameters(noise,filtSegment,p,clicks,PARAMS);
             if ~isempty(clickDets.clickInd)
-                [cParams,sIdx] = dt_populate_cParams(clicks,p,clickDets,...
+                [cParams,sIdx] = dt_populate_cParams(clicks,noise,p,clickDets,...
                     detectionsSample(iD,1)./PARAMS.fs,PARAMS,sIdx,cParams);
                 
             end
@@ -76,8 +81,7 @@ if ~isempty(detectionsSample)
         
         cParams = dt_prune_cParams_byIdx(cParams,keepIdx);
         REMORA.spice_dt.guiDets = cParams;
-        %plot(REMORA.spice_dt.guiDets.clickTimes*PARAMS.fs)
-        %  plotClicks somehow
+     
     end
 else
     disp_msg('No detections in current window')

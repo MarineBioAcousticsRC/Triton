@@ -20,32 +20,45 @@ elseif strcmp(action,'setPruneThr')
     pruneThr = str2double(get(REMORA.ct.CB_verify.pruneThrEdTxt,'String'));
     REMORA.ct.CB_params.pruneThr = pruneThr;
     
-    % Set low end of bandpass filter
 elseif strcmp(action,'setVariableThreshold')
     variableThreshold = get(REMORA.ct.CB_verify.variableThreshold,'Value');
     REMORA.ct.CB_params.variableThreshold = variableThreshold;
     
-    % Set high end of bandpass filter
+elseif strcmp(action,'setUseSpectraTF')
+    useSpectra = get(REMORA.ct.CB_verify.useSpectra,'Value');
+    REMORA.ct.CB_params.useSpectra = useSpectra;
+    if useSpectra % toggle visibility of other spectral options
+        showSpectraOptions = 'on';
+    else
+        showSpectraOptions = 'off';
+    end
+    set(REMORA.ct.CB_verify.linearCheck,'visible',showSpectraOptions)
+    set(REMORA.ct.CB_verify.startFreqTxt,'visible',showSpectraOptions)
+    set(REMORA.ct.CB_verify.startFreqEdTxt,'visible',showSpectraOptions)
+    set(REMORA.ct.CB_verify.endFreqTxt,'visible',showSpectraOptions)
+    set(REMORA.ct.CB_verify.endFreqEdTxt,'visible',showSpectraOptions)
+    set(REMORA.ct.CB_verify.diffCheck,'visible',showSpectraOptions)
+    
+elseif strcmp(action,'setUseEnvelopeTF')
+    useEnvelope = get(REMORA.ct.CB_verify.useEnvelope,'Value');
+    REMORA.ct.CB_params.useEnvelope = useEnvelope;
+    
 elseif strcmp(action,'setMaxCWiterations')
     maxCWiterations = str2double(get(REMORA.ct.CB_verify.maxCWiterationsEdText,'String'));
     REMORA.ct.CB_params.maxCWiterations = min(maxCWiterations,100);
     
-    % Set minimum click peak frequency for detector
 elseif strcmp(action,'setMergeTF')
     mergeTF = get(REMORA.ct.CB_verify.mergeCheck,'Value');
     REMORA.ct.CB_params.mergeTF = mergeTF;
     
-    % Set minimum click peak frequency for detector
 elseif strcmp(action,'setLinearTF')
     linearTF = get(REMORA.ct.CB_verify.linearCheck,'Value');
     REMORA.ct.CB_params.linearTF = linearTF;
     
-    % Set maximum click peak frequency for detector
 elseif strcmp(action,'setPlotFlag')
     plotFlag = get(REMORA.ct.CB_verify.plotCheck,'Value');
     REMORA.ct.CB_params.plotFlag = plotFlag;
     
-    % Set maximum click peak frequency for detector
 elseif strcmp(action,'setFalseRM')
     falseRM = get(REMORA.ct.CB_verify.falseRMCheck,'Value');
     REMORA.ct.CB_params.falseRM = min(falseRM,1);

@@ -49,7 +49,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % check if the output file exists, if not, make it
 if ~exist(outDir,'dir')
-    diso(sprintf('Creating output directory %s\n',outDir))
+    fprintf('Creating output directory %s\n',outDir)
     drawnow
     mkdir(outDir)
 end
