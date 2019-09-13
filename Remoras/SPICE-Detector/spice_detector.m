@@ -49,27 +49,27 @@ if detParams.diary
     diary('on')
 end
 
-detParams = dt_buildDirs(detParams);
+detParams = sp_dt_buildDirs(detParams);
 
 % Build list of (x)wav names in the base directory.
 % Right now only wav and xwav files are looked for.
-fullFileNames = fn_findXWAVs(detParams);
+fullFileNames = sp_fn_findXWAVs(detParams);
 
 if detParams.guidedDetector && ~isempty(detParams.gDxls)
-    [fullFileNames,encounterTimes] = fn_guidedDetection(fullFileNames,detParams);
+    [fullFileNames,encounterTimes] = sp_fn_guidedDetection(fullFileNames,detParams);
     fprintf('Using guided detections from file %s \n',detParams.gDxls')
 else
     encounterTimes = [];
 end
 
 % return a list of files to be built
-fullLabels = fn_getFileset(detParams,fullFileNames);
+fullLabels = sp_fn_getFileset(detParams,fullFileNames);
 
 % profile on
 % profile clear
 if ~isempty(fullFileNames)
     fprintf('Beginning detection\n\n')
-    dt_batch(fullFileNames,fullLabels,detParams,encounterTimes,runMode);
+    sp_dt_batch(fullFileNames,fullLabels,detParams,encounterTimes,runMode);
     
 else
     disp('Error: No wav/xwav files found')
