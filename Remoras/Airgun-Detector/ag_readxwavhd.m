@@ -1,4 +1,4 @@
-function [rawStart,rawDur,fs] = readxwavhd(filepath)
+function [rawStart,rawDur,fs] = ag_readxwavhd(filepath)
 %
 % modified from triton version for use with fixSchedTimes
 % renamed readxwavhd.m
