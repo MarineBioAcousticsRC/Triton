@@ -128,7 +128,7 @@ for iC = 1:length(dateInterval)
             % if the interval contains more than p.maxNetworkSz good clicks, 
             % randomly select a subset for clustering
             fprintf('%d clicks in bin, selecting subset of %d\n',nClicks,p.maxNetworkSz)
-            rList = randperm(nClicks,p.maxNetworkSz);
+            rList = sort(randperm(nClicks,p.maxNetworkSz));
         else
             rList = 1:nClicks;
         end
@@ -178,7 +178,7 @@ for iC = 1:length(dateInterval)
             
             if p.plotFlag 
                 % plotting option
-                ct_plot_bin_clusters(p,f,spectraMean,envDistrib,cRate,dtt,...
+                ct_plot_bin_clusters(p,f,spectraMean,envDistrib,thisFile,dtt,...
                     specHolder,envSetHolder,sizeCA,iC,length(dateInterval)) 
             end
         else

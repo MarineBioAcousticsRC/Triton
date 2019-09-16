@@ -19,7 +19,8 @@ for iF = 1:length(nodeSet)
     hold on
 
     fPlot = f;
-    if length(fPlot)~=length(compositeData(iF).spectraMeanSet) && length(f(s.stIdx,s.edIdx)~=size(compositeData(iF).spectraMeanSet,1)
+    if length(fPlot)~=length(compositeData(iF).spectraMeanSet) &&... 
+        length(f(s.stIdx:s.edIdx))~=size(compositeData(iF).spectraMeanSet,2)
         %Catch for backward compatibility if orignial fill spectra were not stored
         fPlot = f(s.stIdx,s.edIdx);
     else
