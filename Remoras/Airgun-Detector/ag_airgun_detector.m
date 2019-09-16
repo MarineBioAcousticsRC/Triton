@@ -30,7 +30,7 @@ for fidx = 1:size(FileList,1) % Make sure to change the start of the file list s
     display(['calculating ',file,'; file ',num2str(fidx),'/',num2str(size(FileList),1)])
     rawStart = [];
     rawDur = [];
-    [rawStart,rawDur,fs] = readxwavhd(filepath);
+    [rawStart,rawDur,fs] = ag_readxwavhd(filepath);
     
     step = rawDur(1)*fs;
     inc = size(rawStart,1);
