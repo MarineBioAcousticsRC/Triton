@@ -202,16 +202,16 @@ for iEA = 1:s.N
         %         specSetHighs(specNorm(excludedIn,s.stIdx:s.edIdx)>=.5) = 1;
         %         amplitudeMatch = exp(-(pdist(specSetHighs,'seuclidean')/10));
         
-        if s.iciModeTF % if true, use ici distributions for similarity calculations
+        if s.iciModeTF && s.useTimesTF % if true, use ici distributions for similarity calculations
             [iciModeDist,~,~,~] = ct_ici_dist_mode(iciModes(excludedIn),p.barInt(s.maxICIidx));
             compDist = squareform(specDist.*sqrt(iciModeDist),'tomatrix');
             disp('Clustering on modal ICI and spectral correlations')
-        elseif s.iciDistTF
+        elseif s.iciDistTF && s.useTimesTF
             % if true, use ici distributions for similarity calculations
             [iciDist,~,~] = ct_ici_dist(dTTmatNorm(excludedIn,s.minICIidx:s.maxICIidx));
             compDist = squareform(specDist.*iciDist,'tomatrix');
             disp('Clustering on ICI distribution and spectral correlations')
-        elseif s.cRateTF
+        elseif s.cRateTF && s.useTimesTF
             % use click rate distributions for similarity calculations
             [cRateDist,~,~] = ct_ici_dist(cRateNorm(excludedIn,:));
             compDist = squareform(specDist.*cRateDist,'tomatrix');
