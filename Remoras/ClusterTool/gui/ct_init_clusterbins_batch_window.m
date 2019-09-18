@@ -205,6 +205,9 @@ REMORA.ct.CB_verify.cparamtext = uicontrol(REMORA.fig.ct.CB_settings, ...
     'Visible','on'); 
 
 %% Cluster on Spectra
+if ~isfield(REMORA.ct.CB_params,'useSpectra')
+    REMORA.ct.CB_params.useSpectra = 1;
+end
 
 if REMORA.ct.CB_params.useSpectra
     showSpectraOptions = 'on';
@@ -305,6 +308,9 @@ REMORA.ct.CB_verify.diffCheck = uicontrol(REMORA.fig.ct.CB_settings,...
    'Callback','ct_cb_control(''setDiff'')');
 
 %% Cluster on Waveform Envelope
+if ~isfield(REMORA.ct.CB_params,'useEnvelope')
+    REMORA.ct.CB_params.useEnvelope = 0;
+end
 labelStr = 'Cluster on Waveform';
 btnPos = [x(1)+w/6 y(12)+ybuff w dy];
 REMORA.ct.CB_verify.useEnvelope = uicontrol(REMORA.fig.ct.CB_settings,...

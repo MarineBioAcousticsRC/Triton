@@ -56,7 +56,7 @@ if isempty(inFileList)
         fullfile(s.inDir,s.inFileString))
     return
 end
-
+TPWSList = {};
 binDataPruned = [];
 fileNum = [];
 for iFile = 1:length(inFileList)
@@ -88,6 +88,7 @@ for iFile = 1:length(inFileList)
         
         f = loadedData.f;
         p = loadedData.p;
+        TPWSList{iFile} = loadedData.TPWSfilename;
     end
 end
 clear('loadedData')
@@ -345,16 +346,20 @@ fprintf('Calculating NMI\n')
 bestPrunedNodeSet = prunedNodeSet{bokIdx};
 nodeSet = bestPrunedNodeSet;% naiItr{bokIdx};
 
-
 if isempty(nodeSet)
     disp('No clusters formed')
     disp_msg('No clusters formed')
     return
 end
+clusterIDreduced = zeros(size(compDist,1),1);
+for iNodeSet = 1:length(nodeSet)
+    clusterIDreduced(nodeSet{iNodeSet}) = iNodeSet;
+end
 
 figure(11);clf
 G = graph(compDist);
 h = plot(G,'layout','force');
+set(h,'MarkerSize',8,'nodeLabel',clusterIDreduced)
 for iClustPlot=1:size(nodeSet,2)
     highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
 end
@@ -423,7 +428,8 @@ if s.saveOutput
     save(outputDataFile,'inputSet','nodeSet','NMIList','bokVal','bokIdx','f',...
         'p','s','nList','ka','naiItr','isolatedSet','compositeData','Tfinal',...
         'specNorm','dTTmatNorm','iciModes','diffNormSpec','cRateNorm','fileNumExpand',...
-        'bestWNodeDeg','prunedNodeSet','tIntMat','subOrder','binIdx','inFileList','clickTimes','labelStr')
+        'bestWNodeDeg','prunedNodeSet','tIntMat','subOrder','binIdx','inFileList',...
+        'clickTimes','labelStr','TPWSList')
     for iType = 1:size(Tfinal,1)
         thisType = [];
         outputTypeFile = fullfile(s.outDir,[s.outputName,'_type',num2str(iType)]);
@@ -433,10 +439,11 @@ if s.saveOutput
         thisType.tIntMat = tIntMat(Tfinal{iType,8});
         thisType.clickTimes = vertcat(clickTimes{Tfinal{iType,8}});
         thisType.fileNumExpand = fileNumExpand(Tfinal{iType,8});
-        
-        save(outputTypeFile,'thisType','inFileList')
+        if ~exist('TPWSList','var')
+            TPWSList = [];
+        end
+        save(outputTypeFile,'thisType','inFileList','TPWList')
     end
-    
 end
 
 ccOutput.outputDataFile = outputDataFile;
@@ -451,6 +458,7 @@ ccOutput.clickTimes = clickTimes;
 ccOutput.fileNumExpand = fileNumExpand;
 ccOutput.labelStr = labelStr;
 ccOutput.inFileList = inFileList;
+ccOutput.TPWSList = TPWSList;
 
 if s.diary
     diary('off')
