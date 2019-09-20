@@ -136,3 +136,7 @@ ltsa.end.dnum = ltsa.dnumEnd(ltsa.nrftot);
 ltsa.fmax = (ltsa.nf - 1) * ltsa.dfreq;
 ltsa.freq = [0:ltsa.dfreq:ltsa.fmax];
 ltsa.f = ltsa.freq;
+
+%init limits
+ltsa.freq0 = 0;
+ltsa.freq1 = ltsa.fmax;
