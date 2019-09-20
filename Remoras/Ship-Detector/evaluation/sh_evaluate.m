@@ -51,7 +51,7 @@ function sh_evaluate_OpeningFcn(hObject, ~, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to sh_evaluate (see
- 
+
 handles.j = 1;
 handles.marker_count = 0;
 handles.dim_coords = 0;
@@ -159,6 +159,38 @@ elseif isempty(handles.shipTimes)
 else
     disp('Redrawing spectrogram.')
     sh_draw_ltsa(handles);
+    
+    enabledBack = get(handles.motion_backwards,'Enable');
+    enabledFwd = get(handles.motion_forwards,'Enable');
+    
+    % set backwards button off (start file) and on (not start of file)
+    if handles.j == 1
+        if strcmp(enabledBack,'on')
+            set(handles.motion_backwards,'Enable','off')
+        end
+    elseif isfield(handles,'ViewStart')
+    else
+        if handles.ViewStart == 1
+            if strcmp(enabledBack,'on')
+                set(handles.motion_backwards,'Enable','off')
+            end
+        else
+            if strcmp(enabledBack,'off')
+                set(handles.motion_backwards,'Enable','on')
+            end
+        end
+    end
+    
+    % set forwards button off (end file) and on (not end of file)
+    if handles.j > size(handles.shipTimes,1)
+        if strcmp(enabledFwd,'on')
+            set(handles.motion_forwards,'Enable','off')
+        end
+    else
+        if strcmp(enabledFwd,'off')
+            set(handles.motion_forwards,'Enable','on')
+        end
+    end
 end
 guidata(hObject, handles);
 
@@ -170,22 +202,12 @@ function motion_forwards_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % % Move forward button '>'
-% if(handles.NextFile == 1) || handles.j>=size(handles.shipTimes,1)
-% 
-%     handles.shipTimes = shipTimes;
-%     handles.j = 1;
-%     handles.ViewStart = 1;
-%     handles.marker_count = 0;
-% else
-%     disp('Moving forward in file.')
-% end
-ltsaData = []; handles.ltsaData=[]; handles.markers=0; length_index=0; 
-handles.ltsa_eval = 0; repeat = 0;
+ltsaData = []; handles.ltsaData=[]; handles.markers=0; length_index=0;
+repeat = 0;
 
 shipTimes = handles.shipTimes;
 handles.ViewStart = handles.j;
 
-fprintf('Window starting at detection %0.0f\n',handles.ViewStart)
 while(size(handles.ltsaData,2) < floor(handles.PlotLengthVal*60*60/handles.ltsa.tave))...
         && (handles.j <= size(shipTimes,1))
     
@@ -194,40 +216,46 @@ while(size(handles.ltsaData,2) < floor(handles.PlotLengthVal*60*60/handles.ltsa.
     
     length_index = length_index+size(ltsaData,2);
     if length_index > floor((handles.PlotLengthVal*60*60)/handles.ltsa.tave)
-       remove = length_index - ...
-           floor((handles.PlotLengthVal*60*60)/handles.ltsa.tave);
-       ltsaData = ltsaData(:,1:end-remove);
-       repeat = 1;
+        remove = length_index - ...
+            floor((handles.PlotLengthVal*60*60)/handles.ltsa.tave);
+        ltsaData = ltsaData(:,1:end-remove);
+        repeat = 1;
     end
     handles.ltsaData=[handles.ltsaData,ltsaData];
     handles.markers = [handles.markers,length_index];
     handles.j = handles.j+1;
 end
 handles.ViewEnd = handles.j-1;
+
+% show cutted detection from previous window in the next window
 if repeat
-   % show cutted detection from previous window in the next window
-   handles.j = handles.j-1;
+    handles.j = handles.j-1;
 end
-fprintf('Window ending at detection %.0f\n',handles.ViewEnd)
+
+% update text
 set(handles.percent_completed,'String',round(handles.ViewEnd/size(handles.shipTimes,1)*100))
-
 handles.marker_count = handles.marker_count + length(handles.markers);
-
 handles.plot_length_prev = get(handles.plot_length,'string');
+
+% if end of file is less than the designated plot length, just show the
+% current length of the plot
 if(handles.j >= size(shipTimes,1))
     set(handles.plot_length,'String',(size(handles.ltsaData,2)*...
         handles.ltsa.tave)/(60*60))
 end
 guidata(hObject, handles);
+
+% plot data
 plot_ltsa_Callback(hObject, eventdata, handles)
 
+% reached end of file, disable forward button
 if(handles.ViewEnd>=size(shipTimes,1))
     set(handles.motion_forwards,'Enable','off')
     fprintf('Reached end of this detection file.\n')
 else
     enabled = get(handles.motion_forwards,'Enable');
     if strcmp(enabled,'off')
-       set(handles.motion_forwards,'Enable','on') 
+        set(handles.motion_forwards,'Enable','on')
     end
 end
 guidata(hObject, handles);
@@ -240,79 +268,50 @@ function motion_backwards_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % % Scroll backward button '<'
-disp('Moving backward.')
 if handles.ViewStart<=1
-    % need to open the previous file
-    if handles.CurrentDetectionFileIdx>1
-        shipTimes = [];
-        while isempty(shipTimes)
-            handles.CurrentDetectionFileIdx = handles.CurrentDetectionFileIdx-1;
-            handles.DetectionFile = handles.DetectionFileList(handles.CurrentDetectionFileIdx).name;
-            fprintf('Opening previous file: %s\n', handles.DetectionFile)
-            detectionFileStem = strrep(handles.DetectionFile,'.mat','');
-            handles.CurrentWavIdx = find(~cellfun(@isempty,strfind({handles.WaveFileList.name},...
-                detectionFileStem)));
-            if isempty(handles.CurrentWavIdx)
-                warning('No audio file found to match detection file %s\n',handles.DetectionFile)
-            else
-                % storing file name of new wav file
-                handles.WaveFile = fullfile(handles.WaveFileList(handles.CurrentWavIdx).pathName,...
-                    handles.WaveFileList(handles.CurrentWavIdx).name);
-                set(handles.ltsa_filename,'String', handles.WaveFileList(handles.CurrentWavIdx).name); % sets name on plot
-
-                % load new detection_file file
-                fprintf('Opening %s\n',handles.DetectionFile)
-                set(handles.detection_filename,'String', handles.DetectionFile); % sets name on plot
-
-                load(fullfile(handles.DetectionFilePath,handles.DetectionFile));
-                if isempty(shipTimes)
-                    fprintf('No detections in this file, backing up further.\n')
-                else
-                    fprintf('This file contains %.f detections\n', size(shipTimes,1))
-                end
-            end
-        end
-        % whos shipTimes
-        handles.shipTimes = shipTimes;
-        
-        handles.j = size(shipTimes,1);
-        handles.marker_count=0;
-        handles.ViewStart = handles.j;
-        handles.ViewEnd = handles.j;
-        viewStart = handles.ViewStart;
-    else
-        fprintf('There are no earlier files in this folder\n')
-    end
+    set(handles.motion_backwards,'Enable','off')
 else
     handles.j = handles.ViewStart;
-    handles.ViewEnd = handles.j-1;
-    viewStart = handles.ViewStart-1;
+    handles.ViewEnd = handles.j;
+    viewStart = handles.ViewStart;
 end
-%     guidata(hObject, handles);
-audioInfo = audioinfo(handles.WaveFile);
-audioSize = audioInfo.TotalSamples;
 
-handles.AudioData = [];
+handles.ltsaData = [];
 handles.markers = 0;
+repeat = 0;
+shipTimes = handles.shipTimes;
 
-fprintf('Window ending at detection %0.0f\n', handles.ViewEnd)
-while(length(handles.AudioData) < handles.ltsa.fs*handles.PlotLengthVal)...
-        && (viewStart > 0)||(viewStart == 1)
-    % Read in the audio data that goes with this detection_file (currently
-    % doesn't check if buffer reads into header).
-    audioData = audioread(handles.WaveFile,[handles.shipTimes(viewStart,1),...
-        min(handles.shipTimes(viewStart,2),audioSize)]);
+while(size(handles.ltsaData,2) < floor(handles.PlotLengthVal*60*60/handles.ltsa.tave))...
+        && (viewStart > 0)
+    
+    % Read the ltsa data portion of the file
+    ltsaData = sh_read_ltsadata(handles,shipTimes(viewStart,1),shipTimes(viewStart,2));
     
     % concatenate data in reverse
-    handles.AudioData = [audioData;handles.AudioData];
+    handles.ltsaData = [ltsaData,handles.ltsaData];
     
-    reverseLengthIndex = length(audioData);
-    handles.markers = [0,handles.markers+reverseLengthIndex];
+    reverseLengthIndex = size(handles.ltsaData,2);
+    handles.markers = [0,handles.markers+size(ltsaData,2)];
     viewStart = viewStart-1;
+    
+    % remove data exciding window size
+    if reverseLengthIndex > floor((handles.PlotLengthVal*60*60)/handles.ltsa.tave)
+        remove = reverseLengthIndex - ...
+            floor((handles.PlotLengthVal*60*60)/handles.ltsa.tave);
+        handles.ltsaData = handles.ltsaData(:,1:end-remove);
+        repeat = 1;
+    end
 end
 handles.ViewStart = viewStart+1;
-fprintf('Window starting at detection %0.0f\n',handles.ViewStart)
-set(handles.percent_completed,'String',handles.ViewEnd/size(handles.shipTimes,1)*100)
+handles.j = handles.ViewEnd+1;
+
+% show cutted detection from previous window in the next window
+if repeat
+    handles.j = handles.j-1;
+end
+
+% update text
+set(handles.percent_completed,'String',round(handles.ViewEnd/size(handles.shipTimes,1)*100))
 handles.marker_count = handles.marker_count+length(handles.markers);
 
 guidata(hObject, handles);
@@ -581,9 +580,9 @@ if PathName~=0
         error('No audio file found to match detection file %s\n',handles.DetectionFile)
     else
         handles.WaveFile = fullfile(fileList(audioIdx).pathName,fileList(audioIdx).name);
-        handles.CurrentWavIdx = audioIdx;        
+        handles.CurrentWavIdx = audioIdx;
         fprintf('Found matching wav file %s\n',handles.WaveFile)
-
+        
     end
     guidata(hObject,handles);
 else

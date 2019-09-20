@@ -7,6 +7,7 @@ function sh_draw_ltsa(handles)
 bin2hr = handles.ltsa.tave/(60*60);
 boxcolor{1}='r'; % 1 is red
 boxcolor{2}='g'; % 2 is green
+detNum = handles.ViewStart:(handles.ViewStart+length(handles.markers)-1);
 
 % Change plot frequency axis
 
@@ -19,6 +20,7 @@ image(t,handles.ltsa.f,c)
 
 axis xy
 set(gca,'TickDir','out')
+
 for iDilim = 1:length(handles.markers)-1
     hold on
     plot([handles.markers(iDilim)*bin2hr,handles.markers(iDilim)*bin2hr],...
@@ -32,6 +34,10 @@ for iDilim = 1:length(handles.markers)-1
         handles.markers(iDilim+1)*bin2hr-handles.markers(iDilim)*bin2hr,...
         round(.015*(handles.EndFreqVal-handles.StartFreqVal))],...
         'FaceColor',boxcolor{boxnumber});
+
+    text((handles.markers(iDilim+1)*bin2hr+handles.markers(iDilim)*bin2hr)/2,...
+        handles.EndFreqVal*1.02,...
+        num2str(detNum(iDilim)),'FontSize',12,'FontWeight','bold');
   
 end
 
