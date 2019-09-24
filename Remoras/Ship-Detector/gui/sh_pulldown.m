@@ -63,7 +63,9 @@ elseif strcmp(action,'load_labels')
     sh_init_visLabel_gui
 
 elseif strcmp(action,'evaluate_detections')
-    warning('Under construction')
+    
+    % launch evaluation gui
+    sh_evaluate
 end
 
 

@@ -22,7 +22,7 @@ uimenu(REMORA.sh.labelmenu, 'Label', 'Load labels (.tlab)', ...
 
 % Run evaluate interface
 uimenu(REMORA.sh.menu, 'Label', 'Evaluate detections', ...
-    'Enable','off','Callback', 'sh_pulldown(''evaluate_detections'')');
+    'Enable','on','Callback', 'sh_pulldown(''evaluate_detections'')');
 
 
 
