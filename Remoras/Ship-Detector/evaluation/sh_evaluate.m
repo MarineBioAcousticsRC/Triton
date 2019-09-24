@@ -58,6 +58,7 @@ handles.dim_coords = 0;
 handles.brightness = 0.4;
 handles.NextFile = 0;
 handles.replot = 0;
+handles.ViewStart = 1;
 
 % Choose default command line output for sh_evaluate
 handles.output = hObject;
@@ -146,7 +147,7 @@ end
 
 
 % --- Executes on button press in plot_ltsa.
-function plot_ltsa_Callback(hObject, ~, handles)
+function plot_ltsa_Callback(hObject, eventdata, handles)
 % hObject    handle to plot_ltsa (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -157,9 +158,18 @@ if isempty(handles.shipTimes)
     disp('No detections in this file.')
 end
 if ~isfield(handles,'ltsaData') || isempty(handles.ltsaData)
-    motion_forwards_Callback(hObject, 1, handles)    
+    handles = motion_forwards_Callback(hObject, 1, handles); 
 else
     sh_draw_ltsa(handles);
+    
+    % update percentage processed
+    perc = round(handles.ViewEnd/size(handles.shipTimes,1)*100);
+    % only show 100 when it is really 100, keep 99 if round percentage is
+    % 100
+    if perc == 100 && (handles.ViewEnd/size(handles.shipTimes,1)*100) ~=100
+       perc = 99; 
+    end
+    set(handles.percent_completed,'String',perc)
     
     enabledBack = get(handles.motion_backwards,'Enable');
     enabledFwd = get(handles.motion_forwards,'Enable');
@@ -196,7 +206,7 @@ guidata(hObject, handles);
 
 
 % --- Executes on button press in motion_forwards.
-function motion_forwards_Callback(hObject, eventdata, handles)
+function handles = motion_forwards_Callback(hObject, eventdata, handles)
 % hObject    handle to motion_forwards (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -238,7 +248,6 @@ if repeat
 end
 
 % update text
-set(handles.percent_completed,'String',round(handles.ViewEnd/size(handles.shipTimes,1)*100))
 handles.marker_count = handles.marker_count + length(handles.markers);
 handles.plot_length_prev = get(handles.plot_length,'string');
 
@@ -248,7 +257,6 @@ if(handles.j >= size(shipTimes,1))
     set(handles.plot_length,'String',(size(handles.ltsaData,2)*...
         handles.ltsa.tave)/(60*60))
 end
-guidata(hObject, handles);
 
 % plot data
 plot_ltsa_Callback(hObject, eventdata, handles)
@@ -348,63 +356,6 @@ function slider1_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
-
-% --- Executes on button press in listen_selection.
-function listen_selection_Callback(hObject, eventdata, handles)
-% hObject    handle to play_audio (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-coordinates = ginput(2);
-round(coordinates);
-
-[~, k2] = find(handles.markers/handles.OverlapVal > coordinates(1,1));
-[~, k4] = find(handles.markers/handles.OverlapVal <= coordinates(2,1));
-
-%added so that Amanda can see exact time of audio that's playing:
-k5 = intersect(k2-1,k4);
-datestr(handles.shipTimes(handles.ViewStart+k5(1)-1,4))
-datestr(handles.shipTimes(handles.ViewStart+k5(end),4))
-
-if(handles.filter == 1)
-    % Apply a band pass filter
-    lower_freq = coordinates(1,2)/handles.FFTLVal*handles.ltsa.fs;
-    upper_freq = coordinates(2,2)/handles.FFTLVal*handles.ltsa.fs;
-    
-    fs = handles.ltsa.fs; % sampling rate
-    
-    F = [lower_freq-50, lower_freq, upper_freq, upper_freq+50];  % band limits
-    A = [0 1 0];                % band type: 0='stop', 1='pass'
-    dev = [0.0001, 10^(0.1/20)-1, 0.0001]; % ripple/attenuation spec
-    [M,Wn,beta,typ] = kaiserord(F,A,dev,fs);  % window parameters
-    b = fir1(M,Wn,typ,kaiser(M+1,beta),'noscale'); % filter design
-    DATA = filter(b,1,handles.AudioData(coordinates(1,1)*...
-        handles.OverlapVal:coordinates(2,1)...
-        *handles.OverlapVal));
-    
-    handles.dim_coords = [floor(coordinates(1,2)),floor(coordinates(2,2))];
-    
-    plot_ltsa_Callback(hObject, eventdata, handles)
-    
-    if(handles.speedup==1)
-        soundsc(DATA,5*handles.ltsa.fs);
-    else
-        soundsc(DATA,handles.ltsa.fs);
-    end
-    handles.dim_coords=0;
-    plot_ltsa_Callback(hObject, eventdata, handles)
-    
-else
-    
-    if(handles.speedup==1)
-        soundsc(handles.AudioData(coordinates(1,1)*handles.OverlapVal:coordinates(2,1)*handles.OverlapVal),5*handles.ltsa.fs);
-    else
-        soundsc(handles.AudioData(coordinates(1,1)*handles.OverlapVal:coordinates(2,1)*handles.OverlapVal),handles.ltsa.fs);
-    end
-end
-
-guidata(hObject,handles);
 
 
 
@@ -531,77 +482,25 @@ else
     error('No LTSA file selected. \n')
 end
 
-
-% --------------------------------------------------------------------
-function wave_file_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to wave_file (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-PathName = uigetdir('','Select base folder of audio files');
-
-% make sure detection_file file has been selected
-if ~isfield(handles,'DetectionFile')
-    error('Please select a detection file first')
-end
-
-% Search folder and subfolders for audio files
-if PathName~=0
-    dirList = dir(PathName); %are there subfolders?
-    dirList = dirList(3:end);
-    wavEnding = strfind({dirList.name},'.wav');
-    wavFileFlag = ~cellfun(@isempty,wavEnding);
-    fileList = [];
-    if sum(wavFileFlag)>0
-        fileList = dirList(~cellfun(@isempty,wavEnding));
-        for iFile0 = 1:length(fileList)
-            fileList(iFile0).pathName = fullfile(PathName);
-        end
-    end
-    for iDir = 1:length(dirList)
-        if dirList(iDir).isdir
-            subDirList = dir(fullfile(PathName,dirList(iDir).name));
-            wavEnding = strfind({subDirList.name},'.wav');
-            newFileSet = subDirList(~cellfun(@isempty,wavEnding));
-            for iFile = 1:length(newFileSet)
-                newFileSet(iFile).pathName = fullfile(PathName,dirList(iDir).name);
-            end
-            fileList = [fileList;newFileSet];
-        end
-    end
-    %addpath(PathName);
-    handles.WaveFileList = fileList;
-    targetFileName = strrep(handles.DetectionFile,'.mat','');
-    findUscores = strfind(targetFileName,'_');
-    matchNameTF = strfind({fileList(:).name},targetFileName);
-    audioIdx = find(~cellfun(@isempty,matchNameTF));
-    if isempty(audioIdx)
-        error('No audio file found to match detection file %s\n',handles.DetectionFile)
-    else
-        handles.WaveFile = fullfile(fileList(audioIdx).pathName,fileList(audioIdx).name);
-        handles.CurrentWavIdx = audioIdx;
-        fprintf('Found matching wav file %s\n',handles.WaveFile)
-        
-    end
-    guidata(hObject,handles);
-else
-    fprintf('No audio file folder selected.\n')
-end
-%%
-
 % --- Executes on button press in subset_ship.
 function subset_ship_Callback(hObject, eventdata, handles)
 % hObject    handle to subset_ship (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-fprintf('Labeling %0.0f detections as TRUE.\n',...
-    handles.ViewEnd-handles.ViewStart)
-handles.shipTimes(handles.ViewStart:handles.ViewEnd,3)=1;
 
-shipTimes = handles.shipTimes;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipTimes','-append')
+% identify which detections were picked
+coordinates = ginput(2);
+bin2hr = handles.ltsa.tave/(60*60);
+[~, idxRight] = find(handles.markers*bin2hr > coordinates(1,1));
+[~, idxLeft] = find(handles.markers*bin2hr <= coordinates(2,1));
+selected = intersect(idxRight-1,idxLeft);
+
+handles.shipLabels(handles.ViewStart+selected-1) = {'ship'};
+shipLabels = handles.shipLabels;
+save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
 guidata(hObject,handles);
 
-motion_forwards_Callback(hObject, eventdata, handles)
+plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 function start_detection_Callback(hObject, eventdata, handles)
@@ -610,8 +509,9 @@ function start_detection_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.MarkerNumberVal = str2double(get(handles.start_detection,'String'));
 handles.ViewStart = handles.MarkerNumberVal;
+handles.j = handles.MarkerNumberVal;
 handles.replot = 1;
-motion_forwards_Callback(hObject, 1, handles)
+handles = motion_forwards_Callback(hObject, eventdata, handles);
 guidata(hObject,handles);
 
 
@@ -628,7 +528,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 handles.start_detection = get(hObject,'Value');
-
 guidata(hObject,handles);
 
 
@@ -638,20 +537,16 @@ function subset_no_ship_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-coordinates = ginput(2);
-handles.value_mark = str2double(get(handles.start_detection,'String'));
-
 % identify which detections were picked
-[~, k2] = find(handles.markers/handles.OverlapVal > coordinates(1,1));
-[~, k4] = find(handles.markers/handles.OverlapVal <= coordinates(2,1));
+coordinates = ginput(2);
+bin2hr = handles.ltsa.tave/(60*60);
+[~, idxRight] = find(handles.markers*bin2hr > coordinates(1,1));
+[~, idxLeft] = find(handles.markers*bin2hr <= coordinates(2,1));
+selected = intersect(idxRight-1,idxLeft);
 
-k5 = intersect(k2-1,k4);
-% Flag them as zeros
-fprintf('Flagging %.0f detection(s) as false.\n',length(k5))
-handles.shipTimes(handles.ViewStart+k5-1,3) = 0;
-
-shipTimes = handles.shipTimes;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipTimes','-append')
+handles.shipLabels(handles.ViewStart+selected-1) = {'ambient'};
+shipLabels = handles.shipLabels;
+save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
 guidata(hObject,handles);
 
 plot_ltsa_Callback(hObject, eventdata, handles)

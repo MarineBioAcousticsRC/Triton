@@ -129,6 +129,8 @@ if ~isempty(shipTimes)
     filename = split(REMORA.sh.ltsa.infile,'.ltsa');
     matname = ['Ship_detections_',filename{1},'.mat'];
     settings = REMORA.sh.settings;
+    % remove padded text
+    shipLabels(strcmp(shipLabels,'unknown')) = [];
     save(fullfile(REMORA.sh.settings.outDir,matname),'shipTimes',...
         'shipLabels','settings','-mat','-v7.3');
     fprintf('Detections saved at: %s\n',fullfile(REMORA.sh.settings.outDir,matname));
