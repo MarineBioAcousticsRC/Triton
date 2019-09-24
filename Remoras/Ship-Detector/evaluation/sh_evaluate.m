@@ -55,9 +55,9 @@ function sh_evaluate_OpeningFcn(hObject, ~, handles, varargin)
 handles.j = 1;
 handles.marker_count = 0;
 handles.dim_coords = 0;
-handles.filter = 0;
-handles.brightness = 0.3;
+handles.brightness = 0.4;
 handles.NextFile = 0;
+handles.replot = 0;
 
 % Choose default command line output for sh_evaluate
 handles.output = hObject;
@@ -93,6 +93,7 @@ function start_freq_Callback(hObject, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.StartFreqVal = str2double(get(handles.start_freq,'String'));
 guidata(hObject, handles);
+plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -111,6 +112,7 @@ function end_freq_Callback(hObject, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.EndFreqVal = str2double(get(handles.end_freq,'String'));
 guidata(hObject, handles);
+plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -128,7 +130,9 @@ function plot_length_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles.PlotLengthVal = max(1,str2double(get(handles.plot_length,'String')));
+handles.replot = 1;
 guidata(hObject, handles);
+motion_forwards_Callback(hObject, 1, handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -149,15 +153,12 @@ function plot_ltsa_Callback(hObject, ~, handles)
 if ~isfield(handles,'LtsaFile')
     error('Please select LTSA file.')
 end
+if isempty(handles.shipTimes)
+    disp('No detections in this file.')
+end
 if ~isfield(handles,'ltsaData') || isempty(handles.ltsaData)
-    fprintf('Loading data for this window.\n')
-    motion_forwards_Callback(hObject, 1, handles)
-elseif isempty(handles.shipTimes)
-    disp('No detections in this file. Skipping.')
-    handles.NextFile = 1;
-    motion_forwards_Callback(hObject,[],handles)
+    motion_forwards_Callback(hObject, 1, handles)    
 else
-    disp('Redrawing spectrogram.')
     sh_draw_ltsa(handles);
     
     enabledBack = get(handles.motion_backwards,'Enable');
@@ -168,7 +169,6 @@ else
         if strcmp(enabledBack,'on')
             set(handles.motion_backwards,'Enable','off')
         end
-    elseif isfield(handles,'ViewStart')
     else
         if handles.ViewStart == 1
             if strcmp(enabledBack,'on')
@@ -206,7 +206,12 @@ ltsaData = []; handles.ltsaData=[]; handles.markers=0; length_index=0;
 repeat = 0;
 
 shipTimes = handles.shipTimes;
-handles.ViewStart = handles.j;
+% if replot 1, keep same start time, if not the last detection processed.
+if ~handles.replot
+    handles.ViewStart = handles.j;
+else 
+    handles.replot = 0; % set to 0 again after settings changed.
+end
 
 while(size(handles.ltsaData,2) < floor(handles.PlotLengthVal*60*60/handles.ltsa.tave))...
         && (handles.j <= size(shipTimes,1))
@@ -409,16 +414,12 @@ function all_ship_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% % listen_selection everything as true
-fprintf('Labeling %0.0f detections as TRUE.\n',...
-    handles.ViewEnd-handles.ViewStart)
-handles.shipTimes(handles.ViewStart:handles.ViewEnd,3) = 1;
+handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ship'};
+shipLabels = handles.shipLabels;
+save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
 
-shipTimes = handles.shipTimes;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipTimes','-append')
 guidata(hObject,handles);
-% automatically advances? Why not just draw it?
-motion_forwards_Callback(hObject, eventdata, handles)
+plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in all_no_ship.
@@ -426,16 +427,13 @@ function all_no_ship_Callback(hObject, eventdata, handles)
 % hObject    handle to all_no_ship (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-fprintf('Labeling %0.0f detections as FALSE.\n',...
-    handles.ViewEnd-handles.ViewStart)
-handles.shipTimes(handles.ViewStart:handles.ViewEnd,3)=0;
 
-shipTimes = handles.shipTimes;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipTimes','-append')
+handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ambient'};
+shipLabels = handles.shipLabels;
+save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
+
 guidata(hObject,handles);
-
-% plot_ltsa_Callback(hObject, eventdata, handles)
-motion_forwards_Callback(hObject, eventdata, handles)
+plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 function initialize_buttons(src, eventdata, handles, hObject)
@@ -611,6 +609,9 @@ function start_detection_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles.MarkerNumberVal = str2double(get(handles.start_detection,'String'));
+handles.ViewStart = handles.MarkerNumberVal;
+handles.replot = 1;
+motion_forwards_Callback(hObject, 1, handles)
 guidata(hObject,handles);
 
 

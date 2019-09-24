@@ -14,9 +14,11 @@ detNum = handles.ViewStart:(handles.ViewStart+length(handles.markers)-1);
 [~,low] = min(abs(handles.ltsa.freq-handles.StartFreqVal));
 [~,high] = min(abs(handles.ltsa.freq-handles.EndFreqVal));
 
-c = (100/100) .* handles.ltsaData + 40;
+handles.ltsaData = handles.ltsaData(low:high,:);
+
+c = (100/100) .* handles.ltsaData + handles.brightness*100;
 t = (1:size(handles.ltsaData,2))*bin2hr;
-image(t,handles.ltsa.f,c)
+image(t,handles.ltsa.f(low:high),c)
 
 axis xy
 set(gca,'TickDir','out')
@@ -27,17 +29,28 @@ for iDilim = 1:length(handles.markers)-1
         [0,handles.EndFreqVal],'w');
     
     % plot rectangles 
-    boxnumber = strcmp(handles.shipLabels{handles.ViewStart+iDilim},'ship')+1;
+    boxnumber = strcmp(handles.shipLabels{handles.ViewStart+iDilim-1},'ship')+1;
     
     rectangle('Position',[handles.markers(iDilim)*bin2hr,...
         handles.EndFreqVal - round(.015*(handles.EndFreqVal-handles.StartFreqVal)),...
         handles.markers(iDilim+1)*bin2hr-handles.markers(iDilim)*bin2hr,...
         round(.015*(handles.EndFreqVal-handles.StartFreqVal))],...
         'FaceColor',boxcolor{boxnumber});
-
-    text((handles.markers(iDilim+1)*bin2hr+handles.markers(iDilim)*bin2hr)/2,...
+    
+    lenNum = length(num2str(detNum(iDilim)));
+    if lenNum == 2; buff = 0.99;
+    elseif lenNum == 3; buff = 0.98;
+    elseif lenNum > 3; buff = 0.97;
+    else; buff = 1; 
+    end
+    midPos = ((handles.markers(iDilim+1)*bin2hr+handles.markers(iDilim)*bin2hr)/2)*buff;
+    if midPos < handles.PlotLengthVal
+    text(midPos,...
         handles.EndFreqVal*1.02,...
-        num2str(detNum(iDilim)),'FontSize',12,'FontWeight','bold');
+        num2str(detNum(iDilim)),'FontSize',10,'FontWeight','bold');
+    else 
+        continue
+    end
   
 end
 
