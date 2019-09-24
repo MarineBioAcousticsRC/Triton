@@ -36,11 +36,21 @@ for iF = 1:length(nodeSet)
     
     hs3 = subplot(1,3,2);
     hold on
-    hp2 = plot(f(p.stIdx:p.edIdx),compositeData(iF).spectraMeanSet,'-k','lineWidth',2);
+    fPlot = f;
+    if length(fPlot)~=length(compositeData(iF).spectraMeanSet) &&... 
+        length(f(s.stIdx:s.edIdx))~=size(compositeData(iF).spectraMeanSet,2)
+        %Catch for backward compatibility if orignial fill spectra were not stored
+        fPlot = f(s.stIdx,s.edIdx);
+    else
+        warning('Frequency vector and spectra differ in length. Display errors possible in plots')
+        fPlot = linspace(s.startFreq,s.endFreq,length(compositeData(iF).spectraMeanSet));
+    end
+    hp2 = plot(fPlot,compositeData(iF).spectraMeanSet,'-k','lineWidth',2);
+    
     set(gca,'box','on','FontSize',11)
     ylim([0,1])
     xlim([min(f),max(f)])
-    plot(f(p.stIdx:p.edIdx),compositeData(iF).specPrctile,':k','lineWidth',2)
+    plot(fPlot,compositeData(iF).specPrctile,':k','lineWidth',2)
     ylabel('Relative Amplitude','FontSize',12)
     xlabel('Frequency (kHz)','FontSize',12)
     hold off

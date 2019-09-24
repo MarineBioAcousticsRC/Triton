@@ -4,6 +4,11 @@ global REMORA
 
 close(REMORA.fig.ct.cc_saveFigs)
 
+if ~isfield(REMORA.ct.CC,'output')
+    warning('No composite clusters loaded')
+    ct_load_composite_clusters
+end
+
 if ~isdir(REMORA.ct.CC.output.figDir)
     mkdir(REMORA.ct.CC.output.figDir)
 end

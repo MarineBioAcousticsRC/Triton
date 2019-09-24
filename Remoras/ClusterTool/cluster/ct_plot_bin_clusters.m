@@ -1,4 +1,4 @@
-function ct_plot_bin_clusters(p,f,spectraMean,envMean,cRate,dtt,specHolder,...
+function ct_plot_bin_clusters(p,f,spectraMean,envMean,inputFileName,dtt,specHolder,...
     envSetHolder,sizeCA,binNum,totalBins)
 
 % plot mean spectra
@@ -8,8 +8,8 @@ if ~isgraphics(99)
     set(h99,...
         'Name','ClusterBins Active Plotting',...
         'NumberTitle','off',...
-        'Position',[.2,.45,.65,.35],...
-        'Units','normalized')
+        'Units','normalized',...
+        'Position',[.2,.45,.65,.35])
 else
     figure(99);clf
 end
@@ -30,12 +30,13 @@ ylim([0,1])
 ylabel('Normalized Amplitude','Fontsize',12)
 xlabel('Frequency (kHz)','Fontsize',12)
 title('Mean Spectra' )
+set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])
 
 % Plot envelope shape
 subplot(1,nSubplots,4)
 allEnv = cell2mat(envSetHolder');
 imagesc((allEnv./max(allEnv,[],2))')
-set(gca,'ydir','normal')
+%set(gca,'ydir','normal')
 ylabel('Samples','Fontsize',12)
 xlabel('ClickNumber','Fontsize',12)
 delimLocs = cumsum(sizeCA);
@@ -51,6 +52,8 @@ if size(delimLocs,2)>1
     hold off
 end
 title('Waveform Envelope' )
+set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])
+
 % Plot ICI distribution
 h1 = subplot(1,nSubplots,3);
 plot(p.barInt,dtt./repmat(max(dtt,[],2),1,size(dtt,2)),'linewidth',2)
@@ -58,6 +61,8 @@ xlim([min(p.barInt),max(p.barInt)])
 ylabel('Normalized Counts','Fontsize',12)
 xlabel('ICI (sec)','Fontsize',12)
 title('ICI Distribution' )
+set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])
+
 % % Plot click rate distribution
 % subplot(2,2,4)
 % plot(p.barRate,cRate)
@@ -85,11 +90,22 @@ end
 set(gca,'ydir','normal','Fontsize',10)
 ylabel('Frequency (kHz)','Fontsize',12)
 xlabel('Click Number','Fontsize',12)
+set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])
+
 set(gcf,'PaperPosition', [-2.4,3.6,13.3,3.6])
 % pause
 title('Concatenated Spectra' )
 
-%hMainTitle = mtit(sprintf('Bin %0.0f of %0.0f',binNum,totalBins));
+hMainTitle = annotation('textbox',[.1,.91,.8,.09],'Units','normalized',...
+    'HorizontalAlignment','center','EdgeColor','none','string',...
+    sprintf('%s: Bin %0.0f of %0.0f',inputFileName,binNum,totalBins));
 
 drawnow
+if p.pauseAfterPlotting
+    % alert the user in both matlab console and triton messages that code
+    % is paused.
+    disp_msg('Paused. Press any key to continue.')
+    disp('Paused. Press any key to continue.')
+    pause
+end
 % saveas(gcf,sprintf('saveFig_%0.0f.jpg',itrCounter))

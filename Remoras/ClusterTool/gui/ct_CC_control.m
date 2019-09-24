@@ -116,16 +116,13 @@ elseif strcmp(action,'setICIDist')
     REMORA.ct.CC_params.iciModeTF = ~REMORA.ct.CC_params.iciDistTF;
     
 elseif strcmp(action,'setClusterPruningFactor')
-    clusterPruningFactor = str2double(get(clusterPruneEdTxt ,'String'));
-    REMORA.ct.CC_params.clusterPruningFactor = clusterPruningFactor;
+    clusterPruningFactor = str2double(get(REMORA.ct.CC_verify.clusterPruneEdTxt ,'String'));
+    REMORA.ct.CC_params.clusterPrune = clusterPruningFactor;
     
 elseif strcmp(action,'runCompositeClusters')
     dh = ct_cb_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
-    jObj = com.mathworks.widgets.BusyAffordance;
-    [~,spinnerH] = javacomponent(jObj.getComponent, [200,10,40,40], gcf);
-    set(spinnerH,'units','norm', 'position',[0.45,0.3,0.1,0.15])
-    jObj.start;
-    drawnow
+    spinH = ct_add_spinner(gcf,[0.45,0.3,0.1,0.15]);
+    spinH.start;drawnow;
     
     [exitCode,ccOutput] = ct_composite_clusters(REMORA.ct.CC_params);
     REMORA.ct.CC.output = ccOutput;
@@ -136,7 +133,7 @@ elseif strcmp(action,'runCompositeClusters')
     else
         dh = ct_cb_status_dialog('Composite clustering failed. See Matlab console for details.');   
     end
-    jObj.stop;
+    spinH.stop;
 elseif strcmp(action,'ct_cc_settingsLoad')
     thisPath = mfilename('fullpath');
     settingsPath = fullfile(fileparts(fileparts(thisPath)),'settings');

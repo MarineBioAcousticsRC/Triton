@@ -1,15 +1,15 @@
 function sp_dt_motion(action)
 
-global PARAMS REMORA HANDLES
+global REMORA HANDLES
 
 % back button
 if strcmp(action, 'back')
     motion('back');
-    dt_gui
+    sp_dt_gui
 % forward button
 elseif strcmp(action, 'forward')
     motion('forward');
-    dt_gui
+    sp_dt_gui
 elseif strcmp(action, 'refresh')
     % check if xwav has been loaded and enable editing if so
     % set back/fwd buttons to corresponding handles on control panel
@@ -17,7 +17,7 @@ elseif strcmp(action, 'refresh')
 %         set(REMORA.spice_dt.MinBBFreqEdtxt, 'Enable', 'on');
 %         set(REMORA.spice_dt.MaxBBFreqEdtxt, 'Enable', 'on');
 %     end
-    dt_gui
+    sp_dt_gui
 end
 
 % update enabling of fwd/back buttons

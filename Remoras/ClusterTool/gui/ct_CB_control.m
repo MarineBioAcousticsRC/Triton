@@ -58,6 +58,10 @@ elseif strcmp(action,'setLinearTF')
 elseif strcmp(action,'setPlotFlag')
     plotFlag = get(REMORA.ct.CB_verify.plotCheck,'Value');
     REMORA.ct.CB_params.plotFlag = plotFlag;
+ 
+elseif strcmp(action,'setPlotPause')
+    plotPause = get(REMORA.ct.CB_verify.plotPauseCheck,'Value');
+    REMORA.ct.CB_params.pauseAfterPlotting = plotPause;
     
 elseif strcmp(action,'setFalseRM')
     falseRM = get(REMORA.ct.CB_verify.falseRMCheck,'Value');
