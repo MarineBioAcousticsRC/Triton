@@ -367,7 +367,13 @@ function all_ship_Callback(hObject, eventdata, handles)
 
 handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ship'};
 shipLabels = handles.shipLabels;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+if handles.settingsRemora.saveLabels
+   filename = split(handles.LtsaFile,'.ltsa'); 
+   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+end
 
 guidata(hObject,handles);
 plot_ltsa_Callback(hObject, eventdata, handles)
@@ -381,7 +387,13 @@ function all_no_ship_Callback(hObject, eventdata, handles)
 
 handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ambient'};
 shipLabels = handles.shipLabels;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+if handles.settingsRemora.saveLabels
+   filename = split(handles.LtsaFile,'.ltsa'); 
+   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+end
 
 guidata(hObject,handles);
 plot_ltsa_Callback(hObject, eventdata, handles)
@@ -435,7 +447,8 @@ if FilterIndex >0
     load([PathName,handles.DetectionFile]);
     handles.shipTimes = shipTimes;
     handles.shipLabels = shipLabels;
-    handles.settingsRemora = settings;
+    handles.settingsRemora = struct;
+    handles.settingsRemora = settings(:);
     set(handles.detection_filename,'String',handles.DetectionFile)
     guidata(hObject,handles);
 else
@@ -497,7 +510,14 @@ selected = intersect(idxRight-1,idxLeft);
 
 handles.shipLabels(handles.ViewStart+selected-1) = {'ship'};
 shipLabels = handles.shipLabels;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+if handles.settingsRemora.saveLabels
+   filename = split(handles.LtsaFile,'.ltsa'); 
+   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+end
+
 guidata(hObject,handles);
 
 plot_ltsa_Callback(hObject, eventdata, handles)
@@ -546,7 +566,14 @@ selected = intersect(idxRight-1,idxLeft);
 
 handles.shipLabels(handles.ViewStart+selected-1) = {'ambient'};
 shipLabels = handles.shipLabels;
-save(strcat([handles.DetectionFilePath,handles.DetectionFile]), 'shipLabels','-append')
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+if handles.settingsRemora.saveLabels
+   filename = split(handles.LtsaFile,'.ltsa'); 
+   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+end
+
 guidata(hObject,handles);
 
 plot_ltsa_Callback(hObject, eventdata, handles)
