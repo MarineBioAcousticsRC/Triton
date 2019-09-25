@@ -517,6 +517,7 @@ if handles.settingsRemora.saveLabels
    sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
        handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
 end
+
 guidata(hObject,handles);
 
 plot_ltsa_Callback(hObject, eventdata, handles)
@@ -572,6 +573,7 @@ if handles.settingsRemora.saveLabels
    sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
        handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
 end
+
 guidata(hObject,handles);
 
 plot_ltsa_Callback(hObject, eventdata, handles)
