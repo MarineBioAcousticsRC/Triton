@@ -88,7 +88,7 @@ function varargout = sh_evaluate_OutputFcn(~, ~, handles)
 varargout{1} = handles.output;
 
 
-function start_freq_Callback(hObject, ~, handles)
+function start_freq_Callback(hObject, eventdata, handles)
 % hObject    handle to start_freq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -107,7 +107,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function end_freq_Callback(hObject, ~, handles)
+function end_freq_Callback(hObject, eventdata, handles)
 % hObject    handle to end_freq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -126,14 +126,14 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function plot_length_Callback(hObject, ~, handles)
+function plot_length_Callback(hObject, eventdata, handles)
 % hObject    handle to plot_length (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles.PlotLengthVal = max(1,str2double(get(handles.plot_length,'String')));
 handles.replot = 1;
 guidata(hObject, handles);
-motion_forwards_Callback(hObject, 1, handles)
+motion_forwards_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
