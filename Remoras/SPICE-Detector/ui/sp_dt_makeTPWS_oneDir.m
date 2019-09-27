@@ -33,8 +33,10 @@ for itr2 = 1:lfs
         ppSignal = ppSignal(keepers2);
         
         fileStart = datenum(hdr.start.dvec);
-        posDnum = (clickTimes(:,1)/(60*60*24)) + fileStart +...
-            datenum([2000,0,0,0,0,0]);
+        if fileStart< datenum([2000,0,0])
+            fileStart = fileStart + datenum([2000,0,0,0,0,0]);
+        end
+        posDnum = (clickTimes(:,1)/(60*60*24)) + fileStart ;
         clickTimesVec = [clickTimesVec; posDnum];
         ppSignalVec = [ppSignalVec; ppSignal];
         tsWin = 200;
