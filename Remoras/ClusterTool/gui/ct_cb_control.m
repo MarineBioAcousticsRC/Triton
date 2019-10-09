@@ -101,7 +101,7 @@ elseif strcmp(action,'setEndFreq')
     
 elseif strcmp(action,'setBarIntMax')
     barIntMax = str2double(get(REMORA.ct.CB_verify.barIntMaxEdTxt, 'string'));
-    REMORA.ct.CB_params.rmEchos = barIntMax;
+    REMORA.ct.CB_params.barIntMax = barIntMax;
     
 elseif strcmp(action,'setInDir')
     inDir = get(REMORA.ct.CB_verify.inDirEdTxt, 'string');
