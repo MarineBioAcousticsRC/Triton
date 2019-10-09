@@ -13,7 +13,7 @@ if isfield(REMORA.fig, 'ct')
 else 
     REMORA.fig.ct.CC_settings = figure;
 end
-
+clf(REMORA.fig.ct.CC_settings)
 set(REMORA.fig.ct.CC_settings, 'NumberTitle','off', ...
     'Name','Composite Clustering Tool - v1.0',...
     'Units','normalized',...
@@ -349,7 +349,7 @@ REMORA.ct.CC_verify.bg_r2 = uicontrol(REMORA.ct.CC_verify.bg,'Style','radiobutto
                   'Value',REMORA.ct.CC_params.iciDistTF,...
                   'HandleVisibility','on',...
                   'Callback','ct_cc_control(''setICIDist'')');
-REMORA.ct.CC_verify.bg.Visible = 'on';
+REMORA.ct.CC_verify.bg.Visible = showTemporalParams;
 
 %% ICI Min Text
 labelStr = 'Min ICI (sec)';

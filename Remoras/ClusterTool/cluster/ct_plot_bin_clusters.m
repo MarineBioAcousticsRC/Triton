@@ -96,15 +96,19 @@ set(gcf,'PaperPosition', [-2.4,3.6,13.3,3.6])
 % pause
 title('Concatenated Spectra' )
 
+[~, fileName, fileExt] = fileparts(inputFileName);
+fileName = strrep(fileName,'_','\_'); % escape underscores so they don't become subscripts
 hMainTitle = annotation('textbox',[.1,.91,.8,.09],'Units','normalized',...
     'HorizontalAlignment','center','EdgeColor','none','string',...
-    sprintf('%s: Bin %0.0f of %0.0f',inputFileName,binNum,totalBins));
+    sprintf('%s: Bin %0.0f of %0.0f',[fileName,fileExt],binNum,totalBins));
 
 drawnow
-if p.pauseAfterPlotting
+if isfield(p,'pauseAfterPlotting') && p.pauseAfterPlotting
     % alert the user in both matlab console and triton messages that code
     % is paused.
-    disp_msg('Paused. Press any key to continue.')
+    if p.tritonMsg 
+        disp_msg('Paused. Press any key to continue.')
+    end
     disp('Paused. Press any key to continue.')
     pause
 end

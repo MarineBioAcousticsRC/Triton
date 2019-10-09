@@ -5,10 +5,10 @@
 % different projects
 
 % File locations and names
-s.outputName = 'WAT_HZ_01'; % used to name output files
-s.inDir = 'D:\WAT_HZmetadata\TPWS\ClusterBins_120dB_linear'; 
-s.inFileString = 'WAT_HZ_01_disk*incl.mat'; 
-s.outDir = 'D:\WAT_HZmetadata\TPWS\ClusterBins_120dB_linear\singleCluster';
+s.outputName = 'GOM'; % used to name output files
+s.inDir = 'E:\ClusterTool\test_data\dolphin'; 
+s.inFileString = 'GofMX*.mat'; 
+s.outDir = 'E:\ClusterTool\test_data\dolphin\cc';
 
 % Saving?
 s.saveOutput = 1; %set to 1 to save output file and figs, else 0
@@ -30,7 +30,7 @@ s.correctForSaturation = 1; % 1 if you want to look for minor ICI peaks in
 % rain too. Only for modal ICI
 s.specDiffTF = 0; % set to 1 to use spectral 1st derivatives for correlation
 s.linearTF = 0; % Compare spectra in linear space = 1, compare spectra in dB space = 0;
-s.singleClusterOnly = 1; % Only use single cluster bins to train
+s.singleClusterOnly = 0; % Only use single cluster bins to train
 %%%% Distribution Pruning %%%%
 s.startFreq = 5;
 s.endFreq = 80;
@@ -66,6 +66,6 @@ s.N = 1; % bigger is theoretically more robust, but takes longer
 s.mergeTF = 0 ;
 %%%% Plotting %%%%
 s.subPlotSet = 1; % Set to 1 if you want plots with each click type as a subplot
-s.indivPlots = 0; % Set to 1 if you want separate plots for each click type
+s.indivPlots = 1; % Set to 1 if you want separate plots for each click type
 
 s.diary = 0;

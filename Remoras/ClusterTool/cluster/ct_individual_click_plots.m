@@ -1,4 +1,4 @@
-function ct_individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,outDir)
+function ct_individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,outDir)
 
 siteNameNo_ = strrep(s.outputName,'_','\_');
 
@@ -88,4 +88,4 @@ for iF = 1:length(nodeSet)
 end
 
 close(400)
-fprintf('Individual cluster plots saved to %s',outDir)
+fprintf('Individual cluster plots saved to %s\n',outDir)

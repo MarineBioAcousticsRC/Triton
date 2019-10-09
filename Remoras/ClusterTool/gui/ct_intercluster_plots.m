@@ -38,7 +38,7 @@ for iF = 1:length(nodeSet)
     
     hSet(2) = figure(42); % plot spectra as heatmap
     subplot(n1,m1,iF)
-    imagesc(1:length(nodeSet{iF}),f,max(Tfinal{iF,1},0)')
+    imagesc(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)')
     set(gca,'ydir','normal')
     title(labelStr{iF})
     % ylim([min(f(p.startFreqIdx)),max(f(p.endFreqIdx))])
