@@ -59,7 +59,7 @@ end
 
 % Convert the contents of columns with dates to MATLAB datetimes using 
 % the specified date format.
-dateFormats = {'yyyy/MM/dd', 'HH:mm:ss.SSSS', 'HH:mm:ss.SSSS'};
+dateFormats = {'MM/dd/yyyy', 'HH:mm:ss.SSSS', 'HH:mm:ss.SSSS'};
 dateFormatIndex = 1;
 blankDates = cell(1,size(raw,2));
 anyBlankDates = false(size(raw,1),1);
