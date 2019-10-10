@@ -125,7 +125,6 @@ for iTimes = 1:size(binDataPruned,1)
     stepCounter = stepCounter+nCells;
     
 end
-
 if s.singleClusterOnly
     useBins = logical((nSpecMat >= s.minClicks).*(clustersInBin==1));
 else
@@ -165,12 +164,32 @@ clickTimes = clickTimes(useBins);
 tIntMat = tIntMat(useBins);
 subOrder = subOrder(useBins);
 fileNumExpand = fileNumExpand(useBins);
+
 %% Cluster N times for evidence accumulation/robustness
 tempN = ceil(sqrt(size(cRateMat,1)*2));
 % CoMat = zeros(tempN,tempN);
 subSamp = 1; % flag automatically goes to true if subsampling.
 isolatedSet = [];
 wNodeDeg = {};
+
+global REMORA
+tritonMode = 0;
+if isfield(REMORA,'ct')
+    tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
+    % triton tools are fair game.
+end
+if  tritonMode && isfield(REMORA.ct.CC,'TfinalBad')
+    badSet = [cell2mat([REMORA.ct.CC.TfinalBad(:,7)]), cell2mat([REMORA.ct.CC.output.TfinalBad(:,9)])];
+    [~,removeSetIndex] = setdiff([tIntMat,subOrder],badSet,'rows');
+    cRateMat = cRateMat(removeSetIndex,:);
+    clickTimes = clickTimes(removeSetIndex);
+    tIntMat = tIntMat(removeSetIndex);
+    subOrder = subOrder(removeSetIndex);
+    fileNumExpand = fileNumExpand(removeSetIndex);
+    dTTmatNorm = dTTmatNorm(removeSetIndex,:);
+    specNorm = specNorm(removeSetIndex,:);
+    diffNormSpec = diffNormSpec(removeSetIndex,:);
+end
 for iEA = 1:s.N
     % Select random subset if needed
     if size(cRateMat,1)> s.maxClust
@@ -253,11 +272,11 @@ for iEA = 1:s.N
 %             nodeVec2 = [nodeVec2,(iR+1):size(compDist,1)];
 %         end
     end
-    
-    if s.mergeTF
-        [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(compDist,...
-            tempN,specNorm);
-    end
+%     
+%     if s.mergeTF
+%         [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(compDist,...
+%             tempN,specNorm);
+%     end
     connectedList = nansum(compDist)>0; % isolated nodes have NAN
     allIndices = 1:size(excludedIn,2);
     isolated = setdiff(allIndices, allIndices(connectedList));
@@ -274,22 +293,22 @@ for iEA = 1:s.N
     %         normalizeTF, mergeTF);
     clusterID = 1:size(excludedIn,2);
     clusterID = clusterID';
-    if s.mergeTF
-        clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
-    end
+%     if s.mergeTF
+%         clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
+%     end
     clusterID(connectedList==0) = NaN;
     clusterID = ct_run_CW_cluster(clusterID,compDist,s.maxCWIterations);
     
-    if s.mergeTF
-        % unwind node merge by assigning nodes that were merged to the category of
-        % their parent.
-        for iMerge = 1:length(uMergeNodeID)
-            thisID = uMergeNodeID(iMerge);
-            nodeClusterID = clusterID(thisID);
-            clusterID(mergeNodeID == thisID) = nodeClusterID;
-        end
-    end
-    
+%     if s.mergeTF
+%         % unwind node merge by assigning nodes that were merged to the category of
+%         % their parent.
+%         for iMerge = 1:length(uMergeNodeID)
+%             thisID = uMergeNodeID(iMerge);
+%             nodeClusterID = clusterID(thisID);
+%             clusterID(mergeNodeID == thisID) = nodeClusterID;
+%         end
+%     end
+%     
     
     percentIsolated = 100*((length(clusterID)-sum(~isnan(clusterID)))./length(clusterID));
     fprintf('%0.2f %% of nodes isolated.\n',percentIsolated)
@@ -335,7 +354,6 @@ for iEA = 1:s.N
 end
 
 
-
 % Best of K partitions based on NMI filkov and Skiena 2004
 % Compute NMI
 fprintf('Calculating NMI\n')
@@ -348,7 +366,7 @@ nodeSet = bestPrunedNodeSet;% naiItr{bokIdx};
 
 if isempty(nodeSet)
     disp('No clusters formed')
-    disp_msg('No clusters formed')
+    if tritonMode;disp_msg('No clusters formed');end
     return
 end
 clusterIDreduced = zeros(size(compDist,1),1);
@@ -356,12 +374,14 @@ for iNodeSet = 1:length(nodeSet)
     clusterIDreduced(nodeSet{iNodeSet}) = iNodeSet;
 end
 
-figure(11);clf
-G = graph(compDist);
-h = plot(G,'layout','force');
-set(h,'MarkerSize',8,'nodeLabel',clusterIDreduced)
-for iClustPlot=1:size(nodeSet,2)
-    highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
+if tritonMode
+    figure(110);clf
+    G = graph(compDist);
+    h = plot(G,'layout','force');
+    set(h,'MarkerSize',8,'nodeLabel',clusterIDreduced)
+    for iClustPlot=1:size(nodeSet,2)
+        highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
+    end
 end
 
 % % Final cluster using Co-assoc mat.
@@ -442,7 +462,7 @@ if s.saveOutput
         if ~exist('TPWSList','var')
             TPWSList = [];
         end
-        save(outputTypeFile,'thisType','inFileList','TPWList')
+        save(outputTypeFile,'thisType','inFileList','TPWSList')
     end
 end
 
@@ -459,7 +479,7 @@ ccOutput.fileNumExpand = fileNumExpand;
 ccOutput.labelStr = labelStr;
 ccOutput.inFileList = inFileList;
 ccOutput.TPWSList = TPWSList;
-
+ccOutput.partitions = naiItr;
 if s.diary
     diary('off')
 end

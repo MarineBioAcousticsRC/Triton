@@ -7,9 +7,9 @@ p.siteName = ''; % First few letters of TPWS file names
 p.TPWSitr = 1;
 
 % Folder info:
-p.inDir = ''; % where the TPWS files live, 
+p.inDir = 'E:\ClusterTool\test_data\dolphin'; % where the TPWS files live, 
 p.outDir = 'E:\ClusterTool\test_data\dolphin'; % where to save outputs
-p.recursSearch = 0; % search subfolders if true.
+p.recursSearch = 1; % search subfolders if true.
 
 %%% Clustering parameter choices %%%
 p.minClust = 50;% minimum number of clicks required for a cluster to be retained.
@@ -30,16 +30,19 @@ p.modular = 0; % if you use a number other than 0, modularity algorithm will be 
 % In the modularity algorithm, this parameter influences the number of
 % communities detected. 1 = no bias, >1 bias toward fewer communities, <1,
 % bias toward more communities.
-p.useSpectra = 0;
+p.useSpectra = 1;
 p.useEnvelope = 0;
 
 p.mergeTF = 0; % If 1, when a graph is large, we will attempt to reduce computation time
 % by merging extremely similar nodes before clustering. 
 p.linearTF = 1;% compare spectra in linear space
-p.plotFlag = 0; % Want plots? Turn this off for large jobs, but useful for
+p.plotFlag = 1; % Want plots? Turn this off for large jobs, but useful for
 % seeing how your clusters are coming out when choosing parameters above.
 p.falseRM = 0; % Want to remove false positives? Working on removing the 
 % need for manual false positive ID step.
+p.pauseAfterPlotting = 0; % if you want it to pause post plotting so you can look
+% at the clustering results between bins, make this 1. Turn off for fast
+% processing.
 
 %%% Frequencies you want to compare clicks across:
 % comparing across the full bandwidth tends to reduce differences between click

@@ -1,7 +1,11 @@
 function ct_cluster_TPWS(thisFile,fdAll,p,outDir)
 
-global f fkeep
+global f fkeep HANDLES
 
+p.tritonMsg = 0;
+if isfield(HANDLES,'msg')
+    p.tritonMsg = 1; % if the field exists, then we have access to triton messaging.
+end
 % Things to make set-able someday
 normalizeTF = 1; % flag to turn on click normalization
 p.mergeThresh = 3000; % arbitrary threshold above which node merging is attempted 

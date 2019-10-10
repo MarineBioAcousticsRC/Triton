@@ -403,7 +403,7 @@ for spidx=1:spp_count
                     depl_info = dbDeploymentInfo(queryEng, 'Project',...
                         project,'Site', queries(quer_count).Site,...
                         'DeploymentID',queries(quer_count).Deployment);
-                    if issempty(depl_info)
+                    if isempty(depl_info)
                         error('Cannot find deployment information for given inputs')
                     end
                     droplat = depl_info.DeploymentDetails.Latitude;
