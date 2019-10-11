@@ -44,10 +44,13 @@ elseif strcmp(extFile,'.txt')
     % columns, start and end times of detections are stored in BeginDate,
     % BegingClockTime and EndClockTime columns. Behavior column contains
     % the labels
-
-    data = sh_read_RavenTextFile(fileFullPath);
     
-    if ~isnat(data.BeginDate)
+    % chech how many columns it has
+    table = readtable(fileFullPath);
+    numCol = size(table,2);
+    
+    if numCol > 3
+        data = sh_read_RavenTextFile(fileFullPath);
         joinDateTime = @(date,time) datenum([date.Year  date.Month  date.Day  time.Hour  time.Minute time.Second]);
         Starts = joinDateTime(data.BeginDate,data.BeginClockTime);
         Stops = joinDateTime(data.BeginDate,data.EndClockTime);
@@ -56,8 +59,10 @@ elseif strcmp(extFile,'.txt')
     else
         % If does not follow Raven format, assume text file contains 3
         % columns, with start times, end times, and labels 
-        [Starts, Stops, Labels] = sh_read_textFile(fileFullPath, 'Binary', true);
-        disp('.txt file assumed to have three columns: Current start time, current end time, labels')
+        Starts = table{:,1};
+        Stops = table{:,2};
+        Labels = table{:,3};
+        disp('.txt file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
     end
     
 end
