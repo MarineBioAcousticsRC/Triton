@@ -68,7 +68,7 @@ elseif strcmp(action,'setFalseRM')
     REMORA.ct.CB_params.falseRM = min(falseRM,1);
     
 elseif strcmp(action,'setDiff')
-    diffCheck = get(REMORA.ct.CB_verify.diffCheck, 'value');
+    diffCheck = get(REMORA.ct.CB_verify.diffCheck, 'Value');
     REMORA.ct.CB_params.diff = diffCheck;
     
 elseif strcmp(action,'setppThresh')

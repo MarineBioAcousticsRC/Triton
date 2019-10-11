@@ -7,7 +7,7 @@ if isfield(HANDLES,'msg')
     p.tritonMsg = 1; % if the field exists, then we have access to triton messaging.
 end
 % Things to make set-able someday
-normalizeTF = 1; % flag to turn on click normalization
+p.normalizeTF = 1; % flag to turn on click normalization
 p.mergeThresh = 3000; % arbitrary threshold above which node merging is attempted 
 % if merging is desired. Node merging is a strategy for clustering large 
 % networks more quickly, but it comes with a cost, so you shouldn't just
@@ -142,7 +142,7 @@ for iC = 1:length(dateInterval)
         envSet = envSet(rList,:);
         % Cluster
         [spectraMean,clickAssign,~,specHolder,isolatedSet,envDistrib,envSetHolder,envMean] = ...
-            ct_cluster_clicks_cw_merge(specSet,p,normalizeTF,envDur,envSet);
+            ct_cluster_clicks_cw_merge(specSet,p,p.normalizeTF,envDur,envSet);
         
         % If you finish clustering with populated cluster(s)
         if ~isempty(clickAssign)

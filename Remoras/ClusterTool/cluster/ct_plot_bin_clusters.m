@@ -75,7 +75,11 @@ set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])
 h2 = subplot(1,nSubplots,2);
 colormap(jet)
 allSpectra = cell2mat(specHolder');
-imagesc(1:size(allSpectra,1),f,min(max(allSpectra,0),1)')
+if p.normalizeTF
+    imagesc(1:size(allSpectra,1),f,min(max(allSpectra,0),1)')
+else
+    imagesc(1:size(allSpectra,1),f,allSpectra')
+end
 % draw delimiters btwn click spectra if there are
 % multiple types
 if size(delimLocs,2)>1
