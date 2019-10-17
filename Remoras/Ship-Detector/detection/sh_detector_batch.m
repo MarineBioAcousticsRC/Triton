@@ -135,10 +135,14 @@ if ~isempty(shipTimes)
         'shipLabels','settings','-mat','-v7.3');
     fprintf('Detections saved at: %s\n',fullfile(REMORA.sh.settings.outDir,matname));
     
-    % save labels
-    if REMORA.sh.settings.saveLabels
-        labelname = ['Ship_labels_',filename{1},'.tlab'];
-        sh_write_labels(fullfile(REMORA.sh.settings.outDir,labelname), shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+    labelname = ['Ship_labels_',filename{1},'.tlab'];
+    sh_write_labels(fullfile(REMORA.sh.settings.outDir,labelname), shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+    fprintf('Labels saved at: %s\n',fullfile(REMORA.sh.settings.outDir,labelname));
+
+    % create csv file
+    if REMORA.sh.settings.saveCsv
+        csvname = ['Ship_detections_',filename{1},'.csv'];
+        sh_write_csv_file(fullfile(REMORA.sh.settings.outDir,csvname),shipTimes,shipLabels)
         fprintf('Labels saved at: %s\n',fullfile(REMORA.sh.settings.outDir,labelname));
     end
     

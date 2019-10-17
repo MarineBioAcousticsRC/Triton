@@ -368,11 +368,15 @@ function all_ship_Callback(hObject, eventdata, handles)
 handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ship'};
 shipLabels = handles.shipLabels;
 save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-if handles.settingsRemora.saveLabels
-   filename = split(handles.LtsaFile,'.ltsa'); 
-   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+filename = split(handles.LtsaFile,'.ltsa');
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);
@@ -388,11 +392,14 @@ function all_no_ship_Callback(hObject, eventdata, handles)
 handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ambient'};
 shipLabels = handles.shipLabels;
 save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-if handles.settingsRemora.saveLabels
-   filename = split(handles.LtsaFile,'.ltsa'); 
-   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);
@@ -511,11 +518,14 @@ selected = intersect(idxRight-1,idxLeft);
 handles.shipLabels(handles.ViewStart+selected-1) = {'ship'};
 shipLabels = handles.shipLabels;
 save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-if handles.settingsRemora.saveLabels
-   filename = split(handles.LtsaFile,'.ltsa'); 
-   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);
@@ -567,11 +577,14 @@ selected = intersect(idxRight-1,idxLeft);
 handles.shipLabels(handles.ViewStart+selected-1) = {'ambient'};
 shipLabels = handles.shipLabels;
 save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-if handles.settingsRemora.saveLabels
-   filename = split(handles.LtsaFile,'.ltsa'); 
-   handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-   sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-       handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);

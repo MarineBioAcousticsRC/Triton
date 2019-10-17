@@ -100,9 +100,9 @@ elseif strcmp(action,'setDiskWrite')
     diskWriteCheckbox = get(REMORA.sh_verify.diskWriteCheckbox, 'string');
     REMORA.sh.settings.diskWrite = diskWriteCheckbox;
     
-elseif strcmp(action,'setLabelFile')
-    labelsCheckbox = get(REMORA.sh_verify.labelsCheckbox, 'string');
-    REMORA.sh.settings.saveLabels = labelsCheckbox;
+elseif strcmp(action,'setCsvFile')
+    csvCheckbox = get(REMORA.sh_verify.csvCheckbox, 'string');
+    REMORA.sh.settings.saveCsv = csvCheckbox;
     
 elseif strcmp(action,'RunBatchDetection')
     close(REMORA.fig.sh.batch)

@@ -36,4 +36,4 @@ settings.errorRange = 0.25; % n-percent start and end time difference between
 
 settings.diskWrite = true; % exclude disk write noise (only for HARP data)
 settings.dutyCycle = true; % if duty cycle data, set to true, this will ignore gaps
-settings.saveLabels = true; % save .tlab file to plot detection in Triton. 
+settings.saveCsv = true; % save .tlab file to plot detection in Triton. 
