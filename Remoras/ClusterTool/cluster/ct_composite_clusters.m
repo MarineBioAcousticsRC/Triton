@@ -151,7 +151,7 @@ dTTmatNorm = dTTmatNorm1./repmat(max(dTTmatNorm1,[],2),1,size(dTTmat,2));
 if s.correctForSaturation
     iciModeIdx = ct_correct_for_saturation(p,s.maxICIidx,dTTmatNorm,iciModeIdx);
 end
-iciModes = p.barInt(iciModeIdx+s.minICIidx) + p.barInt(2)./2;
+iciModes = p.barInt(iciModeIdx) + p.barInt(2)./2;
 % [iciDist,~,~] = ici_dist(dTTmatNorm);
 
 % Click rates - convert to matrix and normalize

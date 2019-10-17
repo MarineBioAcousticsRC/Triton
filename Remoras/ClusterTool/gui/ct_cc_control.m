@@ -101,6 +101,14 @@ elseif strcmp(action,'setSingleClustTF')
     singleClusterOnly = get(REMORA.ct.CC_verify.singleClustCheck,'Value');
     REMORA.ct.CC_params.singleClusterOnly = singleClusterOnly;
     
+elseif strcmp(action,'setICIMin')
+    minICI = str2num(get(REMORA.ct.CC_verify.ICIMinEdTxt,'String'));
+    REMORA.ct.CC_params.minICI = minICI;
+    
+elseif strcmp(action,'setICIMax')
+    maxICI = str2num(get(REMORA.ct.CC_verify.ICIMaxEdTxt,'String'));
+    REMORA.ct.CC_params.maxICI = maxICI;
+    
 elseif strcmp(action,'setCorrectForSatTF')
     correctForSatTF = get(REMORA.ct.CC_verify.correctForSatCheck,'Value');
     REMORA.ct.CC_params.correctForSaturation = correctForSatTF;

@@ -7,7 +7,7 @@ if isfield(HANDLES,'msg')
     p.tritonMsg = 1; % if the field exists, then we have access to triton messaging.
 end
 % Things to make set-able someday
-normalizeTF = 1; % flag to turn on click normalization
+p.normalizeTF = 1; % flag to turn on click normalization
 p.mergeThresh = 3000; % arbitrary threshold above which node merging is attempted 
 % if merging is desired. Node merging is a strategy for clustering large 
 % networks more quickly, but it comes with a cost, so you shouldn't just
@@ -32,13 +32,33 @@ MSP = [];
 f = [];
 
 load(thisFile,'MPP','MTT','MSP','MSN','f')
-
+if size(MSP,1) ~= size(MSN,1)
+    
+    % if these don't have the same vertical dimension, but they are
+    % the same in the horizontal, assume they are
+    % oriented wrongly (columns represent individual detections instead of
+    % rows representing detections) and flip them.
+    if size(MSP,2) == size(MSN,2)
+        MSP = MSP';
+        MSN = MSN';
+    else
+        error('Error: MSP and MSN don''t have the same dimensions. Each detection should be on one row.')
+    end
+end
+    
 if ~isempty(f)
     fkeep = f;
 elseif isempty(f) && ~isempty(fkeep)
     f = fkeep;
+elseif isfield(p,'sampleRate')
+    warning(['Warning: Missing frequency vector in input file. ',...
+         'Estimating using sample rate and some possibly incorrect assumptions.'])
+    sizeMSP2 = size(MSP,2);% this is dangerous, MSP could be flipped.
+    
+    f = ((p.sampleRate/2)/(sizeMSP2-1))*(1:sizeMSP2) -(p.sampleRate/2)/(sizeMSP2-1);
 else
-    error('Error: Missing frequency vector in input file.')
+    error(['Error: No frequency vector in input file, and no sample rate in parameters.',... 
+      'Please add f to TPWS or add sampleRate to settings file.'])
 end
 
 % Turn specified frequencies into indices
@@ -142,7 +162,7 @@ for iC = 1:length(dateInterval)
         envSet = envSet(rList,:);
         % Cluster
         [spectraMean,clickAssign,~,specHolder,isolatedSet,envDistrib,envSetHolder,envMean] = ...
-            ct_cluster_clicks_cw_merge(specSet,p,normalizeTF,envDur,envSet);
+            ct_cluster_clicks_cw_merge(specSet,p,p.normalizeTF,envDur,envSet);
         
         % If you finish clustering with populated cluster(s)
         if ~isempty(clickAssign)

@@ -16,6 +16,9 @@ end
 
 if normalizeTF 
     [specClickTfNorm,specClickTfNormDiff] = ct_normalize_click_spectra(specClickTf,p);
+else
+    specClickTfNorm = specClickTf;
+    if p.diff; specClickTfNormDiff = diff(specClickTf1,2); end
 end
 tempN = size(specClickTf,1);
 
