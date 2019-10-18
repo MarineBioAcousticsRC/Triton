@@ -32,6 +32,9 @@ MSP = [];
 f = [];
 
 load(thisFile,'MPP','MTT','MSP','MSN','f')
+zeroRowsMSN = find(sum(abs(MSN),2)==0);
+MSN(zeroRowsMSN,:) = [];
+
 if size(MSP,1) ~= size(MSN,1)
     
     % if these don't have the same vertical dimension, but they are
@@ -42,6 +45,7 @@ if size(MSP,1) ~= size(MSN,1)
         MSP = MSP';
         MSN = MSN';
     else
+        
         error('Error: MSP and MSN don''t have the same dimensions. Each detection should be on one row.')
     end
 end
@@ -91,6 +95,7 @@ ppKeep = MPP>=p.ppThresh;
 MSP = MSP(ppKeep,:);
 clear('MPP','fdAll') % don't need anymore.
 MTT = MTT(ppKeep);
+MSN = MSN(ppKeep,:);
 fprintf('%0.0f clicks left after applying amplitude threshold.\n',length(MTT))
 if isempty(MTT)
     warning('All clicks pruned out by amplitude threshold, nothing left to cluster.')
@@ -103,6 +108,7 @@ if p.minCueGap>0
     gapCues = [1;gapCues]; 
     MTT = MTT(gapCues>0);
     MSP = MSP(gapCues>0,:);
+    MSN = MSN(gapCues>0,:);
     fprintf('%0.0f clicks left after applying minimum gap.\n',length(MTT))
     if isempty(MTT)
         warning('All clicks pruned out by cue gap threshold, nothing left to cluster.')
