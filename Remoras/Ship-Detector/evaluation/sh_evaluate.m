@@ -392,6 +392,7 @@ function all_no_ship_Callback(hObject, eventdata, handles)
 handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ambient'};
 shipLabels = handles.shipLabels;
 save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+filename = split(handles.LtsaFile,'.ltsa');
 % rewrite tlab file
 handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
 sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
@@ -518,6 +519,7 @@ selected = intersect(idxRight-1,idxLeft);
 handles.shipLabels(handles.ViewStart+selected-1) = {'ship'};
 shipLabels = handles.shipLabels;
 save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+filename = split(handles.LtsaFile,'.ltsa');
 % rewrite tlab file
 handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
 sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
@@ -577,6 +579,7 @@ selected = intersect(idxRight-1,idxLeft);
 handles.shipLabels(handles.ViewStart+selected-1) = {'ambient'};
 shipLabels = handles.shipLabels;
 save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+filename = split(handles.LtsaFile,'.ltsa');
 % rewrite tlab file
 handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
 sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
