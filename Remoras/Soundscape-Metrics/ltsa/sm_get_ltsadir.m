@@ -28,7 +28,7 @@ fn = char(d.name);      % file names in directory
 fnsz = size(fn);        % number of data files in directory
 nfiles = fnsz(1);
 disp_msg(' ')
-disp_msg([num2str(nfiles),'  data files for LTSA'])
+disp_msg([num2str(nfiles),'  data files for all LTSAs'])
 if fnsz(2)>80
     disp_msg('Error: filename length too long')
     disp_msg('Rename to 80 characters or less')

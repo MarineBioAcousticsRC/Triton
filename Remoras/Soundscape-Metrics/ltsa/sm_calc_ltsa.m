@@ -18,8 +18,13 @@ sampPerAve = PARAMS.ltsa.tave * PARAMS.ltsa.fs;
 
 % open output file
 fod = fopen(fullfile(PARAMS.ltsa.outdir,PARAMS.ltsa.outfile),'r+');
+
+%initiate loadbar showing progress
 h = loadbar(['Creating LTSA ',num2str(lIdx),'/',num2str(size(PARAMS.ltsahd.ltsaIdx,1))]);
-total = PARAMS.ltsa.nFiles;
+pcntDone = 0;
+loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
+
+fCount = 0;                         % total number of wav files in this LTSA
 m = 0;                              % total number of raw file counter
 count = 0;                          % total number of averages counter for output display
 % total = 0;
@@ -50,7 +55,8 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all xwa
     else                                % wav file data
         nrf = 1;
     end
-
+    
+    total = PARAMS.ltsa.endIdx - PARAMS.ltsa.startIdx + 1; %number of wav files for this LTSA
     for r = 1:nrf                   % loop over each raw file in xwav
         m = m + 1;                  % count total number of raw files
         
@@ -165,8 +171,10 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all xwa
             fwrite(fod,ltsa,'int8');
             count = count + 1;
         end     % end for n - loop over the number of spectral averages
+        
 %         pcntDone = m/PARAMS.ltsa.nrftot;
-        pcntDone = ((k-1) + r/nrf)/total;
+        fCount = fCount + 1; %counter for file number within LTSA   
+        pcntDone = ((fCount-1) + r/nrf)/total;
         loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
     end     % end for r - loop over each raw file
     if PARAMS.ltsa.ftype ~= 1           % only for xwav HARP and ARP data
@@ -176,7 +184,7 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all xwa
     if PARAMS.ltsa.ftype ~= 1 %only for xwav
         disp_msg(['Completed Processing XWAV file ',num2str(k),'/',num2str(PARAMS.ltsa.nFiles)])
     else
-        disp_msg(['Completed Processing WAV file ',num2str(k),'/',num2str(PARAMS.ltsa.nFiles)])
+        disp_msg(['Completed Processing WAV file ',num2str(fCount),'/',num2str(PARAMS.ltsa.nFiles)])
     end
     
     

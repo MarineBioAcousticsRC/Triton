@@ -4,6 +4,20 @@ function sm_ltsa_control(action)
 global REMORA PARAMS
 
 if strcmp(action, '')
+
+% Change Directory Settings:
+
+elseif strcmp(action,'indirSel')
+    REMORA.sm.verify.indir = uigetdir(REMORA.sm.ltsa.indir,'Select Directory With WAV Files');
+    REMORA.sm.ltsa.indir = REMORA.sm.verify.indir;
+    PARAMS.ltsa.indir = REMORA.sm.verify.indir;
+    sm_ltsa_params_window
+
+elseif strcmp(action,'outdirSel')
+    REMORA.sm.verify.outdir = uigetdir(REMORA.sm.ltsa.outdir,'Select Directory for LTSA Output Files');
+    REMORA.sm.ltsa.outdir = REMORA.sm.verify.outdir;
+    PARAMS.ltsa.outdir = REMORA.sm.verify.outdir;
+    sm_ltsa_params_window
     
 % Directory Settings:
 
@@ -13,6 +27,8 @@ elseif strcmp(action,'setindir')
 elseif strcmp(action,'setoutdir')
     PARAMS.ltsa.outdir = get(REMORA.sm.verify.outdir, 'String');
 
+elseif strcmp(action,'setoutfname')
+    PARAMS.ltsa.outfname = get(REMORA.sm.verify.outfname, 'String');
     
 % First Column Settings:
 
@@ -24,7 +40,10 @@ elseif strcmp(action,'setdfreq')
     
 elseif strcmp(action,'setndays')
     PARAMS.ltsa.ndays = str2double(get(REMORA.sm.verify.ndays,'String'));
-    
+
+elseif strcmp(action,'setnstart')
+    PARAMS.ltsa.nstart = str2double(get(REMORA.sm.verify.nstart,'String'));
+
     
 % Second Column Settings:
     
@@ -41,8 +60,8 @@ elseif strcmp(action,'setch')
 % Running detector:
 
 elseif strcmp(action,'runltsa')
+    close(REMORA.fig.sm.ltsa)
     sm_mk_ltsa;
- 
     
 % Loading settings:
 
@@ -60,13 +79,10 @@ elseif strcmp(action,'sm_ltsa_settingsLoad')
     end
     if strfind(REMORA.sm.ltsa.paramFile,'.m')
         run(fullfile(REMORA.sm.ltsa.paramPath,REMORA.sm.ltsa.paramFile));
-    elseif strfind(REMORA.sm.ltsa.paramFile,'.mat')
-        load(fullfile(REMORA.sm.ltsa.paramPath,REMORA.sm.ltsa.paramFile))
     else
         warning('Unknown file type detected.')
     end
-    
-    PARAMS.ltsa = param;
+    1;
     sm_ltsa_params_window
     
 elseif strcmp(action,'sm_ltsa_settingsSave')
@@ -75,7 +91,7 @@ elseif strcmp(action,'sm_ltsa_settingsSave')
         %'settings');% User interface retrieve file to open through a dialog box.
     dialogTitle2 = 'Save Soundscape LTSA Settings';
     [REMORA.sm.ltsa.paramFileOut,REMORA.sm.ltsa.paramPathOut] = ...
-        uiputfile(fullfile(settingsPath,'*.mat'),dialogTitle2);
+        uiputfile(fullfile(settingsPath,'*.m'),dialogTitle2);
     
     % if the cancel button is pushed, then no file is loaded
     % so exit this script
@@ -83,10 +99,7 @@ elseif strcmp(action,'sm_ltsa_settingsSave')
         return
     end
     
-    outFile = fullfile(REMORA.sm.ltsa.paramPathOut,...
-        REMORA.sm.ltsa.paramFileOut);
-    param = PARAMS.ltsa;
-    save(outFile,'param')
+    sm_ltsa_create_settings_file
     
 else
     warning('Action %s is unspecified.',action)

@@ -15,6 +15,7 @@ PARAMS.ltsahd = [];
 PARAMS.ltsa.tave = 1;       % averaging time [seconds]
 PARAMS.ltsa.dfreq = 1;    % frequency bin size [Hz]
 PARAMS.ltsa.ndays = 7;    % length of LTSA [days]
+PARAMS.ltsa.nstart = 1;   % start number of LTSA file (e.g. want to start at week 2)
 
 
 % experiment defined (in WAV/XWAV file):
