@@ -178,8 +178,9 @@ if isfield(REMORA,'ct')
     tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
     % triton tools are fair game.
 end
-if  tritonMode && isfield(REMORA.ct.CC,'TfinalBad')
-    badSet = [cell2mat([REMORA.ct.CC.TfinalBad(:,7)]), cell2mat([REMORA.ct.CC.output.TfinalBad(:,9)])];
+if  tritonMode && isfield(REMORA.ct.CC,'rm_clusters')...
+    && REMORA.ct.CC_params.rmPriorClusters
+    badSet = REMORA.ct.CC.rmSet;
     [~,removeSetIndex] = setdiff([tIntMat,subOrder],badSet,'rows');
     cRateMat = cRateMat(removeSetIndex,:);
     clickTimes = clickTimes(removeSetIndex);

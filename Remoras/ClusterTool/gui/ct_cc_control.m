@@ -127,21 +127,26 @@ elseif strcmp(action,'setClusterPruningFactor')
     clusterPruningFactor = str2double(get(REMORA.ct.CC_verify.clusterPruneEdTxt ,'String'));
     REMORA.ct.CC_params.clusterPrune = clusterPruningFactor;
     
+elseif strcmp(action,'rmPriorClustersTF')
+    rmBinsTf = get(REMORA.ct.CC_verify.rmClustCheck,'Value');
+    REMORA.ct.CC_params.rmPriorClusters = rmBinsTf;
+    
 elseif strcmp(action,'runCompositeClusters')
-    dh = ct_cb_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
+    REMORA.fig.ct.status = ct_cb_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
     spinH = ct_add_spinner(gcf,[0.45,0.3,0.1,0.15]);
     spinH.start;drawnow;
     
     [exitCode,ccOutput] = ct_composite_clusters(REMORA.ct.CC_params);
     REMORA.ct.CC.output = ccOutput;
     if exitCode
-        dh = ct_cb_status_dialog('Composite clustering complete.');
+        REMORA.fig.ct.status = ct_cb_status_dialog('Composite clustering complete.');
         % show post-clustering menu
         ct_post_cluster_ui
     else
-        dh = ct_cb_status_dialog('Composite clustering failed. See Matlab console for details.');   
+        REMORA.fig.ct.status = ct_cb_status_dialog('Composite clustering failed. See Matlab console for details.');   
     end
     spinH.stop;
+    
 elseif strcmp(action,'ct_cc_settingsLoad')
     thisPath = mfilename('fullpath');
     settingsPath = fullfile(fileparts(fileparts(thisPath)),'settings');
