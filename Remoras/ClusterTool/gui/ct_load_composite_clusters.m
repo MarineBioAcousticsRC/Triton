@@ -5,4 +5,4 @@ global REMORA
 ccData = load(fullfile(PathName,FileName));
 % TODO: need some kind of check here to see if it's the right thing.
 REMORA.ct.CC.output = ccData;
-
+REMORA.ct.CC_params.outputName = FileName;

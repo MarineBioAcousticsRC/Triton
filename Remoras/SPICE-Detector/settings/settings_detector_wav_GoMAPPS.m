@@ -7,7 +7,7 @@ detParams.baseDir = 'F:\SEFSC_Towed_Array\GU1801';
 
 % Optional output directory location. Metadata directory will be created in 
 % outDir if specified, otherwise it will be created in baseDir.
-detParams.outDir  = 'F:\SEFSC_Towed_Array\dets'; 
+detParams.outDir  = 'F:\SEFSC_Towed_Array\dets\GU1801_ch1'; 
 
 % Set transfer function location
 detParams.tfFullFile = [];
@@ -92,7 +92,7 @@ detParams.maxNeighbor = 10; % max time in seconds allowed between neighboring
 % clicks are likely false positives
 
 %%% Saving options %%%
-detParams.saveNoise = 0; % Make 1 if you want to save noise samples with each click. 
+detParams.saveNoise = 1; % Make 1 if you want to save noise samples with each click. 
 % Beware: this can make big files if you have a lot of detections.
 detParams.saveForTPWS = 1; % Save just enough data to build TPWS files. Should help
 % limit metadata size.
