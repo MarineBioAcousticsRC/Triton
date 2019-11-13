@@ -198,7 +198,7 @@ elseif strcmp(myEvent, 'det')
     end
     
 elseif strcmp(myEvent, 'setTPWSDir')
-    REMORA.ct.CC.output.TPWSDir = get(REMORA.ct.CC.saveClust.TPWSDirEdTxt,'Value');
+    REMORA.ct.CC.output.TPWSDir = get(REMORA.ct.CC.saveClust.TPWSDirEdTxt,'String');
    
 elseif strcmp(myEvent, 'help')
     helpdlg(strcat('This tool will create one subfolder per cluster within your output folder,  ',...

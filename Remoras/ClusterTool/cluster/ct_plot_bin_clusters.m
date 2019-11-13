@@ -1,5 +1,5 @@
 function ct_plot_bin_clusters(p,f,spectraMean,envMean,inputFileName,dtt,specHolder,...
-    envSetHolder,sizeCA,binNum,totalBins)
+    envSetHolder,sizeCA,binNum,totalBins,figCounter)
 
 % plot mean spectra
 
@@ -116,4 +116,4 @@ if isfield(p,'pauseAfterPlotting') && p.pauseAfterPlotting
     disp('Paused. Press any key to continue.')
     pause
 end
-% saveas(gcf,sprintf('saveFig_%0.0f.jpg',itrCounter))
+ %saveas(gcf,sprintf('E:\\Data\\plot_cluster_bins\\saveFig_%0.0f.jpg',figCounter))

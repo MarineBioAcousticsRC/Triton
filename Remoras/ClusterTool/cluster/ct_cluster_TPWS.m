@@ -143,6 +143,7 @@ idxer = 1:length(testBin);
 cIdx = 1;        
 noCluster = 0;
 % loop over bins
+figCounter = 1;
 for iC = 1:length(dateInterval)
     nClicks = testN(iC); % store number of clicks in interval
     idSet = idxer(testBin == iC);
@@ -209,7 +210,8 @@ for iC = 1:length(dateInterval)
             if p.plotFlag 
                 % plotting option
                 ct_plot_bin_clusters(p,f,spectraMean,envDistrib,thisFile,dtt,...
-                    specHolder,envSetHolder,sizeCA,iC,length(dateInterval)) 
+                    specHolder,envSetHolder,sizeCA,iC,length(dateInterval),figCounter) 
+                figCounter = figCounter+1;
             end
         else
             noCluster = 1;

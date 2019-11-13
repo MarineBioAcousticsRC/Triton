@@ -30,6 +30,8 @@ for iF = 1:nTypes
     % have the same name, they are merged.
     thisType = [];
     inFileList = [];
+    thisType.fileNumExpand = REMORA.ct.CC.output.fileNumExpand(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+    
     if REMORA.ct.CC.output.saveBinLevelDataTF
         
         thisType.Tfinal = vertcat(REMORA.ct.CC.output.Tfinal(cIdx,:)); % This keeps cells apart.
@@ -37,7 +39,6 @@ for iF = 1:nTypes
         
         thisType.tIntMat = REMORA.ct.CC.output.tIntMat(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
         thisType.clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
-        thisType.fileNumExpand = REMORA.ct.CC.output.fileNumExpand(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
         inFileList = REMORA.ct.CC.output.inFileList;
         binLevelOutputFile = fullfile(newDir,[REMORA.ct.CC_params.outputName,'_', thisName,'_binLevel.mat']);
         save(binLevelOutputFile,'thisType','inFileList','-v7.3');
@@ -52,7 +53,7 @@ for iF = 1:nTypes
         uInputFiles = unique(thisType.fileNumExpand);
         thisTPWSList = REMORA.ct.CC.output.TPWSList(uInputFiles);
         for iTPWS = 1:length(thisTPWSList)
-            TPWSname = fullfile(REMORA.ct.CC.TPWSfolder,thisTPWSList{iTPWS});
+            TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
             load(TPWSname,'MTT','MSN','MSP');
             fprintf('Loading data from %s...\n',TPWSname)
             timesInThisTPWSFile = vertcat(thisType.clickTimes{(thisType.fileNumExpand...
