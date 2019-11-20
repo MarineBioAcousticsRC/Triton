@@ -31,16 +31,17 @@ for iF = 1:nTypes
     thisType = [];
     inFileList = [];
     thisType.fileNumExpand = REMORA.ct.CC.output.fileNumExpand(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
-    
+    thisType.clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+
     if REMORA.ct.CC.output.saveBinLevelDataTF
         
         thisType.Tfinal = vertcat(REMORA.ct.CC.output.Tfinal(cIdx,:)); % This keeps cells apart.
         % Will need to watch out for this later.
         
         thisType.tIntMat = REMORA.ct.CC.output.tIntMat(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
-        thisType.clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
         inFileList = REMORA.ct.CC.output.inFileList;
-        binLevelOutputFile = fullfile(newDir,[REMORA.ct.CC_params.outputName,'_', thisName,'_binLevel.mat']);
+        outputNameRoot = fileparts(REMORA.ct.CC_params.outputName);
+        binLevelOutputFile = fullfile(newDir,[outputNameRoot,'_', thisName,'_binLevel.mat']);
         save(binLevelOutputFile,'thisType','inFileList','-v7.3');
         fprintf('Done saving bin-level output for %s...\n',uNames{iF})
     end
@@ -54,16 +55,23 @@ for iF = 1:nTypes
         thisTPWSList = REMORA.ct.CC.output.TPWSList(uInputFiles);
         for iTPWS = 1:length(thisTPWSList)
             TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
-            load(TPWSname,'MTT','MSN','MSP');
+            load(TPWSname,'MTT');            
             fprintf('Loading data from %s...\n',TPWSname)
-            timesInThisTPWSFile = vertcat(thisType.clickTimes{(thisType.fileNumExpand...
+            trainTimes = vertcat(thisType.clickTimes{(thisType.fileNumExpand...
                 == uInputFiles(iTPWS))});
-            [~,I] = intersect(timesInThisTPWSFile, MTT);
-            trainTimes = timesInThisTPWSFile;
+            [~,I] = intersect(MTT,trainTimes);
+            if isempty(I)
+                % don't bother loading the big matrices if there are no
+                % matching times
+                continue
+            end
+            load(TPWSname,'MSN','MSP');            
+
             trainMSN = MSN(I,:);
             trainMSP = MSP(I,:);
+            outputName = fileparts(TPWSname);
             detLevelOutputFile = fullfile(newDir,sprintf('%s_%s_file%0.0f_detLevel.mat',...
-                REMORA.ct.CC_params.outputName,thisName,iTPWS));
+                outputName,thisName,iTPWS));
             fprintf('Saving detection-level file %0.0f of %0.0f\n',iTPWS,length(thisTPWSList))
             save(detLevelOutputFile,'trainTimes','trainMSN','trainMSP','TPWSname')
             
