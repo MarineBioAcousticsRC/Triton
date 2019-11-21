@@ -54,10 +54,10 @@ for iD = 1:size(typeList,1)
     % find bouts
     [boutSize,boutStartIdx,...
         boutStartTime,boutEndIdx,...
-        boutEndTime,boutMembership] = ct_findBouts(clusterTimes,minGapTimeDnum);
+        boutEndTime,boutMembership] = nn_fn_findBouts(clusterTimes,minGapTimeDnum);
     nBouts = length(boutSize);
     fprintf('   %0.0f encounters found\n',nBouts)
-    trainBoutIdx = sort(randperm(nBouts,round(nBouts*trainPercent)))';
+    trainBoutIdx = sort(randperm(nBouts,round(nBouts*(trainPercent/100))))';
     [~,testBoutIdx] = setdiff(1:nBouts,trainBoutIdx);
     fprintf('   %0.0f train encounters selected\n',length(trainBoutIdx))
     fprintf('   %0.0f test encounters selected\n',length(testBoutIdx))
@@ -93,13 +93,13 @@ end
 fprintf('Minimum available unique training set size is %0.0f\n', min(trainSetSize))
 fprintf('Maximum available unique training set size is %0.0f\n', max(trainSetSize))
 
-testMSPICI = max([vertcat(testSetMSP{:}),vertcat(testSetICI{:})],0);
-trainMSPICI = [vertcat(trainSetMSP{:}),vertcat(trainSetICI{:})];
+testDataAll = max([vertcat(testSetMSP{:}),vertcat(testSetICI{:})],0);
+trainDataAll = [vertcat(trainSetMSP{:}),vertcat(trainSetICI{:})];
 
-trainLabelSet = vertcat(trainSetLabels{:});
-testLabelSet = vertcat(testSetLabels{:});
+trainLabelsAll = vertcat(trainSetLabels{:});
+testLabelsAll = vertcat(testSetLabels{:});
 
 savedTrainFile = fullfile(saveDir,saveNameTrain);
 savedTestFile = fullfile(saveDir,saveNameTest);
-save(fullfile(saveDir,saveNameTest),'testMSPICI','testLabelSet','-v7.3')
-save(fullfile(saveDir,saveNameTrain),'trainMSPICI','trainLabelSet','-v7.3')
+save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','-v7.3')
+save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','-v7.3')

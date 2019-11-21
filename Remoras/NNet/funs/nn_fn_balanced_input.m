@@ -1,11 +1,13 @@
-function nn_fn_balanced_input(inDir,saveDir,saveName,...
+function [savedTrainFullfile,savedTestFullfile] = nn_fn_balanced_input(inDir,saveDir,saveName,...
     trainPercent,nExamples,boutGap)
 
 % Make a train set
 
 saveNameTrain = [saveName ,'_det_train.mat'];
 saveNameTest = [saveName ,'_det_test.mat'];
-
+if ~exist(saveDir,'dir')
+    mkdir(saveDir)
+end
 subDirList = dir(inDir);
 badDirs = find(~cellfun(@isempty, strfind({subDirList(:).name},'.')));
 subDirList(badDirs) = [];
@@ -42,7 +44,7 @@ for iT = 1:nTypes
     for iFile = 1:length(fList)
         load(fullfile(fList(iFile).folder, fList(iFile).name),'trainTimes')
         [boutSize,boutStartIdx,boutStartTime,boutEndIdx,boutEndTime,~] =...
-            ct_findBouts(trainTimes,minGapTimeDnum);
+            nn_fn_findBouts(trainTimes,minGapTimeDnum);
         boutSizeAll{iFile} = boutSize;
         boutStartIdxAll{iFile} = boutStartIdx;
         boutStartTimeAll{iFile} = boutStartTime;
@@ -57,7 +59,7 @@ for iT = 1:nTypes
 
     
     % pick training bouts
-    trainBoutIdx = sort(randperm(sum(nBouts),round(sum(nBouts)*trainPercent)));
+    trainBoutIdx = sort(randperm(sum(nBouts),round(sum(nBouts)*(trainPercent/100))));
     [~,testBoutIdx] = setdiff(1:sum(nBouts),trainBoutIdx);
     
     fprintf('   %0.0f train encounters selected\n',length(trainBoutIdx))
@@ -166,12 +168,14 @@ end
 normSpecTrain = normalize_spectrum(trainSpecAll);
 normTSTrain = normalize_timeseries(trainTSAll);
 trainDataAll = [normSpecTrain,normTSTrain];
-save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','-v7.3')
+savedTrainFullfile = fullfile(saveDir,saveNameTrain);
+save(savedTrainFullfile,'trainDataAll','trainLabelsAll','-v7.3')
 
 normSpecTest = normalize_spectrum(testSpecAll);
 normTSTest = normalize_timeseries(testTSAll);
 testDataAll = [normSpecTest,normTSTest];
-save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','-v7.3')
+savedTestFullfile = fullfile(saveDir,saveNameTest);
+save(savedTestFullfile,'testDataAll','testLabelsAll','-v7.3')
 
 % to compare:
 % confusionmat(double(testOut),y_test)

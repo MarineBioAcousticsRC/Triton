@@ -7,9 +7,12 @@ function nn_ui_pulldown(action)
 global REMORA
 
 
-if strcmp(action,'make_train_test_sets')
+if strcmp(action,'train_test_from_clusters')
 
     nn_ui_train_test_set_window  
+    
+elseif strcmp(action,'train_test_from_TPWS')
+    
     
 elseif strcmp(action,'train_net')
     

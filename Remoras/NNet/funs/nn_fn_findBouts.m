@@ -1,5 +1,5 @@
 function [nEventsPerBout,startBoutIdx,startBoutTime,endBoutIdx,endBoutTime,binMembers] = ...
-    ct_findBouts(eventTimes,minGapTimeDnum)
+    nn_fn_findBouts(eventTimes,minGapTimeDnum)
 % assume event times are sorted, or if they aren't it's intentional.
 nEventsPerBout = [];
 startBoutIdx = [];
