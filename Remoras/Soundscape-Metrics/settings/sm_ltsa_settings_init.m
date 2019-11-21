@@ -1,7 +1,7 @@
-function sm_settings_init_ltsa
+function sm_ltsa_settings_init
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% settings_init_ltsa.m
+% sm_ltsa_settings_init.m
 %
 % initialize ltsa parameters
 %

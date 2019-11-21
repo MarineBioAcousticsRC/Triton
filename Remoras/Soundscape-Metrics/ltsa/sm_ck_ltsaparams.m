@@ -1,7 +1,7 @@
-function ck_ltsaparams
+function sm_ck_ltsaparams
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% ck_ltsaparams.m
+% sm_ck_ltsaparams.m
 %
 % check user defined ltsa parameters and adjusts/gives suggestions of
 % better parameters so that there is integer number of averages per xwav

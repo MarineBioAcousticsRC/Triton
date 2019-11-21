@@ -15,7 +15,7 @@ global PARAMS REMORA HANDLES
 if strcmp(action, 'make_ltsa')
     sm_setpointers('watch');
     
-    sm_settings_init_ltsa;
+    sm_ltsa_settings_init;
     
     REMORA.sm.ltsa = PARAMS.ltsa;
     if ~isfield(REMORA,'fig')
@@ -28,6 +28,21 @@ if strcmp(action, 'make_ltsa')
     sm_setpointers('arrow');
         
 elseif strcmp(action,'compute_metrics')
+    % dialog box - compute metrics
+    sm_setpointers('watch');
+    
+    sm_cmpt_settings_init;
+    
+    if ~isfield(REMORA,'fig')
+        REMORA.fig = [];
+    end
+    
+    %initialize ltsa parameters
+    sm_cmpt_params_window;
+    
+    sm_setpointers('arrow');
+    
+elseif strcmp(action,'plot_metrics')
     % dialog box - compute metrics
     sm_setpointers('watch');
     
