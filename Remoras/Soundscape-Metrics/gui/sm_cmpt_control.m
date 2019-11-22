@@ -8,15 +8,13 @@ if strcmp(action, '')
 % Change Directory Settings:
 
 elseif strcmp(action,'indirSel')
-    REMORA.sm.verify.indir = uigetdir(REMORA.sm.cmpt.indir,'Select Directory With WAV Files');
-    REMORA.sm.cmpt.indir = REMORA.sm.verify.indir;
-    sm_cmpt_params_window
+    REMORA.sm.verify.indir.String = uigetdir(REMORA.sm.cmpt.indir,'Select Directory With WAV Files');
+    REMORA.sm.cmpt.indir = REMORA.sm.verify.indir.String;
 
 elseif strcmp(action,'outdirSel')
-    REMORA.sm.verify.outdir = uigetdir(REMORA.sm.cmpt.outdir,'Select Directory for LTSA Output Files');
-    REMORA.sm.cmpt.outdir = REMORA.sm.verify.outdir;
-    sm_cmpt_params_window
-  
+    REMORA.sm.verify.outdir.String = uigetdir(REMORA.sm.cmpt.outdir,'Select Directory for LTSA Output Files');
+    REMORA.sm.cmpt.outdir = REMORA.sm.verify.outdir.String;
+
     
 % Directory Settings:
 
@@ -25,6 +23,18 @@ elseif strcmp(action,'setindir')
     
 elseif strcmp(action,'setoutdir')
     REMORA.sm.cmpt.outdir = get(REMORA.sm.verify.outdir, 'String');
+    
+
+% I/O Settings:
+
+elseif strcmp(action,'setfstart')
+    REMORA.sm.cmpt.fstart = str2double(get(REMORA.sm.verify.fstart,'String'));
+    
+elseif strcmp(action,'setcsvout')
+    REMORA.sm.cmpt.csvout = get(REMORA.sm.verify.csvout, 'String');
+    
+elseif strcmp(action,'setltsaout')
+    REMORA.sm.cmpt.ltsaout = get(REMORA.sm.verify.ltsaout, 'String');    
 
     
 % Data Analysis Settings:
@@ -75,7 +85,7 @@ elseif strcmp(action,'setstrum')
     REMORA.sm.cmpt.strum = str2double(get(REMORA.sm.verify.strum,'String'));
 
     
-% Second Calibration Settings:
+% Calibration Settings:
     
 elseif strcmp(action,'setcal')
     REMORA.sm.cmpt.cal = str2double(get(REMORA.sm.verify.cal,'String'));
@@ -90,11 +100,11 @@ elseif strcmp(action,'settfile')
     REMORA.sm.cmpt.tfile = str2double(get(REMORA.sm.verify.tfile,'String'));
     
 elseif strcmp(action,'tfilesel')
-    [REMORA.sm.verify.tfile, REMORA.sm.verify.tpath]...
+    [REMORA.sm.verify.tfile.String, REMORA.sm.verify.tpath.String]...
         = uigetfile(fullfile(REMORA.sm.cmpt.tpath,REMORA.sm.cmpt.tfile),'Select Transfer Function File');
-    REMORA.sm.cmpt.tfile = REMORA.sm.verify.tfile;
-    REMORA.sm.cmpt.tpath = REMORA.sm.verify.tpath;
-    sm_cmpt_params_window
+    REMORA.sm.cmpt.tfile = REMORA.sm.verify.tfile.String;
+    REMORA.sm.cmpt.tpath = REMORA.sm.verify.tpath.String;
+
     
 % Running Computation:
 
@@ -102,7 +112,7 @@ elseif strcmp(action,'runcmpt')
     close(REMORA.fig.sm.cmpt)
     sm_cmpt_metrics;
     
-% Loading settings:
+% Loading Settings:
 
 elseif strcmp(action,'sm_cmpt_settingsLoad')
     thisPath = mfilename('fullpath');
@@ -111,6 +121,7 @@ elseif strcmp(action,'sm_cmpt_settingsLoad')
     
     [REMORA.sm.cmpt.paramFile,REMORA.sm.cmpt.paramPath] = ...
         uigetfile(fullfile(settingsPath,'*.m*'),dialogTitle1);
+    
     % Give user some feedback
     if isscalar(REMORA.sm.cmpt.paramFile)
         return    % User cancelled

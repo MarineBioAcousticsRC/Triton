@@ -30,8 +30,9 @@ diaryfile = fullfile(REMORA.sm.cmpt.outdir,'logfile.txt');
 diary(diaryfile)
 sm_cmpt_diary;
 
+n = 1; %keep track of which file is being computed, needed if start is not first LTSA
 % loop through all the LTSA files
-for fidx = 1:length(REMORA.sm.cmpt.FileList)
+for fidx = REMORA.sm.cmpt.fstart:length(REMORA.sm.cmpt.FileList)
     % read ltsa headers
     PARAMS.ltsa = [];
     PARAMS.ltsa.inpath = REMORA.sm.cmpt.PathList{fidx};
@@ -43,8 +44,8 @@ for fidx = 1:length(REMORA.sm.cmpt.FileList)
     sm_cmpt_setup;
     
     % compute average and keep remainder
-    sm_cmpt_avgs(fidx);
-    
+    sm_cmpt_avgs(fidx,n);
+    n = n+1;
 end
 
 % close files

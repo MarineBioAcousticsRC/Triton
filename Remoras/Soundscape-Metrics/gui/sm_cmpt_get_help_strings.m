@@ -6,6 +6,8 @@ smHelpStrings.indirHelp = 'Input directory where ltsa files are stored';
 
 smHelpStrings.outdirHelp = 'Output directory where soundscape metric files will be saved';
 
+smHelpStrings.fstartHelp = 'Define which LTSA file should be used to start computation';
+
 smHelpStrings.bpassHelp = 'Define lower and upper frequency boundary of computation';
 
 smHelpStrings.lfreqHelp = 'Low frequency boundary of computation in Hertz';

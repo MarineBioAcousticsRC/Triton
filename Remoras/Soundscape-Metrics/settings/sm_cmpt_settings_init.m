@@ -16,6 +16,7 @@ REMORA.sm.cmpt.indir = 'D:\SanctSound_Output\SanctSound_MB02_01\ltsa';
 REMORA.sm.cmpt.outdir = 'D:\SanctSound_Output\SanctSound_MB02_01\metrics';
 REMORA.sm.cmpt.ltsaout = 0; % yes/no for a new average LTSA output
 REMORA.sm.cmpt.csvout = 1; % yes/no for a csv output
+REMORA.sm.cmpt.fstart = 1; % LTSA file number to start with for calculation
 
 %% Analysis Options
 % Bandpass Edges
@@ -47,7 +48,7 @@ REMORA.sm.cmpt.perc = 0.5; % percentage of time bin coverage in averaging window
 % Single Value Calibration
 REMORA.sm.cmpt.cal = 1; % yes/no  to calibrate data during computation
 REMORA.sm.cmpt.sval = 1; % yes/no to calibrate with single value
-REMORA.sm.cmpt.caldb = 172.7; % system sensitivity (high or low gain ST300; hdyrophone + recorder for ST500)
+REMORA.sm.cmpt.caldb = 175.1; % system sensitivity (high or low gain ST300; hdyrophone + recorder for ST500)
 
 % Transfer Function Calibration
 REMORA.sm.cmpt.tfval = 0; %yes/no to calibrate with transfer function

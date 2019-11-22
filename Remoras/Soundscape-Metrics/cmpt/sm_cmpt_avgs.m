@@ -1,10 +1,13 @@
-function sm_cmpt_avgs(fidx)
+function sm_cmpt_avgs(fidx,n)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % sm_cmpt_avgs.m
 %
 % compute averages based on time average bins generated in sm_cmpt_timeinc.m
 % and input header matrix generated in sm_cmpt_setup.m
+% fidx - File number relative to all LTSA files in folder
+% n - File number relative to start number within files (different to 
+%     fidx if start ~1)
 %
 % 1) check whether LTSA spectral average should be kept 
 %   (REMORA.sm.cmpt.header col 3)
@@ -22,16 +25,24 @@ global PARAMS REMORA
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% handle sepctral averages remaining from previous LTSA file
-if fidx == 1
-    % set up variables for computation
-    REMORA.sm.cmpt.pre.rembins = REMORA.sm.cmpt.avgbins; % all time bins remaining to be computed
+if n == 1
+    % set up variables for computation if this is the first LTSA to be run
+    REMORA.sm.cmpt.pre.rembins = []; % time bins from previous LTSA to be computed
     REMORA.sm.cmpt.pre.ltsaavgs = []; % spectral averages from previous LTSA
     REMORA.sm.cmpt.pre.timeavgs = []; % start time of spectral averages from previous LTSA
 end
 
-%% find which remaining time bins to be computed fall within this LTSA
+%% find which time bins to be computed fall within this LTSA
+starttime = REMORA.sm.cmpt.header(1,1);
 endtime = REMORA.sm.cmpt.header(end,1) + datenum([0 0 0 0 0 PARAMS.ltsa.tave]);
-REMORA.sm.cmpt.pre.thisltsa = find(REMORA.sm.cmpt.pre.rembins<=endtime,1,'last');
+thisavgbins = find(REMORA.sm.cmpt.avgbins>=starttime & ...
+    REMORA.sm.cmpt.avgbins<=endtime);
+thisavgbins = [thisavgbins(1)-1; thisavgbins]; % move to one index prior to include starttime
+REMORA.sm.cmpt.pre.thisltsa = length(thisavgbins);
+
+% pull together bins for this ltsa and those remaining from last ltsa
+REMORA.sm.cmpt.pre.rembins = [REMORA.sm.cmpt.avgbins(thisavgbins,:); ...
+    REMORA.sm.cmpt.pre.rembins];
 
 % preallocate toc
 timebintoc = zeros(REMORA.sm.cmpt.pre.thisltsa,1);
@@ -228,21 +239,26 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             end
             % write to output files
             sm_cmpt_writeout(tidx)
+            
+            timebintoc(tidx) = toc(timebintic);
+            % display progress
+            disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
+                ' computed; ',datestr(thisstart),' - ',datestr(thisend),'; duration ',num2str(timebintoc(tidx)),' s'])
+
         end
     else
         perc = (length(hidx) + length(REMORA.sm.cmpt.pre.timeavgs))/...
             REMORA.sm.cmpt.avgt;
-        disp(['Not enough coverage for time average: ',num2str(perc*100),'%; ',datestr(thisstart),'-',datestr(thisend)])
+        % display progress
+        disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
+                ' NOT computed; ',datestr(thisstart),' - ',datestr(thisend),'; duration ',num2str(timebintoc(tidx)),' s'])
+        disp(['Not enough coverage: ',num2str(perc*100),'%; '])
     end
-    timebintoc(tidx) = toc(timebintic);
-    % display progress
-    disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
-        ' computed; ',datestr(thisstart),' - ',datestr(thisend),'; duration ',num2str(timebintoc(tidx)),' s'])
     
     % if the last time average was calculated and no remaining data
     if tidx == REMORA.sm.cmpt.pre.thisltsa && last_avg == 0
         % set up variables for computation
-        REMORA.sm.cmpt.pre.rembins(1:REMORA.sm.cmpt.pre.thisltsa) = []; % all time bins remaining to be computed
+        REMORA.sm.cmpt.pre.rembins = []; % all time bins remaining to be computed
         REMORA.sm.cmpt.pre.ltsaavgs = []; % spectral averages from previous LTSA
         REMORA.sm.cmpt.pre.timeavgs = []; % start time of spectral averages from previous LTSA
     end
