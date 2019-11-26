@@ -1,7 +1,6 @@
 function [layerSet, trainPrefs] = nn_build_network
 
 global REMORA
-% should check that train and test data have same dimensions.
 
 trainFileObj = matfile(REMORA.nn.train_net.trainFile);
 testFileObj = matfile(REMORA.nn.train_net.testFile);
@@ -14,7 +13,7 @@ if trainDataSize(2) ~= testDataSize(2)
     error('Dimensions of training and test sets do not match.')
 end
 
-layerSet = imageInputLayer([trainDataSize(2),1,1]);
+layerSet = imageInputLayer([trainDataSize(2),1,1],'normalization', 'none');
 
 for iD = 1:REMORA.nn.train_net.nHiddenLayers
     layerSet = [layerSet;...
@@ -29,12 +28,10 @@ layerSet = [layerSet;...
 	softmaxLayer;...
 	classificationLayer];
 
-trainPrefs = trainingOptions('sgdm',...
+trainPrefs = trainingOptions('rmsprop',...
     'MaxEpochs',REMORA.nn.train_net.nEpochs, ...
-    'MiniBatchSize',REMORA.nn.train_net.batchSize
-    );
-
-   % 'Shuffle','every-epoch');% ...
-   % 'Plots','training-progress');
+    'MiniBatchSize',REMORA.nn.train_net.batchSize, ...
+    'Shuffle','every-epoch', ...
+    'Plots','training-progress');
 
 

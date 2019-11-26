@@ -12,7 +12,8 @@ if strcmp(action,'train_test_from_clusters')
     nn_ui_train_test_set_window  
     
 elseif strcmp(action,'train_test_from_TPWS')
-    
+   
+    nn_ui_train_test_from_TPWS
     
 elseif strcmp(action,'train_net')
     
@@ -20,6 +21,6 @@ elseif strcmp(action,'train_net')
     
 elseif strcmp(action,'classify_data')
     
-    nn_ui_classify_window    
+    nn_ui_classify_window
 
 end

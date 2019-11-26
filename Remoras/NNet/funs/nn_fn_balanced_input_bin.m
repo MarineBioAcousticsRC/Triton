@@ -70,7 +70,7 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTrain = sum(boutSizeTrain);
-    binIndicesTrain = sort(randi(nBinsTrain,1,nExamples));
+    binIndicesTrain = sort(randperm(nBinsTrain,min(nExamples,nBinsTrain)));
     clusterIdxTrainSet = vertcat(boutMembership{trainBoutIdx});
     trainSetMSP{iD} = clusterSpectra(clusterIdxTrainSet(binIndicesTrain),:);
     trainSetICI{iD} = clusterICI(clusterIdxTrainSet(binIndicesTrain),:);
@@ -83,7 +83,7 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTest = sum(boutSizeTest);
-    binIndicesTest = sort(randi(nBinsTest,1,nExamples));
+    binIndicesTest = sort(randperm(nBinsTest,min(nExamples,nBinsTest)));
     clusterIdxTestSet = vertcat(boutMembership{testBoutIdx});
     testSetMSP{iD} = clusterSpectra(clusterIdxTestSet(binIndicesTest),:);
     testSetICI{iD} = clusterICI(clusterIdxTestSet(binIndicesTest),:);

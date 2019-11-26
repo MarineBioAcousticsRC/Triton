@@ -15,10 +15,10 @@ elseif strcmp(myEvent, 'setOutDir')
         get(REMORA.fig.nn.train_net.outDirEdTxt,'String');
 
 elseif strcmp(myEvent, 'setNHidden')
-    REMORA.nn.train_net.nHiddenLayers = ...
+    REMORA.nn.train_net.nHiddenLayers = ... 
         round(str2num(get(REMORA.fig.nn.train_net.nHiddenEdTxt,'String')));
-
-elseif strcmp(myEvent, 'setHiddenLayerSize')
+ 
+elseif strcmp(myEvent, 'setHiddenLayerSize') 
     REMORA.nn.train_net.hLayerSize = ...
         round(str2num(get(REMORA.fig.nn.train_net.hLayerSizeEdTxt,'String')));
 

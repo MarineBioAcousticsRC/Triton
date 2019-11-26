@@ -23,6 +23,7 @@ end
 
 if ~isfield(p,'countThresh') || isempty(p.countThresh)
     p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;
+    REMORA.spice_dt.detParams.countThresh = p.countThresh;
 end
 cParams = sp_dt_init_cParams(p); % set up storage for HR output.
 sIdx = 1;

@@ -80,7 +80,7 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksTrain = sum(boutSizeAllTrain);
-    clickIndicesTrain = sort(randi(nClicksTrain,1,nExamples));
+    clickIndicesTrain = sort(randperm(nClicksTrain,1,min(nExamples,size(nClicksTrain,1))));
     [~,edges,bin] = histcounts(clickIndicesTrain,[1;cumsum(boutSizeAllTrain)+1]);
     
     trainSetSN = [];
@@ -124,7 +124,7 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksTest = sum(boutSizeAllTest);
-    clickIndicesTest = sort(randi(nClicksTest,1,nExamples));
+    clickIndicesTest = sort(randperm(nClicksTest,1,min(nExamples,size(nClicksTest,1))));
     [N,edges,bin] = histcounts(clickIndicesTest,[1;cumsum(boutSizeAllTest)+1]);
     
     testSetSN = [];
