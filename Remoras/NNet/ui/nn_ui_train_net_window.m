@@ -345,8 +345,13 @@ global REMORA
 
 if isfield(REMORA.nn,'train_test_set')
     % should make this change with bin vs det modes
-    REMORA.nn.train_net.trainFile = REMORA.nn.train_test_set.savedTrainFile_bin;
-    REMORA.nn.train_net.testFile = REMORA.nn.train_test_set.savedTestFile_bin;
+    if isfield(REMORA.nn.train_test_set,'savedTrainFile_bin')
+        REMORA.nn.train_net.trainFile = REMORA.nn.train_test_set.savedTrainFile_bin;
+        REMORA.nn.train_net.testFile = REMORA.nn.train_test_set.savedTestFile_bin;
+    else
+        REMORA.nn.train_net.trainFile = '';
+        REMORA.nn.train_net.testFile = '';
+    end
 else
     REMORA.nn.train_net.trainFile  = '';
     REMORA.nn.train_net.testFile  = '';
