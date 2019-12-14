@@ -28,7 +28,7 @@ minGapTimeDnum = minGapTimeHour/24;    % gap time in datenum
 
 for iT = 1:nTypes
     fprintf('Beginning type %0.0f, name: %s\n',iT, subDirList(iT).name)
-    fList = dir(fullfile(inDir,subDirList(iT).name,'*.mat'));
+    fList = dir(fullfile(inDir,subDirList(iT).name,'*detLevel.mat'));
     timesCat = []; fListIdx = []; indexCat = [];
     
     % iterate over "training set" files, and load times so we can determine
@@ -80,7 +80,7 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksTrain = sum(boutSizeAllTrain);
-    clickIndicesTrain = sort(randperm(nClicksTrain,1,min(nExamples,size(nClicksTrain,1))));
+    clickIndicesTrain = sort(randperm(nClicksTrain,min(nExamples,nClicksTrain)));
     [~,edges,bin] = histcounts(clickIndicesTrain,[1;cumsum(boutSizeAllTrain)+1]);
     
     trainSetSN = [];
@@ -124,7 +124,7 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksTest = sum(boutSizeAllTest);
-    clickIndicesTest = sort(randperm(nClicksTest,1,min(nExamples,size(nClicksTest,1))));
+    clickIndicesTest = sort(randperm(nClicksTest,min(nExamples,nClicksTest)));
     [N,edges,bin] = histcounts(clickIndicesTest,[1;cumsum(boutSizeAllTest)+1]);
     
     testSetSN = [];
@@ -189,6 +189,7 @@ normTS(isnan(normTS)) = 0;
 normTS = normTS/2+0.5;
 
 function normSpec = normalize_spectrum(SP)
-minNormSpec = SP - mean(min(SP,[],2));
+% minNormSpec = SP - mean(min(SP,[],2));
+minNormSpec = SP - min(SP,[],2);
 minNormSpec = max(minNormSpec,0);
-normSpec = minNormSpec./mean(max(minNormSpec,[],2));
+normSpec = minNormSpec./(max(minNormSpec,[],2));

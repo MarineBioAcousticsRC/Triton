@@ -23,7 +23,7 @@ elseif strcmp(myEvent, 'setSaveName')
         get(REMORA.fig.nn.nn_train_test_set.saveNameEdTxt,'String');
     
 elseif strcmp(myEvent, 'setTrainPerc')
-    REMORA.fig.nn.nn_train_test_set.trainPerc = ...
+    REMORA.nn.train_test_set.trainPerc = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set.trainPercEdTxt,'String'));
     
     if REMORA.fig.nn.nn_train_test_set.trainPerc>1
@@ -32,11 +32,11 @@ elseif strcmp(myEvent, 'setTrainPerc')
             REMORA.fig.nn.nn_train_test_set.trainPerc/100;
     end
 elseif strcmp(myEvent, 'setTrainSize')
-    REMORA.fig.nn.nn_train_test_set.trainSize = ...
+    REMORA.nn.train_test_set.trainSize = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set.trainSizeEdTxt,'String'));
     
 elseif strcmp(myEvent, 'setBoutGap')
-    REMORA.fig.nn.nn_train_test_set.boutGap = ...
+    REMORA.nn.train_test_set.boutGap = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set.boutGapEdTxt,'String'));
     
 elseif strcmp(myEvent, 'Run')
@@ -71,7 +71,7 @@ elseif strcmp(myEvent, 'Run')
         fprintf('Detection-level training and test sets saved to: \n')
         fprintf('% s\n',REMORA.nn.train_test_set.outDir);
     end
-    
+    close(REMORA.fig.nn.nn_train_test_set.figH)
 else
     error('Unrecognized callback')
 end

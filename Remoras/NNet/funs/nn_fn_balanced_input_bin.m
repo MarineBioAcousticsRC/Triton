@@ -30,7 +30,7 @@ for iD = 1:size(typeList,1)
     thisTypeDir = fullfile(typeList(iD).folder,typeList(iD).name);
     [~,typeID] = fileparts(thisTypeDir);
     typeNames{iD,1} = typeID;
-    matList = dir(fullfile(thisTypeDir,'*.mat'));
+    matList = dir(fullfile(thisTypeDir,'*binLevel.mat'));
    
     clusterSpectra = [];
     clusterICI = [];
@@ -38,17 +38,21 @@ for iD = 1:size(typeList,1)
     for iM = 1:size(matList,1)
         
         inFile = load(fullfile(matList(iM).folder,matList(iM).name));
-        thisSpec = inFile.thisType.Tfinal{1};
-%         if size(thisSpec,2)>188
-%             thisSpec = thisSpec(:,2:end);
-%         end
-        thisBinTime = inFile.thisType.Tfinal{7};
-        clusterTimes = [clusterTimes;thisBinTime];
-        clusterSpectra = [clusterSpectra;thisSpec];
-        clusterICI = [clusterICI;inFile.thisType.Tfinal{2}];
+        for iRow = 1:size(inFile.thisType.Tfinal,1)
+            thisSpec = inFile.thisType.Tfinal{iRow,1};
+            %         if size(thisSpec,2)>188
+            %             thisSpec = thisSpec(:,2:end);
+            %         end
+            thisBinTime = inFile.thisType.Tfinal{iRow,7};
+            clusterTimes = [clusterTimes;thisBinTime];
+            clusterSpectra = [clusterSpectra;thisSpec];
+            clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+        end
     end
     [clusterTimes,I] = sort(clusterTimes);
     clusterSpectra = clusterSpectra(I,:);
+    clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);
+    clusterSpectra = clusterSpectraMin./max(clusterSpectraMin,[],2);
     clusterICI = clusterICI(I,:);
 
     % find bouts
@@ -70,7 +74,8 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTrain = sum(boutSizeTrain);
-    binIndicesTrain = sort(randperm(nBinsTrain,min(nExamples,nBinsTrain)));
+    binIndicesTrain = sort(randi(nBinsTrain,1,nExamples));
+    %binIndicesTrain = sort(randperm(nBinsTrain,min(nExamples,nBinsTrain)));
     clusterIdxTrainSet = vertcat(boutMembership{trainBoutIdx});
     trainSetMSP{iD} = clusterSpectra(clusterIdxTrainSet(binIndicesTrain),:);
     trainSetICI{iD} = clusterICI(clusterIdxTrainSet(binIndicesTrain),:);
@@ -83,7 +88,8 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTest = sum(boutSizeTest);
-    binIndicesTest = sort(randperm(nBinsTest,min(nExamples,nBinsTest)));
+    binIndicesTest = sort(randi(nBinsTest,1,nExamples));
+    %binIndicesTest = sort(randperm(nBinsTest,min(nExamples,nBinsTest)));
     clusterIdxTestSet = vertcat(boutMembership{testBoutIdx});
     testSetMSP{iD} = clusterSpectra(clusterIdxTestSet(binIndicesTest),:);
     testSetICI{iD} = clusterICI(clusterIdxTestSet(binIndicesTest),:);
