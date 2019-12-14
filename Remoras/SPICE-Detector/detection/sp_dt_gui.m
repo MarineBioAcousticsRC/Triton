@@ -22,6 +22,9 @@ end
 
 
 if ~isfield(p,'countThresh') || isempty(p.countThresh)
+    if ~isfield(p,'xfrOffset') || isempty(p.xfrOffset)
+        p.xfrOffset = 0;
+    end
     p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;
 end
 cParams = sp_dt_init_cParams(p); % set up storage for HR output.
