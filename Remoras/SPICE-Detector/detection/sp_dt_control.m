@@ -11,59 +11,103 @@ if strcmp(action, '')
     
     % Set RL threshold for detector
 elseif strcmp(action,'setPPThreshold')
-    valueDBpp = str2double(get(REMORA.spice_dt.PPThresholdEdTxt,'String'));
+    if ~strcmp(mySource, 'gui')
+        valueDBpp = str2double(get(REMORA.spice_dt_verify.PPThresholdEdTxt,'String'));
+    else
+        valueDBpp = str2double(get(REMORA.spice_dt.PPThresholdEdTxt,'String'));
+    end
     REMORA.spice_dt.detParams.dBppThreshold = max(valueDBpp,1);
-    
+
     % Set minimum click duration for detector
 elseif strcmp(action,'SetMinClickDur')
-    valueMuSec = str2double(get(REMORA.spice_dt.MinClickDurEdText,'String'));
+    if ~strcmp(mySource, 'gui')
+        valueMuSec = str2double(get(REMORA.spice_dt_verify.MinClickDurEdText,'String'));
+    else
+        valueMuSec = str2double(get(REMORA.spice_dt.MinClickDurEdText,'String'));
+    end
     REMORA.spice_dt.detParams.delphClickDurLims(1,1) = max(valueMuSec,0);
     
     % Set maximum click duration for detector
 elseif strcmp(action,'SetMaxClickDur')
-    valueMuSec = str2double(get(REMORA.spice_dt.MaxClickDurEdText,'String'));
+    if ~strcmp(mySource, 'gui')
+        valueMuSec = str2double(get(REMORA.spice_dt_verify.MaxClickDurEdText,'String'));
+    else
+        valueMuSec = str2double(get(REMORA.spice_dt.MaxClickDurEdText,'String'));
+    end
     REMORA.spice_dt.detParams.delphClickDurLims(1,2) = max(valueMuSec,0);
-    
+        
     % Set low end of bandpass filter
 elseif strcmp(action,'SetMinBandpass')
-    valuekHz = str2double(get(REMORA.spice_dt.MinBandPassEdText,'String'));
+    if ~strcmp(mySource, 'gui')
+        valuekHz = str2double(get(REMORA.spice_dt_verify.MinBandPassEdText,'String'));
+    else
+        valuekHz = str2double(get(REMORA.spice_dt.MinBandPassEdText,'String'));
+    end
     REMORA.spice_dt.detParams.bpRanges(1,1) = max(valuekHz,0);
     REMORA.spice_dt.detParams.rebuildFilter = 1;
     
     % Set high end of bandpass filter
 elseif strcmp(action,'SetMaxBandpass')
-    valuekHz = str2double(get(REMORA.spice_dt.MaxBandPassEdText,'String'));
+    if ~strcmp(mySource, 'gui')
+        valuekHz = str2double(get(REMORA.spice_dt_verify.MaxBandPassEdText,'String'));
+    else
+        valuekHz = str2double(get(REMORA.spice_dt.MaxBandPassEdText,'String'));
+    end
     REMORA.spice_dt.detParams.bpRanges(1,2) = max(valuekHz,0);
     REMORA.spice_dt.detParams.rebuildFilter = 1;
     
     % Set minimum click peak frequency for detector
 elseif strcmp(action,'SetMinPeakFreq')
-    valueKHz = str2double(get(REMORA.spice_dt.MinPeakFreqEdTxt,'String'));
+    if ~strcmp(mySource, 'gui')
+        valueKHz = str2double(get(REMORA.spice_dt_verify.MinPeakFreqEdTxt,'String'));
+    else
+        valueKHz = str2double(get(REMORA.spice_dt.MinPeakFreqEdTxt,'String'));
+    end
     REMORA.spice_dt.detParams.cutPeakBelowKHz = max(valueKHz,0);
     
     % Set minimum click peak frequency for detector
 elseif strcmp(action,'SetMaxPeakFreq')
-    valueKHz = str2double(get(REMORA.spice_dt.MaxPeakFreqEdTxt,'String'));
-    REMORA.spice_dt.detParams.cutPeakAbovewKHz = max(valueKHz,0);
+    if ~strcmp(mySource, 'gui')
+        valueKHz = str2double(get(REMORA.spice_dt_verify.MaxPeakFreqEdTxt,'String'));
+    else
+        valueKHz = str2double(get(REMORA.spice_dt.MaxPeakFreqEdTxt,'String'));
+    end
+    REMORA.spice_dt.detParams.cutPeakAboveKHz = max(valueKHz,0);
     
     % Set maximum click peak frequency for detector
 elseif strcmp(action,'SetMinEnvRatio')
-    valueERatio = str2double(get(REMORA.spice_dt.MinEvEdTxt,'String'));
+    if ~strcmp(mySource, 'gui')
+        valueERatio = str2double(get(REMORA.spice_dt_verify.MinEvEdTxt,'String'));
+    else
+        valueERatio = str2double(get(REMORA.spice_dt.MinEvEdTxt,'String'));
+    end
     REMORA.spice_dt.detParams.dEvLims(1) = max(valueERatio,-1);
     
     % Set maximum click peak frequency for detector
 elseif strcmp(action,'SetMaxEnvRatio')
-    valueERatio = str2double(get(REMORA.spice_dt.MaxEvEdTxt,'String'));
+    if ~strcmp(mySource, 'gui')
+        valueERatio = str2double(get(REMORA.spice_dt_verify.MaxEvEdTxt,'String'));
+    else
+        valueERatio = str2double(get(REMORA.spice_dt.MaxEvEdTxt,'String'));
+    end
     REMORA.spice_dt.detParams.dEvLims(2) = min(valueERatio,1);
     
     % Set maximum saturation of click detections
 elseif strcmp(action,'SetClipThreshold')
-    maxSaturationRatio = str2double(get(REMORA.spice_dt.clipThresholdEdTxt, 'string'));
+    if ~strcmp(mySource, 'gui')
+        maxSaturationRatio = str2double(get(REMORA.spice_dt_verify.clipThresholdEdTxt, 'string'));
+    else
+        maxSaturationRatio = str2double(get(REMORA.spice_dt.clipThresholdEdTxt, 'string'));
+    end
     REMORA.spice_dt.detParams.clipThreshold = max(min(maxSaturationRatio,1),0);
     
     
 elseif strcmp(action,'setUsePPThresh')
-    usePPthresh = get(REMORA.spice_dt.PPThresholdRadio,'value');
+    if ~strcmp(mySource, 'gui')
+        usePPthresh = get(REMORA.spice_dt_verify.PPThresholdRadio,'value');
+    else
+        usePPthresh = get(REMORA.spice_dt.PPThresholdRadio,'value');
+    end
     REMORA.spice_dt.detParams.snrDet = ~usePPthresh;
     if usePPthresh
         set(REMORA.spice_dt.PPThresholdEdTxt,'Visible','on')
@@ -74,7 +118,11 @@ elseif strcmp(action,'setUsePPThresh')
     end
         
 elseif strcmp(action,'setUseSNRThresh')
-    useSNRthresh = get(REMORA.spice_dt.SNRThresholdRadio,'value');
+    if ~strcmp(mySource, 'gui')
+        useSNRthresh = get(REMORA.spice_dt_verify.SNRThresholdRadio,'value');
+    else
+        useSNRthresh = get(REMORA.spice_dt.SNRThresholdRadio,'value');
+    end
     REMORA.spice_dt.detParams.snrDet = useSNRthresh;
     if useSNRthresh
         set(REMORA.spice_dt.SNRThresholdEdTxt,'Visible','on')
@@ -194,7 +242,11 @@ elseif strcmp(action,'setUseSNRThreshBatch')
     end
     
 elseif strcmp(action,'setSNRThreshold')
-    SNRthresh = str2num(get(REMORA.spice_dt.SNRThreshold,'string'));
+    if ~strcmp(mySource, 'gui')
+        SNRthresh = str2num(get(REMORA.spice_dt_verify.SNRThreshold,'string'));
+    else
+        SNRthresh = str2num(get(REMORA.spice_dt.SNRThreshold,'string'));
+    end
     REMORA.spice_dt.detParams.snrThresh = SNRthresh;
     
 elseif strcmp(action,'RunBatchDetection')
