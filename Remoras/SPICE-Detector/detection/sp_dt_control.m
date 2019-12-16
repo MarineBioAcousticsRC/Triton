@@ -195,27 +195,27 @@ elseif strcmp(action,'SetWaveRegExp')
     REMORA.spice_dt.detParams.DateRegExp = DateRegExp;
     
 elseif strcmp(action,'SetLRBuffer')
-    LRbuffer = get(REMORA.spice_dt_verify.LRBufferEdTxt, 'string');
+    LRbuffer = str2num(get(REMORA.spice_dt_verify.LRBufferEdTxt, 'string'));
     REMORA.spice_dt.detParams.LRbuffer = LRbuffer;
     
 elseif strcmp(action,'SetHRBuffer')
-    HRbuffer = get(REMORA.spice_dt_verify.HRBufferEdTxt, 'string');
+    HRbuffer = str2num(get(REMORA.spice_dt_verify.HRBufferEdTxt, 'string'));
     REMORA.spice_dt.detParams.HRbuffer = HRbuffer;
     
 elseif strcmp(action,'SetMergeThreshold')
-    mergeThr = get(REMORA.spice_dt_verify.mergeThresholdEdTxt, 'string');
+    mergeThr = str2num(get(REMORA.spice_dt_verify.mergeThresholdEdTxt, 'string'));
     REMORA.spice_dt.detParams.LRbuffer = mergeThr;
     
 elseif strcmp(action,'SetEnergyPercentile')
-    energyPrctile = get(REMORA.spice_dt_verify.energyPercEdTxt, 'string');
+    energyPrctile = str2num(get(REMORA.spice_dt_verify.energyPercEdTxt, 'string'));
     REMORA.spice_dt.detParams.energyPrctile = energyPrctile;
     
 elseif strcmp(action,'SetEnergyThr')
-    energyThr = get(REMORA.spice_dt_verify.energyThrEdTxt, 'string');
+    energyThr = str2num(get(REMORA.spice_dt_verify.energyThrEdTxt, 'string'));
     REMORA.spice_dt.detParams.energyPrctile = energyThr;
     
 elseif strcmp(action,'SetFilterOrder')
-    filterOrder = get(REMORA.spice_dt_verify.BPfilterEdTxt, 'string');
+    filterOrder = str2num(get(REMORA.spice_dt_verify.BPfilterEdTxt, 'string'));
     REMORA.spice_dt.detParams.filterOrder = filterOrder;
     
 elseif strcmp(action,'setUsePPThreshBatch')
@@ -243,9 +243,9 @@ elseif strcmp(action,'setUseSNRThreshBatch')
     
 elseif strcmp(action,'setSNRThreshold')
     if ~strcmp(mySource, 'gui')
-        SNRthresh = str2num(get(REMORA.spice_dt_verify.SNRThreshold,'string'));
+        SNRthresh = str2num(get(REMORA.spice_dt_verify.SNRThresholdEdTxt,'string'));
     else
-        SNRthresh = str2num(get(REMORA.spice_dt.SNRThreshold,'string'));
+        SNRthresh = str2num(get(REMORA.spice_dt.SNRThresholdEdTxt,'string'));
     end
     REMORA.spice_dt.detParams.snrThresh = SNRthresh;
     
