@@ -58,14 +58,18 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all xwa
     
     total = PARAMS.ltsa.endIdx - PARAMS.ltsa.startIdx + 1; %number of wav files for this LTSA
     for r = 1:nrf                   % loop over each raw file in xwav
-        m = m + 1;                  % count total number of raw files
-        
+        % running number of raw files within current LTSA
+        if k == 1
+            m = r;
+        else
+            m = r + sum(PARAMS.ltsahd.rfileid(1:k-1)); 
+        end 
+                
         % check to see if full data for average
         %             nave1 = (PARAMS.ltsahd.write_length(m) * 250)/(PARAMS.ltsa.nfft * PARAMS.ltsa.cfact);
         if PARAMS.ltsa.ftype ~= 1       % xwavs
             nave1 = (PARAMS.ltsahd.write_length(m) * PARAMS.ltsa.blksz / PARAMS.ltsa.nch)/(PARAMS.ltsa.nfft * PARAMS.ltsa.cfact);
         else                            % wavs
-            m = k;
             nave1 = PARAMS.ltsahd.nsamp(m)/(PARAMS.ltsa.nfft * PARAMS.ltsa.cfact);
         end
         
@@ -167,8 +171,9 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all xwa
             % calculate spectra
             [ltsa,freq] = pwelch(data,window,noverlap,PARAMS.ltsa.nfft,PARAMS.ltsa.fs);   % pwelch is supported psd'er
             ltsa = 10*log10(ltsa); % counts^2/Hz
+            ltsa = single(ltsa); % convert from floating point 'double' to 'single'
             % write data
-            fwrite(fod,ltsa,'int8');
+            fwrite(fod,ltsa,'single');
             count = count + 1;
         end     % end for n - loop over the number of spectral averages
         

@@ -8,16 +8,14 @@ if strcmp(action, '')
 % Change Directory Settings:
 
 elseif strcmp(action,'indirSel')
-    REMORA.sm.verify.indir = uigetdir(REMORA.sm.ltsa.indir,'Select Directory With WAV Files');
-    REMORA.sm.ltsa.indir = REMORA.sm.verify.indir;
-    PARAMS.ltsa.indir = REMORA.sm.verify.indir;
-    sm_ltsa_params_window
+    REMORA.sm.verify.indir.String = uigetdir(REMORA.sm.ltsa.indir,'Select Directory With WAV Files');
+    REMORA.sm.ltsa.indir = REMORA.sm.verify.indir.String;
+    PARAMS.ltsa.indir = REMORA.sm.verify.indir.String;
 
 elseif strcmp(action,'outdirSel')
-    REMORA.sm.verify.outdir = uigetdir(REMORA.sm.ltsa.outdir,'Select Directory for LTSA Output Files');
-    REMORA.sm.ltsa.outdir = REMORA.sm.verify.outdir;
-    PARAMS.ltsa.outdir = REMORA.sm.verify.outdir;
-    sm_ltsa_params_window
+    REMORA.sm.verify.outdir.String = uigetdir(REMORA.sm.ltsa.outdir,'Select Directory for LTSA Output Files');
+    REMORA.sm.ltsa.outdir = REMORA.sm.verify.outdir.String;
+    PARAMS.ltsa.outdir = REMORA.sm.verify.outdir.String;
     
 % Directory Settings:
 

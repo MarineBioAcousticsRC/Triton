@@ -1,7 +1,7 @@
 function sm_get_headers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% get_headers.m
+% sm_get_headers.m
 %
 % open data files and read headers for making an ltsa file
 %

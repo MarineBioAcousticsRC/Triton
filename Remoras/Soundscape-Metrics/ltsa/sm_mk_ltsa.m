@@ -1,7 +1,7 @@
-function sm_cmpt_metrics
+function sm_mk_ltsa
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% mk_ltsa.m
+% sm_mk_ltsa.m
 %
 % make long-term spectral averages from XWAV files in a directory
 %

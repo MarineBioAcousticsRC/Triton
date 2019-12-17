@@ -37,7 +37,8 @@ starttime = REMORA.sm.cmpt.header(1,1);
 endtime = REMORA.sm.cmpt.header(end,1) + datenum([0 0 0 0 0 PARAMS.ltsa.tave]);
 thisavgbins = find(REMORA.sm.cmpt.avgbins>=starttime & ...
     REMORA.sm.cmpt.avgbins<=endtime);
-thisavgbins = [thisavgbins(1)-1; thisavgbins]; % move to one index prior to include starttime
+%%%%%%% check next line logic!!!!!
+% thisavgbins = [thisavgbins(1)-1; thisavgbins]; % move to one index prior to include starttime
 REMORA.sm.cmpt.pre.thisltsa = length(thisavgbins);
 
 % pull together bins for this ltsa and those remaining from last ltsa
@@ -90,6 +91,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             % read data into File power
             ltsaavgs(h,:) = fread(fid,[PARAMS.ltsa.nf,1],'*int8');
         end
+        fclose (fid);
         
         if tidx == 1
             % add to potential averages from previous LTSA if this is first

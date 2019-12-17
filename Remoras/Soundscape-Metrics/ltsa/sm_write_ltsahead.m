@@ -1,7 +1,7 @@
 function sm_write_ltsahead(lIdx)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% write_ltsahead.m
+% sm_write_ltsahead.m
 %
 % setup values for ltsa file and write header + directories for new ltsa
 % file
@@ -37,7 +37,7 @@ dirStartLoc = lhsz + 1;                               % directory start location
 dataStartLoc = rhsz * maxNrawfiles + lhsz;           % data start location in bytes
 
 % open output ltsa file
-fid = fopen([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile],'w');
+fid = fopen(fullfile(PARAMS.ltsa.outdir,PARAMS.ltsa.outfile),'w');
 
 % LTSA file Header - 64 bytes total
 fwrite(fid,'LTSA','char');                  % 4 bytes - file ID type
@@ -67,7 +67,7 @@ fwrite(fid,zeros(nz,1),'uint8');                  % 1 bytes x 25 = 25 bytes - 0 
 % 64 bytes used - up to here
 
 l = 1;
-% Directory - one for each raw file - 100 + 4 bytes for each directory listing
+% Directory - one for each raw file - 104 + 4 bytes for each directory listing
 for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx
     % write time values to directory
     fwrite(fid,PARAMS.ltsahd.year(k) ,'uchar');          % 1 byte - Year
@@ -102,7 +102,7 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx
         ltsaByteLoc = dataStartLoc;
     else
         % ltsa data byte loc = previous loc + # spectral ave (of previous loc) * # freqs in each spectra * # of bytes per spectrum level value
-        ltsaByteLoc = ltsaByteLoc +  PARAMS.ltsa.nave(k-1) * PARAMS.ltsa.nfreq * 1;
+        ltsaByteLoc = ltsaByteLoc +  PARAMS.ltsa.nave(k-1) * PARAMS.ltsa.nfreq * 4;
     end
     
     PARAMS.ltsa.byteloc(k) = ltsaByteLoc;
@@ -111,15 +111,15 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx
     %
     % write ltsa parameters:
     %
-    fwrite(fid,PARAMS.ltsa.byteloc(k) ,'uint32');     % 4 byte - Byte location in ltsa file of the spectral averages for this rawfile
+    fwrite(fid,PARAMS.ltsa.byteloc(k) ,'uint64');     % 8 byte - Byte location in ltsa file of the spectral averages for this rawfile
     fwrite(fid,PARAMS.ltsa.nave(k) ,'uint32');          % 4 byte - number of spectral averages for this raw file
-    % 16 bytes up to here
+    % 20 bytes up to here
     fwrite(fid,PARAMS.ltsahd.fname(k,:),'uchar');        % 80 byte - xwav file name for this raw file header
     fwrite(fid,PARAMS.ltsahd.rfileid(k),'uint32');       % 4 byte - raw file id / number for this xwav
-    % 100 bytes up to here
+    % 104 bytes up to here
     nz = 4;
     fwrite(fid,zeros(nz,1),'uint8');                    % 4 bytes
-    % 100 + 4 bytes for each directory listing for each raw file
+    % 104 + 4 bytes for each directory listing for each raw file
     
     l = 2;
 end
