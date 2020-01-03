@@ -6,9 +6,10 @@ p.previousFs = 0; % make sure we build filters on first pass
 
 % get file type list
 fTypes = sp_io_getFileType(fullFiles);
-f = [];
-cParams = [];
-for idx1 = 1:N % for each data file
+fOut = [];
+clickParamsOut = [];
+parfor idx1 = 1:N % for each data file
+    f=[];
     pTemp = p;
     outFileName = fullLabels{idx1};
     if ~pTemp.overwrite && exist(outFileName, 'file') == 2
