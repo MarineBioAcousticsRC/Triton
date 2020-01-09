@@ -125,10 +125,11 @@ for itr2 = 1:lfs
         %remove rows of zeros if applicable
         rmvZeroIdx = find(MTT == 0);
         if ~isempty(rmvZeroIdx)
-            MTT = MTT(rmvZeroIdx);
-            MSP = MSP(rmvZeroIdx,:);
-            MSN = MSN(rmvZeroIdx,:);
-            MPP = MPP(rmvZeroIdx,:);
+            zeroKeep = find(MTT~=0);
+            MTT = MTT(zeroKeep);
+            MSP = MSP(zeroKeep,:);
+            MSN = MSN(zeroKeep,:);
+            MPP = MPP(zeroKeep);
         end
         f = fSave;
         disp_msg('Saving...');drawnow
