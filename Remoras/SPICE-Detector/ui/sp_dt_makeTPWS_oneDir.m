@@ -123,14 +123,13 @@ for itr2 = 1:lfs
         end
         
         %remove rows of zeros if applicable
-        rmvZeroIdx = find(MTT == 0);
-        if ~isempty(rmvZeroIdx)
-            zeroKeep = find(MTT~=0);
-            MTT = MTT(zeroKeep);
-            MSP = MSP(zeroKeep,:);
-            MSN = MSN(zeroKeep,:);
-            MPP = MPP(zeroKeep);
-        end
+        rmvZeroIdx = MTT ~= 0;
+        
+        MTT = MTT(rmvZeroIdx);
+        MSP = MSP(rmvZeroIdx,:);
+        MSN = MSN(rmvZeroIdx,:);
+        MPP = MPP(rmvZeroIdx);
+        
         f = fSave;
         disp_msg('Saving...');drawnow
         save(ttppOutName,'MTT','MPP','MSP','MSN','f','-v7.3')
