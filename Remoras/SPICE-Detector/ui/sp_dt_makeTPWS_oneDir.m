@@ -121,6 +121,15 @@ for itr2 = 1:lfs
             subTP = subTP+1;
             letterFlag = 1;
         end
+        
+        %remove rows of zeros if applicable
+        rmvZeroIdx = MTT ~= 0;
+        
+        MTT = MTT(rmvZeroIdx);
+        MSP = MSP(rmvZeroIdx,:);
+        MSN = MSN(rmvZeroIdx,:);
+        MPP = MPP(rmvZeroIdx);
+        
         f = fSave;
         disp_msg('Saving...');drawnow
         save(ttppOutName,'MTT','MPP','MSP','MSN','f','-v7.3')
