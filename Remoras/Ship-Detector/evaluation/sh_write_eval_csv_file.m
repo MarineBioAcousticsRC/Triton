@@ -18,25 +18,33 @@ ISOEndTime = datestr(shipTimes(:,2), 'YYYY-mm-ddTHH:MM:SS.FFFZ');
 StartTime = m2xdate(shipTimes(:,1));
 EndTime = m2xdate(shipTimes(:,2));
 
+evalTable = table();
+evalTable.ISOStartTime = ISOStartTime;
+evalTable.ISOEndTime = ISOEndTime;
+evalTable.StartTime = StartTime;
+evalTable.EndTime = EndTime;
+evalTable.DetectorLabels = handles.shipLabels(handles.idxRandSamples);
+evalTable.Detector=strcmp(evalTable.DetectorLabels,'ship');
 if start
-    evalTable = table();
-    evalTable.ISOStartTime = ISOStartTime;
-    evalTable.ISOEndTime = ISOEndTime;
-    evalTable.StartTime = StartTime;
-    evalTable.EndTime = EndTime;
-    evalTable.DetectorLabels = shipLabels;
-    evalTable.Detector=strcmp(shipLabels,'ship');
-    evalTable.UserEval=strcmp(shipLabels,'ship');
-    handles.evalTable = evalTable;
+    evalTable.UserEval = evalTable.Detector;   
+else
+    evalTable.UserEval = strcmp(shipLabels,'ship'); 
 end
+evalTable.TP = evalTable.Detector == 1 & evalTable.UserEval == 1;
+evalTable.FP = evalTable.Detector == 1 & evalTable.UserEval == 0;
+evalTable.FN = evalTable.Detector == 0 & evalTable.UserEval == 1;
+evalTable.TN = evalTable.Detector == 0 & evalTable.UserEval == 0;
+evalTable.Precision = nan(height(evalTable),1);
+evalTable.Recall = nan(height(evalTable),1);
+evalTable.Comments = cell(height(evalTable),1);
+evalTable.Precision(1) = sum(evalTable.TP) / (sum(evalTable.TP) + sum(evalTable.FP));
+evalTable.Recall(1) = sum(evalTable.TP) / (sum(evalTable.TP) + sum(evalTable.FN));
+evalTable.Comments(1) = {'Caveat! False Negative does not include the missed detections by the thresholds of the detector. Mannually review the missed detections using the Visualize Detections interface and add them to the total number of False Negative'};
 
-handles.evalTable.UserEval = strcmp(shipLabels,'ship');
-
-
-if 1
+% save table to csv file
 filename = split(handles.LtsaFile,'.ltsa');
 handles.EvalCsvFile = ['Eval_',num2str(size(shipTimes,1)),...
     '_Ship_detections_',filename{1},'.csv'];
 savePath = fullfile(handles.DetectionFilePath,handles.EvalCsvFile);
-writetable(handles.evalTable,savePath)
-end
+writetable(evalTable,savePath)
+

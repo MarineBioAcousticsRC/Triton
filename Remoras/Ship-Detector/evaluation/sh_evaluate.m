@@ -417,7 +417,7 @@ if ~handles.eval
         sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),shipTimes,shipLabels)
     end
 else
-    %%%%% add sh_write_eval_csv_file
+    sh_write_eval_csv_file(handles,0);
 end
 
 guidata(hObject,handles);
@@ -455,7 +455,7 @@ if ~handles.eval
             shipTimes,shipLabels)
     end
 else
-    %%%%% add sh_write_eval_csv_file
+    sh_write_eval_csv_file(handles,0);
 end
 
 guidata(hObject,handles);
@@ -610,7 +610,7 @@ if ~handles.eval
         sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),shipTimes,shipLabels)
     end
 else
-    %%%%% add sh_write_eval_csv_file
+    sh_write_eval_csv_file(handles,0);
 end
 
 guidata(hObject,handles);
@@ -683,7 +683,7 @@ if ~handles.eval
         sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),shipTimes,shipLabels)
     end
 else
-    %%%%% add sh_write_eval_csv_file
+    sh_write_eval_csv_file(handles,0);
 end
 
 guidata(hObject,handles);
@@ -737,8 +737,6 @@ if (get(hObject,'Value') == get(hObject,'Max'))
         set(handles.slash,'Enable','on')
         set(handles.totalNum,'Enable','on')
         set(handles.totalNum,'String',size(handles.shipTimes,1))
-        handles.shipTimesEval = [];
-        handles.shipLabelsEval = [];
     end
 else
 	enabledEval = get(handles.nSamples,'Enable');
@@ -779,13 +777,17 @@ handles.eval = 1;
 handles.ViewStart = 1;
 handles.j = 1;
 handles.replot = 1;
-handles = motion_forwards_Callback(hObject, eventdata, handles);
+handles.shipTimesEval = [];
+handles.shipLabelsEval = [];
+handles.evalTable = [];
 
 % create file with user evaluation
 handles.shipTimesEval = handles.shipTimes(handles.idxRandSamples,:);
 handles.shipLabelsEval = handles.shipLabels(handles.idxRandSamples);
+% plot_ltsa_Callback(hObject, eventdata, handles)
+handles = motion_forwards_Callback(hObject, eventdata, handles);
 
-sh_write_eval_csv_file(handles,1)
+sh_write_eval_csv_file(handles,1);
 
 guidata(hObject,handles);
 
