@@ -103,9 +103,9 @@ REMORA.ct.CC.rmSet = [cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,7)]),...
     cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,9)])];
 close(REMORA.fig.ct.cc_rmclusters)
 close(REMORA.fig.ct.cc_postcluster)
-if isfield(REMORA.fig.ct,'status')
-    close(REMORA.fig.ct.status)
-end
+% if isfield(REMORA.fig.ct,'status')
+%     close(REMORA.fig.ct.status)
+% end
 % enable option on composite window and show it.
 if ~isempty(REMORA.ct.CC.rmSet)
    set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)

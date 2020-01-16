@@ -370,20 +370,26 @@ if isempty(nodeSet)
     if tritonMode;disp_msg('No clusters formed');end
     return
 end
+
 clusterIDreduced = zeros(size(compDist,1),1);
 for iNodeSet = 1:length(nodeSet)
-    clusterIDreduced(nodeSet{iNodeSet}) = iNodeSet;
+    [~,setIntersect] = intersect(excludedIn,nodeSet{iNodeSet});
+    clusterIDreduced(setIntersect) = iNodeSet;
 end
 
-if tritonMode
+if tritonMode && (size(clusterIDreduced,1)<10000)
     figure(110);clf
-    G = graph(compDist);
+    G = graph(compDist);    
     h = plot(G,'layout','force');
     set(h,'MarkerSize',8,'nodeLabel',clusterIDreduced)
+    
     for iClustPlot=1:size(nodeSet,2)
         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
     end
+else
+    disp('Too many nodes to plot as network.')
 end
+
 
 % % Final cluster using Co-assoc mat.
 % disp('Clustering using accumulated evidence')
