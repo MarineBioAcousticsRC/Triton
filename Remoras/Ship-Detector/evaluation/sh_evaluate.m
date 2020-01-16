@@ -22,7 +22,7 @@ function varargout = sh_evaluate(varargin)
 
 % Edit the above text to modify the response to help sh_evaluate
 
-% Last Modified by GUIDE v2.5 06-Jan-2020 10:33:56
+% Last Modified by GUIDE v2.5 18-Sep-2019 11:28:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,6 @@ handles.brightness = 0.4;
 handles.NextFile = 0;
 handles.replot = 0;
 handles.ViewStart = 1;
-handles.eval = 0;
 
 % Choose default command line output for sh_evaluate
 handles.output = hObject;
@@ -99,7 +98,7 @@ plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function start_freq_CreateFcn(hObject, ~, ~)
+function start_freq_CreateFcn(hObject, ~, handles)
 % hObject    handle to start_freq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -118,7 +117,7 @@ plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function end_freq_CreateFcn(hObject, ~, ~)
+function end_freq_CreateFcn(hObject, ~, handles)
 % hObject    handle to end_freq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -138,7 +137,7 @@ motion_forwards_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function plot_length_CreateFcn(hObject, ~, ~)
+function plot_length_CreateFcn(hObject, ~, handles)
 % hObject    handle to plot_length (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -160,30 +159,14 @@ if isempty(handles.shipTimes)
 end
 if ~isfield(handles,'ltsaData') || isempty(handles.ltsaData)
     handles = motion_forwards_Callback(hObject, 1, handles); 
-else   
-    % enable all the tools when ltsa snippets are loaded
-    enabledText = get(handles.text_completed,'Enable');
-    if strcmp(enabledText,'off')
-        set(handles.slider1,'Enable','on')
-        set(handles.percent_completed,'Enable','on'); set(handles.text_completed,'Enable','on');
-        set(handles.all_ship,'Enable','on'); set(handles.all_no_ship,'Enable','on')
-        set(handles.subset_ship,'Enable','on'); set(handles.subset_no_ship,'Enable','on')
-        set(handles.motion_forwards,'Enable','on')
-        set(handles.eval_randomSamples,'Enable','on');
-    end
-    
+else
     sh_draw_ltsa(handles);
     
-    if ~handles.eval
-        shipTimes = handles.shipTimes;
-    else
-        shipTimes = handles.shipTimesEval;
-    end
-    
     % update percentage processed
-    perc = round(handles.ViewEnd/size(shipTimes,1)*100);
-    % only show 100 when it is really 100, keep 99 if round percentage is 100
-    if perc == 100 && (handles.ViewEnd/size(shipTimes,1)*100) ~=100
+    perc = round(handles.ViewEnd/size(handles.shipTimes,1)*100);
+    % only show 100 when it is really 100, keep 99 if round percentage is
+    % 100
+    if perc == 100 && (handles.ViewEnd/size(handles.shipTimes,1)*100) ~=100
        perc = 99; 
     end
     set(handles.percent_completed,'String',perc)
@@ -209,7 +192,7 @@ else
     end
     
     % set forwards button off (end file) and on (not end of file)
-    if handles.j > size(shipTimes,1)
+    if handles.j > size(handles.shipTimes,1)
         if strcmp(enabledFwd,'on')
             set(handles.motion_forwards,'Enable','off')
         end
@@ -217,8 +200,7 @@ else
         if strcmp(enabledFwd,'off')
             set(handles.motion_forwards,'Enable','on')
         end
-    end 
-        
+    end
 end
 guidata(hObject, handles);
 
@@ -230,14 +212,10 @@ function handles = motion_forwards_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % % Move forward button '>'
-handles.ltsaData=[]; handles.markers=0; length_index=0;
+ltsaData = []; handles.ltsaData=[]; handles.markers=0; length_index=0;
 repeat = 0;
 
-if ~handles.eval
-    shipTimes = handles.shipTimes;
-else
-    shipTimes = handles.shipTimesEval;
-end
+shipTimes = handles.shipTimes;
 % if replot 1, keep same start time, if not the last detection processed.
 if ~handles.replot
     handles.ViewStart = handles.j;
@@ -314,12 +292,7 @@ end
 handles.ltsaData = [];
 handles.markers = 0;
 repeat = 0;
-
-if ~handles.eval
-    shipTimes = handles.shipTimes;
-else
-    shipTimes = handles.shipTimesEval;
-end
+shipTimes = handles.shipTimes;
 
 while(size(handles.ltsaData,2) < floor(handles.PlotLengthVal*60*60/handles.ltsa.tave))...
         && (viewStart > 0)
@@ -351,7 +324,7 @@ if repeat
 end
 
 % update text
-set(handles.percent_completed,'String',round(handles.ViewEnd/size(shipTimes,1)*100))
+set(handles.percent_completed,'String',round(handles.ViewEnd/size(handles.shipTimes,1)*100))
 handles.marker_count = handles.marker_count+length(handles.markers);
 
 guidata(hObject, handles);
@@ -374,7 +347,7 @@ plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function slider1_CreateFcn(hObject, ~, ~)
+function slider1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -392,32 +365,18 @@ function all_ship_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-if ~handles.eval
-    shipTimes = handles.shipTimes;
-    % modify labels from current window
-    handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ship'};
-    shipLabels = handles.shipLabels;
-else
-    shipTimes = handles.shipTimes(handles.idxRandSamples,:);
-    handles.shipLabelsEval(handles.ViewStart:handles.ViewEnd) = {'ship'};
-    shipLabels = handles.shipLabelsEval;
-end
-
-if ~handles.eval
-    save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-    filename = split(handles.LtsaFile,'.ltsa');
-    % rewrite tlab file
-    handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-    sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-        shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
-    
-    % rewrite csv file
-    if handles.settingsRemora.saveCsv
-        handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
-        sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),shipTimes,shipLabels)
-    end
-else
-    sh_write_eval_csv_file(handles,0);
+handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ship'};
+shipLabels = handles.shipLabels;
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+filename = split(handles.LtsaFile,'.ltsa');
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);
@@ -430,39 +389,25 @@ function all_no_ship_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-if ~handles.eval
-    shipTimes = handles.shipTimes;
-    handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ambient'};
-    shipLabels = handles.shipLabels;
-else
-    shipTimes = handles.shipTimesEval;
-    handles.shipLabelsEval(handles.ViewStart:handles.ViewEnd) = {'ambient'};
-    shipLabels = handles.shipLabelsEval;
-end
-
-if ~handles.eval
-    save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-    filename = split(handles.LtsaFile,'.ltsa');
-    % rewrite tlab file
-    handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-    sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-        shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
-    
-    % rewrite csv file
-    if handles.settingsRemora.saveCsv
-        handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
-        sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),...
-            shipTimes,shipLabels)
-    end
-else
-    sh_write_eval_csv_file(handles,0);
+handles.shipLabels(handles.ViewStart:handles.ViewEnd) = {'ambient'};
+shipLabels = handles.shipLabels;
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+filename = split(handles.LtsaFile,'.ltsa');
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);
 plot_ltsa_Callback(hObject, eventdata, handles)
 
 
-function initialize_buttons(src, eventdata, ~, ~)
+function initialize_buttons(src, eventdata, handles, hObject)
 %this function takes in two inputs by default
 
 %src is the gui figure
@@ -493,7 +438,7 @@ end;
 
 
 % --------------------------------------------------------------------
-function detection_file_ClickedCallback(hObject, ~, handles)
+function detection_file_ClickedCallback(hObject, eventdata, handles)
 % Choose folder of detection_file files to be reviewed, and specify start file
 % hObject    handle to detection_file (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -513,20 +458,13 @@ if FilterIndex >0
     handles.settingsRemora = struct;
     handles.settingsRemora = settings(:);
     set(handles.detection_filename,'String',handles.DetectionFile)
-    
-    % enable select ltsa file
-    enabledltsa = get(handles.ltsa_file,'Enable');
-    if strcmp(enabledltsa,'off')
-        set(handles.ltsa_file,'Enable','on');
-        set(handles.detection_filename,'Enable','on')
-    end
     guidata(hObject,handles);
 else
     error('No detection file selected. \n')
 end
 
 % --------------------------------------------------------------------
-function ltsa_file_ClickedCallback(hObject, ~, handles)
+function ltsa_file_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to ltsa_file (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -541,15 +479,6 @@ end
 
 % find if detection file matches ltsa file
 if FilterIndex > 0
-    % enable all the tools for ltsa snippets
-    enabledplot = get(handles.plot_ltsa,'Enable');
-    if strcmp(enabledplot,'off')
-        set(handles.plot_ltsa,'Enable','on');
-        set(handles.start_freq,'Enable','on'); set(handles.text_start_freq,'Enable','on');
-        set(handles.end_freq,'Enable','on'); set(handles.text_end_freq,'Enable','on');
-        set(handles.plot_length,'Enable','on'); set(handles.text_plot_length,'Enable','on');
-        set(handles.start_detection,'Enable','on'); set(handles.text_start_detection,'Enable','on');
-    end
     fprintf('Evaluation detections from LTSA file %s\n',FileName)
     targetFileName = strrep(FileName,'.ltsa','');
     match = strfind(handles.DetectionFile,targetFileName);
@@ -565,10 +494,10 @@ if FilterIndex > 0
     end
     set(handles.start_freq,'String',handles.ltsa.freq0)
     set(handles.end_freq,'String',handles.ltsa.freq1)
-
+    %     start_freq_Callback(hObject, eventdata, handles)
+    %     end_freq_Callback(hObject, eventdata, handles)
     handles.StartFreqVal = str2double(get(handles.start_freq,'String'));
     handles.EndFreqVal = str2double(get(handles.end_freq,'String'));
-    
     guidata(hObject,handles);
 else
     error('No LTSA file selected. \n')
@@ -587,30 +516,18 @@ bin2hr = handles.ltsa.tave/(60*60);
 [~, idxLeft] = find(handles.markers*bin2hr <= coordinates(2,1));
 selected = intersect(idxRight-1,idxLeft);
 
-if ~handles.eval
-    shipTimes = handles.shipTimes;
-    handles.shipLabels(handles.ViewStart+selected-1) = {'ship'};
-    shipLabels = handles.shipLabels;
-else
-    shipTimes = handles.shipTimesEval;
-    handles.shipLabelsEval(handles.ViewStart+selected-1) = {'ship'};
-    shipLabels = handles.shipLabelsEval;
-end
-
-if ~handles.eval
-    save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-    filename = split(handles.LtsaFile,'.ltsa');
-    % rewrite tlab file
-    handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-    sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-        shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
-    % rewrite csv file
-    if handles.settingsRemora.saveCsv
-        handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
-        sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),shipTimes,shipLabels)
-    end
-else
-    sh_write_eval_csv_file(handles,0);
+handles.shipLabels(handles.ViewStart+selected-1) = {'ship'};
+shipLabels = handles.shipLabels;
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+filename = split(handles.LtsaFile,'.ltsa');
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);
@@ -631,7 +548,7 @@ guidata(hObject,handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function start_detection_CreateFcn(hObject, ~, handles)
+function start_detection_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to start_detection (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -659,31 +576,18 @@ bin2hr = handles.ltsa.tave/(60*60);
 [~, idxLeft] = find(handles.markers*bin2hr <= coordinates(2,1));
 selected = intersect(idxRight-1,idxLeft);
 
-if ~handles.eval
-    shipTimes = handles.shipTimes;
-    handles.shipLabels(handles.ViewStart+selected-1) = {'ambient'};
-    shipLabels = handles.shipLabels;
-else
-    shipTimes = handles.shipTimesEval;
-    handles.shipLabelsEval(handles.ViewStart+selected-1) = {'ambient'};
-    shipLabels = handles.shipLabelsEval;
-end
-
-if ~handles.eval
-    save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
-    filename = split(handles.LtsaFile,'.ltsa');
-    % rewrite tlab file
-    handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
-    sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
-        shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
-    
-    % rewrite csv file
-    if handles.settingsRemora.saveCsv
-        handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
-        sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),shipTimes,shipLabels)
-    end
-else
-    sh_write_eval_csv_file(handles,0);
+handles.shipLabels(handles.ViewStart+selected-1) = {'ambient'};
+shipLabels = handles.shipLabels;
+save(fullfile(handles.DetectionFilePath,handles.DetectionFile), 'shipLabels','-append')
+filename = split(handles.LtsaFile,'.ltsa');
+% rewrite tlab file
+handles.LabelFile = ['Ship_labels_',filename{1},'.tlab'];
+sh_write_labels(fullfile(handles.DetectionFilePath,handles.LabelFile), ...
+    handles.shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+% rewrite csv file
+if handles.settingsRemora.saveCsv
+    handles.CsvFile = ['Ship_detections_',filename{1},'.csv'];
+    sh_write_csv_file(fullfile(handles.DetectionFilePath,handles.CsvFile),handles.shipTimes,shipLabels)
 end
 
 guidata(hObject,handles);
@@ -692,14 +596,14 @@ plot_ltsa_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function figure1_CreateFcn(hObject, ~, ~)
+function figure1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 
 % --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, ~)
+function figure1_CloseRequestFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -709,97 +613,14 @@ delete(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
-function detection_filename_CreateFcn(hObject, ~, ~)
+function detection_filename_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to detection_file (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 
 % --- Executes during object creation, after setting all properties.
-function ltsa_filename_CreateFcn(hObject, ~, ~)
+function ltsa_filename_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to ltsa_file (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
-
-% --- Executes on button press in eval_randomSamples.
-function eval_randomSamples_Callback(hObject, eventdata, handles)
-% hObject    handle to eval_randomSamples (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of eval_randomSamples
-if (get(hObject,'Value') == get(hObject,'Max'))
-    enabledEval = get(handles.nSamples,'Enable');
-    if strcmp(enabledEval,'off')
-        set(handles.text_nSamples,'Enable','on')
-        set(handles.nSamples,'Enable','on')
-        set(handles.slash,'Enable','on')
-        set(handles.totalNum,'Enable','on')
-        set(handles.totalNum,'String',size(handles.shipTimes,1))
-    end
-else
-	enabledEval = get(handles.nSamples,'Enable');
-    if strcmp(enabledEval,'on')
-        set(handles.text_nSamples,'Enable','off')
-        set(handles.nSamples,'Enable','off')
-        set(handles.slash,'Enable','off')
-        set(handles.totalNum,'String','total')
-        set(handles.totalNum,'Enable','off')
-        % set to normal mode starting from the beggining
-        handles.eval = 0;
-        handles.replot = 1;
-        handles.ViewStart = 1;
-        handles.j = 1;
-        handles = motion_forwards_Callback(hObject, eventdata, handles);
-    end
-end
-guidata(hObject,handles);
-
-
-
-function nSamples_Callback(hObject, eventdata, handles)
-% hObject    handle to nSamples (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of nSamples as text
-%        str2double(get(hObject,'String')) returns contents of nSamples as a double
-handles.maxRandSamples = str2double(get(handles.nSamples,'String'));
-if handles.maxRandSamples > size(handles.shipTimes,1)
-    error('Error! Number of subsamples must be less than the total number of detections (N=%d).',...    
-    size(handles.shipTimes,1));
-end
-% Get indices of selected subsamples
-randIdx = randperm(size(handles.shipTimes,1));
-handles.idxRandSamples = sort(randIdx(1:handles.maxRandSamples));
-handles.eval = 1;
-handles.ViewStart = 1;
-handles.j = 1;
-handles.replot = 1;
-handles.shipTimesEval = [];
-handles.shipLabelsEval = [];
-handles.evalTable = [];
-
-% create file with user evaluation
-handles.shipTimesEval = handles.shipTimes(handles.idxRandSamples,:);
-handles.shipLabelsEval = handles.shipLabels(handles.idxRandSamples);
-% plot_ltsa_Callback(hObject, eventdata, handles)
-handles = motion_forwards_Callback(hObject, eventdata, handles);
-
-sh_write_eval_csv_file(handles,1);
-
-guidata(hObject,handles);
-
-
-% --- Executes during object creation, after setting all properties.
-function nSamples_CreateFcn(hObject, ~, ~)
-% hObject    handle to nSamples (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end

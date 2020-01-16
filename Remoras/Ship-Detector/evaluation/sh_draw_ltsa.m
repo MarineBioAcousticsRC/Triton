@@ -7,15 +7,7 @@ function sh_draw_ltsa(handles)
 bin2hr = handles.ltsa.tave/(60*60);
 boxcolor{1}='r'; % 1 is red
 boxcolor{2}='g'; % 2 is green
-
-if ~handles.eval
-    shipLabels = handles.shipLabels;
-    detNum = handles.ViewStart:(handles.ViewStart+length(handles.markers)-2);
-else
-    shipLabels = handles.shipLabelsEval;
-    idxDetNum = handles.ViewStart:(handles.ViewStart+length(handles.markers)-2);
-    detNum = handles.idxRandSamples(idxDetNum);
-end
+detNum = handles.ViewStart:(handles.ViewStart+length(handles.markers)-1);
 
 % Change plot frequency axis
 
@@ -37,7 +29,7 @@ for iDilim = 1:length(handles.markers)-1
         [0,handles.EndFreqVal],'w');
     
     % plot rectangles 
-    boxnumber = strcmp(shipLabels{handles.ViewStart+iDilim-1},'ship')+1;
+    boxnumber = strcmp(handles.shipLabels{handles.ViewStart+iDilim-1},'ship')+1;
     
     rectangle('Position',[handles.markers(iDilim)*bin2hr,...
         handles.EndFreqVal - round(.015*(handles.EndFreqVal-handles.StartFreqVal)),...
