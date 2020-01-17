@@ -17,6 +17,7 @@ MSN = zeros(maxRows,tsWin);
 MTT = zeros(maxRows,1);
 MSP = [];
 matIdxStart = 1;
+matIdxEnd = 1;
 for itr2 = 1:lfs
     thisFile = fileSet.mat(itr2);
     
