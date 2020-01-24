@@ -15,8 +15,8 @@ ISOStartTime = datestr(shipTimes(:,1), 'YYYY-mm-ddTHH:MM:SS.FFFZ');
 ISOEndTime = datestr(shipTimes(:,2), 'YYYY-mm-ddTHH:MM:SS.FFFZ');
 
 % convert  Matlab serial date to Excel serial date 
-StartTime = m2xdate(shipTimes(:,1));
-EndTime = m2xdate(shipTimes(:,2));
+StartTime = shipTimes(:,1) - 693960;
+EndTime = shipTimes(:,2) - 693960;
 
 evalTable = table();
 evalTable.ISOStartTime = ISOStartTime;
