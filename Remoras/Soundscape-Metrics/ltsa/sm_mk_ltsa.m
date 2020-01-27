@@ -26,7 +26,7 @@ end
 % check some ltsa parameters and other stuff
 sm_ck_ltsaparams;
 
-% split the data into approximately weekly chunks
+% split the data into # days defined before
 sm_split_ltsa;
 
 for lIdx = PARAMS.ltsa.nstart:size(PARAMS.ltsahd.ltsaIdx,1)

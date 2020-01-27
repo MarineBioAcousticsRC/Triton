@@ -13,9 +13,6 @@ global PARAMS
 PARAMS.ltsa.startIdx = PARAMS.ltsahd.ltsaIdx(lIdx,1);
 PARAMS.ltsa.endIdx = PARAMS.ltsahd.ltsaIdx(lIdx,2);
 
-% get file name
-filterSpec1 = '*.ltsa';
-boxTitle1 = 'Save LTSA File';
 % define LTSA output file name
 if lIdx<10
     fnum = ['0',num2str(lIdx)];

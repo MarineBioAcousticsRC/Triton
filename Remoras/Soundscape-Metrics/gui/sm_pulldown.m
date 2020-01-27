@@ -42,6 +42,61 @@ elseif strcmp(action,'compute_metrics')
     
     sm_setpointers('arrow');
     
+elseif strcmp(action,'load_ltsa')
+    
+%     ipnamesave = PARAMS.ltsa.inpath;
+%     ifnamesave = PARAMS.ltsa.infile;
+    % user interface retrieve file to open through a dialog box
+    boxTitle1 = 'Open LTSA File';
+    filterSpec1 = '*.ltsa';
+    [PARAMS.ltsa.infile,PARAMS.ltsa.inpath]=uigetfile(filterSpec1,boxTitle1);
+    % if the cancel button is pushed, then no file is loaded so exit this script
+    if strcmp(num2str(PARAMS.ltsa.infile),'0')
+        PARAMS.ltsa.inpath = '';
+        PARAMS.ltsa.infile = '';
+        return
+    else % give user some feedback
+        disp_msg('Opened File: ')
+        disp_msg([PARAMS.ltsa.inpath,PARAMS.ltsa.infile])
+        cd(PARAMS.ltsa.inpath)
+    end
+    % calculate the number of blocks in the opened file
+    set(HANDLES.fig.ctrl, 'Pointer', 'watch');
+    PARAMS.ltsa.ftype = 1;
+    if(get(HANDLES.display.ltsa,'Value'))
+        if get(HANDLES.mc.on,'Value') || get(HANDLES.mc.lock, 'Value')
+            set(HANDLES.mc.on,'Value', 0)
+            set(HANDLES.mc.lock,'Value', 0)
+        end
+    end
+    set(HANDLES.display.ltsa,'Visible','on')
+    set(HANDLES.display.ltsa,'Value',1);
+    set(HANDLES.ltsa.delimit.but,'Visible','on')
+    control_ltsa('button')
+    set([HANDLES.ltsa.motion.seekbof HANDLES.ltsa.motion.back HANDLES.ltsa.motion.autoback HANDLES.ltsa.motion.stop],...
+        'Enable','off');
+    sm_init_ltsadata
+    sm_read_ltsadata
+    PARAMS.plot.dnum = PARAMS.ltsa.plot.dnum;
+    plot_triton
+    %if link axes is on, lock all the axes zoom in together
+    if get(HANDLES.mc.lock, 'Value') && get(HANDLES.mc.on,'Value')
+        fig_hand = get(HANDLES.plot1,'Parent');
+        all_hands = findobj(fig_hand, 'type', 'axes', 'tag', '');
+        %add one for savalue so ltsa axis doesn't get linked
+        all_hands (PARAMS.ch + 1) = 0;
+        linkaxes(all_hands,'x');
+    end
+    control_ltsa('timeon')   % was timecontrol(1)
+    % turn on other menus now
+    control_ltsa('menuon')
+    control_ltsa('ampon')
+    control_ltsa('freqon')
+    set(HANDLES.ltsa.motioncontrols,'Visible','on')
+    set(HANDLES.ltsa.equal,'Visible','on')
+    set(HANDLES.fig.ctrl, 'Pointer', 'arrow');
+
+
 elseif strcmp(action,'plot_metrics')
     % dialog box - compute metrics
     sm_setpointers('watch');
