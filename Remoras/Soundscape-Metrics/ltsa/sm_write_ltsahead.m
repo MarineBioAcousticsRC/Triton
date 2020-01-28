@@ -99,7 +99,7 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx
         ltsaByteLoc = dataStartLoc;
     else
         % ltsa data byte loc = previous loc + # spectral ave (of previous loc) * # freqs in each spectra * # of bytes per spectrum level value
-        ltsaByteLoc = ltsaByteLoc +  PARAMS.ltsa.nave(k-1) * PARAMS.ltsa.nfreq * 4;
+        ltsaByteLoc = ltsaByteLoc +  PARAMS.ltsa.nave(k-1) * PARAMS.ltsa.nfreq * 1;
     end
     
     PARAMS.ltsa.byteloc(k) = ltsaByteLoc;

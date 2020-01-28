@@ -173,7 +173,7 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all xwa
             ltsa = 10*log10(ltsa); % counts^2/Hz
             ltsa = single(ltsa); % convert from floating point 'double' to 'single'
             % write data
-            fwrite(fod,ltsa,'single');
+            fwrite(fod,ltsa,'int8');
             count = count + 1;
         end     % end for n - loop over the number of spectral averages
         
