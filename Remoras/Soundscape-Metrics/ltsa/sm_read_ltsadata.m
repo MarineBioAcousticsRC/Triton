@@ -49,7 +49,7 @@ if status == -1
     disp_msg(msg_str);
 end
 PARAMS.ltsa.pwr = [];
-PARAMS.ltsa.pwr = fread(fid,[PARAMS.ltsa.nf,nbin],'int8');   % read data
+PARAMS.ltsa.pwr = fread(fid,[PARAMS.ltsa.nf,nbin],'single');   % read data
 
 % time bins
 tbinsz = PARAMS.ltsa.tave/(60*60);

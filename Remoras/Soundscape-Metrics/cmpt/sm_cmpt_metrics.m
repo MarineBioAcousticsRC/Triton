@@ -37,7 +37,7 @@ for fidx = REMORA.sm.cmpt.fstart:length(REMORA.sm.cmpt.FileList)
     PARAMS.ltsa = [];
     PARAMS.ltsa.inpath = REMORA.sm.cmpt.PathList{fidx};
     PARAMS.ltsa.infile = REMORA.sm.cmpt.FileList{fidx};
-    read_ltsahead;
+    sm_read_ltsahead;
 
     % set up header matrix of LTSA averages: timestamp and byte location 
     % in file for each average and whether or not to keep it
