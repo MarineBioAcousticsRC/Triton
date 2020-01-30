@@ -37,9 +37,9 @@ end
 
 
 %% if 'mean' is selected
-if REMORA.sm.cmpt.mean  
+if ~isnan(REMORA.sm.cmpt.mean)
     % if power spectral density selected
-    if REMORA.sm.cmpt.psd
+    if ~isnan(REMORA.sm.cmpt.psd)
         % output in csv (later to be added ltsa format)
         REMORA.sm.cmpt.out.meanpsd = [fileid,'_PSD_mean_',suffix,'.csv'];
         REMORA.sm.cmpt.out.meanltsa = [fileid,'_PSD_mean_',suffix,'.ltsa'];
@@ -61,7 +61,7 @@ if REMORA.sm.cmpt.mean
     end
     
     % if broadband levels selected
-    if REMORA.sm.cmpt.bb
+    if ~isnan(REMORA.sm.cmpt.bb)
         % output in csv
         REMORA.sm.cmpt.out.meanbb = [fileid,'_BB_mean_',suffix,'.csv'];
         
@@ -75,7 +75,7 @@ if REMORA.sm.cmpt.mean
     end
     
     % if octave levels selected
-    if REMORA.sm.cmpt.ol
+    if ~isnan(REMORA.sm.cmpt.ol)
         % output in csv
         REMORA.sm.cmpt.out.meanol = [fileid,'_OL_mean_',suffix,'.csv'];
         
@@ -96,7 +96,7 @@ if REMORA.sm.cmpt.mean
     end
     
     % if third octave levels selected
-    if REMORA.sm.cmpt.tol
+    if ~isnan(REMORA.sm.cmpt.tol)
         % output in csv
         REMORA.sm.cmpt.out.meantol = [fileid,'_TOL_mean_',suffix,'.csv'];
         
@@ -118,9 +118,9 @@ if REMORA.sm.cmpt.mean
 end
 
 %% if 'median' is selected
-if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
+if ~isnan(REMORA.sm.cmpt.median) || ~isnan(REMORA.sm.cmpt.prctile)
     % if power spectral density selected
-    if REMORA.sm.cmpt.psd
+    if ~isnan(REMORA.sm.cmpt.psd)
         % output in csv (later to be added ltsa format)
         REMORA.sm.cmpt.out.psd_pct50 = [fileid,'_PSD_',suffix,'.csv'];
         
@@ -141,7 +141,7 @@ if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
     end
     
     % if broadband levels selected
-    if REMORA.sm.cmpt.bb
+    if ~isnan(REMORA.sm.cmpt.bb)
         % output in csv
         REMORA.sm.cmpt.out.bb_pct50 = [fileid,'_BB_',suffix,'.csv'];
         
@@ -155,7 +155,7 @@ if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
     end
     
     % if octave levels selected
-    if REMORA.sm.cmpt.ol
+    if ~isnan(REMORA.sm.cmpt.ol)
         % output in csv
         REMORA.sm.cmpt.out.ol_pct50 = [fileid,'_OL_',suffix,'.csv'];
         
@@ -176,7 +176,7 @@ if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
     end
     
     % if third octave levels selected
-    if REMORA.sm.cmpt.tol
+    if ~isnan(REMORA.sm.cmpt.tol)
         % output in csv
         REMORA.sm.cmpt.out.tol_pct50 = [fileid,'_TOL_',suffix,'.csv'];
         
@@ -198,9 +198,9 @@ if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
 end
 
 %% if 'percentile' is selected
-if REMORA.sm.cmpt.prctile
+if ~isnan(REMORA.sm.cmpt.prctile)
     % if power spectral density selected
-    if REMORA.sm.cmpt.psd
+    if ~isnan(REMORA.sm.cmpt.psd)
         % output in csv
         REMORA.sm.cmpt.out.psd_pct01 = [fileid,'_PSD_pct01_',suffix,'.csv'];
         REMORA.sm.cmpt.out.psd_pct05 = [fileid,'_PSD_pct05_',suffix,'.csv'];
@@ -256,7 +256,7 @@ if REMORA.sm.cmpt.prctile
     end
     
     % if broadband levels selected
-    if REMORA.sm.cmpt.bb
+    if ~isnan(REMORA.sm.cmpt.bb)
         % output in csv
         REMORA.sm.cmpt.out.bb_pct01 = [fileid,'_BB_pct01_',suffix,'.csv'];
         REMORA.sm.cmpt.out.bb_pct05 = [fileid,'_BB_pct05_',suffix,'.csv'];
@@ -305,7 +305,7 @@ if REMORA.sm.cmpt.prctile
     end
     
     % if octave levels selected
-    if REMORA.sm.cmpt.ol
+    if ~isnan(REMORA.sm.cmpt.ol)
         % output in csv
         REMORA.sm.cmpt.out.ol_pct01 = [fileid,'_OL_pct01_',suffix,'.csv'];
         REMORA.sm.cmpt.out.ol_pct05 = [fileid,'_OL_pct05_',suffix,'.csv'];
@@ -361,7 +361,7 @@ if REMORA.sm.cmpt.prctile
     end
     
     % if third octave levels selected
-    if REMORA.sm.cmpt.tol
+    if ~isnan(REMORA.sm.cmpt.tol)
         % output in csv
         REMORA.sm.cmpt.out.tol_pct01 = [fileid,'_TOL_pct01_',suffix,'.csv'];
         REMORA.sm.cmpt.out.tol_pct05 = [fileid,'_TOL_pct05_',suffix,'.csv'];

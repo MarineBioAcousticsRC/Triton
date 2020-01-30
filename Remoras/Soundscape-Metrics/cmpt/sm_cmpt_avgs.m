@@ -124,14 +124,14 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             REMORA.sm.cmpt.pre.pwr = 10.^(REMORA.sm.cmpt.pre.psd/10);
 
             % if bb, sum up band power
-            if REMORA.sm.cmpt.bb
+            if ~isnan(REMORA.sm.cmpt.bb)
                 bb=[];
                 % lower frequency edge
                 bb = sum(REMORA.sm.cmpt.pre.pwr(:,poslow:end),2);
             end
 
             % if tol, sum up tol band power
-            if REMORA.sm.cmpt.tol
+            if ~isnan(REMORA.sm.cmpt.tol)
                 tol = [];
                 for a = 1:size(REMORA.sm.cmpt.TOLbound,1)
                     tol(:,a) = sum(REMORA.sm.cmpt.pre.pwr(:,...
@@ -140,7 +140,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             end
 
             % if ol, sum up ol band power
-            if REMORA.sm.cmpt.ol
+            if ~isnan(REMORA.sm.cmpt.ol)
                 ol=[];
                 for a = 1:size(REMORA.sm.cmpt.OLbound,1)
                     ol(:,a) = sum(REMORA.sm.cmpt.pre.pwr(:,...
@@ -168,10 +168,10 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
 
 
             %% if 'mean' is selected
-            if REMORA.sm.cmpt.mean 
+            if ~isnan(REMORA.sm.cmpt.mean)
 
                 % if power spectral density selected
-                if REMORA.sm.cmpt.psd
+                if ~isnan(REMORA.sm.cmpt.psd)
                     % arithmetic mean
                     REMORA.sm.cmpt.pre.meanpsd = 10*log10(nanmean(REMORA.sm.cmpt.pre.pwr));
                     REMORA.sm.cmpt.pre.logmeanpsd = nanmean(REMORA.sm.cmpt.pre.psd);
@@ -188,12 +188,12 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
                 end
 
                 % if broadband levels selected
-                if REMORA.sm.cmpt.bb
+                if ~isnan(REMORA.sm.cmpt.bb)
                    REMORA.sm.cmpt.pre.meanbb = 10*log10(nanmean(bb));               
                 end
 
                 % if octave levels selected
-                if REMORA.sm.cmpt.ol
+                if ~isnan(REMORA.sm.cmpt.ol)
                    REMORA.sm.cmpt.pre.meanol = 10*log10(nanmean(ol));
                    % adjust for octave level rounding based on 1 Hz increments
                    REMORA.sm.cmpt.pre.meanol = REMORA.sm.cmpt.pre.meanol + ...
@@ -201,7 +201,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
                 end
 
                 % if 1/3 octave levels selected
-                if REMORA.sm.cmpt.tol
+                if ~isnan(REMORA.sm.cmpt.tol)
                    REMORA.sm.cmpt.pre.meantol = 10*log10(nanmean(tol));
                    % adjust for octave level rounding based on 1 Hz increments
                    REMORA.sm.cmpt.pre.meantol = REMORA.sm.cmpt.pre.meantol + ...
@@ -210,11 +210,11 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             end
 
             %% if 'median' or 'percentile' is selected
-            if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
+            if ~isnan(REMORA.sm.cmpt.median) || ~isnan(REMORA.sm.cmpt.prctile)
                 p = [1, 5, 10, 25, 50, 75, 90, 95, 99];
 
                 % if power spectral density selected
-                if REMORA.sm.cmpt.psd
+                if ~isnan(REMORA.sm.cmpt.psd)
                     % compute percentiles
                     REMORA.sm.cmpt.pre.prcpsd = 10*log10(prctile(REMORA.sm.cmpt.pre.pwr,p));
                     % crop to lower band edge
@@ -222,19 +222,19 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
                 end
 
                 % if broadband levels selected
-                if REMORA.sm.cmpt.bb
+                if ~isnan(REMORA.sm.cmpt.bb)
                     % compute percentiles
                     REMORA.sm.cmpt.pre.prcbb = 10*log10(prctile(bb,p));
                 end
 
                 % if octave levels selected
-                if REMORA.sm.cmpt.ol
+                if ~isnan(REMORA.sm.cmpt.ol)
                    % compute percentiles
                     REMORA.sm.cmpt.pre.prcol = 10*log10(prctile(ol,p));
                 end
 
                 % if third octave levels selected
-                if REMORA.sm.cmpt.tol
+                if ~isnan(REMORA.sm.cmpt.tol)
                     % compute percentiles
                     REMORA.sm.cmpt.pre.prctol = 10*log10(prctile(tol,p));
                 end

@@ -13,9 +13,9 @@ thisstart = REMORA.sm.cmpt.pre.rembins(tidx) + datenum([2000 0 0 0 0 0]);
 avg_date = dbSerialDateToISO8601(thisstart);
 
 %% if 'mean' is selected
-if REMORA.sm.cmpt.mean  
+if ~isnan(REMORA.sm.cmpt.mean)
     % if power spectral density selected
-    if REMORA.sm.cmpt.psd
+    if ~isnan(REMORA.sm.cmpt.psd)
         % output in csv (later to be added ltsa);
         %write date
         fprintf(REMORA.sm.cmpt.fid.psd,'%s, ',avg_date);
@@ -30,13 +30,13 @@ if REMORA.sm.cmpt.mean
     end
     
     % if broadband levels selected
-    if REMORA.sm.cmpt.bb
+    if ~isnan(REMORA.sm.cmpt.bb)
         %write mean bb
         fprintf(REMORA.sm.cmpt.fid.bb,'%s, %f\n',avg_date,REMORA.sm.cmpt.pre.meanbb);
     end
     
     % if octave levels selected
-    if REMORA.sm.cmpt.ol
+    if ~isnan(REMORA.sm.cmpt.ol)
         %write date
         fprintf(REMORA.sm.cmpt.fid.ol,'%s, ',avg_date);
         %write mean ol
@@ -50,7 +50,7 @@ if REMORA.sm.cmpt.mean
     end
     
     % if third octave levels selected
-    if REMORA.sm.cmpt.tol
+    if ~isnan(REMORA.sm.cmpt.tol)
        %write date
         fprintf(REMORA.sm.cmpt.fid.tol,'%s, ',avg_date);
         %write mean tol
@@ -65,9 +65,9 @@ if REMORA.sm.cmpt.mean
 end
 
 %% if 'median' is selected
-if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
+if ~isnan(REMORA.sm.cmpt.median) || ~isnan(REMORA.sm.cmpt.prctile)
     % if power spectral density selected
-    if REMORA.sm.cmpt.psd
+    if ~isnan(REMORA.sm.cmpt.psd)
         % output in csv (later to be added ltsa);
         %write date
         fprintf(REMORA.sm.cmpt.fid.psd_pct50,'%s, ',avg_date);
@@ -82,13 +82,13 @@ if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
     end
     
     % if broadband levels selected
-    if REMORA.sm.cmpt.bb
+    if ~isnan(REMORA.sm.cmpt.bb)
         %write mean bb
         fprintf(REMORA.sm.cmpt.fid.bb_pct50,'%s, %f\n',avg_date,REMORA.sm.cmpt.pre.prcbb(5));
     end
     
     % if octave levels selected
-    if REMORA.sm.cmpt.ol
+    if ~isnan(REMORA.sm.cmpt.ol)
         %write date
         fprintf(REMORA.sm.cmpt.fid.ol_pct50,'%s, ',avg_date);
         %write median
@@ -102,7 +102,7 @@ if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
     end
     
     % if third octave levels selected
-    if REMORA.sm.cmpt.tol
+    if ~isnan(REMORA.sm.cmpt.tol)
         %write date
         fprintf(REMORA.sm.cmpt.fid.tol_pct50,'%s, ',avg_date);
         %write median
@@ -117,9 +117,9 @@ if REMORA.sm.cmpt.median || REMORA.sm.cmpt.prctile
 end
 
 %% if 'percentile' is selected
-if REMORA.sm.cmpt.prctile
+if ~isnan(REMORA.sm.cmpt.prctile)
     % if power spectral density selected
-    if REMORA.sm.cmpt.psd
+    if ~isnan(REMORA.sm.cmpt.psd)
         %write 1%
         fprintf(REMORA.sm.cmpt.fid.psd_pct01,'%s, ',avg_date);
         for a = 1:size(REMORA.sm.cmpt.pre.prcpsd,2)
@@ -202,7 +202,7 @@ if REMORA.sm.cmpt.prctile
     end
     
     % if broadband levels selected
-    if REMORA.sm.cmpt.bb
+    if ~isnan(REMORA.sm.cmpt.bb)
         fprintf(REMORA.sm.cmpt.fid.bb_pct01,'%s, %f\n',avg_date,REMORA.sm.cmpt.pre.prcbb(1));
         fprintf(REMORA.sm.cmpt.fid.bb_pct05,'%s, %f\n',avg_date,REMORA.sm.cmpt.pre.prcbb(2));
         fprintf(REMORA.sm.cmpt.fid.bb_pct10,'%s, %f\n',avg_date,REMORA.sm.cmpt.pre.prcbb(3));
@@ -214,7 +214,7 @@ if REMORA.sm.cmpt.prctile
     end
     
     % if octave levels selected
-    if REMORA.sm.cmpt.ol
+    if ~isnan(REMORA.sm.cmpt.ol)
         %write 1%
         fprintf(REMORA.sm.cmpt.fid.ol_pct01,'%s, ',avg_date);
         for a = 1:size(REMORA.sm.cmpt.pre.prcol,2)
@@ -297,7 +297,7 @@ if REMORA.sm.cmpt.prctile
     end
     
     % if third octave levels selected
-    if REMORA.sm.cmpt.tol
+    if ~isnan(REMORA.sm.cmpt.tol)
         %write 1%
         fprintf(REMORA.sm.cmpt.fid.tol_pct01,'%s, ',avg_date);
         for a = 1:size(REMORA.sm.cmpt.pre.prctol,2)
