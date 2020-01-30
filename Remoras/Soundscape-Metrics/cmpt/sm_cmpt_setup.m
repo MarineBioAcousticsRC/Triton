@@ -45,14 +45,15 @@ for ridx = 1:PARAMS.ltsa.nrftot
     % find index in header matrix based on time stamp of raw file
     % look for closest value - cannot do == due to rounding errors in datenum
     [~, minPos] = min(abs(REMORA.sm.cmpt.header(:,1)-PARAMS.ltsa.dnumStart(ridx)));
-    % compute vector of byte locations for each average
-    bytevec = PARAMS.ltsa.byteloc(ridx):PARAMS.ltsa.nf:...
-        (PARAMS.ltsa.byteloc(ridx)+PARAMS.ltsa.nf*(PARAMS.ltsa.nave(ridx)-1));
+    % compute vector of byte locations for each average * 4 bytes for
+    % 'single' precision
+    bytevec = PARAMS.ltsa.byteloc(ridx):PARAMS.ltsa.nf*4:...
+        (PARAMS.ltsa.byteloc(ridx)+PARAMS.ltsa.nf*(PARAMS.ltsa.nave(ridx)-1)*4);
     bytevec = bytevec.'; %transpose
     % keep or discard average; currently keep all, need to add logic for
     % erroneous data
     keep = ones(length(bytevec),1);
-    % fill into position of header matris
+    % fill into position of header matrices
     REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),2) = bytevec;
     REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),3) = keep;
 end

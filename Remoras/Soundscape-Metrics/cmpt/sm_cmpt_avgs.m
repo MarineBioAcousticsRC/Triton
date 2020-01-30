@@ -89,7 +89,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             fseek(fid,skip,'bof');                  
 
             % read data into File power
-            ltsaavgs(h,:) = fread(fid,[PARAMS.ltsa.nf,1],'*int8');
+            ltsaavgs(h,:) = fread(fid,[PARAMS.ltsa.nf,1],'single');
         end
         fclose (fid);
         

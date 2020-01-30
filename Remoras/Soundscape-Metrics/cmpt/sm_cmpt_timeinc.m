@@ -11,17 +11,16 @@ global REMORA PARAMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% find start and end time of deployment
-
 % start time
 PARAMS.ltsa.inpath = REMORA.sm.cmpt.PathList{1};
 PARAMS.ltsa.infile = REMORA.sm.cmpt.FileList{1};
-read_ltsahead;
+sm_read_ltsahead;
 datestart = PARAMS.ltsa.dvecStart(1,:);
 
 % end time
 PARAMS.ltsa.inpath = REMORA.sm.cmpt.PathList{end};
 PARAMS.ltsa.infile = REMORA.sm.cmpt.FileList{end};
-read_ltsahead;
+sm_read_ltsahead;
 dateend = PARAMS.ltsa.dvecEnd(end,:);
 
 %% align bin size of averaging window with full hours
