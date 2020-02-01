@@ -384,7 +384,7 @@ function sm_cmpt_params_window
        'TooltipString',sprintf(REMORA.sm.params_help.percHelp));
 
 
-    % Bin Size Frequency Editable Text
+    % Percentage of Time Editable Text
     labelStr=num2str(REMORA.sm.cmpt.perc*100);
     btnPos=[x(1)+w/2 y(14) w/4 h];
     REMORA.sm.verify.perc = uicontrol(REMORA.fig.sm.cmpt,...
@@ -629,7 +629,7 @@ function sm_cmpt_params_window
         'Position',btnPos,...
         'HandleVisibility','on',...
         'Value',REMORA.sm.cmpt.tfval,...
-        'Callback','sm_cmpt_control(''setsval'')');
+        'Callback','sm_cmpt_control(''settfval'')');
 
     %% Left Column Single Value Calibration
     % System Sensitivity Text

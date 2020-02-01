@@ -31,10 +31,10 @@ elseif strcmp(action,'setfstart')
     REMORA.sm.cmpt.fstart = str2double(get(REMORA.sm.verify.fstart,'String'));
     
 elseif strcmp(action,'setcsvout')
-    REMORA.sm.cmpt.csvout = get(REMORA.sm.verify.csvout, 'String');
+    REMORA.sm.cmpt.csvout = get(REMORA.sm.verify.csvout, 'Value');
     
 elseif strcmp(action,'setltsaout')
-    REMORA.sm.cmpt.ltsaout = get(REMORA.sm.verify.ltsaout, 'String');    
+    REMORA.sm.cmpt.ltsaout = get(REMORA.sm.verify.ltsaout, 'Value');    
 
     
 % Data Analysis Settings:
@@ -52,52 +52,56 @@ elseif strcmp(action,'setavgf')
     REMORA.sm.cmpt.avgf = str2double(get(REMORA.sm.verify.avgf,'String'));
     
 elseif strcmp(action,'setperc')
-    REMORA.sm.cmpt.perc = str2double(get(REMORA.sm.verify.perc,'String'));
+    REMORA.sm.cmpt.perc = str2double(get(REMORA.sm.verify.perc,'String'))/100;
     
 elseif strcmp(action,'setbb')
-    REMORA.sm.cmpt.bb = str2double(get(REMORA.sm.verify.bb,'String'));
+    REMORA.sm.cmpt.bb =get(REMORA.sm.verify.bb,'Value');
     
 elseif strcmp(action,'setol')
-    REMORA.sm.cmpt.ol = str2double(get(REMORA.sm.verify.ol,'String'));
+    REMORA.sm.cmpt.ol = get(REMORA.sm.verify.ol,'Value');
     
 elseif strcmp(action,'settol')
-    REMORA.sm.cmpt.tol = str2double(get(REMORA.sm.verify.tol,'String'));
+    REMORA.sm.cmpt.tol = get(REMORA.sm.verify.tol,'Value');
     
 elseif strcmp(action,'setpsd')
-    REMORA.sm.cmpt.psd = str2double(get(REMORA.sm.verify.psd,'String'));
+    REMORA.sm.cmpt.psd = get(REMORA.sm.verify.psd,'Value');
     
 elseif strcmp(action,'setmean')
-    REMORA.sm.cmpt.mean = str2double(get(REMORA.sm.verify.mean,'String'));
+    REMORA.sm.cmpt.mean = get(REMORA.sm.verify.mean,'Value');
     
 elseif strcmp(action,'setmedian')
-    REMORA.sm.cmpt.median = str2double(get(REMORA.sm.verify.median,'String'));    
+    REMORA.sm.cmpt.median = get(REMORA.sm.verify.median,'Value');    
 
 elseif strcmp(action,'setprctile')
-    REMORA.sm.cmpt.prctile = str2double(get(REMORA.sm.verify.prctile,'String'));    
+    REMORA.sm.cmpt.prctile = get(REMORA.sm.verify.prctile,'Value');    
 
 elseif strcmp(action,'setfifo')
-    REMORA.sm.cmpt.fifo = str2double(get(REMORA.sm.verify.fifo,'String'));    
+    REMORA.sm.cmpt.fifo = get(REMORA.sm.verify.fifo,'Value');    
 
 elseif strcmp(action,'setdw')
-    REMORA.sm.cmpt.dw = str2double(get(REMORA.sm.verify.dw,'String'));    
+    REMORA.sm.cmpt.dw = get(REMORA.sm.verify.dw,'Value');    
 
 elseif strcmp(action,'setstrum')
-    REMORA.sm.cmpt.strum = str2double(get(REMORA.sm.verify.strum,'String'));
+    REMORA.sm.cmpt.strum = get(REMORA.sm.verify.strum,'Value');
 
     
 % Calibration Settings:
     
 elseif strcmp(action,'setcal')
-    REMORA.sm.cmpt.cal = str2double(get(REMORA.sm.verify.cal,'String'));
+    REMORA.sm.cmpt.cal = get(REMORA.sm.verify.cal,'Value');
     
 elseif strcmp(action,'setsval')
-    REMORA.sm.cmpt.sval = str2double(get(REMORA.sm.verify.sval,'String'));
+    REMORA.sm.cmpt.sval = get(REMORA.sm.verify.sval,'Value');
     
 elseif strcmp(action,'setcaldb')
     REMORA.sm.cmpt.caldb = str2double(get(REMORA.sm.verify.caldb,'String'));
     
+elseif strcmp(action,'settfval')
+    REMORA.sm.cmpt.tfval = get(REMORA.sm.verify.tfval,'Value');
+    
 elseif strcmp(action,'settfile')
-    REMORA.sm.cmpt.tfile = str2double(get(REMORA.sm.verify.tfile,'String'));
+    REMORA.sm.cmpt.tfile = get(REMORA.sm.verify.tfile,'String');
+%     REMORA.sm.cmpt.tpath = get(REMORA.sm.verify.tpath,'String');
     
 elseif strcmp(action,'tfilesel')
     [REMORA.sm.verify.tfile.String, REMORA.sm.verify.tpath.String]...
