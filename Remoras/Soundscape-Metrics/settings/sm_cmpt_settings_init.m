@@ -46,9 +46,9 @@ REMORA.sm.cmpt.perc = 0.5; % percentage of time bin coverage in averaging window
 
 %% Calibration Options
 % Single Value Calibration
-REMORA.sm.cmpt.cal = 1; % yes/no  to calibrate data during computation
-REMORA.sm.cmpt.sval = 1; % yes/no to calibrate with single value
-REMORA.sm.cmpt.caldb = 175.1; % system sensitivity (high or low gain ST300; hdyrophone + recorder for ST500)
+REMORA.sm.cmpt.cal = 0; % yes/no  to calibrate data during computation
+REMORA.sm.cmpt.sval = 0; % yes/no to calibrate with single value
+REMORA.sm.cmpt.caldb = []; % system sensitivity (high or low gain ST300; hdyrophone + recorder for ST500)
 
 % Transfer Function Calibration
 REMORA.sm.cmpt.tfval = 0; %yes/no to calibrate with transfer function

@@ -38,7 +38,9 @@ endtime = REMORA.sm.cmpt.header(end,1) + datenum([0 0 0 0 0 PARAMS.ltsa.tave]);
 thisavgbins = find(REMORA.sm.cmpt.avgbins>=starttime & ...
     REMORA.sm.cmpt.avgbins<=endtime);
 %%%%%%% check next line logic!!!!!
-% thisavgbins = [thisavgbins(1)-1; thisavgbins]; % move to one index prior to include starttime
+if thisavgbins(1) ~= 1
+    thisavgbins = [thisavgbins(1)-1; thisavgbins]; % move to one index prior to include starttime
+end
 REMORA.sm.cmpt.pre.thisltsa = length(thisavgbins);
 
 % pull together bins for this ltsa and those remaining from last ltsa
