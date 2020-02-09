@@ -2,7 +2,7 @@
 
 % Input / Output Settings 
 
-REMORA.sm.cmpt.indir = 'D:\SanctSound_Output\SanctSound_MB02_01\ltsa';
+REMORA.sm.cmpt.indir = 'D:\SanctSound_Output\SanctSound_MB02_01\ltsa\MB02_01_pwelch';
 REMORA.sm.cmpt.outdir = 'D:\SanctSound_Output\SanctSound_MB02_01\metrics\MB02_01_02';
 
 REMORA.sm.cmpt.ltsaout = 0;
@@ -25,7 +25,7 @@ REMORA.sm.cmpt.perc = 0.0;
 
 REMORA.sm.cmpt.mean = 1;
 REMORA.sm.cmpt.median = 1;
-REMORA.sm.cmpt.prctile = 1;
+REMORA.sm.cmpt.prctile = 0;
 
 REMORA.sm.cmpt.fifo = 0;
 REMORA.sm.cmpt.dw = 0;
