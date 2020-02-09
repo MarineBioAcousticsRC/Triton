@@ -14,8 +14,7 @@ global REMORA
 if REMORA.sm.cmpt.sval
     % conversion of sensitivity to counts
     REMORA.sm.cmpt.counts= 2^15; %16 bit; +/- bit range
-    % counts/ dB rms - full system calibration value - 3 dB to account for
-    % SPL in dB re counts
+   % calibration value in dB re counts
     dbcounts= abs(20*log10(REMORA.sm.cmpt.counts)-REMORA.sm.cmpt.caldb);
     % adjust for single value
     REMORA.sm.cmpt.pre.psd = REMORA.sm.cmpt.pre.psd + dbcounts;

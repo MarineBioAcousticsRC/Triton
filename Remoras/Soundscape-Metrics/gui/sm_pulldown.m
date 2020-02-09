@@ -44,8 +44,14 @@ elseif strcmp(action,'compute_metrics')
     
 elseif strcmp(action,'load_ltsa')
     
-%     ipnamesave = PARAMS.ltsa.inpath;
-%     ifnamesave = PARAMS.ltsa.infile;
+    % reset default of standard LTSA plot length to SanctSound data length
+    PARAMS.ltsa.tseg.hr = 0.5;
+    PARAMS.ltsa.tseg.sec = 0.5 * 60 * 60;
+    PARAMS.ltsa.bright = 50;
+    
+    %initialize ltsa plotting functionality
+    sm_initcontrol
+    
     % user interface retrieve file to open through a dialog box
     boxTitle1 = 'Open LTSA File';
     filterSpec1 = '*.ltsa';
@@ -60,6 +66,7 @@ elseif strcmp(action,'load_ltsa')
         disp_msg([PARAMS.ltsa.inpath,PARAMS.ltsa.infile])
         cd(PARAMS.ltsa.inpath)
     end
+    
     % calculate the number of blocks in the opened file
     set(HANDLES.fig.ctrl, 'Pointer', 'watch');
     PARAMS.ltsa.ftype = 1;
@@ -72,7 +79,7 @@ elseif strcmp(action,'load_ltsa')
     set(HANDLES.display.ltsa,'Visible','on')
     set(HANDLES.display.ltsa,'Value',1);
     set(HANDLES.ltsa.delimit.but,'Visible','on')
-    control_ltsa('button')
+    sm_control_ltsa('button')
     set([HANDLES.ltsa.motion.seekbof HANDLES.ltsa.motion.back HANDLES.ltsa.motion.autoback HANDLES.ltsa.motion.stop],...
         'Enable','off');
     sm_init_ltsadata
@@ -87,11 +94,11 @@ elseif strcmp(action,'load_ltsa')
         all_hands (PARAMS.ch + 1) = 0;
         linkaxes(all_hands,'x');
     end
-    control_ltsa('timeon')   % was timecontrol(1)
+    sm_control_ltsa('timeon')   % was timecontrol(1)
     % turn on other menus now
-    control_ltsa('menuon')
-    control_ltsa('ampon')
-    control_ltsa('freqon')
+    sm_control_ltsa('menuon')
+    sm_control_ltsa('ampon')
+    sm_control_ltsa('freqon')
     set(HANDLES.ltsa.motioncontrols,'Visible','on')
     set(HANDLES.ltsa.equal,'Visible','on')
     set(HANDLES.fig.ctrl, 'Pointer', 'arrow');
