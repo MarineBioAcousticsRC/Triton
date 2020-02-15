@@ -72,6 +72,37 @@ elseif strcmp(myEvent, 'Run')
         fprintf('% s\n',REMORA.nn.train_test_set.outDir);
     end
     close(REMORA.fig.nn.nn_train_test_set.figH)
+    
+elseif strcmp(myEvent, 'setInDirTPWS')
+      REMORA.nn.nn_train_test_set_TPWS.inDir = ...
+        get(REMORA.fig.nn.nn_train_test_set_TPWS.inDirEdTxt,'String');
+elseif strcmp(myEvent, 'setSaveDirTPWS')
+      REMORA.nn.nn_train_test_set_TPWS.saveDir = ...
+        get(REMORA.fig.nn.nn_train_test_set_TPWS.saveDirEdTxt,'String');
+elseif strcmp(myEvent, 'setSaveNameTPWS')
+      REMORA.nn.nn_train_test_set_TPWS.saveName = ...
+        get(REMORA.fig.nn.nn_train_test_set_TPWS.saveNameEdTxt,'String');
+elseif strcmp(myEvent, 'setTrainPercTPWS')
+    REMORA.nn.nn_train_test_set_TPWS.trainPerc = ...
+        str2num(get(REMORA.fig.nn.nn_train_test_set_TPWS.trainPercEdTxt,'String'));
+    
+    if REMORA.fig.nn.nn_train_test_set_TPWS.trainPerc>1
+        % make it a fraction if needed.
+        REMORA.fig.nn.nn_train_test_set_TPWS.trainPerc = ...
+            REMORA.fig.nn.nn_train_test_set_TPWS.trainPerc/100;
+    end
+    
+elseif strcmp(myEvent, 'setTrainSizeTPWS')
+    REMORA.nn.nn_train_test_set_TPWS.trainSize = ...
+        str2num(get(REMORA.fig.nn.nn_train_test_set_TPWS.trainSizeEdTxt,'String'));
+    
+elseif strcmp(myEvent, 'setBoutGapTPWS')
+    REMORA.nn.nn_train_test_set_TPWS.boutGap = ...
+        str2num(get(REMORA.fig.nn.nn_train_test_set_TPWS.boutGapEdTxt,'String'));
+    
+    
+elseif strcmp(myEvent, 'RunTPWS')
+    nn_fn_balanced_input_TPWS
 else
     error('Unrecognized callback')
 end
