@@ -69,7 +69,7 @@ peakS = ((peakIx-1)/fRate + hOff);
 
 % Display the results: first the spectrogram, using some heuristics for
 % intensity scaling and frequency limits, and then the detection function.
-if DISPLAY > 0
+if DISPLAY > 0 && max(detFn)>0
     subplot(211)
     med = median(gram(:)); mx = max(gram(:));  % used for intensity scaling
     imagesc([0 nCols(gram)/fRate], [0 I.SampleRate/2], gram, [med + (mx-med)*[.25 1]])
