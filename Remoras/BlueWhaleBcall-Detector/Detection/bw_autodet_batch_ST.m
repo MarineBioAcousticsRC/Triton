@@ -62,6 +62,7 @@ offset = zeros([1,length(PathFileListWav)]);
 %det_times = struct('');
 %det_times2 = struct('');
 maintable = [];
+
 for fidx = 1:length(PathFileListWav)
     %Write into excel sheet
     %out_fid = fopen(PathFileListCsv{fidx}, 'a');   % Open xls file to write to
@@ -76,10 +77,11 @@ for fidx = 1:length(PathFileListWav)
     %e.g. dlmwrite('test.csv',N,'delimiter',',','-append');
     %5) in findcalls - detection shows as peakS, being seconds into the
     %window; export of call start - add peakS to start of window
-    
+    times = [];
     filename = PathFileListWav{fidx};
     block = 3600;   % s - hourly increments
     halfblock = block/2;
+    display(['calculating ',filename,'; file ',num2str(fidx),'/',num2str(size(PathFileListWav),1)])
     
     %time keeping; start of file and first hourly increment
     startTime = fileDates(fidx);
@@ -119,8 +121,10 @@ if fidx == 1
             %det_times = vertcat(det_times,abstime);
             %det_times{fidx,blockIdx} = abstime;
         File = repmat({filename},length(abstime),1);
-            Date = datetime(abstime,'ConvertFrom','datenum','Format','yyyy-MM-dd HH:mm:ss.sss');
+            Date = dbSerialDateToISO8601(abstime); %datetime(abstime,'ConvertFrom','datenum','Format','yyyy-MM-dd HH:mm:ss.sss');
             det_times = table(File,abstime,Date);
+            abstimefin = abstime+datenum([0 0 0 0 0 10]);
+            times = [abstime,abstimefin]; 
         else
           det_times = [];
         end 
@@ -131,6 +135,9 @@ if fidx == 1
         %end
         
     end
+    filename = split(PathFileListCsv,'.csv');
+labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
+ioWriteLabel(labelname,times,'Blue whale');
     %If not first file, 20s segment of previous file will be added to the start
     %of the file, so no call gets missed.
 else
@@ -175,13 +182,17 @@ else
         %det_times{fidx,blockIdx} = abstime;
             %det_times = vertcat(det_times,abstime);
             File = repmat({filename},length(abstime),1);
-            Date = datetime(abstime,'ConvertFrom','datenum','Format','yyyy-MM-dd HH:mm:ss.sss');
+            Date = dbSerialDateToISO8601(abstime); %datetime(abstime,'ConvertFrom','datenum','Format','yyyy-MM-dd HH:mm:ss.sss');
             det_times = table(File,abstime,Date);
+            abstimefin = abstime+datenum([0 0 0 0 0 10]);
+            times = [abstime,abstimefin];
         else
             det_times = [];
         end 
         maintable = [maintable;det_times];
     end
+   
+    
 %det_times2 = vertcat(det_times2,det_times);   
 %dety = 1 - isempty(det_times{fidx,:});
  %       if dety == 1
@@ -191,7 +202,9 @@ else
    %     det_times2{1,fidx} = '';    
     %    end
 end
-
+filename = split(PathFileListCsv,'.csv');
+labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
+ioWriteLabel(labelname,times,'Blue whale'); 
 %fclose(out_fid);
 
 end
@@ -212,7 +225,7 @@ prevcall = [];
    %date = datestr(det_times3,31);
    %results = table(date,seconds,check);
    results = [maintable,check];
-   writetable(results,PathFileListCsv{1});
+   writetable(results,PathFileListCsv{1}); 
 end
 end
 
