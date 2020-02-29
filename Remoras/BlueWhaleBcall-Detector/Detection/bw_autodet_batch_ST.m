@@ -122,7 +122,10 @@ if fidx == 1
             %det_times{fidx,blockIdx} = abstime;
         File = repmat({filename},length(abstime),1);
             Date = dbSerialDateToISO8601(abstime); %datetime(abstime,'ConvertFrom','datenum','Format','yyyy-MM-dd HH:mm:ss.sss');
-            det_times = table(File,abstime,Date);
+            if ischar(Date)
+                Date = {Date};
+            end
+            det_times = table(File,Date,abstime);
             abstimefin = abstime+datenum([0 0 0 0 0 10]);
             times = [abstime,abstimefin]; 
         else
@@ -183,7 +186,10 @@ else
             %det_times = vertcat(det_times,abstime);
             File = repmat({filename},length(abstime),1);
             Date = dbSerialDateToISO8601(abstime); %datetime(abstime,'ConvertFrom','datenum','Format','yyyy-MM-dd HH:mm:ss.sss');
-            det_times = table(File,abstime,Date);
+            if ischar(Date)
+                Date = {Date};
+            end
+            det_times = table(File,Date,abstime);
             abstimefin = abstime+datenum([0 0 0 0 0 10]);
             times = [abstime,abstimefin];
         else
