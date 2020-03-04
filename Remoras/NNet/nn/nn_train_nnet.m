@@ -36,9 +36,16 @@ testDataAll(isnan(testDataAll))=0;
 test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
 
 [YPredEval,scoresEval] = classify(net,test4D);
-confusionmat(YPredEval,categorical(testLabelsAll))
+confusionMatrixEval = confusionmat(YPredEval,categorical(testLabelsAll));
 bestScores = max(scoresEval,[],2);
 strongScores = bestScores>.99;
-confusionmat(YPredEval(strongScores),categorical(testLabelsAll(strongScores)))
+% confusionmat(YPredEval(strongScores),categorical(testLabelsAll(strongScores)))
+[~,filenameStem,~] = fileparts(REMORA.nn.train_net.trainFile);
+filenameStem = strrep(filenameStem,'_bin_train','');
+REMORA.nn.train_net.networkFilename = fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_trainedNetwork.mat']);
+REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores.mat']);
+save(REMORA.nn.train_net.networkFilename,'net')
+save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval','scoresEval')
 
+figure(253);clf;plotconfusion(categorical(testLabelsAll),YPredEval)
 1;

@@ -166,7 +166,6 @@ subOrder = subOrder(useBins);
 fileNumExpand = fileNumExpand(useBins);
 
 %% Cluster N times for evidence accumulation/robustness
-tempN = ceil(sqrt(size(cRateMat,1)*2));
 % CoMat = zeros(tempN,tempN);
 subSamp = 1; % flag automatically goes to true if subsampling.
 isolatedSet = [];
@@ -273,16 +272,20 @@ for iEA = 1:s.N
 %             nodeVec2 = [nodeVec2,(iR+1):size(compDist,1)];
 %         end
     end
-%     
-%     if s.mergeTF
-%         [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(compDist,...
-%             tempN,specNorm);
-%     end
+    
+    tempN = size(compDist,1);
+    if s.mergeTF
+        [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(compDist,...
+            tempN,specNorm);
+        compDistOrig = compDist;
+        compDist = compDist(uMergeNodeID,uMergeNodeID);
+    end
+    numNodes = size(compDist,1);% in case pruning has happened, compute this
+    % for use in preallocation
     connectedList = nansum(compDist)>0; % isolated nodes have NAN
-    allIndices = 1:size(excludedIn,2);
+    allIndices = 1:numNodes;
     isolated = setdiff(allIndices, allIndices(connectedList));
     
-    inputSet{iEA} = setdiff(excludedIn,isolated);
     
     fprintf('Clustering for evidence accumulation: %d of %d\n',iEA,s.N)
     
@@ -292,24 +295,24 @@ for iEA = 1:s.N
     %         s.minClust,s.modular,s.pgThresh,s.javaPathVar,s.classPathVar,s.toolkitPath,gv_file);
     %     [~,nodeAssign,~,~,excludedOut] = cluster_clicks_cw_merge(specClickTf,p,...
     %         normalizeTF, mergeTF);
-    clusterID = 1:size(excludedIn,2);
-    clusterID = clusterID';
-%     if s.mergeTF
-%         clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
-%     end
+    clusterID = (1:numNodes)';
+    %clusterID = clusterID';
+    if s.mergeTF
+        clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
+    end
     clusterID(connectedList==0) = NaN;
     clusterID = ct_run_CW_cluster(clusterID,compDist,s.maxCWIterations);
     
-%     if s.mergeTF
-%         % unwind node merge by assigning nodes that were merged to the category of
-%         % their parent.
-%         for iMerge = 1:length(uMergeNodeID)
-%             thisID = uMergeNodeID(iMerge);
-%             nodeClusterID = clusterID(thisID);
-%             clusterID(mergeNodeID == thisID) = nodeClusterID;
-%         end
-%     end
-%     
+    if s.mergeTF
+        % unwind node merge by assigning nodes that were merged to the category of
+        % their parent.
+        for iMerge = 1:length(uMergeNodeID)
+            thisID = uMergeNodeID(iMerge);
+            nodeClusterID = clusterID(thisID);
+            clusterID(mergeNodeID == thisID) = nodeClusterID;
+        end
+    end
+    
     
     percentIsolated = 100*((length(clusterID)-sum(~isnan(clusterID)))./length(clusterID));
     fprintf('%0.2f %% of nodes isolated.\n',percentIsolated)
@@ -351,13 +354,15 @@ for iEA = 1:s.N
     naiItr{iEA} = nodeSet;
     fprintf('found %d clusters\n',length(nodeSet))
     isolatedSet(iEA,1) = length(setdiff(excludedIn,horzcat(nodeSet{:})));
-    
+    inputSet{iEA} = setdiff(excludedIn,isolated);
+
 end
 
 
 % Best of K partitions based on NMI filkov and Skiena 2004
 % Compute NMI
 fprintf('Calculating NMI\n')
+
 [NMIList] = ct_compute_NMI(nList,ka,naiItr,inputSet);
 % the one with the highest mean score is the best
 [bokVal,bokIdx] = max(sum(NMIList)./(size(NMIList,1)-1)); % account for empty diagonal.
@@ -370,19 +375,25 @@ if isempty(nodeSet)
     if tritonMode;disp_msg('No clusters formed');end
     return
 end
+
 clusterIDreduced = zeros(size(compDist,1),1);
 for iNodeSet = 1:length(nodeSet)
-    clusterIDreduced(nodeSet{iNodeSet}) = iNodeSet;
+    [~,setIntersect] = intersect(excludedIn,nodeSet{iNodeSet});
+    clusterIDreduced(setIntersect) = iNodeSet;
 end
 
-if tritonMode
+if tritonMode && (size(clusterIDreduced,1)<10000)
+    fprintf('Plotting network\n')
     figure(110);clf
     G = graph(compDist);
     h = plot(G,'layout','force');
-    set(h,'MarkerSize',8,'nodeLabel',clusterIDreduced)
+    set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)
+    
     for iClustPlot=1:size(nodeSet,2)
         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
-    end
+    end    
+else
+    disp('Too many nodes to plot as network.')
 end
 
 % % Final cluster using Co-assoc mat.
@@ -393,6 +404,8 @@ end
 %        minClust,pruneThr,modular,pgThresh);
 
 %% calculate means, percentiles, std devs
+fprintf('Creating output structures\n')
+
 compositeData = struct(...
     'spectraMeanSet',[],'specPrctile',{},'iciMean',[],...
     'iciStd',[],'cRateMean',[],'cRateStd',[]);
@@ -436,6 +449,7 @@ if s.subPlotSet
 end
 
 if s.indivPlots
+    fprintf('Making individual type plots\n')
     ct_individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,s.outDir)
 end
 % binDataUsed = binDataPruned(binIdx(useBins));
