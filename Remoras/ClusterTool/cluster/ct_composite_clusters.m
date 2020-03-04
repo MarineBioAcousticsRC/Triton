@@ -383,18 +383,23 @@ for iNodeSet = 1:length(nodeSet)
 end
 
 if tritonMode && (size(clusterIDreduced,1)<10000)
+
     fprintf('Plotting network\n')
+
     figure(110);clf
-    G = graph(compDist);
+    G = graph(compDist);    
     h = plot(G,'layout','force');
+
     set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)
     
     for iClustPlot=1:size(nodeSet,2)
         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
     end    
+
 else
     disp('Too many nodes to plot as network.')
 end
+
 
 % % Final cluster using Co-assoc mat.
 % disp('Clustering using accumulated evidence')

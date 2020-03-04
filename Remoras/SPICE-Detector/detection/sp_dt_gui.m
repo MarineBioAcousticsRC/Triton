@@ -22,6 +22,9 @@ end
 
 
 if ~isfield(p,'countThresh') || isempty(p.countThresh)
+    if ~isfield(p,'xfrOffset') || isempty(p.xfrOffset)
+        p.xfrOffset = 0;
+    end
     p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;
     REMORA.spice_dt.detParams.countThresh = p.countThresh;
 end

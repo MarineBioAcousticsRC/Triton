@@ -18,7 +18,7 @@ elseif strcmp(action, 'setTPWSFilterString')
     REMORA.spice_dt.mkTPWS.filterString = filterString;
     
 elseif strcmp(action, 'setTPWSminRL')
-    minDBpp = get(REMORA.spice_dt_mkTPWS.minRLTxt,'String');
+    minDBpp = get(REMORA.spice_dt_mkTPWS.minRLEdTxt,'String');
     if ~isempty(minDBpp)
         minDBpp = str2num(minDBpp);
         REMORA.spice_dt.mkTPWS.minDBpp = minDBpp;
