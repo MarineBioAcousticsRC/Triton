@@ -4,7 +4,7 @@ global REMORA HANDLES
 REMORA.sm.menu = uimenu(HANDLES.remmenu,'Label','&Soundscape Metrics',...
     'Enable','on','Visible','on');
 
-% Make weekly LTSAs
+% Make Soundscape LTSAs
 uimenu(REMORA.sm.menu, 'Label', 'Make Soundscape LTSAs', ...
     'Enable','on','Callback', 'sm_pulldown(''make_ltsa'')');
 
@@ -12,7 +12,7 @@ uimenu(REMORA.sm.menu, 'Label', 'Make Soundscape LTSAs', ...
 uimenu(REMORA.sm.menu, 'Label', 'Compute Soundscape Metrics', ...
     'Callback', 'sm_pulldown(''compute_metrics'')');
 
-% Make weekly LTSAs
+% Load Soundscape LTSAs
 uimenu(REMORA.sm.menu, 'Label', 'Load Soundscape LTSA', ...
     'Enable','on','Callback', 'sm_pulldown(''load_ltsa'')');
 
