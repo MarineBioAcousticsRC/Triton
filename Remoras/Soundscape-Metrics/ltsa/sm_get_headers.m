@@ -72,6 +72,19 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         PARAMS.ltsahd.ticks(m) = 0;
         
     elseif PARAMS.ltsa.ftype == 2               % do the following for xwavs
+        try
+            info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+        catch ME
+            disp(ME.message)
+            dmsg = sprintf('Is %s a real wave file?', ...
+                fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+            disp(dmsg);
+            PARAMS.ltsa.gen = 0; % need to cancel
+            return 
+        end
+        
+        PARAMS.ltsahd.nsamp(k) = info.TotalSamples;
+        
         fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)),'r');
         
         fseek(fid,22,'bof');
@@ -123,7 +136,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
 end
 
 PARAMS.ltsa.nrftot = m;     % total number of raw files
-PARAMS.ltsa.ver = 4;    % 32 bits (~ 4billon nave and nrftot allowed)
+PARAMS.ltsa.ver = 4;    % 64 bits (2^64 byte locations and nrftot allowed)
 
 disp(['Total number of raw files: ',num2str(PARAMS.ltsa.nrftot)])
 disp(['LTSA version ',num2str(PARAMS.ltsa.ver)])

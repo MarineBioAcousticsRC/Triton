@@ -13,7 +13,7 @@ global PARAMS
 % read file start times
 dnumStart = PARAMS.ltsahd.dnumStart;
 % convert number of samples per file to duration in minutes
-nMinFiles = PARAMS.ltsahd.nsamp/PARAMS.ltsahd.sample_rate(1)/60;
+nMinFiles = PARAMS.ltsahd.nsamp/PARAMS.ltsahd.sample_rate(1)/60; 
 % length of LTSA
 nMinLTSAInc = PARAMS.ltsa.ndays*24*60;
 

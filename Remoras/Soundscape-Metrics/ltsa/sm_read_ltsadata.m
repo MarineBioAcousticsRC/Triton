@@ -35,11 +35,11 @@ end
 % time bin number at start of plot within rawfile (index)
 PARAMS.ltsa.plotStartBin = floor((PARAMS.ltsa.plot.dnum - ....
     PARAMS.ltsa.dnumStart(PARAMS.ltsa.plotStartRawIndex)) * 24 * 60 * 60 ...
-    / PARAMS.ltsa.tave) + 1;
+    / PARAMS.ltsa.tave)+1;
 
 % samples to skip over in ltsa file
-skip = PARAMS.ltsa.byteloc(PARAMS.ltsa.plotStartRawIndex) + ....
-    (PARAMS.ltsa.plotStartBin - 1) * PARAMS.ltsa.nf;
+skip = PARAMS.ltsa.byteloc(PARAMS.ltsa.plotStartRawIndex) + ...
+    (PARAMS.ltsa.plotStartBin-1) * PARAMS.ltsa.nf * 4;
 
 status = fseek(fid,skip,-1);    % skip over header + other data
 if status == -1
