@@ -23,7 +23,18 @@ if strcmp(action,'full_detector')
     bw_init_batch_gui
     
      bw_setpointers('arrow');
-
+% elseif strcmp(action,'create_labels')
+%     
+%     % load text file and create .tlab file 
+%     sh_create_tlab_file
+    
+elseif strcmp(action,'load_labels')
+    
+    % set up to open gui window for motion detector
+    bw_init_visLabel_figure
+    
+    % set motion gui for detection lables
+    bw_init_visLabel_gui
 end
 
 

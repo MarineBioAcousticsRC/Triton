@@ -63,7 +63,7 @@ offset = zeros([1,length(PathFileListWav)]);
 %det_times2 = struct('');
 maintable = [];
 
-for fidx = 1:length(PathFileListWav)
+for fidx = 1:3 %length(PathFileListWav)
     %Write into excel sheet
     %out_fid = fopen(PathFileListCsv{fidx}, 'a');   % Open xls file to write to
     %hdr = PathFileListWav{fidx};
