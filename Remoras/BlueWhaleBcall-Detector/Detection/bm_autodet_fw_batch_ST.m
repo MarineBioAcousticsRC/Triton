@@ -1,4 +1,4 @@
-function bw_autodet_fw_batch_ST(WavDir, OutDir)
+function bm_autodet_fw_batch_ST(WavDir, OutDir)
 
 % scroll through Sound Trap wav file - adapted from Shyam's BatchClassifyBlueCalls
 % smk 100219
@@ -14,12 +14,12 @@ global REMORA
 %endF      = [44.5, 44, 43.5, 42.7];	% Hz - end frequency kernel
 startF = 25;
 endF = 20;
-thresh =  REMORA.bw.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
+thresh =  REMORA.bm.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
 %thresh = 15;
 %% Get list of wav files in deployment and define output
 %Get all wavs in that deployment
 %WavDir = 'G:\CI01_01_df8';
-WavDir = REMORA.bw.settings.inDir;
+WavDir = REMORA.bm.settings.inDir;
 SearchFileMaskMat = {'*wav'};
 SearchPathMaskMat = {WavDir};
 SearchRecursiv = 0;
@@ -29,7 +29,7 @@ SearchRecursiv = 0;
 
 %Define output files
 %OutDir = 'I:\Shared drives\Soundscape_Analysis\trial_output'; %NB: the drive letter changes quite often, so check.
-OutDir = REMORA.bw.settings.outDir;
+OutDir = REMORA.bm.settings.outDir;
 PathListCsv = PathListWav;
 FileListCsv = FileListWav;
 
@@ -115,7 +115,7 @@ if fidx == 1
         
             % Read in data
             y = audioread(filename, [startS endS]);
-            abstime = bw_findcalls_fw_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
+            abstime = bm_findcalls_fw_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
             ty = 1 - isempty(abstime);
         if ty == 1
             %det_times = vertcat(det_times,abstime);
@@ -171,7 +171,7 @@ else
         else
             y = audioread(filename, [startS endS]);
         end
-        abstime = bw_findcalls_fw_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
+        abstime = bm_findcalls_fw_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
         ty = 1 - isempty(abstime);
         if ty == 1
         %det_times{fidx,blockIdx} = abstime;

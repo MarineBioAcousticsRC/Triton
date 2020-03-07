@@ -1,9 +1,9 @@
-function bw_init_visLabel_figure
+function bm_init_visLabel_figure
 
 global REMORA
 
 defaultPos = [0.05,0.1,0.16,0.17];
-REMORA.fig.bw.visLabel = figure( ...
+REMORA.fig.bm.visLabel = figure( ...
     'NumberTitle','off', ...
     'Name','Visualize Labels',...
     'Units','normalized',...
@@ -13,5 +13,5 @@ REMORA.fig.bw.visLabel = figure( ...
     'Visible', 'on');
 
 % initialize
-REMORA.bw.detection.PlotLabels = false;
-REMORA.bw.detection2.PlotLabels = false;
+REMORA.bm.detection.PlotLabels = false;
+REMORA.bm.detection2.PlotLabels = false;

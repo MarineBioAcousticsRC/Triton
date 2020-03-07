@@ -1,4 +1,4 @@
-function [start, stop] = sh_get_ltsa_range
+function [start, stop] = bm_get_ltsa_range
 % [start, stop] = sh_get_ltsa_range
 % etermine the starting and stopping dnums for the current ltsa plot.
 

@@ -1,4 +1,4 @@
-function [abstime] = bw_findcalls_fw_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,DISPLAY,filename)
+function [abstime] = bm_findcalls_fw_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,DISPLAY,filename)
 %% function findcalls(halfblock, block, gap, offset, startS, endS, filename, startF, endF, thresh,out_fid, DISPLAY)
 
 % Adapted from David Mellinger's 
@@ -97,6 +97,6 @@ if DISPLAY > 0
 end
 
 
-abstime = bw_writecalls_soundtrap2 (halfblock, startTime, peakS, score);
+abstime = bm_writecalls_soundtrap2 (halfblock, startTime, peakS, score);
 
 end

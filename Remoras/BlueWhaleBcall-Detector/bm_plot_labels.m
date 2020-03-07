@@ -1,4 +1,4 @@
-function bw_plot_labels
+function bm_plot_labels
 % sh_plot_labels
 % Plot the detection labels for the currently active window.
 
@@ -7,27 +7,24 @@ function bw_plot_labels
 
 global REMORA PARAMS
 
-%freq = PARAMS.ltsa.f(1)+.9*(PARAMS.ltsa.f(end)-PARAMS.ltsa.f(1));
-freq = PARAMS.freq0 + .9*(PARAMS.freq1-PARAMS.freq0);
-startDate = PARAMS.plot.dnum+datenum([2000 0 0 0 0 0]);
-stopDate = PARAMS.plot.dnum + datenum([2000 0 0 0 0 PARAMS.tseg.sec]);
-%[startDate, stopDate] = sh_get_ltsa_range;
+freq = PARAMS.ltsa.f(1)+.9*(PARAMS.ltsa.f(end)-PARAMS.ltsa.f(1));
+[startDate, stopDate] = bm_get_ltsa_range;
 
-if REMORA.bw.detection.PlotLabels
+if REMORA.sh.detection.PlotLabels
     lowPos = .995*freq;
     highPos = 1.01*freq;
     color = [1 1 1];
-    plot_times(REMORA.bw.detection.starts,REMORA.bw.detection.stops,...
-        REMORA.bw.detection.labels,startDate,stopDate,color,lowPos,highPos)
+    plot_times(REMORA.bm.detection.starts,REMORA.bm.detection.stops,...
+        REMORA.bm.detection.labels,startDate,stopDate,color,lowPos,highPos)
 end
 
-% if REMORA.bw.detection2.PlotLabels
-%     lowPos = 1.035*freq;
-%     highPos = 1.05*freq;
-%     color = [1 .6 .6];
-%     plot_times(REMORA.bw.detection2.starts,REMORA.bw.detection2.stops,...
-%         REMORA.bw.detection2.labels,startDate,stopDate,color,lowPos,highPos)
-% end
+if REMORA.bm.detection2.PlotLabels
+    lowPos = 1.035*freq;
+    highPos = 1.05*freq;
+    color = [1 .6 .6];
+    plot_times(REMORA.bm.detection2.starts,REMORA.bm.detection2.stops,...
+        REMORA.bm.detection2.labels,startDate,stopDate,color,lowPos,highPos)
+end
 
 function plot_times(startDet,stopDet,labDet,StartDate,StopDate,color,lowPos,highPos)
 
@@ -83,8 +80,8 @@ end
 
 if ~isempty(PlotInfo)
     % convert dates to offset from starting time in units appropriate for plot.
-    Offsets = bw_date_to_xaxis([StartDate; StopDate]);
-    PlotTime = bw_date_to_xaxis(PlotInfo(:,[Start Stop]));
+    Offsets = bm_date_to_xaxis([StartDate; StopDate]);
+    PlotTime = bm_date_to_xaxis(PlotInfo(:,[Start Stop]));
     
     % Extend PlotTime to contain the following information
     MidPt = 3;    % midpoint between start & stop

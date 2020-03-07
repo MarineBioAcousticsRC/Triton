@@ -1,4 +1,4 @@
-function sh_init_ltsa_params
+function bm_init_ltsa_params
 % sh_init_ltsa_params()
 % Initialize LTSA parameters.
 
@@ -8,10 +8,10 @@ global PARAMS REMORA
 % to the metadata directory, save other directory in case user switches
 
 if isempty(PARAMS.ltsa.inpath) || isempty(PARAMS.ltsa.infile)
-    error('Load first an LTSA file');  % No LTSA, use current directory
+    error('First load an LTSA file');  % No LTSA, use current directory
 end
 
-REMORA.sh.ltsa.inpath = PARAMS.ltsa.inpath;
-REMORA.sh.ltsa.infile = PARAMS.ltsa.infile;
+REMORA.bm.ltsa.inpath = PARAMS.ltsa.inpath;
+REMORA.bm.ltsa.infile = PARAMS.ltsa.infile;
 
-sh_read_ltsa_header;
+bm_read_ltsa_header;

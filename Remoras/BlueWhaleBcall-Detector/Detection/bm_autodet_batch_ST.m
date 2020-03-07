@@ -1,4 +1,4 @@
-function bw_autodet_batch_ST(WavDir, OutDir)
+function bm_autodet_batch_ST(WavDir, OutDir)
 
 % scroll through Sound Trap wav file - adapted from Shyam's BatchClassifyBlueCalls
 % smk 100219
@@ -12,12 +12,12 @@ function bw_autodet_batch_ST(WavDir, OutDir)
 global REMORA
 startF    = [45, 44.5, 44, 43.5];	% Hz - start frequency kernel
 endF      = [44.5, 44, 43.5, 42.7];	% Hz - end frequency kernel
-thresh =  REMORA.bw.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
+thresh =  REMORA.bm.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
 %thresh = 15;
 %% Get list of wav files in deployment and define output
 %Get all wavs in that deployment
 %WavDir = 'G:\CI01_01_df8';
-WavDir = REMORA.bw.settings.inDir;
+WavDir = REMORA.bm.settings.inDir;
 SearchFileMaskMat = {'*wav'};
 SearchPathMaskMat = {WavDir};
 SearchRecursiv = 0;
@@ -27,7 +27,7 @@ SearchRecursiv = 0;
 
 %Define output files
 %OutDir = 'I:\Shared drives\Soundscape_Analysis\trial_output'; %NB: the drive letter changes quite often, so check.
-OutDir = REMORA.bw.settings.outDir;
+OutDir = REMORA.bm.settings.outDir;
 PathListCsv = PathListWav;
 FileListCsv = FileListWav;
 
@@ -63,7 +63,7 @@ offset = zeros([1,length(PathFileListWav)]);
 %det_times2 = struct('');
 maintable = [];
 
-for fidx = 1:3 %length(PathFileListWav)
+for fidx = 1:length(PathFileListWav)
     %Write into excel sheet
     %out_fid = fopen(PathFileListCsv{fidx}, 'a');   % Open xls file to write to
     %hdr = PathFileListWav{fidx};
@@ -115,7 +115,7 @@ if fidx == 1
         
             % Read in data
             y = audioread(filename, [startS endS]);
-            abstime = bw_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
+            abstime = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
             ty = 1 - isempty(abstime);
         if ty == 1
             %det_times = vertcat(det_times,abstime);
@@ -126,8 +126,8 @@ if fidx == 1
                 Date = {Date};
             end
             det_times = table(File,Date,abstime);
-            abstimefin = abstime+datenum([0 0 0 0 0 10]);
-            times = [abstime,abstimefin]; 
+            %abstimefin = abstime+datenum([0 0 0 0 0 10]);
+            %times = [abstime,abstimefin]; 
         else
           det_times = [];
         end 
@@ -138,9 +138,7 @@ if fidx == 1
         %end
         
     end
-    filename = split(PathFileListCsv,'.csv');
-labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
-ioWriteLabel(labelname,times,'Blue whale');
+    
     %If not first file, 20s segment of previous file will be added to the start
     %of the file, so no call gets missed.
 else
@@ -179,7 +177,7 @@ else
         else
             y = audioread(filename, [startS endS]);
         end
-        abstime = bw_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
+        abstime = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
         ty = 1 - isempty(abstime);
         if ty == 1
         %det_times{fidx,blockIdx} = abstime;
@@ -190,8 +188,8 @@ else
                 Date = {Date};
             end
             det_times = table(File,Date,abstime);
-            abstimefin = abstime+datenum([0 0 0 0 0 10]);
-            times = [abstime,abstimefin];
+            %abstimefin = abstime+datenum([0 0 0 0 0 10]);
+            %times = [abstime,abstimefin];
         else
             det_times = [];
         end 
@@ -208,9 +206,9 @@ else
    %     det_times2{1,fidx} = '';    
     %    end
 end
-filename = split(PathFileListCsv,'.csv');
-labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
-ioWriteLabel(labelname,times,'Blue whale'); 
+%filename = split(PathFileListCsv,'.csv');
+%labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
+%ioWriteLabel(labelname,times,'Blue whale'); 
 %fclose(out_fid);
 
 end
@@ -232,6 +230,14 @@ prevcall = [];
    %results = table(date,seconds,check);
    results = [maintable,check];
    writetable(results,PathFileListCsv{1}); 
+   
+   %Write label file
+   startTriton = maintable.abstime - dateoffset();
+   endTriton = startTriton + datenum([0 0 0 0 0 10]);
+   times = [startTriton, endTriton];
+   filename = split(PathFileListCsv,'.csv');
+labelname = [filename{fidx},'_Bm.tlab'];
+ioWriteLabel(labelname,times,'Bm','Binary',true);
 end
 end
 

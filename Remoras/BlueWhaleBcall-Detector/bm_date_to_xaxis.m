@@ -1,4 +1,4 @@
-function x = bw_date_to_xaxis(datenums) 
+function x = bm_date_to_xaxis(datenums) 
 % x = fn_date_to_xaxis(datenums)
 % For the specified plot type ('ltsa' only for now), convert each of the
 % serial dates (datenums) to an x axis offset.  x is a matrix of the 
@@ -11,9 +11,7 @@ global PARAMS
 x = NaN;
 x = x(ones(size(datenums)));
 
-start = PARAMS.plot.dnum+datenum([2000 0 0 0 0 0]);
-stop = PARAMS.plot.dnum+datenum([2000 0 0 0 0 PARAMS.tseg.sec]);
-%[start, stop] = bw_get_ltsa_range;
+[start, stop] = bm_get_ltsa_range;
 valid = find(start <= datenums & stop >= datenums);
 if size(valid, 1) > 1
     valid = valid';
@@ -48,12 +46,12 @@ function [rawIndex, tBin, present] = timeIndexBin(time)
 
 global PARAMS
 
-rawIndex = find(time >= PARAMS.plot.dnum+datenum([2000 0 0 0 0 0]) & ...
-                time <= PARAMS.plot.dnum+datenum([2000 0 0 0 0 PARAMS.tseg.sec]));
+rawIndex = find(time >= PARAMS.ltsa.dnumStart & ...
+                time <= PARAMS.ltsa.dnumEnd);
 
 if isempty(rawIndex)
   % first one past requested time
-  rawIndex = min(find(time < PARAMS.plot.dnum+datenum([2000 0 0 0 0 0])));
+  rawIndex = min(find(time < PARAMS.ltsa.dnumStart));
   present = false;
 else
   present = true;
@@ -62,7 +60,7 @@ else
     % occur only in one file.
     multtimewarn = true;        % if too annoying set to false
     if multtimewarn 
-      files = sprintf('%s ', PARAMS.infile);
+      files = sprintf('%s ', PARAMS.ltsahd.fname{rawIndex});
       warning('Requested time %s occurs in multiple files %s.', ...
               files, datestr(time));
     end
@@ -72,7 +70,7 @@ end
 
 % Find ltsa bin number in current rawIndex
 if present
-  delta = PARAMS.tseg.sec;
+  delta = time - PARAMS.ltsa.dnumStart(rawIndex);
   % Compute bin width 
   tBinWidth = datenum([0 0 PARAMS.ltsa.tave/(60*60*24)]);
   tBin = 1 + round(delta / tBinWidth);
