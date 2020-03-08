@@ -1,30 +1,44 @@
-function  xcorr_explosion_p2_v4(VARGIN)
+function  ex_xcorr_explosion_p2_v4(varargin)
 
 % Pull in all xwavs of a folder and subfolder to run matched filter detector
 % for explosions.
 
 % Parm stores parameters, to be used in TethysXML output.
-parm.threshold = 0.003; % Threshold for correlation coefficient.
-parm.c2_offset = 0.000003; % Threshold offset above median square of correlation coefficient.
-parm.diff_s = 2; % Minimum time distance between consecutive explosions (was .05).
-parm.nSamples = 10000; % Number of noise samples to be pulled out.
-parm.rmsAS = 1.5; % rms noise after signal <rmsAS (dB) difference will be eliminated.
-parm.rmsBS = 1; % rms noise before signal.
-parm.ppAS = 4; % pp noise after singal <ppAS (dB) difference will be eliminated.
-parm.ppBS = 3; % pp noise before signal.
-parm.durLong_s = 0.55; % Duration >= durAfter_s (s) will be eliminated.
-parm.durShort_s = 0.03; % Duration >= dur_s (s) will be eliminated.
+% parm.threshold = 0.003; % Threshold for correlation coefficient.
+% parm.c2_offset = 0.000003; % Threshold offset above median square of correlation coefficient.
+% parm.diff_s = 2; % Minimum time distance between consecutive explosions (was .05).
+% parm.nSamples = 10000; % Number of noise samples to be pulled out.
+% parm.rmsAS = 1.5; % rms noise after signal <rmsAS (dB) difference will be eliminated.
+% parm.rmsBS = 1; % rms noise before signal.
+% parm.ppAS = 4; % pp noise after singal <ppAS (dB) difference will be eliminated.
+% parm.ppBS = 3; % pp noise before signal.
+% parm.durLong_s = 0.55; % Duration >= durAfter_s (s) will be eliminated.
+% parm.durShort_s = 0.03; % Duration >= dur_s (s) will be eliminated.
 
-BaseDir = uigetdir('F:\','Please select main folder with xwavs'); % Selects the input folder with all the xwav files to run through detector.
-DetDir = fullfile('F:\Jacksonville\JAX_D_14\JAX_D_14_Explosions'); % Modified to save files to different folder than the input folder.
+global REMORA
+threshold = REMORA.ex.detect_params.threshold;
+c2_offset = REMORA.ex.detect_params.c2_offset;
+diff_s = REMORA.ex.detect_params.diff_s;
+nSamples = REMORA.ex.detect_params.nSamples;
+rmsAS = REMORA.ex.detect_params.rmsAS;
+rmsBS = REMORA.ex.detect_params.rmsBS;
+ppAS = REMORA.ex.detect_params.ppAS;
+ppBS = REMORA.ex.detect_params.ppBS;
+durLong_s = REMORA.ex.detect_params.durLong_s;
+durShort_s = REMORA.ex.detect_params.durShort_s;
+
+BaseDir = REMORA.ex.detect_params.baseDir; % Selects the input folder with all the xwav files to run through detector.
+DetDir = REMORA.ex.detect_params.outDir; % Modified to save files to different folder than the input folder.
 SearchFileMask = {'*.x.wav'}; % Searches for the files ending in .x.wav.
 SearchPathMask = {BaseDir};
-SearchRecursiv = 1; % Setting to 1 searches through all subfolders in the selected folder, setting to 0 only searches the selected folder.
+SearchRecursiv = REMORA.ex.detect_params.recursSearch; % Setting to 1 searches through all subfolders in the selected folder, setting to 0 only searches the selected folder.
 
 [PathFileList, FileList, PathList] = ...
     utFindFiles(SearchFileMask, SearchPathMask, SearchRecursiv);
 
-template = 'D:\Code\explosions-detector 20150128 xml\template.mat'; % Make sure that this line is correct for the input template folder!
+currentPath = mfilename('fullpath');
+templateFilePath = fileparts(currentPath);
+template = fullfile(templateFilePath,'template.mat'); % Make sure that this line is correct for the input template folder!
 load(template)
 
 pre_env_temp=hilbert(template.');
@@ -109,7 +123,7 @@ for fidx = 1:size(FileList,1)
             
             % Calculate floating threshold.
             medianC2 = prctile(c2,50);
-            threshold_c2 = medianC2 + parm.c2_offset;
+            threshold_c2 = medianC2 + c2_offset;
             %         thr = ones(length(y),1)*threshold;
             thr2 = ones(length(y),1)*threshold_c2;
             
@@ -146,7 +160,7 @@ for fidx = 1:size(FileList,1)
             if ~isempty(above)
                 % Determine breaks between explosions.
                 diffAbove = diff(above);
-                breakP = find(diffAbove > parm.diff_s*fs); % Separates explosions by 0.5 seconds.
+                breakP = find(diffAbove > diff_s*fs); % Separates explosions by 0.5 seconds.
                 % Determine start and end index for each explosion.
                 for eidx = 1:length(breakP)+1
                     if eidx == 1
@@ -214,7 +228,7 @@ for fidx = 1:size(FileList,1)
                             % yDet = [pad;ydet];
                             
                             % Get noise after signal.
-                            eAfter = e+parm.nSamples;
+                            eAfter = e+nSamples;
                             if eAfter>length(yFilt)
                                 eAfter = length(yFilt);
                                 yNAfter = yFilt(e:eAfter);
@@ -234,7 +248,7 @@ for fidx = 1:size(FileList,1)
                             yDet = yFilt(s:e);
                             % yDet = [ydet;pad];
                             % Get noise before signal.
-                            sBefore = s-parm.nSamples;
+                            sBefore = s-nSamples;
                             if sBefore<1
                                 sBefore = 1;
                                 yNBefore = yFilt(sBefore:s-1);
@@ -247,7 +261,7 @@ for fidx = 1:size(FileList,1)
                             yDet = yFilt(s:e);
                             
                             % Get noise before signal.
-                            sBefore = s-parm.nSamples;
+                            sBefore = s-nSamples;
                             if sBefore<1
                                 sBefore = 1;
                                 yNBefore = yFilt(sBefore:s-1);
@@ -257,7 +271,7 @@ for fidx = 1:size(FileList,1)
                             end
                             
                             % Get noise after signal.
-                            eAfter = e+parm.nSamples;
+                            eAfter = e+nSamples;
                             if eAfter>length(yFilt)
                                 eAfter = length(yFilt);
                                 yNAfter = yFilt(e:eAfter);
@@ -367,11 +381,11 @@ for fidx = 1:size(FileList,1)
                         
                         % Eliminate for signal vs. noise after signal and
                         % duration.
-                        delRmsAS = find(drmsAS<parm.rmsAS); %239,028
-                        delPpAS = find(dppAS<parm.ppAS); %249,166
-                        delRmsBS = find(drmsBS<parm.rmsBS); %214,914
-                        delPpBS = find(dppBS<parm.ppBS); %230,409
-                        delDur = find(durSeg>=parm.durLong_s | durSeg<=parm.durShort_s); %230,729
+                        delRmsAS = find(drmsAS<rmsAS); %239,028
+                        delPpAS = find(dppAS<ppAS); %249,166
+                        delRmsBS = find(drmsBS<rmsBS); %214,914
+                        delPpBS = find(dppBS<ppBS); %230,409
+                        delDur = find(durSeg>=durLong_s | durSeg<=durShort_s); %230,729
                         
                         delUnion = unique([delRmsAS;delPpAS;delRmsBS;delPpBS;delDur]); %276,145
                         
@@ -480,6 +494,7 @@ for fidx = 1:size(FileList,1)
         if isempty(fend)
             fend = strfind(file,'.x.wav');
         end
+        parm = REMORA.ex.detect_params;
         newFile = fullfile(DetDir,[file(1:fend-1),'.mat']);
         save(newFile,'allSmpPts','allExp','allCorrVal','allDur',...
             'allRmsNBefore','allRmsNAfter','allRmsDet','allPpNBefore',...
@@ -490,6 +505,7 @@ for fidx = 1:size(FileList,1)
         if isempty(fend)
             fend = strfind(file,'.x.wav');
         end
+        parm = REMORA.ex.detect_params;
         newFile = fullfile(DetDir,[file(1:fend-1),'.mat']);
         save(newFile,'allSmpPts','allExp','allCorrVal','allDur',...
             'allRmsNBefore','allRmsNAfter','allRmsDet','allPpNBefore',...

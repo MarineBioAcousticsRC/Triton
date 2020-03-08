@@ -17,6 +17,7 @@ parm = varargin{1};
 
 SearchFileMask = {'*.wav'}; % Searches for the files ending in .x.wav.
 SearchPathMask = parm.baseDir;
+DetDir = parm.outDir; % Modified to save files to different folder than the input folder.
 SearchRecursiv = parm.recursSearch; % Setting to 1 searches through all subfolders in the selected folder, setting to 0 only searches the selected folder.
 
 [PathFileList, FileList, PathList] = ...
@@ -88,7 +89,8 @@ for fidx = 1:size(FileList,1)
     
     for idx = 1:inc
         display(['start of segment ',num2str(idx),'/',num2str(inc)])
-        segStart = datenum(rawStart(fidx,:))+datenum([0 0 0 0 0((idx-1)*75)]);
+        segsize = (idx-1)*75;
+        segStart = datenum(rawStart+datenum([0 0 0 0 0 segsize]));
         rStart = (idx-1)*step + 1;
         % start = round((idx-1)*stepSize + 1);
         rStop = rStart + step;%  round(idx*stepSize);
@@ -109,7 +111,7 @@ for fidx = 1:size(FileList,1)
             % Calculate cross correlation with template explosion.
             %       [c, filterstate] = filter(env_temp,1,env_y,filterstate);
             c = xcorr(env_y,env_temp);
-            c(1:stepSize-1) = [];
+            c(1:step-1) = [];
             
             c2 = c.*c;
             

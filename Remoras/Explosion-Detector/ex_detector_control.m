@@ -19,6 +19,12 @@ elseif strcmp(action,'setOutDir')
     outDir = get(REMORA.ex.verify.outDirEdTxt, 'string');
     REMORA.ex.detect_params.outDir = outDir;    
 
+elseif strcmp(action,'setDataType')
+    datatype.val = get(REMORA.ex.verify.datatype, 'Value');
+    datatype.opt = get(REMORA.ex.verify.datatype, 'string');
+    datachoice = datatype.opt{datatype.val};
+    REMORA.ex.detect_params.datatype = datachoice;
+
 % First Column Settings:
 
 elseif strcmp(action,'setThresh')
@@ -63,15 +69,20 @@ elseif strcmp(action,'setDurBefore')
     durShort_s = str2double(get(REMORA.ex.verify.durBeforeEdText,'String'));
     REMORA.ex.detect_params.durShort_s = durShort_s;
     
-elseif strcmp(action,'plotOn')
-    plotOn = get(REMORA.ex.verify.plotOn, 'Value');
-    REMORA.ex.detect_params.plotOn = plotOn;
+% elseif strcmp(action,'plotOn')
+%     plotOn = get(REMORA.ex.verify.plotOn, 'Value');
+%     REMORA.ex.detect_params.plotOn = plotOn;
     
 % Running detector:
 
 elseif strcmp(action,'runExplosionDetector')
-    d = ag_status_dialog('Explosion detector in progress.\n   Details in MatLab console.');
-    ex_xcorr_explosion_p2_v4(REMORA.ex.detect_params)
+    d = ex_status_dialog('Explosion detector in progress.\n   Details in MatLab console.');
+    if strcmp(REMORA.ex.detect_params.datatype, 'HARP')
+    ex_xcorr_explosion_p2_v4(REMORA.ex.detect_params);
+    elseif strcmp(REMORA.ex.detect_params.datatype, 'Sound Trap')
+        ex_xcorr_explosion_p2_v4_ST(REMORA.ex.detect_params);
+    end
+    
     
 % Loading settings:
 
