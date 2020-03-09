@@ -21,8 +21,7 @@ if  strcmp(action,'full_detector')
     bp_init_settings
     
     % set up all default settings to motion gui
-    bp_init_batch_gui
-    bp_settings_to_sec
+    bp_init_detector_params_window
     
     bp_setpointers('arrow');
 
@@ -35,14 +34,14 @@ set(HANDLES.fig.ctrl, 'Pointer', icon);
 set(HANDLES.fig.main, 'Pointer', icon);
 set(HANDLES.fig.msg, 'Pointer', icon);
 
-function update_window_settings
-global HANDLES REMORA
-set(HANDLES.ltsa.time.edtxt3,'string',REMORA.bp.settings.durWind)
-set(HANDLES.ltsa.time.edtxt4,'string',REMORA.bp.settings.slide)
-control_ltsa('newtseg') %change Triton plot length
-control_ltsa('newtstep') %change Triton time step 
-% bring motion gui to front
-figure(REMORA.fig.bp.motion);
+% function update_window_settings
+% global HANDLES REMORA
+% set(HANDLES.ltsa.time.edtxt3,'string',REMORA.bp.settings.durWind)
+% set(HANDLES.ltsa.time.edtxt4,'string',REMORA.bp.settings.slide)
+% control_ltsa('newtseg') %change Triton plot length
+% control_ltsa('newtstep') %change Triton time step 
+% % bring motion gui to front
+% figure(REMORA.fig.bp.motion);
 
 
 
