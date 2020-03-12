@@ -10,8 +10,13 @@ function sm_write_ltsahead(lIdx)
 global PARAMS
 
 % pull out start/end idx of files to be included in this LTSA
-PARAMS.ltsa.startIdx = PARAMS.ltsahd.ltsaIdx(lIdx,1);
-PARAMS.ltsa.endIdx = PARAMS.ltsahd.ltsaIdx(lIdx,2);
+if PARAMS.ltsa.ftype == 1       % do the following for wav files
+    PARAMS.ltsa.startIdx = PARAMS.ltsa.ltsaIdx(lIdx,1);
+    PARAMS.ltsa.endIdx = PARAMS.ltsa.ltsaIdx(lIdx,2);
+else % do this for xwav files
+    PARAMS.ltsa.startIdx = PARAMS.ltsahd.ltsaRawIdx(lIdx,1);
+    PARAMS.ltsa.endIdx = PARAMS.ltsahd.ltsaRawIdx(lIdx,2);
+end
 
 % define LTSA output file name
 if lIdx<10
@@ -23,13 +28,17 @@ fname = [PARAMS.ltsa.outfname,'_',fnum,'.ltsa'];
 PARAMS.ltsa.outfile = fname;
 
 % calculate file header values, open file and fill up header
-PARAMS.ltsa.nRawFiles = sum(PARAMS.ltsahd.rfileid(PARAMS.ltsa.startIdx:PARAMS.ltsa.endIdx));
+if PARAMS.ltsa.ftype == 1       % do the following for wav files
+    PARAMS.ltsa.nRawFiles = sum(PARAMS.ltsahd.rfileid(PARAMS.ltsa.startIdx:PARAMS.ltsa.endIdx));
+else % do this for xwav files
+    PARAMS.ltsa.nRawFiles = PARAMS.ltsa.endIdx - PARAMS.ltsa.startIdx + 1;
+end
 maxNrawfiles = PARAMS.ltsa.nRawFiles + 20;          % maximum number of raw files + a few more
-PARAMS.ltsa.nFiles = PARAMS.ltsahd.ltsaIdx(lIdx,2)-PARAMS.ltsahd.ltsaIdx(lIdx,1)+1;         %number of files in this LTSA
+PARAMS.ltsa.nFiles = PARAMS.ltsa.ltsaIdx(lIdx,2)-PARAMS.ltsa.ltsaIdx(lIdx,1)+1;         %number of files in this LTSA
 
 
 lhsz = 64;         % LTSA header size [bytes]
-rhsz = 64 + 40;    % LTSA rawfile header (directory) size (add 40 bytes for longer (upto 80 char) xwav files names
+rhsz = 64 + 40 + 4;    % LTSA rawfile header (directory) size (add 40 bytes for longer (upto 80 char) xwav files names + 4 empty
 dirStartLoc = lhsz + 1;                               % directory start location in bytes
 dataStartLoc = rhsz * maxNrawfiles + lhsz;           % data start location in bytes
 
