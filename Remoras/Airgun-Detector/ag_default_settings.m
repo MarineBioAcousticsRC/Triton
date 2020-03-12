@@ -14,6 +14,7 @@ parm.durShort_s = .5; % Durations >= dur_s (s) will be eliminated.
 
 parm.baseDir = 'G:\Site\data\df100'; % Example base directory.
 parm.outDir = 'G:\Site\AirgunDetections'; % Example output directory.
+parm.datatype = 'HARP'; %most common source of data
 currentPath = mfilename('fullpath');
 templateFilePath = fileparts(currentPath);
 parm.templateFile = fullfile(templateFilePath,'air_template_df100.mat'); % Searches current path of remora for the template!
