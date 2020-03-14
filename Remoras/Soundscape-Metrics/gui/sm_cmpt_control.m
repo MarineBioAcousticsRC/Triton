@@ -90,20 +90,39 @@ elseif strcmp(action,'setstrum')
 elseif strcmp(action,'setcal')
     REMORA.sm.cmpt.cal = get(REMORA.sm.verify.cal,'Value');
     
+    if REMORA.sm.cmpt.cal == 1 % toggle visibility of other spectral options
+        radioButtonParams = 'on';
+    else
+        radioButtonParams = 'off';
+    end
+    set(REMORA.sm.verify.bg,'visible',radioButtonParams)
+    set(REMORA.sm.verify.sval,'HandleVisibility',radioButtonParams)
+    set(REMORA.sm.verify.tfval,'HandleVisibility',radioButtonParams)
+    set(REMORA.sm.verify.caldbTxt,'visible',radioButtonParams)
+    set(REMORA.sm.verify.caldb,'visible',radioButtonParams)
+    set(REMORA.sm.verify.tfile,'visible',radioButtonParams)
+    set(REMORA.sm.verify.tfilesel,'visible',radioButtonParams)
+    
 elseif strcmp(action,'setsval')
     REMORA.sm.cmpt.sval = get(REMORA.sm.verify.sval,'Value');
+    REMORA.sm.cmpt.tfval = ~REMORA.sm.cmpt.sval;
     
 elseif strcmp(action,'setcaldb')
     REMORA.sm.cmpt.caldb = str2double(get(REMORA.sm.verify.caldb,'String'));
     
 elseif strcmp(action,'settfval')
     REMORA.sm.cmpt.tfval = get(REMORA.sm.verify.tfval,'Value');
+    REMORA.sm.cmpt.sval = ~REMORA.sm.cmpt.tfval;
     
 elseif strcmp(action,'settfile')
     REMORA.sm.cmpt.tfile = get(REMORA.sm.verify.tfile,'String');
 %     REMORA.sm.cmpt.tpath = get(REMORA.sm.verify.tpath,'String');
     
 elseif strcmp(action,'tfilesel')
+    if isempty(REMORA.sm.cmpt.tpath)
+        REMORA.sm.cmpt.tpath = REMORA.sm.cmpt.indir;
+        REMORA.sm.cmpt.tfile = '../*.tf';
+    end
     [REMORA.sm.verify.tfile.String, REMORA.sm.verify.tpath.String]...
         = uigetfile(fullfile(REMORA.sm.cmpt.tpath,REMORA.sm.cmpt.tfile),'Select Transfer Function File');
     REMORA.sm.cmpt.tfile = REMORA.sm.verify.tfile.String;
