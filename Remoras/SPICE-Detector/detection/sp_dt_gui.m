@@ -20,14 +20,18 @@ else
     p = REMORA.spice_dt.detParams;
 end
 
-
-if ~isfield(p,'countThresh') || isempty(p.countThresh)
+if REMORA.spice_dt.detParams.dBppThresholdFlag == 1||...
+    ~isfield(REMORA.spice_dt.detParams, 'countThresh')||...
+    isempty(REMORA.spice_dt.detParams.countThresh)
+    
     if ~isfield(p,'xfrOffset') || isempty(p.xfrOffset)
         p.xfrOffset = 0;
     end
     p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;
     REMORA.spice_dt.detParams.countThresh = p.countThresh;
+    REMORA.spice_dt.detParams.dBppThresholdFlag = 0; % set flag to off 
 end
+
 cParams = sp_dt_init_cParams(p); % set up storage for HR output.
 sIdx = 1;
 buffSamples = p.LRbuffer*PARAMS.fs;
