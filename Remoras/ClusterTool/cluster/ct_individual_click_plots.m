@@ -41,7 +41,11 @@ for iF = 1:length(nodeSet)
         length(f(s.stIdx:s.edIdx))~=size(compositeData(iF).spectraMeanSet,2)
         %Catch for backward compatibility if orignial fill spectra were not stored
         fPlot = f(s.stIdx,s.edIdx);
-    else
+    end
+    % if it still doesn't match, interpolate and warn the user.
+    if length(fPlot)~=length(compositeData(iF).spectraMeanSet) &&... 
+        length(f(s.stIdx:s.edIdx))~=size(compositeData(iF).spectraMeanSet,2)
+    
         warning('Frequency vector and spectra differ in length. Display errors possible in plots')
         fPlot = linspace(s.startFreq,s.endFreq,length(compositeData(iF).spectraMeanSet));
     end
