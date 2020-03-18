@@ -25,7 +25,11 @@ pcntDone = 0;
 loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
 
 fCount = 0;                         % total number of wav files in this LTSA
-m = 0;                              % total number of raw file counter
+if PARAMS.ltsa.ftype ~= 1
+    m = PARAMS.ltsa.startIdx - 1;
+else
+    m = 0;                              % total number of raw file counter
+end
 count = 0;                          % total number of averages counter for output display
 % total = 0;
 % rfc = 0;
@@ -195,7 +199,7 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all x.w
    
             fCount = fCount + 1; %counter for file number within LTSA
             if PARAMS.ltsa.ftype ~=1 % for xwav HARP and ARP data
-                pcntDone = m/total;
+                pcntDone = (fCount-1)/total;
             else % for wav files
                 pcntDone = ((fCount-1) + r/nrf)/total;
             end
