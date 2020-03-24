@@ -1,4 +1,4 @@
-function [abstime] = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,DISPLAY,filename)
+function [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,DISPLAY,filename)
 %% function findcalls(halfblock, block, gap, offset, startS, endS, filename, startF, endF, thresh,out_fid, DISPLAY)
 
 % Adapted from David Mellinger's 

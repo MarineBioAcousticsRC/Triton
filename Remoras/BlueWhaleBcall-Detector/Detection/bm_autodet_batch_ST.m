@@ -106,16 +106,18 @@ if fidx == 1
         else
             startS = ((blockIdx-1)*block-20)*I.SampleRate;
             endS = (blockIdx)*block*I.SampleRate;
-            startTime = startTime + endTime;
+            startTime = startTime + datenum([0 0 0 0 0 (block-20)]);
             endTime = endTime + incHr;
         end
         if endS > I.TotalSamples
             endS = I.TotalSamples;
+            block = (endS - startS)/I.SampleRate;
+            endTime = startTime + datenum([0 0 0 0 0 block]);
         end
         
             % Read in data
             y = audioread(filename, [startS endS]);
-            abstime = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
+            [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
             ty = 1 - isempty(abstime);
         if ty == 1
             %det_times = vertcat(det_times,abstime);
@@ -125,7 +127,7 @@ if fidx == 1
             if ischar(Date)
                 Date = {Date};
             end
-            det_times = table(File,Date,abstime);
+            det_times = table(File,Date,abstime,peakS);
             %abstimefin = abstime+datenum([0 0 0 0 0 10]);
             %times = [abstime,abstimefin]; 
         else
@@ -142,16 +144,16 @@ if fidx == 1
     %If not first file, 20s segment of previous file will be added to the start
     %of the file, so no call gets missed.
 else
-    gap(fidx) = floor((startTime - ...
-    fileEnd(fidx-1)) * 24 * 60 * 60);
+    %gap(fidx) = floor((startTime - ...
+    %fileEnd(fidx-1)) * 24 * 60 * 60);
 
         % Calculate the cumulative offset in scheduled gaps per raw file
-    offset(fidx) = offset(fidx-1) + gap(fidx); % will give cumulative gap time so far
+    %offset(fidx) = offset(fidx-1) + gap(fidx); % will give cumulative gap time so far
     
     for blockIdx = 1:blocknum  %scroll through blocks
     
         if blockIdx == 1
-            startS = 1;
+            startS = 1; 
             endS = block*I.SampleRate;
             prevfile = PathFileListWav{fidx-1};
             J = audioinfo(prevfile);
@@ -163,10 +165,13 @@ else
         else
             startS = ((blockIdx-1)*block-20)*I.SampleRate;
             endS = (blockIdx)*block*I.SampleRate;
+            startTime = startTime + datenum([0 0 0 0 0 (block-20)]);
+            endTime = endTime + incHr;
         end
         if endS > I.TotalSamples
             endS = I.TotalSamples;
             block = (endS - startS)/I.SampleRate;
+            endTime = startTime + datenum([0 0 0 0 0 block]);
         end
         
         % Read in data
@@ -177,7 +182,7 @@ else
         else
             y = audioread(filename, [startS endS]);
         end
-        abstime = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
+        [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
         ty = 1 - isempty(abstime);
         if ty == 1
         %det_times{fidx,blockIdx} = abstime;
@@ -187,7 +192,7 @@ else
             if ischar(Date)
                 Date = {Date};
             end
-            det_times = table(File,Date,abstime);
+            det_times = table(File,Date,abstime,peakS);
             %abstimefin = abstime+datenum([0 0 0 0 0 10]);
             %times = [abstime,abstimefin];
         else
