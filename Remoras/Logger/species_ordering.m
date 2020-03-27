@@ -8,7 +8,7 @@ if nargin < 3
 end
 n = 1;
 [ly,lx] = size(TREE.textR);
-col = strfind(name,'\');
+col = strfind(name,filesep);
 
 % checking how many sections to look through
 if col ~= 0

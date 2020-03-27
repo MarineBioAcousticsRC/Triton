@@ -37,7 +37,7 @@ end
 maxNrawfiles = PARAMS.ltsa.nrftot + 100;          % maximum number of raw files + a few more
 
 lhsz = 64;         % LTSA header size [bytes]
-rhsz = 64 + 40;    % LTSA rawfile header (directory) size (add 40 bytes for longer (upto 80 char) xwav files names
+rhsz = 64 + 40 + 4;    % LTSA rawfile header (directory) size (add 40 bytes for longer (up to 80 char) xwav files names) + 4 "zero" bytes
 dirStartLoc = lhsz + 1;                               % directory start location in bytes
 dataStartLoc = rhsz * maxNrawfiles + lhsz;           % data start location in bytes
 
@@ -71,7 +71,7 @@ fwrite(fid,PARAMS.ltsa.ch,'uint8');         % 1 byte - channel number that was l
 fwrite(fid,zeros(nz,1),'uint8');                  % 1 bytes x 27 = 27 bytes - 0 padding / spare
 % 64 bytes used - up to here
 
-% Directory - one for each raw file - 64 + 40 bytes for each directory listing
+% Directory - one for each raw file - 64 + 44 bytes for each directory listing
 for k = 1 : PARAMS.ltsa.nrftot
     % write time values to directory
     fwrite(fid,PARAMS.ltsahd.year(k) ,'uchar');          % 1 byte - Year

@@ -29,7 +29,7 @@ sm_ck_ltsaparams;
 % split the data into # days defined before
 sm_split_ltsa;
 
-for lIdx = PARAMS.ltsa.nstart:size(PARAMS.ltsahd.ltsaIdx,1)
+for lIdx = PARAMS.ltsa.nstart:size(PARAMS.ltsa.ltsaIdx,1)
     % setup ltsa file header + directory listing
     sm_write_ltsahead(lIdx);
 

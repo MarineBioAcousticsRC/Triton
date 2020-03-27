@@ -7,7 +7,7 @@ function sm_cmpt_calib
 % averaging in time and frequency
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global REMORA 
+global REMORA PARAMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% single value calibration
 
@@ -21,5 +21,23 @@ if REMORA.sm.cmpt.sval
     
 %% transfer function calibration
 elseif REMORA.sm.cmpt.tfval
-    1;
+    files = dir(fullfile(REMORA.sm.cmpt.tpath, '*.tf'));
+    if length(files) ~= 1
+        error('Unable to find transfer fn or transfer fn ambiguous')
+    end
+    transferfnfile = fullfile(REMORA.sm.cmpt.tpath, REMORA.sm.cmpt.tfile);
+    fileH = fopen(transferfnfile, 'r');
+    if fileH == -1
+        error('Unable to open transfer fn %s\n(corresponding to: %s)', ...
+            transferfnfile, audiofile)
+    end
+    freqpower = textscan(fileH, '%f %f');  % freq <whitespace> dB format
+    
+    REMORA.sm.cmpt.pre.fvec = 0:REMORA.sm.cmpt.avgf:REMORA.sm.cmpt.hfreq;
+
+    % Resample to DFT resolution
+    REMORA.sm.cmpt.pre.dB = interp1(freqpower{1}, freqpower{2}, REMORA.sm.cmpt.pre.fvec, 'linear', 'extrap');
+    
+    % adjust for single value
+    REMORA.sm.cmpt.pre.psd = REMORA.sm.cmpt.pre.psd + REMORA.sm.cmpt.pre.dB;
 end
