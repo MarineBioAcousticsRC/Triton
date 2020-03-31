@@ -6,7 +6,7 @@ function sm_get_ltsadir
 % get directory of wave/xwav files
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%this is to load PARAMS to make them visible
 global PARAMS 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

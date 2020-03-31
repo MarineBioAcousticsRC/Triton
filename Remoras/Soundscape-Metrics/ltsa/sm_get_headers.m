@@ -13,7 +13,7 @@ m = 0;                                  % total number of raw files used for lts
 fnsz = size(PARAMS.ltsa.fname);        % number of data files in directory
 PARAMS.ltsa.nxwav = fnsz(1);           % number of xwav files
 PARAMS.ltsahd.fname = char(zeros(PARAMS.ltsa.nxwav,80));         % make empty matrix - filenames need to be 80 char or less
-for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
+for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
     
     if PARAMS.ltsa.ftype == 1       % do the following for wav files
         m = m + 1;
@@ -72,6 +72,19 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         PARAMS.ltsahd.ticks(m) = 0;
         
     elseif PARAMS.ltsa.ftype == 2               % do the following for xwavs
+        try
+            info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+        catch ME
+            disp(ME.message)
+            dmsg = sprintf('Is %s a real wave file?', ...
+                fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+            disp(dmsg);
+            PARAMS.ltsa.gen = 0; % need to cancel
+            return 
+        end
+        
+        PARAMS.ltsahd.nsamp(k) = info.TotalSamples;
+        
         fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)),'r');
         
         fseek(fid,22,'bof');
@@ -111,6 +124,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
             PARAMS.ltsahd.gain(m) = fread(fid,1,'uint8');          % gain (1 = no change)
             PARAMS.ltsahd.padding = fread(fid,7,'uchar');    % Padding to make it 32 bytes...misc info can be added here
             PARAMS.ltsahd.fname(m,1:fnsz(2)) = PARAMS.ltsa.fname(k,:);        % xwav file name for this raw file header
+            PARAMS.ltsahd.fnum(m) = k;
             
             PARAMS.ltsahd.dnumStart(m) = datenum([PARAMS.ltsahd.year(m) PARAMS.ltsahd.month(m)...
                 PARAMS.ltsahd.day(m) PARAMS.ltsahd.hour(m) PARAMS.ltsahd.minute(m) ...
@@ -123,7 +137,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
 end
 
 PARAMS.ltsa.nrftot = m;     % total number of raw files
-PARAMS.ltsa.ver = 4;    % 32 bits (~ 4billon nave and nrftot allowed)
+PARAMS.ltsa.ver = 4;    % 64 bits (2^64 byte locations and nrftot allowed)
 
 disp(['Total number of raw files: ',num2str(PARAMS.ltsa.nrftot)])
 disp(['LTSA version ',num2str(PARAMS.ltsa.ver)])

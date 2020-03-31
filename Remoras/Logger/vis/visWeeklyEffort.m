@@ -1091,7 +1091,7 @@ for n=1:length(plots);
     end
     if save
         %try to save file
-        save_path=strcat(path,species,'\');
+        save_path=strcat(path,species,filesep);
         if ~isdir(save_path)
             mkdir(save_path);
         end

@@ -18,6 +18,12 @@ elseif strcmp(action,'recursSearch')
 elseif strcmp(action,'setOutDir')
     outDir = get(REMORA.ag.verify.outDirEdTxt, 'string');
     REMORA.ag.detect_params.outDir = outDir;    
+    
+elseif strcmp(action,'setDataType')
+    datatype.val = get(REMORA.ag.verify.datatype, 'Value');
+    datatype.opt = get(REMORA.ag.verify.datatype, 'string');
+    datachoice = datatype.opt{datatype.val};
+    REMORA.ag.detect_params.datatype = datachoice;
 
 % First Column Settings:
 
@@ -71,7 +77,11 @@ elseif strcmp(action,'plotOn')
 
 elseif strcmp(action,'runAirgunDetector')
     d = ag_status_dialog('Airgun detector in progress.\n   Details in MatLab console.');
-    ag_airgun_detector(REMORA.ag.detect_params)
+    if strcmp(REMORA.ag.detect_params.datatype, 'HARP')
+    ag_airgun_detector(REMORA.ag.detect_params);
+    elseif strcmp(REMORA.ag.detect_params.datatype, 'Sound Trap')
+        ag_airgun_detector_ST(REMORA.ag.detect_params);
+    end
     
 % Loading settings:
 

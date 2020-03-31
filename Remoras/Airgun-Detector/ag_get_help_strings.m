@@ -6,6 +6,7 @@ agHelpStrings.baseDirHelp = 'Base directory where audio files are stored.';
 
 agHelpStrings.outDirHelp = 'Directory where detector files will be stored.';
 
+agHelpStrings.datatypeHelp = 'Source of the data, pick "HARP" for x.wav, "Sound Trap" for wav files.';
 agHelpStrings.thresholdHelp = 'Threshold for correlation coefficient.';
 
 agHelpStrings.thresholdOffsetHelp = 'Threshold offset above median square of correlation coefficient';

@@ -18,6 +18,9 @@ fprintf('%s \n\t\t %s - %s\n', ...
     datestr(PARAMS.ltsa.dnumStart(1),'mm/dd/yy HH:MM'),...
     datestr(PARAMS.ltsa.dnumEnd(end),'mm/dd/yy HH:MM'));
 
+% removal of disk write data in seconds
+REMORA.sm.cmpt.remove = 15;
+
 %% re-compute decimal date, some error due to rounding
 PARAMS.ltsa.dnumStart = datenum(PARAMS.ltsa.dvecStart);
 PARAMS.ltsa.dnumEnd = datenum(PARAMS.ltsa.dvecEnd);
@@ -52,7 +55,14 @@ for ridx = 1:PARAMS.ltsa.nrftot
     bytevec = bytevec.'; %transpose
     % keep or discard average; currently keep all, need to add logic for
     % erroneous data
-    keep = ones(length(bytevec),1);
+    if REMORA.sm.cmpt.dw == 1 %do this for xwav files
+        keep = ones(length(bytevec),1);
+        % define how many time bins for disk write
+        tbin = REMORA.sm.cmpt.remove/PARAMS.ltsa.dfreq;
+        keep(1:tbin) = 0;
+    else %do this for wav files
+        keep = ones(length(bytevec),1);
+    end
     % fill into position of header matrices
     REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),2) = bytevec;
     REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),3) = keep;
