@@ -10,8 +10,8 @@ function bm_autodet_batch_ST(WavDir, OutDir)
 % modified by Annebelle Kok Februari 6, 2020
 %% Define settings to provide to findcalls.m
 global REMORA
-startF    = [45, 44.5, 44, 43.5];	% Hz - start frequency kernel
-endF      = [44.5, 44, 43.5, 42.7];	% Hz - end frequency kernel
+startF    = [45.6, 44.3, 43.8, 43.2];	% Hz - start frequency kernel
+endF      = [44.3, 43.8, 43.2, 42.6];	% Hz - end frequency kernel
 thresh =  REMORA.bm.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
 %thresh = 15;
 %% Get list of wav files in deployment and define output
@@ -101,23 +101,24 @@ if fidx == 1
     for blockIdx = 1:blocknum  %scroll through blocks
         if blockIdx == 1
             startS = 1;
-            endS = block*I.SampleRate; 
+            endS = block*I.SampleRate;
+            startTime1 = startTime;
             endTime = startTime + incHr;
         else
             startS = ((blockIdx-1)*block-20)*I.SampleRate;
             endS = (blockIdx)*block*I.SampleRate;
-            startTime = startTime + datenum([0 0 0 0 0 (block-20)]);
+            startTime1 = startTime + datenum([0 0 0 0 0 ((blockIdx-1)*block-20)]);
             endTime = endTime + incHr;
         end
         if endS > I.TotalSamples
             endS = I.TotalSamples;
             block = (endS - startS)/I.SampleRate;
-            endTime = startTime + datenum([0 0 0 0 0 block]);
+            endTime = startTime1 + datenum([0 0 0 0 0 block]);
         end
         
             % Read in data
             y = audioread(filename, [startS endS]);
-            [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
+            [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime1,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
             ty = 1 - isempty(abstime);
         if ty == 1
             %det_times = vertcat(det_times,abstime);
@@ -160,18 +161,18 @@ else
             edge1S = J.TotalSamples-J.SampleRate*20;
             edge1E = J.TotalSamples;
             incS = datenum([0 0 0 0 0 20]);
-            startTime = startTime - incS; 
+            startTime1 = startTime - incS; 
             endTime = startTime + incHr+incS;
         else
             startS = ((blockIdx-1)*block-20)*I.SampleRate;
             endS = (blockIdx)*block*I.SampleRate;
-            startTime = startTime + datenum([0 0 0 0 0 (block-20)]);
+            startTime1 = startTime + datenum([0 0 0 0 0 ((blockIdx-1)*block-20)]);
             endTime = endTime + incHr;
         end
         if endS > I.TotalSamples
             endS = I.TotalSamples;
             block = (endS - startS)/I.SampleRate;
-            endTime = startTime + datenum([0 0 0 0 0 block]);
+            endTime = startTime1 + datenum([0 0 0 0 0 block]);
         end
         
         % Read in data
@@ -182,7 +183,7 @@ else
         else
             y = audioread(filename, [startS endS]);
         end
-        [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
+        [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime1,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
         ty = 1 - isempty(abstime);
         if ty == 1
         %det_times{fidx,blockIdx} = abstime;
