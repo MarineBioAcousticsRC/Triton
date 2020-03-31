@@ -1,4 +1,4 @@
-function [abstime] = bw_writecalls_soundtrap (halfblock, startTime, peakS, score)
+function [abstime] = bm_writecalls_soundtrap (halfblock, startTime, peakS, score)
 
 % Adapted from Shyam's BatchClassifyBlueCalls
 % Updated to write score after start time

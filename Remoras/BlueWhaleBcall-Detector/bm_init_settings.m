@@ -1,4 +1,4 @@
-function bw_init_settings
+function bm_init_settings
 
 global REMORA
 
@@ -11,4 +11,4 @@ settings.SoundTrap = true; % if not Sound Trap data, set to false
 settings.saveCsv = true; % save results to a .csv file
 
 
-REMORA.bw.settings = settings;
+REMORA.bm.settings = settings;

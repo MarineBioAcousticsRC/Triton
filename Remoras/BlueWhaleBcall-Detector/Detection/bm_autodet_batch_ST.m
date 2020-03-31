@@ -1,4 +1,4 @@
-function bw_autodet_batch_ST(WavDir, OutDir)
+function bm_autodet_batch_ST(WavDir, OutDir)
 
 % scroll through Sound Trap wav file - adapted from Shyam's BatchClassifyBlueCalls
 % smk 100219
@@ -10,14 +10,14 @@ function bw_autodet_batch_ST(WavDir, OutDir)
 % modified by Annebelle Kok Februari 6, 2020
 %% Define settings to provide to findcalls.m
 global REMORA
-startF    = [45, 44.5, 44, 43.5];	% Hz - start frequency kernel
-endF      = [44.5, 44, 43.5, 42.7];	% Hz - end frequency kernel
-thresh =  REMORA.bw.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
+startF    = [45.6, 44.3, 43.8, 43.2];	% Hz - start frequency kernel
+endF      = [44.3, 43.8, 43.2, 42.6];	% Hz - end frequency kernel
+thresh =  REMORA.bm.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
 %thresh = 15;
 %% Get list of wav files in deployment and define output
 %Get all wavs in that deployment
 %WavDir = 'G:\CI01_01_df8';
-WavDir = REMORA.bw.settings.inDir;
+WavDir = REMORA.bm.settings.inDir;
 SearchFileMaskMat = {'*wav'};
 SearchPathMaskMat = {WavDir};
 SearchRecursiv = 0;
@@ -27,7 +27,7 @@ SearchRecursiv = 0;
 
 %Define output files
 %OutDir = 'I:\Shared drives\Soundscape_Analysis\trial_output'; %NB: the drive letter changes quite often, so check.
-OutDir = REMORA.bw.settings.outDir;
+OutDir = REMORA.bm.settings.outDir;
 PathListCsv = PathListWav;
 FileListCsv = FileListWav;
 
@@ -101,21 +101,24 @@ if fidx == 1
     for blockIdx = 1:blocknum  %scroll through blocks
         if blockIdx == 1
             startS = 1;
-            endS = block*I.SampleRate; 
+            endS = block*I.SampleRate;
+            startTime1 = startTime;
             endTime = startTime + incHr;
         else
             startS = ((blockIdx-1)*block-20)*I.SampleRate;
             endS = (blockIdx)*block*I.SampleRate;
-            startTime = startTime + endTime;
+            startTime1 = startTime + datenum([0 0 0 0 0 ((blockIdx-1)*block-20)]);
             endTime = endTime + incHr;
         end
         if endS > I.TotalSamples
             endS = I.TotalSamples;
+            block = (endS - startS)/I.SampleRate;
+            endTime = startTime1 + datenum([0 0 0 0 0 block]);
         end
         
             % Read in data
             y = audioread(filename, [startS endS]);
-            abstime = bw_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
+            [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime1,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
             ty = 1 - isempty(abstime);
         if ty == 1
             %det_times = vertcat(det_times,abstime);
@@ -125,9 +128,9 @@ if fidx == 1
             if ischar(Date)
                 Date = {Date};
             end
-            det_times = table(File,Date,abstime);
-            abstimefin = abstime+datenum([0 0 0 0 0 10]);
-            times = [abstime,abstimefin]; 
+            det_times = table(File,Date,abstime,peakS);
+            %abstimefin = abstime+datenum([0 0 0 0 0 10]);
+            %times = [abstime,abstimefin]; 
         else
           det_times = [];
         end 
@@ -138,37 +141,38 @@ if fidx == 1
         %end
         
     end
-    filename = split(PathFileListCsv,'.csv');
-labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
-ioWriteLabel(labelname,times,'Blue whale');
+    
     %If not first file, 20s segment of previous file will be added to the start
     %of the file, so no call gets missed.
 else
-    gap(fidx) = floor((startTime - ...
-    fileEnd(fidx-1)) * 24 * 60 * 60);
+    %gap(fidx) = floor((startTime - ...
+    %fileEnd(fidx-1)) * 24 * 60 * 60);
 
         % Calculate the cumulative offset in scheduled gaps per raw file
-    offset(fidx) = offset(fidx-1) + gap(fidx); % will give cumulative gap time so far
+    %offset(fidx) = offset(fidx-1) + gap(fidx); % will give cumulative gap time so far
     
     for blockIdx = 1:blocknum  %scroll through blocks
     
         if blockIdx == 1
-            startS = 1;
+            startS = 1; 
             endS = block*I.SampleRate;
             prevfile = PathFileListWav{fidx-1};
             J = audioinfo(prevfile);
             edge1S = J.TotalSamples-J.SampleRate*20;
             edge1E = J.TotalSamples;
             incS = datenum([0 0 0 0 0 20]);
-            startTime = startTime - incS; 
+            startTime1 = startTime - incS; 
             endTime = startTime + incHr+incS;
         else
             startS = ((blockIdx-1)*block-20)*I.SampleRate;
             endS = (blockIdx)*block*I.SampleRate;
+            startTime1 = startTime + datenum([0 0 0 0 0 ((blockIdx-1)*block-20)]);
+            endTime = endTime + incHr;
         end
         if endS > I.TotalSamples
             endS = I.TotalSamples;
             block = (endS - startS)/I.SampleRate;
+            endTime = startTime1 + datenum([0 0 0 0 0 block]);
         end
         
         % Read in data
@@ -179,7 +183,7 @@ else
         else
             y = audioread(filename, [startS endS]);
         end
-        abstime = bw_findcalls_soundtrap(y,I,blockIdx,startTime,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
+        [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime1,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
         ty = 1 - isempty(abstime);
         if ty == 1
         %det_times{fidx,blockIdx} = abstime;
@@ -189,9 +193,9 @@ else
             if ischar(Date)
                 Date = {Date};
             end
-            det_times = table(File,Date,abstime);
-            abstimefin = abstime+datenum([0 0 0 0 0 10]);
-            times = [abstime,abstimefin];
+            det_times = table(File,Date,abstime,peakS);
+            %abstimefin = abstime+datenum([0 0 0 0 0 10]);
+            %times = [abstime,abstimefin];
         else
             det_times = [];
         end 
@@ -208,9 +212,9 @@ else
    %     det_times2{1,fidx} = '';    
     %    end
 end
-filename = split(PathFileListCsv,'.csv');
-labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
-ioWriteLabel(labelname,times,'Blue whale'); 
+%filename = split(PathFileListCsv,'.csv');
+%labelname = [filename{fidx},'_BlueWhaleLabels.tlab'];
+%ioWriteLabel(labelname,times,'Blue whale'); 
 %fclose(out_fid);
 
 end
@@ -232,6 +236,14 @@ prevcall = [];
    %results = table(date,seconds,check);
    results = [maintable,check];
    writetable(results,PathFileListCsv{1}); 
+   
+   %Write label file
+   startTriton = maintable.abstime - dateoffset();
+   endTriton = startTriton + datenum([0 0 0 0 0 10]);
+   times = [startTriton, endTriton];
+   filename = split(PathFileListCsv,'.csv');
+labelname = [filename{fidx},'_Bm.tlab'];
+ioWriteLabel(labelname,times,'Bm','Binary',true);
 end
 end
 

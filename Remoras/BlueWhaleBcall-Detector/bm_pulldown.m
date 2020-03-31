@@ -1,4 +1,4 @@
-function bw_pulldown(action)
+function bm_pulldown(action)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % sh_pulldown.m
@@ -13,21 +13,32 @@ global PARAMS REMORA HANDLES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if strcmp(action,'full_detector')
     % dialog box - run full detector
-    bw_setpointers('watch');
+    bm_setpointers('watch');
     
     % set up to open gui window for batch detector
-    bw_init_batch_figure
-    bw_init_settings
+    bm_init_batch_figure
+    bm_init_settings
     
     % set up all default settings to motion gui
-    bw_init_batch_gui
+    bm_init_batch_gui
     
-     bw_setpointers('arrow');
-
+     bm_setpointers('arrow');
+% elseif strcmp(action,'create_labels')
+%     
+%     % load text file and create .tlab file 
+%     sh_create_tlab_file
+    
+elseif strcmp(action,'load_labels')
+    
+    % set up to open gui window for motion detector
+    bm_init_visLabel_figure
+    
+    % set motion gui for detection lables
+    bm_init_visLabel_gui
 end
 
 
-function bw_setpointers(icon)
+function bm_setpointers(icon)
 global HANDLES
 set(HANDLES.fig.ctrl, 'Pointer', icon);
 set(HANDLES.fig.main, 'Pointer', icon);
