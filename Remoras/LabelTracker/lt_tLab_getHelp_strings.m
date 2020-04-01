@@ -4,10 +4,11 @@ function ltTlabHelp = lt_tLab_getHelp_strings
 %%%%to do
 
 ltTlabHelp.saveDir = 'Where do you want to save your output?';
-ltTlabHelp.filePrefix = 'What do you want your output file prefix to be?';
+ltTlabHelp.filePrefix = 'File prefix used to find files';
 ltTlabHelp.filePath = 'Full path to your file for conversion';
 ltTlabHelp.FDpath = 'Full path to false detections file';
-ltTlabHelp.rmvFDs = 'Check box to remove false detections if filePath is to TPWS file and want to remove FDs';
+ltTlabHelp.rmvFDs = 'Check box to remove false detections from TPWS file';
+ltTlabHelp.TPWSitr = 'What iteration of TPWS files are your detections from?';
 
 %%what kind of labels do you want?
 %ltTlabHelp.trueL = 'Check to create labels';

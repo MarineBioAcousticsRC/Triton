@@ -2,11 +2,17 @@
 %%%%%%default settings for making tlabs in triton Label Tracker remora
 
 p.saveDir = 'H:\Hawaii_K\DCLDE\PIFSC_2\1705_ch4\TPWS1_tLabs'; %where to save
-p.filePrefix = '1705a'; %what do you want your file to be called?
-p.filePath = 'H:\Hawaii_K\DCLDE\PIFSC_2\1705_ch4\TPWS\1705a_Delphin_TPWS1.mat';
+p.filePrefix = '1705'; %what do you want your file to be called?
+p.filePath = 'H:\Hawaii_K\DCLDE\PIFSC_2\1705_ch4\TPWS';
 p.rmvFDs = 0; %set to 1 if loading TPWS and want to remove false detections
-p.FDpath = 'H:\Hawaii_K\DCLDE\PIFSC_2\1705_ch4\TPWS\1705a_Delphin_FD1.mat'; %path to false detections file 
+%p.FDpath = 'H:\Hawaii_K\DCLDE\PIFSC_2\1705_ch4\TPWS\1705a_Delphin_FD1.mat'; %path to false detections file 
+p.TPWSitr = '1'; %iteration of TPWS to run for
 
+%%%what type of file are you using as input?
+p.TPWStype = 0;
+p.FDtype = 1;
+p.IDtype = 0;
+p.TDtype = 0;
 
 %%what kind of labels do you want?
 % p.trueL = 1; %create true labels
