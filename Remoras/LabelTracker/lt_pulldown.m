@@ -10,5 +10,6 @@ if strcmp(action,'create_tlabs')
     lt_init_mk_tLab_window
     
 elseif strcmp(action,'visualize_labels')
-    disp('Im afraid I cant do that sire...')
+    REMORA.lt.lVis_params = lt_lVis_init_settings;
+    lt_init_lVis_window
 end 

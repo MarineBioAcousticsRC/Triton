@@ -3,6 +3,7 @@ function lt_mk_tLabs(varargin)
 
 %%%%created by MAZ on 3/13/2020 to speed up input into ioWriteLabel
 p = varargin{1};
+p.timeOffNum = datenum(p.timeOffset,0,0,0,0,0);
 
 %%load files of interest
 if p.TPWStype
@@ -60,7 +61,7 @@ for iFile = 1:size(fileNames,1)
         
         for iLab = 1:size(labelType,1)
             labelTimes = zID(find(zID(:,2)==labelType(iLab)),1);
-            tTimeS = labelTimes - p.timeOffset;
+            tTimeS = labelTimes - p.timeOffNum;
             %dur = .0001; %what duration do you want for your clicks?
             tTimeE = tTimeS + datenum(0,0,0,0,0,p.dur);
             
@@ -82,17 +83,17 @@ for iFile = 1:size(fileNames,1)
                 FD = fullfile(p.filePath,[p.outPrefix,'_FD',p.TPWSitr,'.mat']);
                 load(FD)
                 
-                tTimeS = setdiff(MTT,zFD,'rows')- p.timeOffset;
+                tTimeS = setdiff(MTT,zFD,'rows')- p.timeOffNum;
                 disp('using difference in MTT and zFD to find true labels from TPWS')
             else
                 disp('using full TPWS file to make tlabs')
-                tTimeS = MTT - p.timeOffset;
+                tTimeS = MTT - p.timeOffNum;
             end
         elseif p.FDtype
-            tTimeS = zFD- p.timeOffset;
+            tTimeS = zFD- p.timeOffNum;
             disp('using FD file to make tlabs')
         elseif p.TDtype
-            tTimeS = zTD - p.timeOffset;
+            tTimeS = zTD - p.timeOffNum;
             disp('using TD file to make tlabs')
         end
         
