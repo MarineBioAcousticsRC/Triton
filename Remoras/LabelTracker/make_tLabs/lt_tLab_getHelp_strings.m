@@ -15,7 +15,7 @@ ltTlabHelp.TPWSitr = 'What iteration of TPWS files are your detections from?';
 ltTlabHelp.trueLabel = 'Name for output label. Overwritten with detEdit labels if using ID file as input';
 
 %%other
-ltTlabHelp.timeOffset = 'time offset in years; set to 0 if no offset. PIFSC data originally used started with different year than triton datenums';
+ltTlabHelp.timeOffset = 'time offset in years; set to 0 if no offset. Triton datetimes start at year 2000';
 ltTlabHelp.dur = 'duration for click labels in seconds, necessary to create an end time for data coming from detEdit. Default is a good option for echolocation clicks.'; 
 
 ltTlabHelp.runButton = 'I mean like... run the code, man';

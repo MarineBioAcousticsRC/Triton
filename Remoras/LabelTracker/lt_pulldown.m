@@ -12,4 +12,10 @@ if strcmp(action,'create_tlabs')
 elseif strcmp(action,'visualize_labels')
     REMORA.lt.lVis_params = lt_lVis_init_settings;
     lt_init_lVis_window
-end 
+    
+    %initialize settings needed for plotting
+    REMORA.lt.lVis_det.detection.PlotLabels = false;
+    REMORA.lt.lVis_det.detection2.PlotLabels = false;
+    REMORA.lt.lVis_det.detection3.PlotLabels = false;
+    REMORA.lt.lVis_det.detection4.PlotLabels = false;
+end

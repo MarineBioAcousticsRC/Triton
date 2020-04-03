@@ -1,6 +1,6 @@
 function lt_init_lVis_window
 
-global REMORA
+global REMORA HANDLES PARAMS
 
 
 defaultPos = [0.1,0.1,0.3,0.25];
@@ -39,10 +39,12 @@ w = 1/col;
 x = 0:w:1;
 y = 1:-h:0;
 xbuff = w*0.25;
+ybuff = h*0.2;
 
 %%%colors
 bgColor = [1 1 1];
 bgColorPurple = [0.8 0.6 0.6];
+bgColorTeal = [0.2 0.8 0.8];
 
 REMORA.lt.lVis_verify = [];
 
@@ -60,14 +62,14 @@ REMORA.lt.lVis_verify.headtext = uicontrol(REMORA.fig.lt.lVis_settings, ...
     'Visible','on');  %'BackgroundColor',bgColor3,...
 
 
-% %%%work with LTSA
-% if isfield(PARAMS, 'ltsa')
-%     f_enbl = get(HANDLES.ltsa.motion.fwd, 'Enable');
-%     b_enbl = get(HANDLES.ltsa.motion.back, 'Enable');
-% else
-%     f_enbl = 'off';
-%     b_enbl = 'off';
-% end
+%%%work with LTSA
+if isfield(PARAMS, 'ltsa')
+    f_enable = get(HANDLES.ltsa.motion.fwd, 'Enable');
+    b_enable = get(HANDLES.ltsa.motion.back, 'Enable');
+else
+    f_enable = 'off';
+    b_enable = 'off';
+end
 
 %% label loading functionality
 labelStr = 'Load Labels 1';
@@ -163,4 +165,33 @@ REMORA.lt.lVis_labels.label4Check = uicontrol(REMORA.fig.lt.lVis_settings,...
     'Enable', 'off', ...
     'FontUnits','normalized', ...
     'Callback','lt_lVis_control(''Display'',''labels4'')');
+
+%% back button 
+
+labelStr = '<';
+btnPos = [x(1)+w/4 y(7)-ybuff w*1.2 h];
+REMORA.lt.lVis_labels.back = uicontrol(REMORA.fig.lt.lVis_settings,...
+    'Style','pushbutton',...
+    'Units','normalized',...
+    'Position',btnPos,...
+    'BackgroundColor',bgColorTeal,...
+    'String',labelStr ,...
+    'FontUnits','normalized', ...
+    'Enable', b_enable, ...
+    'FontWeight','bold',...
+    'Callback','lt_lVis_control(''TakeItBack'')');
+
+%% forward button
+labelStr = '>';
+btnPos = [x(2)+w/2 y(7)-ybuff w*1.2 h];
+REMORA.lt.lVis_labels.fwd = uicontrol(REMORA.fig.lt.lVis_settings,...
+    'Style','pushbutton',...
+    'Units','normalized',...
+    'Position',btnPos,...
+    'BackgroundColor',bgColorTeal,...
+    'String',labelStr ,...
+    'FontUnits','normalized', ...
+    'Enable', f_enable, ...
+    'FontWeight','bold',...
+    'Callback','lt_lVis_control(''MoveAlong'')');
 

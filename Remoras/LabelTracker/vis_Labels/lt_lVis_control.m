@@ -2,7 +2,7 @@ function lt_lVis_control(action,NFile)
 
 %updates in response to GUI changes
 
-global REMORA
+global REMORA HANDLES
 
 
 if strcmp(action,'LoadLabels')
@@ -15,7 +15,7 @@ if strcmp(action,'LoadLabels')
     fileFullPath = fullfile(path, filename);
     
     % Read detection label file and add detection times to remora
-    [Starts, Stops, Labels] = lt_read_textFile(fileFullPath, 'Binary', true);
+    [Starts, Stops, Labels] = lt_lVis_read_textFile(fileFullPath, 'Binary', true);
     if strcmp(NFile,'labels1')
         REMORA.lt.lVis_det.detection.starts = Starts;
         REMORA.lt.lVis_det.detection.stops = Stops;
@@ -69,10 +69,9 @@ if strcmp(action,'LoadLabels')
         set(REMORA.lt.lVis_labels.label4Check,'BackgroundColor',[1 1 1])
     end
     
-    %     %refresh window
-    
-    %     plot_triton
-    %     lt_lVis_plot_labels
+    %refresh window
+    plot_triton
+    lt_lVis_plotLabels_options
     
 elseif strcmp(action,'Display')
     if strcmp(NFile,'labels1')
@@ -95,7 +94,7 @@ elseif strcmp(action,'Display')
             if checked
                 REMORA.lt.lVis_det.detection2.PlotLabels = true;
             else
-                REMORA.lt.lVis_det.detection2.PlotLabels = false
+                REMORA.lt.lVis_det.detection2.PlotLabels = false;
             end
         else
             return
@@ -127,10 +126,27 @@ elseif strcmp(action,'Display')
             return
         end
     end
-end      
+
+%refresh window
+plot_triton
+lt_lVis_plotLabels_options
         
-        %         %refresh window
-        %         plot_triton
-        %         lt_lVis_plot_labels
-        
+% back button
+elseif strcmp(action, 'TakeItBack')
+    motion_ltsa('back');
+    lt_lVis_plotLabels_options
+    
+% forward button
+elseif strcmp(action, 'MoveAlong')
+    motion_ltsa('forward');
+    lt_lVis_plotLabels_options
+end
+
+% update enabling of fwd/back buttons
+set(REMORA.lt.lVis_labels.fwd, 'Enable', ...
+    get(HANDLES.ltsa.motion.fwd, 'Enable'));
+set(REMORA.lt.lVis_labels.back, 'Enable', ...
+    get(HANDLES.ltsa.motion.back, 'Enable'));
+
+end
     
