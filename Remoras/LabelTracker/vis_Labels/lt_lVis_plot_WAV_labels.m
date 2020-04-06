@@ -41,7 +41,7 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
     yPos3 = plotFreq*.7;
     col3 = [1 0.6 0];
     labl3 = REMORA.lt.lVis_det.detection3.labels(1);
-    label3Pos = .75;
+    label3Pos = plotFreq*.75;
     
     plot_labels_wav(labl3,label3Pos,REMORA.lt.lVis_det.detection3.starts,REMORA.lt.lVis_det.detection3.stops,yPos3,col3,startWV,endWV);
     
@@ -91,6 +91,14 @@ for iPlot = 1:size(detXstart,1)
         plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'--','Marker','*',...
             'MarkerSize',2,'Color',color)
         text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+    end
+end
+
+%plot a line at the end of the detection file
+if ~isempty(winDets)
+    if isequal(stopL(end),winDets(end,2))
+        plot([detXend(end) detXend(end)], [PARAMS.freq0 PARAMS.freq1],'-','LineWidth',2,...
+            'Color',color)
     end
 end
 
