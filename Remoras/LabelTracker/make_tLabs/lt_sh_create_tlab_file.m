@@ -1,4 +1,4 @@
-function lt_sh_create_tlab_file
+function sh_create_tlab_file
 
 [file, path] = uigetfile({'*.txt';'*.s'},'Select text file with detection times');
 
@@ -27,7 +27,7 @@ if strcmp(extFile,'.s')
         utFindFiles(SearchFileMaskMat, SearchPathMaskMat, SearchRecursiv);
 
     for idx = 1:length(PathFileListMat)
-    [StartsFile, StopsFile, LabelsFile] = lt_sh_read_textFile(PathFileListMat{idx}, 'Binary', true);
+    [StartsFile, StopsFile, LabelsFile] = sh_read_textFile(PathFileListMat{idx}, 'Binary', true);
     unscr = strsplit(FileListMat{idx},'.');
     filename = unscr{1,1};
     getdate = strsplit(filename,'_');
@@ -50,7 +50,7 @@ elseif strcmp(extFile,'.txt')
     numCol = size(table,2);
     
     if numCol > 3
-        data = lt_sh_read_RavenTextFile(fileFullPath);
+        data = sh_read_RavenTextFile(fileFullPath);
         joinDateTime = @(date,time) datenum([date.Year  date.Month  date.Day  time.Hour  time.Minute time.Second]);
         Starts = joinDateTime(data.BeginDate,data.BeginClockTime);
         Stops = joinDateTime(data.BeginDate,data.EndClockTime);
@@ -71,7 +71,7 @@ shipTimes = [Starts, Stops];
 shipLabels = Labels;
 
 % Save detection times and labels to .tlab file
-lt_sh_write_labels(fullfile(outDir,[filename,'.tlab']), ...
+sh_write_labels(fullfile(outDir,[filename,'.tlab']), ...
     shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
 
 fprintf('Labels saved at: %s\n',fullfile(outDir,[filename,'.tlab']));

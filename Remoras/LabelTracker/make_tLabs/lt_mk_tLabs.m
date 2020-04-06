@@ -3,7 +3,11 @@ function lt_mk_tLabs(varargin)
 
 %%%%created by MAZ on 3/13/2020 to speed up input into ioWriteLabel
 p = varargin{1};
-p.timeOffNum = datenum(p.timeOffset,0,0,0,0,0);
+if isempty(p.timeOffset)
+    p.timeOffNum = 0;
+else
+    p.timeOffNum = datenum(p.timeOffset,0,0,0,0,0);
+end
 
 %%load files of interest
 if p.TPWStype
@@ -55,27 +59,31 @@ for iFile = 1:size(fileNames,1)
     %make true labels
     if p.IDtype
         %%slightly different procedure if ID files
-        disp('using ID file to make tlabs')
-        labelCol = zID(:,2);
-        labelType = unique(labelCol);
-        
-        for iLab = 1:size(labelType,1)
-            labelTimes = zID(find(zID(:,2)==labelType(iLab)),1);
-            tTimeS = labelTimes - p.timeOffNum;
-            %dur = .0001; %what duration do you want for your clicks?
-            tTimeE = tTimeS + datenum(0,0,0,0,0,p.dur);
+        if isempty(zID)
+            disp('zID empty! Skipping file...')
+        else
+            disp('using ID file to make tlabs')
+            labelCol = zID(:,2);
+            labelType = unique(labelCol);
             
-            tfullTimes = [tTimeS,tTimeE];
-            
-            p.trueLabel = num2str(labelType(iLab));
-            fileNameT = [p.outPrefix,'_',p.trueLabel,'_labels'];
-            fileNT = [p.saveDir,'\',fileNameT,'.tlab'];
-            
-            
-            %create your label file using ioWriteLabel!
-            dispText1 = ['Creating ',p.trueLabel,' labels...'];
-            disp(dispText1)
-            lt_ioWriteLabel(fileNT,tfullTimes,p.trueLabel,'Binary',true);
+            for iLab = 1:size(labelType,1)
+                labelTimes = zID(find(zID(:,2)==labelType(iLab)),1);
+                tTimeS = labelTimes - p.timeOffNum;
+                %dur = .0001; %what duration do you want for your clicks?
+                tTimeE = tTimeS + datenum(0,0,0,0,0,p.dur);
+                
+                tfullTimes = [tTimeS,tTimeE];
+                
+                p.trueLabel = num2str(labelType(iLab));
+                fileNameT = [p.outPrefix,'_',p.trueLabel,'_labels'];
+                fileNT = [p.saveDir,'\',fileNameT,'.tlab'];
+                
+                
+                %create your label file using ioWriteLabel!
+                dispText1 = ['Creating ',p.trueLabel,' labels...'];
+                disp(dispText1)
+                lt_ioWriteLabel(fileNT,tfullTimes,p.trueLabel,'Binary',true);
+            end
         end
     else
         if p.TPWStype %if loaded file is a TPWS file

@@ -2,8 +2,6 @@ function lt_lVis_plot_LTSA_labels
 
 global REMORA PARAMS
 
-disp('GUMpy');
-
 %% get LTSA range times
 %pull start and end times of window
 [ltsaS,ltsaE] = lt_lVis_get_ltsa_range;
@@ -84,12 +82,12 @@ for iPlot = 1:size(detXstart,1)
         plot(detXstart(iPlot), yPos,'*','Color',color)
         text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
     else
-        plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'--','Color',color)
+        plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'--','Marker','*',...
+            'MarkerSize',2,'Color',color)
         text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
     end
 end
 
 hold off
 
-disp('hey!')
 

@@ -6,3 +6,6 @@ p.Load1check = 1;
 p.Load2check = 0;
 p.Load3check = 0;
 p.Load4check = 0;
+
+%use raw files for scanning 
+p.rawFile = 'true';

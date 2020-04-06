@@ -4,7 +4,6 @@ global REMORA PARAMS HANDLES
 %%PARAMS.start.dnum = start of individual wav file! Useful for figuring out
 %%what's in window and plotting it. 
 
-disp('Cromslor!');
 
 %% get range times
 %create start and end times of window
@@ -89,11 +88,11 @@ for iPlot = 1:size(detXstart,1)
         plot(detXstart(iPlot), yPos,'*','Color',color)
         text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
     else
-        plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'--','Color',color)
+        plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'--','Marker','*',...
+            'MarkerSize',2,'Color',color)
         text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
     end
 end
 
 hold off
 
-disp('do we have slacks?')

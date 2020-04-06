@@ -2,7 +2,7 @@ function lt_lVis_control(action,NFile)
 
 %updates in response to GUI changes
 
-global REMORA HANDLES
+global REMORA HANDLES PARAMS
 
 
 if strcmp(action,'LoadLabels')
@@ -55,7 +55,7 @@ if strcmp(action,'LoadLabels')
         set(REMORA.lt.lVis_labels.label3Check,'String',filename)
         set(REMORA.lt.lVis_labels.label3Check,'BackgroundColor',[1 1 1])
         
-    elseif strcmp(Nfile,'labels4')
+    elseif strcmp(NFile,'labels4')
         REMORA.lt.lVis_det.detection4.starts = Starts;
         REMORA.lt.lVis_det.detection4.stops = Stops;
         REMORA.lt.lVis_det.detection4.labels = Labels;
@@ -71,7 +71,19 @@ if strcmp(action,'LoadLabels')
     
     %refresh window
     plot_triton
-    lt_lVis_plotLabels_options
+    %which labels to display
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
+    end
+    
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    
     
 elseif strcmp(action,'Display')
     if strcmp(NFile,'labels1')
@@ -126,27 +138,84 @@ elseif strcmp(action,'Display')
             return
         end
     end
-
-%refresh window
-plot_triton
-lt_lVis_plotLabels_options
-        
-% back button
+    
+    %refresh window
+    plot_triton
+    %which labels to display
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
+    end
+    
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    
+    
+    % back buttons
 elseif strcmp(action, 'TakeItBack')
     motion_ltsa('back');
-    lt_lVis_plotLabels_options
+    lt_lVis_plot_LTSA_labels
     
-% forward button
+elseif strcmp(action, 'SmallStepBack')
+    motion('back');
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    
+elseif strcmp(action, 'PrevRawFile')
+    motion('prevfile');
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    
+    % forward buttons
 elseif strcmp(action, 'MoveAlong')
     motion_ltsa('forward');
-    lt_lVis_plotLabels_options
+    lt_lVis_plot_LTSA_labels
+    
+elseif strcmp(action, 'OneStepForward')
+    motion('forward');
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    
+elseif strcmp(action, 'NextRawFile')
+    motion('nextfile');
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
 end
 
-% update enabling of fwd/back buttons
-set(REMORA.lt.lVis_labels.fwd, 'Enable', ...
-    get(HANDLES.ltsa.motion.fwd, 'Enable'));
-set(REMORA.lt.lVis_labels.back, 'Enable', ...
-    get(HANDLES.ltsa.motion.back, 'Enable'));
-
-end
+    % update enabling of fwd/back buttons
+    set(REMORA.lt.lVis_labels.LTSAfwd, 'Enable', ...
+        get(HANDLES.ltsa.motion.fwd, 'Enable'));
+    set(REMORA.lt.lVis_labels.LTSAback, 'Enable', ...
+        get(HANDLES.ltsa.motion.back, 'Enable'));
+    
+    if ~isempty(PARAMS.infile)
+        set(REMORA.lt.lVis_labels.RFfwd,'Enable',...
+            get(HANDLES.motion.fwd,'Enable'));
+        set(REMORA.lt.lVis_labels.nextF,'Enable',...
+            get(HANDLES.motion.nextfile,'Enable'));
+        set(REMORA.lt.lVis_labels.RFback,'Enable',...
+            get(HANDLES.motion.back,'Enable'));
+        set(REMORA.lt.lVis_labels.prevF,'Enable',...
+            get(HANDLES.motion.prevfile,'Enable'));
+    end
     

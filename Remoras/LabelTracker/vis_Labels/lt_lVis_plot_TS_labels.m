@@ -1,7 +1,5 @@
 function lt_lVis_plot_TS_labels
 
-disp('what makes the best sauce?');
-
 global REMORA PARAMS HANDLES
 %%PARAMS.start.dnum = start of individual wav file! Useful for figuring out
 %%what's in window and plotting it. 
@@ -92,11 +90,10 @@ for iPlot = 1:size(detXstart,1)
         plot(detXstart(iPlot), yPos,'*','Color',color)
         text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
     else
-        plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'--','Color',color)
+        plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','Marker','*',...
+            'MarkerSize',2,'Color',color)
         text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
     end
 end
 
 hold off
-
-disp('Worcestershire')
