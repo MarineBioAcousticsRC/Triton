@@ -32,7 +32,7 @@ figure(REMORA.fig.lt.lVis_settings)
 
 
 %%%%button grid
-row = 10;
+row = 11;
 col = 3;
 h = 1/row;
 w = 1/col;
@@ -46,7 +46,7 @@ bgColor = [1 1 1];
 bgColorPurple = [0.8 0.6 0.6];
 bgColorTeal = [0.2 0.6 0.4];
 bgColorCoral = [1.0 0.6 0.4];
-
+bgColorBlue = [0 0.8 1.0];
 REMORA.lt.lVis_verify = [];
 
 %% title content 
@@ -78,6 +78,7 @@ REMORA.lt.lVis_verify.headtext = uicontrol(REMORA.fig.lt.lVis_settings, ...
     next_enableRF = 'on'; %get(HANDLES.motion.nextfile,'Enable');
     b_enableRF = 'on'; %get(HANDLES.motion.back,'Enable');
     prev_enableRF = 'on'; %get(HANDLES.motion.prevfile,'Enable');
+    ref_enable = 'on'; %refresh button always enabled
 % else
 %     f_enableRF = 'off';
 %     b_enableRF = 'off';
@@ -289,3 +290,17 @@ REMORA.lt.lVis_labels.nextF = uicontrol(REMORA.fig.lt.lVis_settings,...
     'Enable', next_enableRF, ...
     'FontWeight','normal',...
     'Callback','lt_lVis_control(''NextRawFile'')');
+
+%% refresh all open plots
+labelStr = 'Refresh';
+btnPos = [x(1)+1.25*w y(11)-2*ybuff w/2 h];
+REMORA.lt.lVis_labels.refresh = uicontrol(REMORA.fig.lt.lVis_settings,...
+    'Style','pushbutton',...
+    'Units','normalized',...
+    'Position',btnPos,...
+    'BackgroundColor',bgColorBlue,...
+    'String',labelStr ,...
+    'FontUnits','normalized', ...
+    'Enable', ref_enable, ...
+    'FontWeight','normal',...
+    'Callback','lt_lVis_control(''Refresh'')');

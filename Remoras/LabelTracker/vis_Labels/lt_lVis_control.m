@@ -99,7 +99,7 @@ elseif strcmp(action,'Display')
             return
         end
         
-    elseif strcmp(Nfile,'labels2')
+    elseif strcmp(NFile,'labels2')
         enabled = get(REMORA.lt.lVis_labels.label2Check,'Enable');
         if strcmp(enabled,'on')
             checked = get(REMORA.lt.lVis_labels.label2Check,'Value');
@@ -112,7 +112,7 @@ elseif strcmp(action,'Display')
             return
         end
         
-    elseif strcmp(Nfile,'labels3')
+    elseif strcmp(NFile,'labels3')
         enabled = get(REMORA.lt.lVis_labels.label3Check,'Enable');
         if strcmp (enabled,'on')
             checked = get(REMORA.lt.lVis_labels.label3Check,'Value');
@@ -125,7 +125,7 @@ elseif strcmp(action,'Display')
             return
         end
         
-    elseif strcmp(Nfile,'labels4')
+    elseif strcmp(NFile,'labels4')
         enabled = get(REMORA.lt.lVis_labels.label4Check,'Enable');
         if strcmp (enabled,'on')
             checked = get(REMORA.lt.lVis_labels.label4Check,'Value');
@@ -160,6 +160,14 @@ elseif strcmp(action, 'TakeItBack')
     motion_ltsa('back');
     lt_lVis_plot_LTSA_labels
     
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    
 elseif strcmp(action, 'SmallStepBack')
     motion('back');
     if HANDLES.display.specgram.Value
@@ -167,6 +175,9 @@ elseif strcmp(action, 'SmallStepBack')
     end
     if HANDLES.display.timeseries.Value
         lt_lVis_plot_TS_labels
+    end
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
     end
     
 elseif strcmp(action, 'PrevRawFile')
@@ -177,11 +188,20 @@ elseif strcmp(action, 'PrevRawFile')
     if HANDLES.display.timeseries.Value
         lt_lVis_plot_TS_labels
     end
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
+    end
     
     % forward buttons
 elseif strcmp(action, 'MoveAlong')
     motion_ltsa('forward');
     lt_lVis_plot_LTSA_labels
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
     
 elseif strcmp(action, 'OneStepForward')
     motion('forward');
@@ -190,6 +210,9 @@ elseif strcmp(action, 'OneStepForward')
     end
     if HANDLES.display.timeseries.Value
         lt_lVis_plot_TS_labels
+    end
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
     end
     
 elseif strcmp(action, 'NextRawFile')
@@ -200,22 +223,40 @@ elseif strcmp(action, 'NextRawFile')
     if HANDLES.display.timeseries.Value
         lt_lVis_plot_TS_labels
     end
-end
-
-    % update enabling of fwd/back buttons
-    set(REMORA.lt.lVis_labels.LTSAfwd, 'Enable', ...
-        get(HANDLES.ltsa.motion.fwd, 'Enable'));
-    set(REMORA.lt.lVis_labels.LTSAback, 'Enable', ...
-        get(HANDLES.ltsa.motion.back, 'Enable'));
-    
-    if ~isempty(PARAMS.infile)
-        set(REMORA.lt.lVis_labels.RFfwd,'Enable',...
-            get(HANDLES.motion.fwd,'Enable'));
-        set(REMORA.lt.lVis_labels.nextF,'Enable',...
-            get(HANDLES.motion.nextfile,'Enable'));
-        set(REMORA.lt.lVis_labels.RFback,'Enable',...
-            get(HANDLES.motion.back,'Enable'));
-        set(REMORA.lt.lVis_labels.prevF,'Enable',...
-            get(HANDLES.motion.prevfile,'Enable'));
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
     end
     
+    %refresh buttons
+elseif strcmp(action, 'Refresh')
+    %which labels to display
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
+    end
+    
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+end
+
+% update enabling of fwd/back buttons
+set(REMORA.lt.lVis_labels.LTSAfwd, 'Enable', ...
+    get(HANDLES.ltsa.motion.fwd, 'Enable'));
+set(REMORA.lt.lVis_labels.LTSAback, 'Enable', ...
+    get(HANDLES.ltsa.motion.back, 'Enable'));
+
+if ~isempty(PARAMS.infile)
+    set(REMORA.lt.lVis_labels.RFfwd,'Enable',...
+        get(HANDLES.motion.fwd,'Enable'));
+    set(REMORA.lt.lVis_labels.nextF,'Enable',...
+        get(HANDLES.motion.nextfile,'Enable'));
+    set(REMORA.lt.lVis_labels.RFback,'Enable',...
+        get(HANDLES.motion.back,'Enable'));
+    set(REMORA.lt.lVis_labels.prevF,'Enable',...
+        get(HANDLES.motion.prevfile,'Enable'));
+end
+
