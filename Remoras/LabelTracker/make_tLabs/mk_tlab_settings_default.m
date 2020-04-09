@@ -10,9 +10,9 @@ p.TPWSitr = '1'; %iteration of TPWS to run for
 
 %%%what type of file are you using as input?
 p.TPWStype = 0;
-p.FDtype = 1;
+p.FDtype = 0;
 p.IDtype = 0;
-p.TDtype = 0;
+p.TDtype = 1;
 
 %%what kind of labels do you want?
 % p.trueL = 1; %create true labels
@@ -22,5 +22,5 @@ p.trueLabel = 'true'; %label name
 
 %%other
 p.timeOffset = 2000; %set to 0 if no offset. PIFSC data originally used started with different date than triton nums
-p.dur = 0.010; %duration for click labels (sec), necessary for data coming from detEdit 
+p.dur = 0.0001; %duration for click labels (sec), necessary for data coming from detEdit 
 %%%%modify this later to allow for more label types?

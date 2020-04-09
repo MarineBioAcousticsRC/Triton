@@ -102,11 +102,10 @@ if fullDet
 end
 
 if ~isempty(winDets)
-    detstartOff = winDets(:,1) - ltsaS;
-    detXstart = lt_convertDatenum(detstartOff,'hours'); %convert from datenum to time in hours
-    
-    detendOff = winDets(:,2) - ltsaS;
-    detXend = lt_convertDatenum(detendOff,'hours');
+    %find which raw file each detection in winDet is in
+    detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
+    detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+
     
     axes (HANDLES.subplt.ltsa)
     hold on
