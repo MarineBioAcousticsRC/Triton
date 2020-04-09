@@ -12,7 +12,7 @@ if strcmp(action,'starts')
             detstartOff = (winDetWavIdx - plotStart).*rfDur; %find offset of raw file from start of LTSA
             detWavOff = inWindowDet(iWin,1) - winDetWavs;
             detWavOffSec = lt_convertDatenum(detWavOff,'seconds');
-            detXpos = (detstartOff + detWavOffSec)./3600; %convert seconds back to hours
+            detXpos(iWin) = (detstartOff + detWavOffSec)./3600; %convert seconds back to hours
         else
             detXpos(iWin) = 0; %skip weird detection
             disp('detection found not within any raw file!')

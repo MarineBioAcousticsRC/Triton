@@ -119,7 +119,7 @@ if ~isempty(winDetsFull)
     
     LineThresh = 1/600;
     
-    for iPlot = 1:size(detXstart,1)
+    for iPlot = 1:size(detXstart,2)
         detDur = detXend - detXstart;
         if detDur < LineThresh
             %just plot the start of a given detection
@@ -156,7 +156,7 @@ if ~isempty(winDetsStarts)
     
     LineThresh = 1/600;
     
-    for iPlot = 1:size(detXstart,1)
+    for iPlot = 1:size(detXstart,2)
         detDur = detXend - detXstart;
         if detDur < LineThresh
             %just plot the start of a given detection
@@ -193,7 +193,7 @@ if ~isempty(winDetsStops)
     
     LineThresh = 1/600;
     
-    for iPlot = 1:size(detXstart,1)
+    for iPlot = 1:size(detXstart,2)
         detDur = detXend - detXstart;
         if detDur < LineThresh
             %just plot the start of a given detection
