@@ -17,8 +17,8 @@ uimenu(REMORA.bm.menu, 'Label', 'Batch run detector', ...
 %     'Enable','on','Callback', 'bw_pulldown(''create_labels'')');
 
 % Run evaluate interface
-% uimenu(REMORA.bw.menu, 'Label', 'Evaluate detections', ...
-%     'Enable','on','Callback', 'bw_pulldown(''evaluate_detections'')');
+uimenu(REMORA.bm.menu, 'Label', 'Evaluate detections', ...
+    'Enable','on','Callback', 'bm_pulldown(''evaluate_detections'')');
 
 
 

@@ -9,6 +9,7 @@ settings.species = 'Blue whale';
 settings.HARPdata = false; % if HARP data, set to true
 settings.SoundTrap = true; % if not Sound Trap data, set to false
 settings.saveCsv = true; % save results to a .csv file
-
+settings.startF = [45, 44.5, 44, 43.5];
+settings.endF = [44.5, 44, 43.5, 42.7];
 
 REMORA.bm.settings = settings;
