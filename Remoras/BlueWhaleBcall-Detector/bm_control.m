@@ -22,6 +22,38 @@ elseif strcmp(action,'setThresh')
     ThreshEdText = str2double(get(REMORA.bm_verify.ThreshEdText, 'string'));
     REMORA.bm.settings.thresh = ThreshEdText;
     
+elseif strcmp(action, 'setStartF1')
+    startF1EdText = str2double(get(REMORA.bm_verify.StartF1EdText, 'string'));
+    REMORA.bm.settings.startF(1,1) = startF1EdText;
+    
+elseif strcmp(action, 'setStartF2')
+    startF2EdText = str2double(get(REMORA.bm_verify.StartF2EdText, 'string'));
+    REMORA.bm.settings.startF(1,2) = startF2EdText;
+
+elseif strcmp(action, 'setStartF3')
+    startF3EdText = str2double(get(REMORA.bm_verify.StartF3EdText, 'string'));
+    REMORA.bm.settings.startF(1,3) = startF3EdText;
+
+elseif strcmp(action, 'setStartF4')
+    startF4EdText = str2double(get(REMORA.bm_verify.StartF4EdText, 'string'));
+    REMORA.bm.settings.startF(1,4) = startF4EdText;
+
+elseif strcmp(action, 'setEndF1')
+    endF1EdText = str2double(get(REMORA.bm_verify.EndF1EdText, 'string'));
+    REMORA.bm.settings.endF(1,1) = endF1EdText;
+    
+elseif strcmp(action, 'setEndF2')
+    endF2EdText = str2double(get(REMORA.bm_verify.EndF2EdText, 'string'));
+    REMORA.bm.settings.endF(1,2) = endF2EdText;
+
+elseif strcmp(action, 'setEndF3')
+    endF3EdText = str2double(get(REMORA.bm_verify.EndF3EdText, 'string'));
+    REMORA.bm.settings.endF(1,3) = endF3EdText;
+
+elseif strcmp(action, 'setEndF4')
+    endF4EdText = str2double(get(REMORA.bm_verify.EndF4EdText, 'string'));
+    REMORA.bm.settings.endF(1,4) = endF4EdText;
+
 elseif strcmp(action,'setSpecies')
     species.val = get(REMORA.bm_verify.SpeciesChoice, 'Value');
     species.opt = get(REMORA.bm_verify.SpeciesChoice,'string');

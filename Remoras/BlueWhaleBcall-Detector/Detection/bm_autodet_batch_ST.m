@@ -10,8 +10,10 @@ function bm_autodet_batch_ST(WavDir, OutDir)
 % modified by Annebelle Kok Februari 6, 2020
 %% Define settings to provide to findcalls.m
 global REMORA
-startF    = [45.6, 44.3, 43.8, 43.2];	% Hz - start frequency kernel
-endF      = [44.3, 43.8, 43.2, 42.6];	% Hz - end frequency kernel
+startF = REMORA.bm.settings.startF;
+endF = REMORA.bm.settings.endF;
+%startF    = [45.6, 44.3, 43.8, 43.2];	% Hz - start frequency kernel
+%endF      = [44.3, 43.8, 43.2, 42.6];	% Hz - end frequency kernel
 thresh =  REMORA.bm.settings.thresh; %detection threshold, was 30, lowered it to 10 to see how function works.
 %thresh = 15;
 %% Get list of wav files in deployment and define output
@@ -244,6 +246,16 @@ prevcall = [];
    filename = split(PathFileListCsv,'.csv');
 labelname = [filename{fidx},'_Bm.tlab'];
 ioWriteLabel(labelname,times,'Bm','Binary',true);
+
+    %Write mat file
+    matname = [filename{fidx},'_Bm.mat'];
+    settings = REMORA.bm.settings;
+    %remove padded text
+    endtime = maintable.abstime + datenum([0 0 0 0 0 10]);
+    times = [maintable.abstime,endtime];
+    BmLabels = repmat({'Bm'},size(times(:,1)));
+    save(matname,'times',...
+        'BmLabels','settings','-mat','-v7.3');
 end
 end
 

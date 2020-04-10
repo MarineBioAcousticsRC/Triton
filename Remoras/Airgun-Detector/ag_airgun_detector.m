@@ -349,7 +349,7 @@ end
         if isempty(fend)
             fend = strfind(file,'.x.wav');
         end
-        newFile = fullfile(DetDir,[file(1:fend-1),'.mat']);
+        newFile = fullfile(parm.outDir,[file(1:fend-1),'.mat']);
         save(newFile,'allSmpPts','allExp','allCorrVal','allDur',...
             'allRmsNBefore','allRmsNAfter','allRmsDet','allPpNBefore',...
             'allPpNAfter','allPpDet','rawStart','rawDur','parm','bt','-v7.3');

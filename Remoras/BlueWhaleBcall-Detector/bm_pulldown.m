@@ -35,6 +35,12 @@ elseif strcmp(action,'load_labels')
     
     % set motion gui for detection lables
     bm_init_visLabel_gui
+    
+elseif strcmp(action,'evaluate_detections')
+    
+    %launch evaluation gui
+    bm_evaluate
+    
 end
 
 
