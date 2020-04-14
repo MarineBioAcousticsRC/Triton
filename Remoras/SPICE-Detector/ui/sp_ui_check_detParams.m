@@ -53,6 +53,17 @@ bgColor4 = [.76 .87 .78]; % light blue
  
 REMORA.spice_dt_verify = [];
 REMORA.spice_dt_verify.spHelpStrings = sp_get_help_strings;
+% Detection Parameters pulldown
+REMORA.spice_dt_verify.filemenu = uimenu(REMORA.fig.spice_dt_verify,'Label','Save/Load Params',...
+    'Enable','on','Visible','on');
+
+% Spectrogram load/save params
+uimenu(REMORA.spice_dt_verify.filemenu ,'Label','&Load detector settings',...
+    'Callback',{@sp_dt_paramspd,'spice_settingsLoad','batchMode'});
+uimenu(REMORA.spice_dt_verify.filemenu ,'Label','&Save detector settings',...
+    'Callback',{@sp_dt_paramspd,'spice_settingsSave','batchMode'});
+
+
 
 labelStr = 'Verify Detector Options';
 btnPos=[x(1) y(2) 4*w h];

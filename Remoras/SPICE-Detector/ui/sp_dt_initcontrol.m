@@ -88,9 +88,9 @@ REMORA.spice_dt.fig.filemenu = uimenu(REMORA.fig.spice_dt,'Label','Save/Load Par
 
 % Spectrogram load/save params
 uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Load detector settings',...
-    'Callback','sp_dt_paramspd(''spice_settingsLoad'')');
+    'Callback',{@sp_dt_paramspd,'spice_settingsLoad','interactiveMode'});
 uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Save detector settings',...
-    'Callback','sp_dt_paramspd(''spice_settingsSave'')');
+    'Callback',{@sp_dt_paramspd,'spice_settingsSave','interactiveMode'});
 
 
 
