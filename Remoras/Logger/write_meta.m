@@ -64,6 +64,6 @@ Header = get(Range, 'Value');
 %     M = [{userID} {project} {region} {deploy} {site} {effortstart} {effortend}];
     M = [{userID} {project} {deploy} {site} {effortstart} {effortend}];
     
-    xlswrite([handles.logfilepath '\' handles.logfilename],...
+    xlswrite([handles.logfilepath filesep handles.logfilename],...
     M, 'MetaData', ['A' num2str(M_rowstartnum)]);
     handles = [];
