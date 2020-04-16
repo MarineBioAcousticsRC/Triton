@@ -29,6 +29,13 @@ if strcmp(action,'LoadLabels')
         set(REMORA.lt.lVis_labels.label1Check,'String',filename)
         set(REMORA.lt.lVis_labels.label1Check,'BackgroundColor',[1 1 1])
         
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection.chLabFalse = double.empty(0,2);
+        REMORA.lt.lEdit.detection.chLab1 = double.empty(0,2);
+        REMORA.lt.lEdit.detection.chLab2 = double.empty(0,2);
+        REMORA.lt.lEdit.detection.chLab3 = double.empty(0,2);
+        REMORA.lt.lEdit.detection.chLab4 = double.empty(0,2);
+        
     elseif strcmp(NFile,'labels2')
         REMORA.lt.lVis_det.detection2.starts = Starts;
         REMORA.lt.lVis_det.detection2.stops = Stops;
@@ -41,6 +48,13 @@ if strcmp(action,'LoadLabels')
         set(REMORA.lt.lVis_labels.label2Check,'Enable','on')
         set(REMORA.lt.lVis_labels.label2Check,'String',filename)
         set(REMORA.lt.lVis_labels.label2Check,'BackgroundColor',[1 1 1])
+        
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection2.chLabFalse = double.empty(0,2);
+        REMORA.lt.lEdit.detection2.chLab1 = double.empty(0,2);
+        REMORA.lt.lEdit.detection2.chLab2 = double.empty(0,2);
+        REMORA.lt.lEdit.detection2.chLab3 = double.empty(0,2);
+        REMORA.lt.lEdit.detection2.chLab4 = double.empty(0,2);
         
     elseif strcmp(NFile,'labels3')
         REMORA.lt.lVis_det.detection3.starts = Starts;
@@ -55,6 +69,13 @@ if strcmp(action,'LoadLabels')
         set(REMORA.lt.lVis_labels.label3Check,'String',filename)
         set(REMORA.lt.lVis_labels.label3Check,'BackgroundColor',[1 1 1])
         
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection3.chLabFalse = double.empty(0,2);
+        REMORA.lt.lEdit.detection3.chLab1 = double.empty(0,2);
+        REMORA.lt.lEdit.detection3.chLab2 = double.empty(0,2);
+        REMORA.lt.lEdit.detection3.chLab3 = double.empty(0,2);
+        REMORA.lt.lEdit.detection3.chLab4 = double.empty(0,2);
+        
     elseif strcmp(NFile,'labels4')
         REMORA.lt.lVis_det.detection4.starts = Starts;
         REMORA.lt.lVis_det.detection4.stops = Stops;
@@ -67,6 +88,13 @@ if strcmp(action,'LoadLabels')
         set(REMORA.lt.lVis_labels.label4Check,'Enable','on')
         set(REMORA.lt.lVis_labels.label4Check,'String',filename)
         set(REMORA.lt.lVis_labels.label4Check,'BackgroundColor',[1 1 1])
+        
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection4.chLabFalse = double.empty(0,2);
+        REMORA.lt.lEdit.detection4.chLab1 = double.empty(0,2);
+        REMORA.lt.lEdit.detection4.chLab2 = double.empty(0,2);
+        REMORA.lt.lEdit.detection4.chLab3 = double.empty(0,2);
+        REMORA.lt.lEdit.detection4.chLab4 = double.empty(0,2);
     end
     
     %refresh window

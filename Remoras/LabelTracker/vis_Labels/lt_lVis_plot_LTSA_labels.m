@@ -75,11 +75,11 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
     plot_labels_ltsa(labl4,label4Pos,startBouts,endBouts,yPos4,col4,ltsaS,ltsaE);
     
 end
-end
+
 
 function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
 
-global PARAMS HANDLES
+global PARAMS HANDLES REMORA
 lablFull = [startL,stopL];
 
 startWin = find(startL >= ltsaS & startL <= ltsaE);
@@ -213,7 +213,6 @@ if ~isempty(winDetsStops)
     end
     
     hold off
-end
 end
 
 
