@@ -88,9 +88,9 @@ REMORA.spice_dt.fig.filemenu = uimenu(REMORA.fig.spice_dt,'Label','Save/Load Par
 
 % Spectrogram load/save params
 uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Load detector settings',...
-    'Callback','sp_dt_paramspd(''spice_settingsLoad'')');
+    'Callback',{@sp_dt_paramspd,'spice_settingsLoad','interactiveMode'});
 uimenu(REMORA.spice_dt.fig.filemenu,'Label','&Save detector settings',...
-    'Callback','sp_dt_paramspd(''spice_settingsSave'')');
+    'Callback',{@sp_dt_paramspd,'spice_settingsSave','interactiveMode'});
 
 
 
@@ -385,6 +385,8 @@ REMORA.spice_dt.MinEvEdTxt = uicontrol(REMORA.fig.spice_dt,...
 % Maximum Envelope Limit Editable Text
 %***********************************
 labelStr=num2str(REMORA.spice_dt.detParams.dEvLims(2));
+REMORA.spice_dt.detParams.dBppThresholdFlag = 1; % set flag to true so that 
+% counts threshold is computed on first pass.
 btnPos=[x(2)+(w2/2) y(9) w2/2 h];
 REMORA.spice_dt.MaxEvEdTxt = uicontrol(REMORA.fig.spice_dt,...
     'Style','edit',...

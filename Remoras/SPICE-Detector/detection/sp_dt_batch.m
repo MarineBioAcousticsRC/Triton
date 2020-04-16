@@ -8,7 +8,7 @@ p.previousFs = 0; % make sure we build filters on first pass
 fTypes = sp_io_getFileType(fullFiles);
 fOut = [];
 clickParamsOut = [];
-parfor idx1 = 1:N % for each data file
+for idx1 = 1:N % for each data file
     f=[];
     pTemp = p;
     outFileName = fullLabels{idx1};
@@ -51,7 +51,7 @@ parfor idx1 = 1:N % for each data file
         pTemp.previousFs = previousFs;
         pTemp = sp_fn_interp_tf(pTemp);
         if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
-            pTemp.countThresh = (10^((pTemp.dBppThreshold - median(pTemp.xfrOffset))/20))/2;
+            pTemp.countThresh = (10^((pTemp.dBppThreshold - max(pTemp.xfrOffset))/20))/2;
         end
     end
     

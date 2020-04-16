@@ -1,4 +1,4 @@
-function sp_dt_paramspd(action)
+function sp_dt_paramspd(hObject,eventdata,action,userMode)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % dt_paramspd.m
@@ -27,7 +27,7 @@ if strcmp(action,'spice_settingsLoad')
     if isscalar(REMORA.spice_dt.paramfile)
       return    % User cancelled
     end
-    sp_dt_load_settings
+    sp_dt_load_settings(userMode)
 % save a parameters file (spectrogram)
 elseif strcmp(action,'spice_settingsSave')
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
