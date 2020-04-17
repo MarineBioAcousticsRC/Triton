@@ -26,21 +26,28 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     
     plot_labels_wav(labl1,label1Pos,REMORA.lt.lVis_det.detection.starts,REMORA.lt.lVis_det.detection.stops,yPos1,col1,startWV,endWV);
     
-    %plot changed labels 
-    if ~isempty(REMORA.lt.lEdit.detection.chLabFalse)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection.chLabFalse,colF,yPos1)
+      %plot changed labels 
+      changedLab = REMORA.lt.lEdit.detection;
+      falseCh = changedLab(changedLab(:,3) == 0,:);
+      oneCh = changedLab(changedLab(:,3) == 1,:);
+      twoCh = changedLab(changedLab(:,3) == 2,:);
+      threeCh = changedLab(changedLab(:,3) == 3,:);
+      fourCh = changedLab(changedLab(:,3) == 4,:);
+      
+    if ~isempty(falseCh)
+        plot_chLab_wav(startWV,endWV,falseCh,colF,yPos1)
     end
-    if ~isempty(REMORA.lt.lEdit.detection.chLab1)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection.chLab1,col1,yPos1)
+    if ~isempty(oneCh)
+        plot_chLab_wav(startWV,endWV,oneCh,col1,yPos1)
     end
-    if ~isempty(REMORA.lt.lEdit.detection.chLab2)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection.chLab2,col2,yPos1)
+    if ~isempty(twoCh)
+        plot_chLab_wav(startWV,endWV,twoCh,col2,yPos1)
     end
-    if ~isempty(REMORA.lt.lEdit.detection.chLab3)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection.chLab3,col3,yPos1)
+    if ~isempty(threeCh)
+        plot_chLab_wav(startWV,endWV,threeCh,col3,yPos1)
     end
-    if ~isempty(REMORA.lt.lEdit.detection.chLab4)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection.chLab4,col4,yPos1)
+    if ~isempty(fourCh)
+        plot_chLab_wav(startWV,endWV,fourCh,col4,yPos1)
     end
 end
 
@@ -54,20 +61,27 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
     
         
     %plot changed labels 
-    if ~isempty(REMORA.lt.lEdit.detection2.chLabFalse)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection2.chLabFalse,colF,yPos2)
+      changedLab = REMORA.lt.lEdit.detection2;
+      falseCh = changedLab(changedLab(:,3) == 0,:);
+      oneCh = changedLab(changedLab(:,3) == 1,:);
+      twoCh = changedLab(changedLab(:,3) == 2,:);
+      threeCh = changedLab(changedLab(:,3) == 3,:);
+      fourCh = changedLab(changedLab(:,3) == 4,:);
+      
+    if ~isempty(falseCh)
+        plot_chLab_wav(startWV,endWV,falseCh,colF,yPos2)
     end
-    if ~isempty(REMORA.lt.lEdit.detection2.chLab1)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection2.chLab1,col1,yPos2)
+    if ~isempty(oneCh)
+        plot_chLab_wav(startWV,endWV,oneCh,col1,yPos2)
     end
-    if ~isempty(REMORA.lt.lEdit.detection2.chLab2)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection2.chLab2,col2,yPos2)
+    if ~isempty(twoCh)
+        plot_chLab_wav(startWV,endWV,twoCh,col2,yPos2)
     end
-    if ~isempty(REMORA.lt.lEdit.detection2.chLab3)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection2.chLab3,col3,yPos2)
+    if ~isempty(threeCh)
+        plot_chLab_wav(startWV,endWV,threeCh,col3,yPos2)
     end
-    if ~isempty(REMORA.lt.lEdit.detection2.chLab4)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection2.chLab4,col4,yPos2)
+    if ~isempty(fourCh)
+        plot_chLab_wav(startWV,endWV,fourCh,col4,yPos2)
     end
 end
 
@@ -81,20 +95,27 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
     plot_labels_wav(labl3,label3Pos,REMORA.lt.lVis_det.detection3.starts,REMORA.lt.lVis_det.detection3.stops,yPos3,col3,startWV,endWV);
         
     %plot changed labels 
-    if ~isempty(REMORA.lt.lEdit.detection3.chLabFalse)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection3.chLabFalse,colF,yPos3)
+      changedLab = REMORA.lt.lEdit.detection3;
+      falseCh = changedLab(changedLab(:,3) == 0,:);
+      oneCh = changedLab(changedLab(:,3) == 1,:);
+      twoCh = changedLab(changedLab(:,3) == 2,:);
+      threeCh = changedLab(changedLab(:,3) == 3,:);
+      fourCh = changedLab(changedLab(:,3) == 4,:);
+      
+    if ~isempty(falseCh)
+        plot_chLab_wav(startWV,endWV,falseCh,colF,yPos3)
     end
-    if ~isempty(REMORA.lt.lEdit.detection3.chLab1)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection3.chLab1,col1,yPos3)
+    if ~isempty(oneCh)
+        plot_chLab_wav(startWV,endWV,oneCh,col1,yPos3)
     end
-    if ~isempty(REMORA.lt.lEdit.detection3.chLab2)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection3.chLab2,col2,yPos3)
+    if ~isempty(twoCh)
+        plot_chLab_wav(startWV,endWV,twoCh,col2,yPos3)
     end
-    if ~isempty(REMORA.lt.lEdit.detection3.chLab3)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection3.chLab3,col3,yPos3)
+    if ~isempty(threeCh)
+        plot_chLab_wav(startWV,endWV,threeCh,col3,yPos3)
     end
-    if ~isempty(REMORA.lt.lEdit.detection3.chLab4)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection3.chLab4,col4,yPos3)
+    if ~isempty(fourCh)
+        plot_chLab_wav(startWV,endWV,fourCh,col4,yPos3)
     end
 end
 
@@ -107,21 +128,28 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
     
     plot_labels_wav(labl4,label4Pos,REMORA.lt.lVis_det.detection4.starts,REMORA.lt.lVis_det.detection4.stops,yPos4,col4,startWV,endWV);
         
-    %plot changed labels 
-    if ~isempty(REMORA.lt.lEdit.detection4.chLabFalse)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection4.chLabFalse,colF,yPos4)
+     %plot changed labels 
+      changedLab = REMORA.lt.lEdit.detection4;
+      falseCh = changedLab(changedLab(:,3) == 0,:);
+      oneCh = changedLab(changedLab(:,3) == 1,:);
+      twoCh = changedLab(changedLab(:,3) == 2,:);
+      threeCh = changedLab(changedLab(:,3) == 3,:);
+      fourCh = changedLab(changedLab(:,3) == 4,:);
+      
+    if ~isempty(falseCh)
+        plot_chLab_wav(startWV,endWV,falseCh,colF,yPos4)
     end
-    if ~isempty(REMORA.lt.lEdit.detection4.chLab1)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection4.chLab1,col1,yPos4)
+    if ~isempty(oneCh)
+        plot_chLab_wav(startWV,endWV,oneCh,col1,yPos4)
     end
-    if ~isempty(REMORA.lt.lEdit.detection4.chLab2)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection4.chLab2,col2,yPos4)
+    if ~isempty(twoCh)
+        plot_chLab_wav(startWV,endWV,twoCh,col2,yPos4)
     end
-    if ~isempty(REMORA.lt.lEdit.detection4.chLab3)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection4.chLab3,col3,yPos4)
+    if ~isempty(threeCh)
+        plot_chLab_wav(startWV,endWV,threeCh,col3,yPos4)
     end
-    if ~isempty(REMORA.lt.lEdit.detection4.chLab4)
-        plot_chLab_wav(startWV,endWV,REMORA.lt.lEdit.detection4.chLab4,col4,yPos4)
+    if ~isempty(fourCh)
+        plot_chLab_wav(startWV,endWV,fourCh,col4,yPos4)
     end
 end
 
@@ -177,7 +205,7 @@ function plot_chLab_wav(startWV,endWV,chLab,col,yPos)
 
 global PARAMS HANDLES REMORA
 
-lablFull = chLab;
+lablFull = chLab(:,1:2);
 
 %just look for starts for click-level detections
 inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);

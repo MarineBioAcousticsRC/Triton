@@ -6,12 +6,14 @@ global REMORA PARAMS
 %pull start and end times of window
 [ltsaS,ltsaE] = lt_lVis_get_ltsa_range;
 plotFreq = PARAMS.ltsa.f(end) *.9;
-
+col1 = [1 1 1];
+col2 = [1 0.2 0.6];
+col3 = [1 0.6 0];
+col4 = [0.8 0.6 1];
 
 %find detections in the window
 if REMORA.lt.lVis_det.detection.PlotLabels
     yPos1 = plotFreq*1;
-    col1 = [1 1 1];
     labl1 = REMORA.lt.lVis_det.detection.labels(1);
     label1Pos = plotFreq*1.05;
     
@@ -28,7 +30,6 @@ end
 %%%plot second labels if desired
 if REMORA.lt.lVis_det.detection2.PlotLabels
     yPos2 = plotFreq*.9;
-    col2 = [1 0 0.2];
     labl2 = REMORA.lt.lVis_det.detection2.labels(1);
     label2Pos = plotFreq*.95;
     
@@ -45,7 +46,6 @@ end
 %%%plot third labels if desired
 if REMORA.lt.lVis_det.detection3.PlotLabels
     yPos3 = plotFreq*.7;
-    col3 = [1 0.6 0];
     labl3 = REMORA.lt.lVis_det.detection3.labels(1);
     label3Pos = plotFreq*.75;
     
@@ -62,7 +62,6 @@ end
 %%%plot fourth labels if desired
 if REMORA.lt.lVis_det.detection4.PlotLabels
     yPos4 = plotFreq*.6;
-    col4 = [0.8 0.2 0.2];
     labl4 = REMORA.lt.lVis_det.detection4.labels(1);
     label4Pos = plotFreq*.65;
     

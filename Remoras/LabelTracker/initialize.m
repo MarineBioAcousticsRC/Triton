@@ -2,7 +2,7 @@ global REMORA HANDLES
 
 % initialization script for label tracking remora
 
-REMORA.lt.menu = uimenu(HANDLES.remmenu,'Label','&Label Tracker',...
+REMORA.lt.menu = uimenu(HANDLES.remmenu,'Label','&Label Lord',...
     'Enable','on','Visible','on');
 
 %create tlab files from text
