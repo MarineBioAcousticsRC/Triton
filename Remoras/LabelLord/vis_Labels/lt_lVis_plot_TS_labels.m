@@ -95,7 +95,7 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
     plot_labels_wav(labl3,label3Pos,REMORA.lt.lVis_det.detection3.starts,REMORA.lt.lVis_det.detection3.stops,yPos3,col3,startWV,endWV);
     
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detectio3n;
+    changedLab = REMORA.lt.lEdit.detection3;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
