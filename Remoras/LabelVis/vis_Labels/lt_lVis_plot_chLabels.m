@@ -1,4 +1,4 @@
-function mod_chLabels
+function lt_lVis_plot_chLabels
 
 global PARAMS HANDLES REMORA
 

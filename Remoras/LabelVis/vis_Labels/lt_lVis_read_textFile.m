@@ -1,4 +1,4 @@
-function [Starts, Stops, Labels] = sh_read_textFile(Filename, varargin)
+function [Starts, Stops, Labels] = lt_lVis_read_textFile(Filename, varargin)
 
 %%NOTE: THIS CODE TAKEN ENTIRELY FROM SHIP DETECTOR!
 

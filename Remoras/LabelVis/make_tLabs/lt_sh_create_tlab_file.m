@@ -1,4 +1,4 @@
-function sh_create_tlab_file
+function lt_sh_create_tlab_file
 
 [file, path] = uigetfile({'*.txt';'*.s'},'Select text file with detection times');
 
