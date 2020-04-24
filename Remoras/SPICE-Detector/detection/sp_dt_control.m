@@ -17,7 +17,7 @@ elseif strcmp(action,'setPPThreshold')
         valueDBpp = str2double(get(REMORA.spice_dt.PPThresholdEdTxt,'String'));
     end
     REMORA.spice_dt.detParams.dBppThreshold = max(valueDBpp,1);
-
+    REMORA.spice_dt.detParams.dBppThresholdFlag = 1; % if true, recalculate counts threshold.
     % Set minimum click duration for detector
 elseif strcmp(action,'SetMinClickDur')
     if ~strcmp(mySource, 'gui')

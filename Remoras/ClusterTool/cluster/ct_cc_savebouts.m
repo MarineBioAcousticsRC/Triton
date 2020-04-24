@@ -3,7 +3,7 @@ function ct_cc_savebouts(hObject,eventdata)
 global REMORA
 close(REMORA.fig.ct.cc_saveBouts)
 
-timeStepDNum = REMORA.ct.CC.output.p.timeStep./(60*60*24);
+timeStepDNum = REMORA.ct.CC.output.p.timeStep./(60*24);
 fNameCells = {REMORA.ct.CC.output.inFileList(:).name};
 dataAll = [];
 labelsAll = [];
@@ -30,6 +30,9 @@ outputTable = table(datestr(dataAll(:,1)),datestr(dataAll(:,2)),dataAll(:,3),...
 outputTable = outputTable(sortedOrder,:);
 fName = fullfile(REMORA.ct.CC.output.boutDir,...
     REMORA.ct.CC.output.boutFName);
+if ~isdir(REMORA.ct.CC.output.boutDir)
+    mkdir(REMORA.ct.CC.output.boutDir)
+end
 writetable(outputTable,fName)
 
 fprintf('Bout file saved to %s\n',fName)

@@ -6,7 +6,11 @@ global REMORA
 if strcmp(fileType,'.mat')
     % it's a mat file, so load it
     loadedVars = load(fullfile(REMORA.ct.CB_settings.paramPath,REMORA.ct.CB_settings.paramFile));
-    REMORA.ct.CB_params = loadedVars.p;
+    if isfield(loadedVars,'p')
+        REMORA.ct.CB_params = loadedVars.p;
+    else
+        error('file does not contain the expected parameters')
+    end
     ct_init_clusterbins_batch_window
 
 elseif strcmp(fileType,'.m')
