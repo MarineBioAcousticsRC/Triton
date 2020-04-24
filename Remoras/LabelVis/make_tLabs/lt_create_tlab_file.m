@@ -66,21 +66,36 @@ elseif strcmp(extFile,'.txt')
 %     end
     
 elseif strcmp(extFile,'.cTg')
+    Starts = [];
+    Stops = [];
+    Labels = [];
+    %get path to raw file 
+    [rfFile,rfPath] = uigetfile({'*.wav','*.xwav'},'Select Corresponding Raw File');
+    rfFull = fullfile(rfPath,rfFile);
+    hdr = ioReadXWAVHeader(rfFull);
+    rawStart = hdr.start.dnum; 
     cTgFile = fopen(fileFullPath);
     [table] = textscan(cTgFile,'%f %f %s');
     % assume cTg file contains 3
     % columns, with start times, end times, and labels
-    Starts = table{:,1};
-    Stops = table{:,2};
+    Starts = ctg_to_datenum(table{1,1},rawStart)';
+    Stops = ctg_to_datenum(table{1,2},rawStart)';
     Labels = table{:,3};
     disp('.cTg file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
 end
 
-shipTimes = [Starts, Stops];
-shipLabels = Labels;
+Times = [Starts, Stops];
+Labels = Labels;
 
 % Save detection times and labels to .tlab file
 lt_write_labels(fullfile(outDir,[filename,'.tlab']), ...
-    shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
+    Times, Labels, 'Binary', true);
 
 fprintf('Labels saved at: %s\n',fullfile(outDir,[filename,'.tlab']));
+
+    function dnTimes = ctg_to_datenum(times,rawStart)
+        for iT = 1:length(times)
+            dnT = datenum([0 0 0 0 0 times(iT)]);
+            dnTimes(iT) = rawStart + dnT;
+        end
+   
