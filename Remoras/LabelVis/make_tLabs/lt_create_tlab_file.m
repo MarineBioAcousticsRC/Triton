@@ -1,6 +1,6 @@
-function lt_sh_create_tlab_file
+function lt_create_tlab_file
 
-[file, path] = uigetfile({'*.txt';'*.s'},'Select text file with detection times');
+[file, path] = uigetfile({'*.txt';'*.s';'*.cTg'},'Select text file with detection times');
 
 outDir = uigetdir([], 'Specify directory to save .tlab files');
 
@@ -27,7 +27,7 @@ if strcmp(extFile,'.s')
         utFindFiles(SearchFileMaskMat, SearchPathMaskMat, SearchRecursiv);
 
     for idx = 1:length(PathFileListMat)
-    [StartsFile, StopsFile, LabelsFile] = sh_read_textFile(PathFileListMat{idx}, 'Binary', true);
+    [StartsFile, StopsFile, LabelsFile] = lt_read_textFile(PathFileListMat{idx}, 'Binary', true);
     unscr = strsplit(FileListMat{idx},'.');
     filename = unscr{1,1};
     getdate = strsplit(filename,'_');
@@ -49,29 +49,38 @@ elseif strcmp(extFile,'.txt')
     table = readtable(fileFullPath);
     numCol = size(table,2);
     
-    if numCol > 3
-        data = sh_read_RavenTextFile(fileFullPath);
-        joinDateTime = @(date,time) datenum([date.Year  date.Month  date.Day  time.Hour  time.Minute time.Second]);
-        Starts = joinDateTime(data.BeginDate,data.BeginClockTime);
-        Stops = joinDateTime(data.BeginDate,data.EndClockTime);
-        Labels = data.Behavior;
-        disp('.txt file assumed to be Raven software output table format')
-    else
+%     if numCol > 3
+%         data = lt_read_RavenTextFile(fileFullPath);
+%         joinDateTime = @(date,time) datenum([date.Year  date.Month  date.Day  time.Hour  time.Minute time.Second]);
+%         Starts = joinDateTime(data.BeginDate,data.BeginClockTime);
+%         Stops = joinDateTime(data.BeginDate,data.EndClockTime);
+%         Labels = data.Behavior;
+%         disp('.txt file assumed to be Raven software output table format')
+%     else
         % If does not follow Raven format, assume text file contains 3
-        % columns, with start times, end times, and labels 
+        % columns, with start times, end times, and labels
         Starts = table{:,1};
         Stops = table{:,2};
         Labels = table{:,3};
         disp('.txt file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
-    end
+%     end
     
+elseif strcmp(extFile,'.cTg')
+    cTgFile = fopen(fileFullPath);
+    [table] = textscan(cTgFile,'%f %f %s');
+    % assume cTg file contains 3
+    % columns, with start times, end times, and labels
+    Starts = table{:,1};
+    Stops = table{:,2};
+    Labels = table{:,3};
+    disp('.cTg file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
 end
 
 shipTimes = [Starts, Stops];
 shipLabels = Labels;
 
 % Save detection times and labels to .tlab file
-sh_write_labels(fullfile(outDir,[filename,'.tlab']), ...
+lt_write_labels(fullfile(outDir,[filename,'.tlab']), ...
     shipTimes - datenum([2000 0 0 0 0 0]), shipLabels, 'Binary', true);
 
 fprintf('Labels saved at: %s\n',fullfile(outDir,[filename,'.tlab']));
