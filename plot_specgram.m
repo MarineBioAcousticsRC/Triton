@@ -121,6 +121,10 @@ if PARAMS.ftype ~=1 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~
     end
 end
 
+%Make sure color range is fixed
+set(HANDLES.plt.specgram,'CDataMapping','scaled');
+caxis([1,65]);
+
 axis xy
 
 % colorbar
@@ -152,7 +156,8 @@ set(get(HANDLES.plt.specgram, 'Parent'), 'TickDir', 'out')
 minp = min(min(sg));
 % maxp = max(max(PARAMS.pwr)); 
 maxp = max(max(sg));
-set(PARAMS.cb,'YLim',[minp maxp])
+%set(PARAMS.cb,'YLim',[minp maxp]) %Commented out because it changes
+%colorbar to show only part of the range.
 
 % image (child of colorbar)
 PARAMS.cbb = findobj(get(PARAMS.cb, 'Children'), 'Type', 'image');
