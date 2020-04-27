@@ -73,13 +73,12 @@ elseif strcmp(extFile,'.cTg')
     [rfFile,rfPath] = uigetfile({'*.wav','*.xwav'},'Select Corresponding Raw File');
     rfFull = fullfile(rfPath,rfFile);
     hdr = ioReadXWAVHeader(rfFull);
-    rawStart = hdr.start.dnum; 
     cTgFile = fopen(fileFullPath);
     [table] = textscan(cTgFile,'%f %f %s');
     % assume cTg file contains 3
     % columns, with start times, end times, and labels
-    Starts = ctg_to_datenum(table{1,1},rawStart)';
-    Stops = ctg_to_datenum(table{1,2},rawStart)';
+    Starts = ctg_to_datenum(table{1,1},hdr)';
+    Stops = ctg_to_datenum(table{1,2},hdr)';
     Labels = table{:,3};
     disp('.cTg file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
 end
@@ -93,9 +92,21 @@ lt_write_labels(fullfile(outDir,[filename,'.tlab']), ...
 
 fprintf('Labels saved at: %s\n',fullfile(outDir,[filename,'.tlab']));
 
-    function dnTimes = ctg_to_datenum(times,rawStart)
+    function dnTimes = ctg_to_datenum(times,hdr)
+        dur = unique((hdr.raw.dnumEnd - hdr.raw.dnumStart).*60*60*24);
+        if length(dur)>=2
+            disp('WARNING! raw files not all of equal duration- may affect tlab creation')
+        end
+        
+        rawFiles = hdr.raw.dnumStart;
+        nRawFile = 1:length(rawFiles);
+        secStart = [0,nRawFile.*dur(1)]; %convert rawfiles into time of start in seconds
+        nextStart = [secStart(2:end),(nRawFile(end)*dur(1))];
+        
         for iT = 1:length(times)
-            dnT = datenum([0 0 0 0 0 times(iT)]);
-            dnTimes(iT) = rawStart + dnT;
+            rawFIdx = find(times(iT)>=secStart&times(iT)<=nextStart);
+            dnDiff = times(iT) - secStart(rawFIdx); %find time within raw file of this detection 
+            dnT = datenum([0 0 0 0 0 dnDiff]);%turn corrected offset time into a datenum 
+            dnTimes(iT) = rawFiles(rawFIdx) + dnT; %add to start time of that raw file
         end
    
