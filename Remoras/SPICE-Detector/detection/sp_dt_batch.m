@@ -25,7 +25,13 @@ for idx1 = 1:N % for each data file
     %labelFile = fullLabels{idx1};
     
     % read file header
-    hdr = sp_io_readXWAVHeader(fullFiles{idx1}, pTemp,'fType', fTypes(idx1));
+    try
+        hdr = sp_io_readXWAVHeader(fullFiles{idx1}, pTemp,'fType', fTypes(idx1));
+    catch
+        fprintf('Problem reading file %s\n',fullFiles{idx1})
+        hdr = [];
+    end
+   
     
     if isempty(hdr)
         warning('No header info returned for file %s',currentRecFile);
