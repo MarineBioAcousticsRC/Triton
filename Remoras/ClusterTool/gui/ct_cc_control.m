@@ -73,6 +73,10 @@ elseif strcmp(action,'setUseTimesTF')
     set(REMORA.ct.CC_verify.ICIMaxEdTxt,'Visible',showTemporalParams)
     set(REMORA.ct.CC_verify.correctForSatCheck,'Visible',showTemporalParams)
 
+elseif strcmp(action,'setUseEnvShape')
+    useEnvShapeTF = get(REMORA.ct.CC_verify.envCheck,'Value');
+    REMORA.ct.CC_params.useEnvShape = useEnvShapeTF;
+    
 elseif strcmp(action,'setMaxCWiterations')
     maxCWIterations = str2double(get(REMORA.ct.CC_verify.maxCWitrEdTxt,'String'));
     REMORA.ct.CC_params.maxCWIterations = maxCWIterations;

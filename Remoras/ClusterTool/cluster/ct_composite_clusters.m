@@ -103,6 +103,17 @@ dTTmat = vertcat(binDataPruned.dTT);
 cRateMat = vertcat(binDataPruned.clickRate);
 clickTimes = horzcat(binDataPruned(:).clickTimes);
 
+for iEM = 1:size(binDataPruned,1)
+    if size(binDataPruned(iEM).envMean,2) == 1 
+        binDataPruned(iEM).envMean = zeros(1,p.maxDur);
+    end
+%     if size(binDataPruned(iEM).envMean,2) == 1 
+%         binDataPruned(iEM).envDur = zeros(1,p.envDur);
+%     end
+end
+envShape = vertcat(binDataPruned(:).envMean);
+%envDistrib = vertcat(binDataPruned(:).envDur);
+
 clustersInBin = nan(size(dTTmat,1),1);
 tIntMat =  nan(size(dTTmat,1),1);
 subOrder =  nan(size(dTTmat,1),1);
@@ -130,7 +141,9 @@ if s.singleClusterOnly
 else
     useBins = (nSpecMat >= s.minClicks);
 end
-
+if ~isfield(s,'useEnvShapeTF')
+    s.useEnvShapeTF = 0;
+end
 [~,s.stIdx] = min(abs(f-s.startFreq));
 [~,s.edIdx] = min(abs(f-s.endFreq));
 [specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
@@ -164,7 +177,7 @@ clickTimes = clickTimes(useBins);
 tIntMat = tIntMat(useBins);
 subOrder = subOrder(useBins);
 fileNumExpand = fileNumExpand(useBins);
-
+envShape = envShape(useBins,:);
 %% Cluster N times for evidence accumulation/robustness
 % CoMat = zeros(tempN,tempN);
 subSamp = 1; % flag automatically goes to true if subsampling.
@@ -189,6 +202,7 @@ if  tritonMode && isfield(REMORA.ct.CC,'rm_clusters')...
     dTTmatNorm = dTTmatNorm(removeSetIndex,:);
     specNorm = specNorm(removeSetIndex,:);
     diffNormSpec = diffNormSpec(removeSetIndex,:);
+    envShape = envShape(removeSetIndex,:);
 end
 for iEA = 1:s.N
     % Select random subset if needed
@@ -212,9 +226,9 @@ for iEA = 1:s.N
     if subSamp || iEA == 1
         % Only do this on first iteration, or on every iteration if you are subsampling
         % find pairwise distances between spectra
-        if s.specDiffTF
+        if s.specDiffTF && s.useSpectraTF
             [specDist,~,~] = ct_spectra_dist(diffNormSpec(excludedIn,s.stIdx:s.edIdx-1));
-        else
+        elseif s.useSpectraTF
             [specDist,~,~] = ct_spectra_dist(specNorm(excludedIn,s.stIdx:s.edIdx));
         end
         %         specSetHighs = zeros(size(specNorm(excludedIn,s.stIdx:s.edIdx)));
@@ -223,22 +237,47 @@ for iEA = 1:s.N
         
         if s.iciModeTF && s.useTimesTF % if true, use ici distributions for similarity calculations
             [iciModeDist,~,~,~] = ct_ici_dist_mode(iciModes(excludedIn),p.barInt(s.maxICIidx));
-            compDist = squareform(specDist.*sqrt(iciModeDist),'tomatrix');
-            disp('Clustering on modal ICI and spectral correlations')
+            compDist = squareform(sqrt(iciModeDist),'tomatrix');
+            fprintf('Clustering on modal ICI ')
         elseif s.iciDistTF && s.useTimesTF
             % if true, use ici distributions for similarity calculations
             [iciDist,~,~] = ct_ici_dist(dTTmatNorm(excludedIn,s.minICIidx:s.maxICIidx));
-            compDist = squareform(specDist.*iciDist,'tomatrix');
-            disp('Clustering on ICI distribution and spectral correlations')
+            compDist = squareform(iciDist,'tomatrix');
+            disp('Clustering on ICI distribution ')
         elseif s.cRateTF && s.useTimesTF
             % use click rate distributions for similarity calculations
             [cRateDist,~,~] = ct_ici_dist(cRateNorm(excludedIn,:));
-            compDist = squareform(specDist.*cRateDist,'tomatrix');
-            disp('Clustering on modal click rate and spectral correlations')
-        else
+            compDist = squareform(cRateDist,'tomatrix');
+            disp('Clustering on modal click rate ')
+        elseif s.useSpectraTF && ~s.useTimesTF
             % if nothing, only use spectra
             compDist = squareform(specDist,'tomatrix');
             disp('Clustering on spectral correlations')
+        end
+        
+        if s.useSpectraTF && s.useTimesTF
+            compDist = compDist.*squareform(specDist,'tomatrix');
+            fprintf('and spectral correlations\n')
+        else
+            fprintf('\n')% terminate the statement.
+        end
+        
+        % add cluster on waveform option:
+        if s.useEnvShape
+            disp('Add clustering on waveform envelope shape')
+            [envShapeDist,~,~] = ct_spectra_dist(envShape(excludedIn,:));
+            if exist('compDist','var')
+                compDist = compDist.*squareform(envShapeDist,'tomatrix');
+            else
+                compDist = squareform(envShapeDist,'tomatrix');
+            end
+        elseif 0%s.useEnvDur
+            [envDurDist,~,~] = ct_spectra_dist(envDur(excludedIn,:));
+            if exist('compDist','var')
+                compDist = compDist.*squareform(envDurDist,'tomatrix');
+            else
+                compDist = squareform(envDurDist,'tomatrix');
+            end
         end
         % [gv_file,isolated] = write_gephi_input(compDist, s.minClust,s.pruneThr);
         
@@ -392,9 +431,9 @@ if tritonMode && (size(clusterIDreduced,1)<10000)
 
     set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)
     
-    for iClustPlot=1:size(nodeSet,2)
-        highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
-    end    
+%     for iClustPlot=1:size(nodeSet,2)
+%         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
+%     end    
 
 else
     disp('Too many nodes to plot as network.')
@@ -435,7 +474,7 @@ for iTF = 1:length(nodeSet)
     Tfinal{iTF,7} = tIntMat(nodeSet{iTF}); % time of bin
     Tfinal{iTF,8} = nodeSet{iTF};% primary index of bin in
     Tfinal{iTF,9} = subOrder(nodeSet{iTF}); % subIndex of bin
-    
+    Tfinal{iTF,10} = envShape(nodeSet{iTF},:); % all mean envelope shape
 end
 bestWNodeDeg = wNodeDeg{bokIdx};
 s.barAdj = .5*mode(diff(p.barInt));%p.stIdx = 2;

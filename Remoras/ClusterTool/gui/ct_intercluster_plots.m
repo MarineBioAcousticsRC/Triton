@@ -6,12 +6,13 @@ figure(41);clf(41);set(gcf,'Units','normalized','Position',[0.01,.05,.48,.4])
 figure(42);clf(42);set(gcf,'Units','normalized','Position',[0.01,.52,.48,.4])
 figure(43);clf(43);set(gcf,'Units','normalized','Position',[.5,.05,.48,.4])
 figure(44);clf(44);set(gcf,'Units','normalized','Position',[.5,.52,.48,.4])
-
+figure(45);clf(45);set(gcf,'Units','normalized','Position',[.5,.52,.48,.4])
 
 figName{1} = fullfile(figDir,sprintf('%s_autoTypes_allMeanSpec',s.outputName));
 figName{2} = fullfile(figDir,sprintf('%s_autoTypes_allCatSpec',s.outputName));
 figName{3} = fullfile(figDir,sprintf('%s_autoTypes_allICI',s.outputName));
-figName{4} = fullfile(figDir,sprintf('%s_autoTypes_allcRate',s.outputName));
+figName{4} = fullfile(figDir,sprintf('%s_autoTypes_allICIimage',s.outputName));
+figName{5} = fullfile(figDir,sprintf('%s_autoTypes_allWaveEnv',s.outputName));
 
 for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles
@@ -57,6 +58,12 @@ for iF = 1:length(nodeSet)
     subplot(n1,m1,iF)
     imagesc(1:length(nodeSet{iF}),p.barInt(1:s.maxICIidx),[Tfinal{iF,2}./max(Tfinal{iF,2},[],2)]')
     set(gca,'ydir','normal')
+
+
+    hSet(5) = figure(45); % plot click rate distributions
+    subplot(n1,m1,iF)
+    imagesc(1:length(nodeSet{iF}),1:p.maxDur,[Tfinal{iF,10}./max(Tfinal{iF,10},[],2)]')
+    set(gca,'ydir','normal')
 end
 figure(41)
 mxlabel(41,'Frequency (kHz)','FontSize',16);
@@ -69,14 +76,17 @@ figure(43)
 mxlabel(43,'ICI (sec)','FontSize',16);
 mylabel(43,'Normalized Counts','FontSize',16);
 figure(44)
-mxlabel(44,'Click Number','FontSize',16);
+mxlabel(44,'Bin Number','FontSize',16);
 mylabel(44,'ICI (sec)','FontSize',16);
+colormap(jet)
+mxlabel(45,'Bin Number','FontSize',16);
+mylabel(45,'Samples','FontSize',16);
 colormap(jet)
 mtit(41,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(42,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(43,strrep(s.outputName,'_',' ' ),'FontSize',12);
 mtit(44,strrep(s.outputName,'_',' ' ),'FontSize',12);
-
+mtit(45,strrep(s.outputName,'_',' ' ),'FontSize',12);
 
 if s.saveOutput
     disp('Saving figures...')
