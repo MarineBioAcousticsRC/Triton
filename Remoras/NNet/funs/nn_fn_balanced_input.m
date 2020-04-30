@@ -2,6 +2,7 @@ function [savedTrainFullfile,savedTestFullfile] = nn_fn_balanced_input(inDir,sav
     trainPercent,nExamples,boutGap)
 
 % Make a train set
+global REMORA 
 
 saveNameTrain = [saveName ,'_det_train.mat'];
 saveNameTest = [saveName ,'_det_test.mat'];
@@ -12,7 +13,7 @@ subDirList = dir(inDir);
 badDirs = find(~cellfun(@isempty, strfind({subDirList(:).name},'.')));
 subDirList(badDirs) = [];
 nTypes = size(subDirList,1);
-typeList = {subDirList(:).name}';
+typeNames = {subDirList(:).name}';
 typeIdNum = 1:nTypes;
 trainSpecAll = [];
 trainTSAll = [];
@@ -94,9 +95,17 @@ for iT = 1:nTypes
         fileObj = matfile(thisTypeFile);
         
         boutIdxRange = boutStartIdxAllAllTrain(iBout):boutEndIdxAllAllTrain(iBout);
-        thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
-        thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
-        if isempty(trainSetSN)
+        if REMORA.nn.train_test_set.useWave
+            thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
+        else
+            thisBout.MSN = [];
+        end
+        if REMORA.nn.train_test_set.useSpectra
+            thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
+        else
+            thisBout.MSP = [];
+        end
+        if iBout == 1
             % pre-allocate now that we know the horizontal dimensions if
             % this is the first pass.
             trainSetSN = zeros(nExamples,size(thisBout.MSN,2));
@@ -105,8 +114,12 @@ for iT = 1:nTypes
         % Figure out which of the randomly selected training events are in this bout
         whichEvents = clickIndicesTrain(bin==iBout)-edges(iBout)+1;
         eIdx = sIdx+size(whichEvents,2)-1;
-        trainSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
-        trainSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+        if REMORA.nn.train_test_set.useWave
+            trainSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+        end
+        if REMORA.nn.train_test_set.useSpectra
+            trainSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+        end
         sIdx = sIdx+size(whichEvents,2);
     end
     
@@ -138,9 +151,17 @@ for iT = 1:nTypes
         fileObj = matfile(thisTypeFile);
         
         boutIdxRange = boutStartIdxAllAllTest(iBout):boutEndIdxAllAllTest(iBout);
-        thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
-        thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
-        if isempty(testSetSN)
+        if REMORA.nn.train_test_set.useWave
+            thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
+        else
+            thisBout.MSN = [];
+        end
+        if REMORA.nn.train_test_set.useSpectra
+            thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
+        else
+            thisBout.MSP = [];
+        end
+        if iBout==1
             % pre-allocate now that we know the horizontal dimensions if
             % this is the first pass.
             testSetSN = zeros(nExamples,size(thisBout.MSN,2));
@@ -149,8 +170,12 @@ for iT = 1:nTypes
         % Figure out which of the randomly selected testing events are in this bout
         whichEvents = clickIndicesTest(bin==iBout)-edges(iBout)+1;
         eIdx = sIdx+size(whichEvents,2)-1;
-        testSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
-        testSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+        if REMORA.nn.train_test_set.useWave
+            testSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+        end
+        if REMORA.nn.train_test_set.useSpectra
+            testSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+        end
         sIdx = sIdx+size(whichEvents,2);
     end
 
@@ -169,13 +194,13 @@ normSpecTrain = normalize_spectrum(trainSpecAll);
 normTSTrain = normalize_timeseries(trainTSAll);
 trainDataAll = [normSpecTrain,normTSTrain];
 savedTrainFullfile = fullfile(saveDir,saveNameTrain);
-save(savedTrainFullfile,'trainDataAll','trainLabelsAll','-v7.3')
+save(savedTrainFullfile,'trainDataAll','trainLabelsAll','typeNames','-v7.3')
 
 normSpecTest = normalize_spectrum(testSpecAll);
 normTSTest = normalize_timeseries(testTSAll);
 testDataAll = [normSpecTest,normTSTest];
 savedTestFullfile = fullfile(saveDir,saveNameTest);
-save(savedTestFullfile,'testDataAll','testLabelsAll','-v7.3')
+save(savedTestFullfile,'testDataAll','testLabelsAll','typeNames','-v7.3')
 
 % to compare:
 % confusionmat(double(testOut),y_test)

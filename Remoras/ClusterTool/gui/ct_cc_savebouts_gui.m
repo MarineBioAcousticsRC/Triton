@@ -1,4 +1,4 @@
-function ct_cc_savebouts_gui(hObject,eventdata)
+function ct_cc_savebouts_gui(~,~)
 % TODO: would be nice to have the option to merge bins into bouts.
 
 global REMORA

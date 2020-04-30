@@ -1,6 +1,7 @@
 function [savedTrainFile,savedTestFile] = nn_fn_balanced_input_bin(inDir,saveDir,saveName,...
     trainPercent,nExamples,boutGap)
 
+global REMORA
 % inDir = 'E:\Data\John Reports\WAT\WAT_2018_trainingExamples';
 typeList = dir(inDir);
 badDirs = find(~cellfun(@isempty, strfind({typeList(:).name},'.')));
@@ -35,18 +36,18 @@ for iD = 1:size(typeList,1)
     clusterSpectra = [];
     clusterICI = [];
     clusterTimes = [];
+    clusterWave = [];
     for iM = 1:size(matList,1)
         
         inFile = load(fullfile(matList(iM).folder,matList(iM).name));
         for iRow = 1:size(inFile.thisType.Tfinal,1)
-            thisSpec = inFile.thisType.Tfinal{iRow,1};
-            %         if size(thisSpec,2)>188
-            %             thisSpec = thisSpec(:,2:end);
-            %         end
-            thisBinTime = inFile.thisType.Tfinal{iRow,7};
-            clusterTimes = [clusterTimes;thisBinTime];
-            clusterSpectra = [clusterSpectra;thisSpec];
-            clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+            clusterTimes = [clusterTimes;inFile.thisType.Tfinal{iRow,7}];
+            clusterSpectra = [clusterSpectra;inFile.thisType.Tfinal{iRow,1}];
+            clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}]; 
+            if size(inFile.thisType.Tfinal,2)>=10
+                clusterWave = [clusterWave;inFile.thisType.Tfinal{iRow,10}]; 
+            end
+
         end
     end
     [clusterTimes,I] = sort(clusterTimes);
@@ -77,12 +78,30 @@ for iD = 1:size(typeList,1)
     binIndicesTrain = sort(randi(nBinsTrain,1,nExamples));
     %binIndicesTrain = sort(randperm(nBinsTrain,min(nExamples,nBinsTrain)));
     clusterIdxTrainSet = vertcat(boutMembership{trainBoutIdx});
-    trainSetMSP{iD} = clusterSpectra(clusterIdxTrainSet(binIndicesTrain),:);
-    trainSetICI{iD} = clusterICI(clusterIdxTrainSet(binIndicesTrain),:);
-    trainSetLabels{iD} = ones(size(trainSetMSP{iD},1),1)*iD;
+    if REMORA.nn.train_test_set.useSpectra 
+        trainSetMSP{iD} = clusterSpectra(clusterIdxTrainSet(binIndicesTrain),:);
+    else
+        trainSetMSP{iD} = [];
+    end
+    if REMORA.nn.train_test_set.useICI
+        trainSetICI{iD} = clusterICI(clusterIdxTrainSet(binIndicesTrain),:);
+    else
+        trainSetICI{iD} = [];
+    end
+    if REMORA.nn.train_test_set.useWave && ~isempty(clusterWave)
+        trainSetWave{iD} = clusterWave(clusterIdxTrainSet(binIndicesTrain),:);
+    else
+        trainSetWave{iD} = [];
+        warning('No waveform data available.')
+    end
+    trainSetLabels{iD} = ones(size(binIndicesTrain,2),1)*iD;
 
     % pull out testing data
     boutSizeTest = boutSize(testBoutIdx);
+    if isempty(boutSizeTest)
+        disp(sprintf('WARNING: No ''%s'' events available for test set',typeList(iD).name))
+        continue
+    end
     boutStartIdxTest = boutStartIdx(testBoutIdx);
     boutEndIdxTest = boutEndIdx(testBoutIdx);
     
@@ -93,19 +112,34 @@ for iD = 1:size(typeList,1)
     clusterIdxTestSet = vertcat(boutMembership{testBoutIdx});
     testSetMSP{iD} = clusterSpectra(clusterIdxTestSet(binIndicesTest),:);
     testSetICI{iD} = clusterICI(clusterIdxTestSet(binIndicesTest),:);
-    testSetLabels{iD} = ones(size(testSetMSP{iD},1),1)*iD;
+    if REMORA.nn.train_test_set.useSpectra 
+        testSetMSP{iD} = clusterSpectra(clusterIdxTestSet(binIndicesTest),:);
+    else
+        testSetMSP{iD} = [];
+    end
+    if REMORA.nn.train_test_set.useICI
+        testSetICI{iD} = clusterICI(clusterIdxTestSet(binIndicesTest),:);
+    else
+        testSetICI{iD} = [];
+    end
+    if REMORA.nn.train_test_set.useWave && ~isempty(clusterWave)
+        testSetWave{iD} = clusterWave(clusterIdxTestSet(binIndicesTest),:);
+    else
+        testSetWave{iD} = [];
+    end
+    testSetLabels{iD} = ones(size(binIndicesTest,2),1)*iD;
     trainSetSize(iD) = nBinsTrain;
 end
 fprintf('Minimum available unique training set size is %0.0f\n', min(trainSetSize))
 fprintf('Maximum available unique training set size is %0.0f\n', max(trainSetSize))
 
-testDataAll = max([vertcat(testSetMSP{:}),vertcat(testSetICI{:})],0);
-trainDataAll = [vertcat(trainSetMSP{:}),vertcat(trainSetICI{:})];
+trainDataAll = [vertcat(trainSetMSP{:}),vertcat(trainSetICI{:}),vertcat(trainSetWave{:})];
+testDataAll = max([vertcat(testSetMSP{:}),vertcat(testSetICI{:}),vertcat(trainSetWave{:})],0);
 
 trainLabelsAll = vertcat(trainSetLabels{:});
 testLabelsAll = vertcat(testSetLabels{:});
 
 savedTrainFile = fullfile(saveDir,saveNameTrain);
 savedTestFile = fullfile(saveDir,saveNameTest);
-save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','-v7.3')
-save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','-v7.3')
+save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','typeNames','-v7.3')
+save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','typeNames','-v7.3')
