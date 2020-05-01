@@ -1,4 +1,4 @@
-function bp_Fin3PowerDetectDay_HARP
+function bp_Fin3PowerDetectDay_ST
 
 % ripped from SpectAves.m that made 1 hr spectral averages from LTSA
 % 110921 smw
@@ -14,21 +14,20 @@ function bp_Fin3PowerDetectDay_HARP
 global REMORA
 global PARAMS
                                                   
-import tethys.nilus.*;
 tic
 %user defined variables:
-userid =  REMORA.fw.params; %change to your username, usually firstinitial+lastname(jdoe)
+userid =  REMORA.bp.settings.userid; %change to your username, usually firstinitial+lastname(jdoe)
 version = '3.0';  %change to reflect version of this detector
 %3.0 for version where time is not manually calculated but pulled from
 %LTSA time stamps
 %2.0 for power index where threshold is NaN; 
 %1.0 for call level in 5s bins where threshold is real number
 triton_version = PARAMS.ver; %change to reflect version of Triton
-granularity = 'binned'; %type of granularity, allowed: call, encounter, binned
-binsize = '60';   %in minutes; this is one hour
+granularity = REMORA.bp.settings.granularity; %type of granularity, allowed: call, encounter, binned
+binsize = REMORA.bp.settings.binsize;   %in minutes; this is one hour
 call = '20Hz'; %string to describe calls of interest
 callsubtype = '';
-xml_dir = 'F:\\General LF Data Analysis\\Fin 20Hz detector\\detector output\\'; %location of output XML, notice double backslash (java thing).
+xml_dir = REMORA.bp.settings.outDir; %location of output XML, notice double backslash (java thing).
 %xml_dir = 'E:\\General LF Data Analysis\\Fin 20Hz detector\\detector output\\'; %location of output XML, notice double backslash (java thing).
 new_filename = PARAMS.ltsa.infile;
 xml_filename = new_filename(1:strfind(new_filename,'.ltsa')-1);  %remove ltsa from filename
@@ -55,109 +54,30 @@ stleng = size(pwr,2);
 % interval = 28+28/60;
 % duration = 5;
 
+
 %load appropriate transfer function to apply to data
-tffilename = 'F:\General LF Data Analysis\Fin 20Hz detector\Transfer functions\800 series\new TFs\868_170419_HARP.tf';
+tffilename = REMORA.bp.settings.tffile;
+
+if ~isempty(tffilename)
 fid1 = fopen(tffilename,'r');
 [A1,count1] = fscanf(fid1,'%f %f',[2,inf]);
 freqvec = 1:1001;
 tf1 = interp1(A1(1,1:60),A1(2,1:60),freqvec,'linear','extrap');
-
 %apply the transfer function
 for i=1:size(pwr,2)
     %pwr(:,i) = pwr(:,i)+tf1.';
     pwr(1:1001,i) = pwr(1:1001,i)+tf1.';
 end
+end
 
 %Detector parameters
-threshold = NaN;
-callfreq = 22;
-nfreq1 = 10;
-nfreq2 = 34;
+threshold = REMORA.bp.settings.thresh;
+callfreq = REMORA.bp.settings.callfreq;
+nfreq1 = REMORA.bp.settings.nfreq1;
+nfreq2 = REMORA.bp.settings.nfreq2;
 LTSAres_time = num2str(PARAMS.ltsa.tave);
 LTSAres_freq = num2str(PARAMS.ltsa.dfreq);
 
-%%XML STUFF%%
-%Create Javabean
-detections = Detections();
-speciesID = 180527;%ITIS TSN for fin whales - balaenoptera physalus
-%Grab datasource info from filename
-filenm = PARAMS.ltsa.infile(1:(end-5));
-
-%SOCAL
-% prodesi = strtok(filenm,'_');%strtok chops up strings at a given identifier ( _ in this case)
-% prodesi = filenm;
-% project = prodesi(1:5);%get the first 5 letters of that chopped string for Project (e.g. SOCAL)
-% deployment = str2double(prodesi(6:7));%next two characters are deployment (e.g. 01)
-% site = prodesi(8);
-
-%CINMS
-% prodesi = strtok(filenm,'_');%strtok chops up strings at a given identifier ( _ in this case)
-% prodesi = filenm;
-% project = prodesi(1:5);%get the first 5 letters of that chopped string for Project (e.g. SOCAL)
-% deployment = str2double(prodesi(7:8));%next two characters are deployment (e.g. 01)
-% site = prodesi(6);
-
-%HAT
-%prodesi = strtok(filenm,'_');%strtok chops up strings at a given identifier ( _ in this case)
-% prodesi = filenm;
-% project = prodesi(1:3);%get the first 5 letters of that chopped string for Project (e.g. SOCAL)
-% deployment = str2double(prodesi(7:8));%next two characters are deployment (e.g. 01)
-% site = prodesi(5);
-project = 'GofAK';
-site = 'CB';
-deployment = 09;
-%GofAK
-%prodesi = filenm;
-%project = prodesi(1:5);%get the first 5 letters of that chopped string for Project (e.g. SOCAL)
-%deployment = str2double(prodesi(9:10));%next two characters are deployment (e.g. 01)
-%site = prodesi(7:8);
-
-%La Jolla
-% prodesi = filenm;
-% project = prodesi(1:2);%get the first 5 letters of that chopped string for Project (e.g. SOCAL)
-% deployment = str2double(prodesi(3:4));%next two characters are deployment (e.g. 01)
-% site = prodesi(5);
-
-detections.setSite(project, site, deployment);%set datasource info to this
-%userID
-detections.setUserID(userid);
-%Algorithm Information (e for element name, v for value)
-%values must be STRINGS because matlab(or my coding skill) sucks with anything else..
-ethresh = 'Threshold';
-ecallfreq = 'CallFreq';
-enfreq1 = 'NoiseFreq1';
-enfreq2 = 'NoiseFreq2';
-efile = 'FileName';
-eres_time = 'LTSAres_time';
-eres_freq = 'LTSAres_freq';
-vcallfreq = num2str(callfreq);
-vthresh = num2str(threshold);
-vnfreq1 = num2str(nfreq1);
-vnfreq2 = num2str(nfreq2);
-vfile = PARAMS.ltsa.infile;
-vres_time = LTSAres_time;
-vres_freq = LTSAres_freq;
-
-detections.setAlgorithm({'finDetector', version, 'Energy Detector'});
-%any (even)number of arguments can be input for parameters, but make sure to
-%wrap them in {   } because matlab is a dummy with java methods
-detections.addAlgorithmParameters({ethresh,vthresh,ecallfreq,vcallfreq,...
-    enfreq1,vnfreq1,enfreq2,vnfreq2,eres_time,vres_time,eres_freq,vres_freq}); 
-%got rid of "efile,vfile," in line above to not include general filename
-%define support software
-detections.addSupportSoftware( {'Triton', triton_version,});
-
-%set effort details (kind)
-detections.addKind(speciesID,{granularity,call,callsubtype,binsize}); %once again, notice the {  }
-
-%record start of effort
-effort(1) = firsttime+datenum([2000 0 0 0 0 0]);
-effStart = dbSerialDateToISO8601(effort(1));
-tc = find(PARAMS.ltsa.dnumStart==firsttime)
-
-% various loops for testing; assume plot length 2 hr
-%while k<84      %assumes 7 days of data
-%while k<4,
 
 % plot length of 2 h seems to work well
 while ~feof(fid)
@@ -171,12 +91,14 @@ while ~feof(fid)
     newvec = reshape(pwrave,[15,size(pwrave,2)/15]);
     newvec = mean(newvec,1);
     totalpwer = [totalpwer newvec];
+    
     %assign time stamps to each 75s chunck
     if (tc+stepss)<=size(PARAMS.ltsa.dnumStart,2)
         ttime = [ttime; PARAMS.ltsa.dnumStart(tc:tc+stepss-1)'];
     else ttime = [ttime; PARAMS.ltsa.dnumStart(tc:end)'];
     end
     tc = tc+stepss;
+    
     %when it goes into a new day, we average it all out and write out
     %detection
     ttimevec = datevec(ttime);
