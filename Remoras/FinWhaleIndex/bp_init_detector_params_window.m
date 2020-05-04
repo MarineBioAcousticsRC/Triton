@@ -2,42 +2,14 @@ function bp_init_detector_params_window
 
 global REMORA
 
-% defaultPos = [0.25,0.35,0.38,0.4];
-% if isfield(REMORA.fig, 'bp')
-%     % Check if the figure already exists. If so, don't move it.
-%     if isfield(REMORA.fig.bp, 'detector') && isvalid(REMORA.fig.bp.detector)
-%         defaultPos = get(REMORA.fig.bp.detector,'Position');
-%     else
-%         REMORA.fig.bp.detector = figure;
-%     end
-% else 
-%     REMORA.fig.bp.detector = figure;
-% end
-
-clf
-
-% set(REMORA.fig.bp.detector,'NumberTitle','off', ...
-%     'Name','Explosion Detector - v1.0',...
-%     'Units','normalized',...
-%     'MenuBar','none',...
-%     'Position',defaultPos, ...
-%     'Visible', 'on',...
-%     'ToolBar', 'none');
-
-%figure(REMORA.fig.bp.detector)
-
-% Load/save settings pulldown:
-
-% if ~isfield(REMORA.fig.bp,'EXfileMenu') || ~isvalid(REMORA.fig.bp.EXfileMenu)
-%     REMORA.fig.bp.EXfileMenu = uimenu(REMORA.fig.bp.detector,'Label',...
-%         'Save/Load Settings','Enable','on','Visible','on');
-%     
-    % Spectrogram load/save params:
-%     uimenu(REMORA.fig.bp.EXfileMenu,'Label','&Load Settings',...
-%         'Callback','bp_detector_control(''bp_detector_settingsLoad'')');
-%     uimenu(REMORA.fig.bp.EXfileMenu,'Label','&Save Settings',...
-%         'Callback','bp_detector_control(''bp_detector_settingsSave'')');
-% end
+defaultPos = [0.25,0.35,0.38,0.4];
+REMORA.fig.bp.detector = figure('NumberTitle','off', ...
+    'Name','Fin Whale Index Detector - v1.0',...
+    'Units','normalized',...
+    'MenuBar','none',...
+    'Position',defaultPos, ...
+    'Visible', 'on',...
+    'ToolBar', 'none');
 
 % Button grid layouts
 % 14 rows, 2 columns

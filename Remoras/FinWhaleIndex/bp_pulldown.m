@@ -19,9 +19,7 @@ if  strcmp(action,'full_detector')
     % set up to open gui window for batch detector
     bp_init_batch_figure
     bp_init_settings
-    
-    % set up all default settings to motion gui
-    bp_init_detector_params_window
+    bp_init_batch_gui
     
     bp_setpointers('arrow');
 
