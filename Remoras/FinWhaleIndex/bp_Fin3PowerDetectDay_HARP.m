@@ -13,8 +13,13 @@ function bp_Fin3PowerDetectDay_HARP
 % also good idea to scroll back and forth to start of file; not sure why
 global REMORA
 global PARAMS
-                                                  
+
+LinkTethys = REMORA.settings.Tethys;
+
+if LinkTethys == true
 import tethys.nilus.*;
+end
+
 tic
 %user defined variables:
 userid =  REMORA.fw.params; %change to your username, usually firstinitial+lastname(jdoe)
@@ -103,9 +108,9 @@ filenm = PARAMS.ltsa.infile(1:(end-5));
 % project = prodesi(1:3);%get the first 5 letters of that chopped string for Project (e.g. SOCAL)
 % deployment = str2double(prodesi(7:8));%next two characters are deployment (e.g. 01)
 % site = prodesi(5);
-project = 'GofAK';
-site = 'CB';
-deployment = 09;
+project = 'SanctSound';
+site = 'CI04';
+deployment = 02;
 %GofAK
 %prodesi = filenm;
 %project = prodesi(1:5);%get the first 5 letters of that chopped string for Project (e.g. SOCAL)

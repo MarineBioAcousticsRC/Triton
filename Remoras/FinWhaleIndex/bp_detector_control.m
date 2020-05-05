@@ -27,6 +27,10 @@ elseif strcmp(action,'setOutDir')
     outDir = get(REMORA.bp_verify.OutDirEdTxt,'string');
     REMORA.bp.settings.outDir = outDir;
    
+elseif strcmp(action,'checkTethys')
+    Tethys = get(REMORA.bp_veriyf.tethysCheck, 'Value');
+    REMORA.bp.settings.Tethys = Tethys;
+    
 elseif strcmp(action,'setThresh')
     threshold = str2double(get(REMORA.bp_verify.threshEdTxt,'string'));
     REMORA.bp.settings.threshold = threshold;

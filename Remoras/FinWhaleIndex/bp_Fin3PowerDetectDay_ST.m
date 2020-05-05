@@ -13,7 +13,13 @@ function bp_Fin3PowerDetectDay_ST
 % also good idea to scroll back and forth to start of file; not sure why
 global REMORA
 global PARAMS
-                                                  
+
+LinkTethys = REMORA.settings.Tethys;
+
+if LinkTethys == true
+import tethys.nilus.*;
+end
+
 tic
 %user defined variables:
 userid =  REMORA.bp.settings.userid; %change to your username, usually firstinitial+lastname(jdoe)
@@ -32,6 +38,7 @@ xml_dir = REMORA.bp.settings.outDir; %location of output XML, notice double back
 new_filename = PARAMS.ltsa.infile;
 xml_filename = new_filename(1:strfind(new_filename,'.ltsa')-1);  %remove ltsa from filename
 xml_out= strcat(xml_dir,xml_filename,'_20finDPI.xml');  %unique identifier for daily power index
+csv_out=strcat(xml_dir,xml_filename,'_20finDPI.csv');
 
 %opening LTSA file to be able to continue reading from it
 fid = fopen([PARAMS.ltsa.inpath,PARAMS.ltsa.infile],'r');
@@ -78,6 +85,54 @@ nfreq2 = REMORA.bp.settings.nfreq2;
 LTSAres_time = num2str(PARAMS.ltsa.tave);
 LTSAres_freq = num2str(PARAMS.ltsa.dfreq);
 
+if  LinkTethys == true
+    %%XML STUFF%%
+%Create Javabean
+detections = Detections();
+speciesID = 180527;%ITIS TSN for fin whales - balaenoptera physalus
+%Grab datasource info from filename
+filenm = PARAMS.ltsa.infile(1:(end-5));
+project = REMORA.settings.project;
+site = REMORA.settings.site;
+deployment = REMORA.settings.deployment;
+
+detections.setSite(project, site, deployment);%set datasource info to this
+%userID
+detections.setUserID(userid);
+%Algorithm Information (e for element name, v for value)
+%values must be STRINGS because matlab(or my coding skill) sucks with anything else..
+ethresh = 'Threshold';
+ecallfreq = 'CallFreq';
+enfreq1 = 'NoiseFreq1';
+enfreq2 = 'NoiseFreq2';
+efile = 'FileName';
+eres_time = 'LTSAres_time';
+eres_freq = 'LTSAres_freq';
+vcallfreq = num2str(callfreq);
+vthresh = num2str(threshold);
+vnfreq1 = num2str(nfreq1);
+vnfreq2 = num2str(nfreq2);
+vfile = PARAMS.ltsa.infile;
+vres_time = LTSAres_time;
+vres_freq = LTSAres_freq;
+
+detections.setAlgorithm({'finDetector', version, 'Energy Detector'});
+%any (even)number of arguments can be input for parameters, but make sure to
+%wrap them in {   } because matlab is a dummy with java methods
+detections.addAlgorithmParameters({ethresh,vthresh,ecallfreq,vcallfreq,...
+    enfreq1,vnfreq1,enfreq2,vnfreq2,eres_time,vres_time,eres_freq,vres_freq}); 
+%got rid of "efile,vfile," in line above to not include general filename
+%define support software
+detections.addSupportSoftware( {'Triton', triton_version,});
+
+%set effort details (kind)
+detections.addKind(speciesID,{granularity,call,callsubtype,binsize}); %once again, notice the {  }
+end
+
+%record start of effort
+effort(1) = firsttime+datenum([2000 0 0 0 0 0]);
+effStart = dbSerialDateToISO8601(effort(1));
+tc = find(PARAMS.ltsa.dnumStart==firsttime)
 
 % plot length of 2 h seems to work well
 while ~feof(fid)
@@ -93,7 +148,7 @@ while ~feof(fid)
     totalpwer = [totalpwer newvec];
     
     %assign time stamps to each 75s chunck
-    if (tc+stepss)<=size(PARAMS.ltsa.dnumStart,2) %find out what to replace tc with.
+    if (tc+stepss)<=size(PARAMS.ltsa.dnumStart,2) 
         ttime = [ttime; PARAMS.ltsa.dnumStart(tc:tc+stepss-1)'];
     else ttime = [ttime; PARAMS.ltsa.dnumStart(tc:end)'];
     end
@@ -125,19 +180,23 @@ while ~feof(fid)
         if dtime<effort(1),
             startISO = effStart;
         end
+        if LinkTethys == true
         oed = Detection(startISO,speciesID);
         score = dailypwr;
         oed.addCall(call);
         oed.setInputFile(PARAMS.ltsa.infile);
         oed.parameters.setScore(java.lang.Double(score));
         detections.addDetection(oed);
-        %end
+        end
+        score = dailypwr;
     end
     pwr = fread(fid,[PARAMS.ltsa.nf,nbin],'int8');   % read next chunk data
     %apply the transfer function
+    if ~isempty(tffilename)
     for i=1:size(pwr,2)
         %pwr(:,i) = pwr(:,i)+tf1.';
         pwr(1:1001,i) = pwr(1:1001,i)+tf1.';
+    end
     end
     k = k+1;
 end
@@ -189,6 +248,8 @@ dayVal = [dayVal timestamp+datenum([2000 0 0 0 0 0])];
 %includes dailypwr; timestamp+datenum([2000 0 0 0 0 0]);
 dtime = timestamp+datenum([2000 0 0 0 0 0]);
 startISO = dbSerialDateToISO8601(dtime);
+
+if LinkTethys == true
 oed = Detection(startISO,speciesID);
 score = dailypwr;
 oed.addCall(call);
@@ -196,7 +257,12 @@ oed.setInputFile(PARAMS.ltsa.infile);
 oed.parameters.setScore(java.lang.Double(score));
 
 detections.addDetection(oed);
-        
+end    
+
+score = dailypwr;
+
+%index values represented by totalpwer I think, but maybe also by
+%dailypwer, except that was only one value.
 %record end of effort
 effort(2) = PARAMS.ltsa.dnumStart(end);
 effort(2) = effort(2)+datenum([2000 0 0 0 0 0]);
@@ -206,8 +272,11 @@ effort(2) = effort(2)+datenum([2000 0 0 0 0 0]);
 %uses Marie's function dbSerialDatetoISO8601 --if you're getting errors
 %here let me know and I can supply the function
 effEnd = dbSerialDateToISO8601(effort(2));  
+
+if LinkTethys == true
 detections.setEffort(effStart,effEnd);
 detections.marshal(xml_out);
+end
 
 datevec(effort)
 t = toc;
