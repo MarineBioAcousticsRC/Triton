@@ -190,8 +190,9 @@ if isfield(REMORA,'ct')
     tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
     % triton tools are fair game.
 end
-if  tritonMode && isfield(REMORA.ct.CC,'rm_clusters')...
+if  tritonMode && isfield(REMORA.ct.CC_params,'rmPriorClusters')...
     && REMORA.ct.CC_params.rmPriorClusters
+    disp('Removing prior clusters')
     badSet = REMORA.ct.CC.rmSet;
     [~,removeSetIndex] = setdiff([tIntMat,subOrder],badSet,'rows');
     cRateMat = cRateMat(removeSetIndex,:);
@@ -431,9 +432,9 @@ if tritonMode && (size(clusterIDreduced,1)<10000)
 
     set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)
     
-%     for iClustPlot=1:size(nodeSet,2)
-%         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
-%     end    
+    for iClustPlot=1:size(nodeSet,2)
+        highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
+    end    
 
 else
     disp('Too many nodes to plot as network.')
@@ -539,6 +540,7 @@ ccOutput.labelStr = labelStr;
 ccOutput.inFileList = inFileList;
 ccOutput.TPWSList = TPWSList;
 ccOutput.partitions = naiItr;
+ccOutput.nList = nList;
 if s.diary
     diary('off')
 end
