@@ -93,7 +93,7 @@ while ~feof(fid)
     totalpwer = [totalpwer newvec];
     
     %assign time stamps to each 75s chunck
-    if (tc+stepss)<=size(PARAMS.ltsa.dnumStart,2)
+    if (tc+stepss)<=size(PARAMS.ltsa.dnumStart,2) %find out what to replace tc with.
         ttime = [ttime; PARAMS.ltsa.dnumStart(tc:tc+stepss-1)'];
     else ttime = [ttime; PARAMS.ltsa.dnumStart(tc:end)'];
     end
