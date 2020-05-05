@@ -6,6 +6,10 @@ disp('Preparing to train network, please be patient.')
 % In matlab 2018+ this should work, OR if you have a GPU, AND if you have
 % the deep learning toolbox.
 load(REMORA.nn.train_net.trainFile);
+
+if ~isdir(REMORA.nn.train_net.outDir)
+    mkdir(REMORA.nn.train_net.outDir)
+end
 % figure out weights based on distribution of labels.
 uLabels = unique(trainLabelsAll);
 [labelOccurence,~] = histc(trainLabelsAll, uLabels);
@@ -35,6 +39,8 @@ load(REMORA.nn.train_net.testFile);
 testDataAll(isnan(testDataAll))=0;
 test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
 
+[YPredTrain,scoresTrain] = classify(net,train4D);
+
 [YPredEval,scoresEval] = classify(net,test4D);
 confusionMatrixEval = confusionmat(YPredEval,categorical(testLabelsAll));
 bestScores = max(scoresEval,[],2);
@@ -47,7 +53,15 @@ REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[
 save(REMORA.nn.train_net.networkFilename,'net')
 save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval','scoresEval','testLabelsAll')
 
-nn_fn_plotconfusion(testLabelsAll,YPredEval,typeNames)
+
+
+cHtrain = nn_fn_plotconfusion(trainLabelsAll,YPredTrain,typeNames);
+cHtrain;
+title('Confusion Matrix: Training Data')
+cHtest = nn_fn_plotconfusion(testLabelsAll,YPredEval,typeNames);
+cHtest;
+title('Confusion Matrix: Evaluation Data')
+
 nn_fn_plotaccuracy(REMORA.nn.train_net.evalResultsFilename)
 
 %crossentropy(double(YPredEval),testLabelsAll)
@@ -73,7 +87,7 @@ for iR = 1:nPlots
     subplot(nCols,nRows,iR)
     imagesc(testDataAll(testLabelsAll==iR,:)')
     set(gca,'ydir','normal')
-    title(sprintf('Category %0.0f',iR))
+    title(typeNames{iR})
 end
 
 figure(212);clf;colormap(jet)
@@ -82,5 +96,17 @@ for iR = 1:nPlots
     subplot(nCols,nRows,iR)
     imagesc(testDataAll(double(YPredEval)==iR,:)')
     set(gca,'ydir','normal')
-    title(sprintf('Category %0.0f',iR))
+    title(typeNames{iR})
+end
+
+figure(213);clf;colormap(jet)
+set(213,'name', 'Misclassified Events in on Test Set')
+misclassSet = double(YPredEval)~=testLabelsAll;
+for iR = 1:nPlots
+    thisType = double(YPredEval)==iR;
+    misclassIdx = find(thisType & misclassSet);
+    subplot(nCols,nRows,iR)
+    imagesc(testDataAll(misclassIdx,:)')
+    set(gca,'ydir','normal')
+    title(typeNames{iR})
 end

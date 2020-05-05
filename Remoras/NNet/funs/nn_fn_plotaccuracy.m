@@ -17,12 +17,16 @@ end
 
 
 figure(254);clf;plot(percClassified,accuracySubset,'o')
-legend('Minimum Classification Score')
+xlim([floor(min(percClassified)*100)/100,1]);
+ylim([floor(min(accuracySubset)*100)/100,1]);
 hold on
+myY = get(gca,'ylim');
+yLimExtent = myY(2)-myY(1);
 for iA = 1:length(accuracyCutoffs)
-    text((percClassified(iA)+.01),accuracySubset(iA),num2str(accuracyCutoffs(iA)),...
+    text((percClassified(iA)+yLimExtent*(.01)),accuracySubset(iA),num2str(accuracyCutoffs(iA)),...
         'HorizontalAlignment','Left','VerticalAlignment','bottom')
 end
 xlabel('Proportion of Data Classified')
 ylabel('Classification Accuracy')
 grid on
+legend('Minimum Classification Score','location','southwest')

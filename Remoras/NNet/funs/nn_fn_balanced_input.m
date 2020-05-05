@@ -81,7 +81,7 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksTrain = sum(boutSizeAllTrain);
-    clickIndicesTrain = sort(randperm(nClicksTrain,min(nExamples,nClicksTrain)));
+    clickIndicesTrain = sort(randi(nClicksTrain,1,nExamples));
     [~,edges,bin] = histcounts(clickIndicesTrain,[1;cumsum(boutSizeAllTrain)+1]);
     
     trainSetSN = [];
@@ -94,41 +94,68 @@ for iT = 1:nTypes
         % do partial load of just clicks in bout
         fileObj = matfile(thisTypeFile);
         
-        boutIdxRange = boutStartIdxAllAllTrain(iBout):boutEndIdxAllAllTrain(iBout);
-        if REMORA.nn.train_test_set.useWave
-            thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
-        else
-            thisBout.MSN = [];
-        end
-        if REMORA.nn.train_test_set.useSpectra
-            thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
-        else
-            thisBout.MSP = [];
-        end
         if iBout == 1
             % pre-allocate now that we know the horizontal dimensions if
             % this is the first pass.
-            trainSetSN = zeros(nExamples,size(thisBout.MSN,2));
-            trainSetSP = zeros(nExamples,size(thisBout.MSP,2));
+            SNwidth = size(fileObj.trainMSN(1,:),2);
+            SPwidth = size(fileObj.trainMSP(1,:),2);
+            trainSetSN = zeros(nExamples,SNwidth);
+            trainSetSP = zeros(nExamples,SPwidth);
         end
-        % Figure out which of the randomly selected training events are in this bout
+        
+        boutIdxRange = boutStartIdxAllAllTrain(iBout):boutEndIdxAllAllTrain(iBout);
         whichEvents = clickIndicesTrain(bin==iBout)-edges(iBout)+1;
         eIdx = sIdx+size(whichEvents,2)-1;
-        if REMORA.nn.train_test_set.useWave
-            trainSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+        
+        if size(boutIdxRange,2)<100000
+            % load a big set, then pick what you want
+            if REMORA.nn.train_test_set.useWave
+                thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
+            else
+                thisBout.MSN = [];
+            end
+            if REMORA.nn.train_test_set.useSpectra
+                thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
+            else
+                thisBout.MSP = [];
+            end
+            
+            % Figure out which of the randomly selected training events are in this bout
+            if REMORA.nn.train_test_set.useWave
+                trainSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+            end
+            if REMORA.nn.train_test_set.useSpectra
+                trainSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+            end
+            sIdx = sIdx+size(whichEvents,2);
+        else
+            % if that's too much to load, do it one at a time
+            for iDet = 1:length(whichEvents)
+                if REMORA.nn.train_test_set.useWave
+                    trainSetSN(sIdx,:) = fileObj.trainMSN(boutIdxRange(1)+whichEvents(iDet),:);
+                end
+                if REMORA.nn.train_test_set.useSpectra
+                    trainSetSP(sIdx,:) = fileObj.trainMSP(boutIdxRange(1)+whichEvents(iDet),:);
+                end
+                sIdx = sIdx+1;
+                
+            end
         end
-        if REMORA.nn.train_test_set.useSpectra
-            trainSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+        
+        
+        fprintf('. ')
+        if mod(iBout,25)==0
+            fprintf('\n')
         end
-        sIdx = sIdx+size(whichEvents,2);
     end
-    
+    fprintf('\n')
     trainTSAll = [trainTSAll;trainSetSN];
     trainSpecAll = [trainSpecAll;trainSetSP];
     
     trainLabelsAll = [trainLabelsAll;repmat(iT,size(trainSetSN,1),1)];
     
-    
+    fprintf('  %0.0f Training examples gathered\n',length(trainLabelsAll))
+
     %% TEST
     boutSizeAllTest = boutSizeAllVec(testBoutIdx);
     boutStartIdxAllAllTest = boutStartIdxAllVec(testBoutIdx);
@@ -137,11 +164,17 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksTest = sum(boutSizeAllTest);
-    clickIndicesTest = sort(randperm(nClicksTest,min(nExamples,nClicksTest)));
-    [N,edges,bin] = histcounts(clickIndicesTest,[1;cumsum(boutSizeAllTest)+1]);
-    
     testSetSN = [];
     testSetSP = [];
+    
+    if nClicksTest == 0 
+        disp(sprintf('WARNING: No ''%s'' events available for test set',typeNames{iT}))
+        continue
+    end
+    clickIndicesTest = sort(randi(nClicksTest,1,nExamples));
+    [N,edges,bin] = histcounts(clickIndicesTest,[1;cumsum(boutSizeAllTest)+1]);
+    
+    
     sIdx = 1;
     for iBout = 1:length(testBoutIdx)
         
@@ -150,41 +183,65 @@ for iT = 1:nTypes
         % do partial load of just clicks in bout
         fileObj = matfile(thisTypeFile);
         
-        boutIdxRange = boutStartIdxAllAllTest(iBout):boutEndIdxAllAllTest(iBout);
-        if REMORA.nn.train_test_set.useWave
-            thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
-        else
-            thisBout.MSN = [];
-        end
-        if REMORA.nn.train_test_set.useSpectra
-            thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
-        else
-            thisBout.MSP = [];
-        end
-        if iBout==1
+        if iBout == 1
             % pre-allocate now that we know the horizontal dimensions if
             % this is the first pass.
-            testSetSN = zeros(nExamples,size(thisBout.MSN,2));
-            testSetSP = zeros(nExamples,size(thisBout.MSP,2));
+            SNwidth = size(fileObj.trainMSN(1,:),2);
+            SPwidth = size(fileObj.trainMSP(1,:),2);
+            testSetSN = zeros(nExamples,SNwidth);
+            testSetSP = zeros(nExamples,SPwidth);
         end
-        % Figure out which of the randomly selected testing events are in this bout
+        
+        boutIdxRange = boutStartIdxAllAllTest(iBout):boutEndIdxAllAllTest(iBout);
         whichEvents = clickIndicesTest(bin==iBout)-edges(iBout)+1;
         eIdx = sIdx+size(whichEvents,2)-1;
-        if REMORA.nn.train_test_set.useWave
-            testSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+        
+        if size(boutIdxRange,2)<100000
+            % load a big set, then pick what you want
+            if REMORA.nn.train_test_set.useWave
+                thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
+            else
+                thisBout.MSN = [];
+            end
+            if REMORA.nn.train_test_set.useSpectra
+                thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
+            else
+                thisBout.MSP = [];
+            end
+            
+            % Figure out which of the randomly selected training events are in this bout
+            if REMORA.nn.train_test_set.useWave
+                testSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+            end
+            if REMORA.nn.train_test_set.useSpectra
+                testSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+            end
+            sIdx = sIdx+size(whichEvents,2);
+        else
+            % if that's too much to load, do it one at a time
+            for iDet = 1:length(whichEvents)
+                if REMORA.nn.train_test_set.useWave
+                    testSetSN(sIdx,:) = fileObj.trainMSN(boutIdxRange(1)+whichEvents(iDet),:);
+                end
+                if REMORA.nn.train_test_set.useSpectra
+                    testSetSP(sIdx,:) = fileObj.trainMSP(boutIdxRange(1)+whichEvents(iDet),:);
+                end
+                sIdx = sIdx+1;
+                
+            end
         end
-        if REMORA.nn.train_test_set.useSpectra
-            testSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
+        
+        fprintf('. ')
+        if mod(iBout,25)==0
+            fprintf('\n')
         end
-        sIdx = sIdx+size(whichEvents,2);
     end
-
+    fprintf('\n')
     testTSAll = [testTSAll;testSetSN];
     testSpecAll = [testSpecAll;testSetSP];
     
     testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN,1),1)];
     
-    fprintf('  %0.0f Training examples gathered\n',length(trainLabelsAll))
     fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))    
     fprintf('Done with type %0.0f of %0.0f\n',iT,nTypes)
 
