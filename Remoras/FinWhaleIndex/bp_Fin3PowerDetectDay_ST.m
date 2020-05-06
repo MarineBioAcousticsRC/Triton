@@ -14,7 +14,7 @@ function bp_Fin3PowerDetectDay_ST
 global REMORA
 global PARAMS
 
-LinkTethys = REMORA.settings.Tethys;
+LinkTethys = REMORA.bp.settings.Tethys;
 
 if LinkTethys == true
 import tethys.nilus.*;
@@ -38,7 +38,7 @@ xml_dir = REMORA.bp.settings.outDir; %location of output XML, notice double back
 new_filename = PARAMS.ltsa.infile;
 xml_filename = new_filename(1:strfind(new_filename,'.ltsa')-1);  %remove ltsa from filename
 xml_out= strcat(xml_dir,xml_filename,'_20finDPI.xml');  %unique identifier for daily power index
-csv_out=strcat(xml_dir,xml_filename,'_20finDPI.csv');
+csv_out=strcat(xml_dir,'\',xml_filename,'_20finDPI.csv');
 
 %opening LTSA file to be able to continue reading from it
 fid = fopen([PARAMS.ltsa.inpath,PARAMS.ltsa.infile],'r');
@@ -51,10 +51,12 @@ fseek(fid,skip,-1);    % skip over header + other data read in first LTSA
 ltsaplotstart = PARAMS.ltsa.plotStartRawIndex;
 pwr = [];
 firsttime = PARAMS.ltsa.dnumStart(ltsaplotstart);
-timeincr = datenum([0 0 0 0 0 5]);
+%timeincr = datenum([0 0 0 0 0 5]);
 k = 1;
 timess = []; ScoreVal = []; ttime = []; totalpwer = []; dayVal = [];
 pwr = PARAMS.ltsa.pwr;
+%nbin = floor(PARAMS.ltsa.tseg.sec/PARAMS.ltsa.tave);
+%pwr = fread(fid, [PARAMS.ltsa.nf, nbin],'int8');
 stleng = size(pwr,2);
 
 % %enter duty cycle for the deployment; if none enter 0s
@@ -82,8 +84,8 @@ threshold = REMORA.bp.settings.thresh;
 callfreq = REMORA.bp.settings.callfreq;
 nfreq1 = REMORA.bp.settings.nfreq1;
 nfreq2 = REMORA.bp.settings.nfreq2;
-LTSAres_time = num2str(PARAMS.ltsa.tave);
-LTSAres_freq = num2str(PARAMS.ltsa.dfreq);
+LTSAres_time = num2str(PARAMS.ltsa.tave); %time bin of LTSA
+LTSAres_freq = num2str(PARAMS.ltsa.dfreq); %frequency bin of LTSA
 
 if  LinkTethys == true
     %%XML STUFF%%
@@ -132,8 +134,9 @@ end
 %record start of effort
 effort(1) = firsttime+datenum([2000 0 0 0 0 0]);
 effStart = dbSerialDateToISO8601(effort(1));
-tc = find(PARAMS.ltsa.dnumStart==firsttime)
-
+tc = find(PARAMS.ltsa.dnumStart==firsttime);
+newtime = effort(1);
+ttime = newtime;
 % plot length of 2 h seems to work well
 while ~feof(fid)
     %calculate the SNR between freq in fin band and adjacent noise
@@ -141,18 +144,24 @@ while ~feof(fid)
     pwrave = pwr(callfreq,:)-((pwr(nfreq1,:)+pwr(nfreq2,:))/2);   %Det3
     %find all times when the SNR is negative and fix to 0
     pwrave(pwrave<0)=0;
+    totalpwer = [totalpwer pwrave];
+    stepss = size(pwrave,2) * PARAMS.ltsa.tave;
     %create 75s averages to match time stamps
-    stepss = size(pwrave,2)/15;
-    newvec = reshape(pwrave,[15,size(pwrave,2)/15]);
-    newvec = mean(newvec,1);
-    totalpwer = [totalpwer newvec];
+%     stepss = size(pwrave,2)/15;
+%     newvec = reshape(pwrave,[15,size(pwrave,2)/15]);
+%     newvec = mean(newvec,1);
+%     totalpwer = [totalpwer newvec];
     
-    %assign time stamps to each 75s chunck
-    if (tc+stepss)<=size(PARAMS.ltsa.dnumStart,2) 
-        ttime = [ttime; PARAMS.ltsa.dnumStart(tc:tc+stepss-1)'];
-    else ttime = [ttime; PARAMS.ltsa.dnumStart(tc:end)'];
-    end
-    tc = tc+stepss;
+    % Assign time stamp to the chunk 
+    newtime = newtime+datenum([0 0 0 0 0 stepss]);
+    ttime = [ttime; newtime];
+    
+%assign time stamps to each 75s chunck
+%     if (tc+stepss)<=size(PARAMS.ltsa.dnumStart,2) 
+%         ttime = [ttime; PARAMS.ltsa.dnumStart(tc:tc+stepss-1)'];
+%     else ttime = [ttime; PARAMS.ltsa.dnumStart(tc:end)'];
+%     end
+%     tc = tc+stepss;
     
     %when it goes into a new day, we average it all out and write out
     %detection
@@ -161,20 +170,28 @@ while ~feof(fid)
     if ttimevec(1,3)~=ttimevec(size(ttimevec,1),3)
         %if we are, average the power and add date stamp
         indx = find(ttimevec(:,3)==ttimevec(1,3));
-        dailypwr = mean(totalpwer(indx));
+        dailypwr = mean(totalpwer(1:indx(end)*nbin));
         ScoreVal = [ScoreVal dailypwr];
         timestamp = datenum(ttimevec(1,1),ttimevec(1,2),ttimevec(1,3));
+        if ttimevec(1,1)<2000
         dayVal = [dayVal timestamp+datenum([2000 0 0 0 0 0])];
+        else
+            dayVal = [dayVal timestamp];
+        end
         %need to save data that are not in that day
-        newpwr = totalpwer(indx(end)+1:end);
+        newpwr = totalpwer((indx(end)*nbin)+1:end);
         newtime = ttime(indx(end)+1:end);
         ttime = []; totalpwer = []; pwrave= []; indx = []; pwr = []; newvec = [];
         totalpwer = newpwr;
         ttime = newtime;
-        newtime = []; newpwr = [];
+        newpwr = [];
         %then write the detection
-        %includes dailypwr; timestamp+datenum([2000 0 0 0 0 0]);
+        if ttimevec(1,1) < 2000
         dtime = timestamp+datenum([2000 0 0 0 0 0]);
+        else
+            dtime = timestamp;
+        end
+        
         %check that the beginning of effort falls before the timestamp
         startISO = dbSerialDateToISO8601(dtime);
         if dtime<effort(1),
@@ -188,7 +205,8 @@ while ~feof(fid)
         oed.parameters.setScore(java.lang.Double(score));
         detections.addDetection(oed);
         end
-        score = dailypwr;
+       % dailypwrTot(k) = dailypwr;
+       % datetimeTot(k) = startISO;
     end
     pwr = fread(fid,[PARAMS.ltsa.nf,nbin],'int8');   % read next chunk data
     %apply the transfer function
@@ -243,29 +261,41 @@ dailypwr = mean(totalpwer);
 ScoreVal = [ScoreVal dailypwr];
 ttimevec = datevec(ttime);
 timestamp = datenum(ttimevec(1,1),ttimevec(1,2),ttimevec(1,3));
+if ttimevec(1,1)<2000
 dayVal = [dayVal timestamp+datenum([2000 0 0 0 0 0])];
+else
+    dayVal = [dayVal timestamp];
+end
+
 %then write the detection
 %includes dailypwr; timestamp+datenum([2000 0 0 0 0 0]);
-dtime = timestamp+datenum([2000 0 0 0 0 0]);
-startISO = dbSerialDateToISO8601(dtime);
-
 if LinkTethys == true
-oed = Detection(startISO,speciesID);
-score = dailypwr;
-oed.addCall(call);
-oed.setInputFile(PARAMS.ltsa.infile);
-oed.parameters.setScore(java.lang.Double(score));
+    dtime = timestamp+datenum([2000 0 0 0 0 0]);
+    startISO = dbSerialDateToISO8601(dtime);
+    oed = Detection(startISO,speciesID);
+    score = dailypwr;
+    oed.addCall(call);
+    oed.setInputFile(PARAMS.ltsa.infile);
+    oed.parameters.setScore(java.lang.Double(score));
 
-detections.addDetection(oed);
+    detections.addDetection(oed);
 end    
 
-score = dailypwr;
 
 %index values represented by totalpwer I think, but maybe also by
 %dailypwer, except that was only one value.
 %record end of effort
 effort(2) = PARAMS.ltsa.dnumStart(end);
+if ttimevec(1,1)<2000
 effort(2) = effort(2)+datenum([2000 0 0 0 0 0]);
+end
+
+%%Write csv%%
+datetime = dbSerialDateToISO8601(dayVal);
+Date = datetime';
+DailySNR = ScoreVal';
+dets = table(Date,DailySNR);
+writetable(dets,csv_out);
 
 %%Final XML stuff%%
 %convert start/end effort times, set and output XML
