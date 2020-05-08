@@ -6,7 +6,7 @@ global PARAMS REMORA HANDLES
 
 if strcmp(action, 'create_tlabs_txt')
     %load text file and create tlab, taken from ship detector
-    lt_create_tlab_file
+    lt_sh_create_tlab_file
     
 elseif strcmp(action,'create_tlabs_detEdit')
     %load file from some sort of detEdit output, create tlab
