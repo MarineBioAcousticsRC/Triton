@@ -1,8 +1,11 @@
-function detXpos = lt_lVis_get_LTSA_Offset(inWindowDet,action)
+function detXpos = lt_lVis_get_LTSA_Offset(inWindowDet,action,ltsaS)
 
 global PARAMS
 plotStart = PARAMS.ltsa.plotStartRawIndex;
+plotDiff = abs(ltsaS - PARAMS.ltsa.dnumStart(plotStart)); %where are we in the first raw file? 
+
 rfDur = PARAMS.ltsa.dur(1); %assumes same duration of all rfs in LTSA
+startPad = rfDur - lt_convertDatenum(plotDiff,'seconds'); %figure out padding to add to detstartOff for first raw file 
 
 if strcmp(action,'starts')
     for iWin = 1:size(inWindowDet,1)
@@ -15,7 +18,7 @@ if strcmp(action,'starts')
     
     wDWIdx = [winDetWavIdx{:}];
     winDetWavs = PARAMS.ltsa.dnumStart(wDWIdx)';
-    detstartOff = (wDWIdx - plotStart).*rfDur; %find offset of raw file from start of LTSA
+    detstartOff = (wDWIdx - (plotStart+1)).*rfDur + startPad; %find offset of raw file from first raw file of LTSA
     detWavOff = inWindowDet(:,1) - winDetWavs;
     detWavOffSec = lt_convertDatenum(detWavOff,'seconds');
     detXpos = (detstartOff' + detWavOffSec)./3600; %convert seconds back to hours
@@ -34,7 +37,7 @@ elseif strcmp(action,'stops')
     
     wDWIdx = [winDetWavIdx{:}];
     winDetWavs = PARAMS.ltsa.dnumStart(wDWIdx)';
-    detstartOff = (wDWIdx - plotStart).*rfDur; %find offset of raw file from start of LTSA
+    detstartOff = (wDWIdx - (plotStart+1)).*rfDur + startPad; %find offset of raw file from start of LTSA
     detWavOff = inWindowDet(:,2) - winDetWavs;
     detWavOffSec = lt_convertDatenum(detWavOff,'seconds');
     detXpos = (detstartOff' + detWavOffSec)./3600; %convert seconds back to hours

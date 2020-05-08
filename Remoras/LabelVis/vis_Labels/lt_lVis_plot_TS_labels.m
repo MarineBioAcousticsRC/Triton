@@ -11,7 +11,7 @@ colF = [1 0 0];
 %% get range times
 %create start and end times of window
 startWV = PARAMS.plot.dnum;
-winLength = HANDLES.subplt.specgram.XLim(2); %get length of window in seconds, used to compute end limit
+winLength = HANDLES.subplt.timeseries.XLim(2); %get length of window in seconds, used to compute end limit
 endWV = startWV + datenum(0,0,0,0,0,winLength);
 
 plotMin = HANDLES.subplt.timeseries.YLim(1);
