@@ -50,7 +50,8 @@ for l = 1:length(FileListCsv)
 end
 
 %% find start times from each file for Sound Trap data
-RegDate = '(?<yr>\d\d)(?<mon>\d\d)(?<day>\d\d)(?<hr>\d\d)(?<min>\d\d)(?<s>\d\d)';
+RegDate = REMORA.bm.settings.regdate;
+%RegDate = '(?<yr>\d\d)(?<mon>\d\d)(?<day>\d\d)(?<hr>\d\d)(?<min>\d\d)(?<s>\d\d)';
 fileDates = dateregexp(FileListWav,RegDate);
 
 %%
@@ -120,7 +121,33 @@ if fidx == 1
         
             % Read in data
             y = audioread(filename, [startS endS]);
+%             if ~isempty(find(y==0,1))
+%                 noSig = find(y==0);
+%                 samplestop = noSig(1);
+%                 samplestart = noSig(end);
+%                 if samplestop ~= startS
+%                 y1 = audioread(filename,[StartS,samplestop-1];
+%                 endTime1 = (samplestop-1)/I.SampleRate;
+%                 [abstime1,peakS1] = bm_findcalls_soundtrap(y1,I,blockIdx,startTime1,endTime1,startF,endF,thresh,block,halfblock,offset,1,filename);
+%                 end
+%                 if samplestart ~=endS
+%                 y2 = audioread(filename,[samplestart+1,endS];
+%                 startTime2 = (samplestart+1)/I.SampleRate;
+%                 [abstime2,peakS2] = bm_findcalls_soundtrap(y2,I,blockIdx,startTime2,endTime,startF,endF,thresh,block,halfblock,offset,1,filename);
+%                 end
+%                 if ~isempty(abstime1) && ~isempty(abstime2)
+%                 abstime = [abstime1,abstime2];
+%                 peakS = [peakS1,peakS2];
+%                 elseif ~isempty(abstime1)
+%                     abstime = abstime1;
+%                     peakS = peakS1;
+%                 elseif ~isempty(abstime2)
+%                     abstime =abstime2;
+%                     peakS = peakS2;
+%                 end
+%             else
             [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime1,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Waar gaat de output naartoe?
+%             end
             ty = 1 - isempty(abstime);
         if ty == 1
             %det_times = vertcat(det_times,abstime);
@@ -185,7 +212,33 @@ else
         else
             y = audioread(filename, [startS endS]);
         end
+%         if ~isempty(find(y==0,1))
+%                 noSig = find(y==0);
+%                 samplestop = noSig(1);
+%                 samplestart = noSig(end);
+%                 if samplestop ~= startS
+%                 y1 = audioread(filename,[StartS,samplestop-1];
+%                 endTime1 = (samplestop-1)/I.SampleRate;
+%                 [abstime1,peakS1] = bm_findcalls_soundtrap(y1,I,blockIdx,startTime1,endTime1,startF,endF,thresh,block,halfblock,offset,1,filename);
+%                 end
+%                 if samplestart ~=endS
+%                 y2 = audioread(filename,[samplestart+1,endS];
+%                 startTime2 = (samplestart+1)/I.SampleRate;
+%                 [abstime2,peakS2] = bm_findcalls_soundtrap(y2,I,blockIdx,startTime2,endTime,startF,endF,thresh,block,halfblock,offset,1,filename);
+%                 end
+%                 if ~isempty(abstime1) && ~isempty(abstime2)
+%                 abstime = [abstime1,abstime2];
+%                 peakS = [peakS1,peakS2];
+%                 elseif ~isempty(abstime1)
+%                     abstime = abstime1;
+%                     peakS = peakS1;
+%                 elseif ~isempty(abstime2)
+%                     abstime =abstime2;
+%                     peakS = peakS2;
+%                 end
+%             else
         [abstime,peakS] = bm_findcalls_soundtrap(y,I,blockIdx,startTime1,endTime,startF,endF,thresh,block,halfblock,offset,1,filename); %Detect calls
+%         end
         ty = 1 - isempty(abstime);
         if ty == 1
         %det_times{fidx,blockIdx} = abstime;
