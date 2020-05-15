@@ -24,5 +24,8 @@ elseif strcmp(action,'visualize_labels')
     REMORA.lt.lVis_det.detection2.PlotLabels = false;
     REMORA.lt.lVis_det.detection3.PlotLabels = false;
     REMORA.lt.lVis_det.detection4.PlotLabels = false;
-    
+    REMORA.lt.lVis_det.detection5.PlotLabels = false;
+    REMORA.lt.lVis_det.detection6.PlotLabels = false;
+    REMORA.lt.lVis_det.detection7.PlotLabels = false;
+    REMORA.lt.lVis_det.detection8.PlotLabels = false;
 end

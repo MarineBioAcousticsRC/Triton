@@ -7,9 +7,13 @@ global REMORA PARAMS
 [ltsaS,ltsaE] = lt_lVis_get_ltsa_range;
 plotFreq = PARAMS.ltsa.f(end) *.9;
 col1 = [1 1 1];
-col2 = [1 0.2 0.6];
+col2 = [0.8 0.4 0.8];
 col3 = [1 0.6 0];
 col4 = [0.8 0.6 1];
+col5 = [0.8 1.0 1.0];
+col6 = [1.0 0 0.4];
+col7 = [1.0 0.6 0.6];
+col8 = [1.0 0.6 0.2];
 
 %find detections in the window
 if REMORA.lt.lVis_det.detection.PlotLabels
@@ -75,6 +79,69 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
     
 end
 
+%%%plot fifth labels if desired
+if REMORA.lt.lVis_det.detection5.PlotLabels
+    yPos5 = plotFreq*.5;
+    labl5 = REMORA.lt.lVis_det.detection5.labels(1);
+    label5Pos = plotFreq*.55;
+    
+    %%% shorten detections to bout-level
+    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+    %is less than this, combine into a bout
+    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection5.starts,REMORA.lt.lVis_det.detection5.stops,...
+        boutGap);
+    
+    plot_labels_ltsa(labl5,label5Pos,startBouts,endBouts,yPos5,col5,ltsaS,ltsaE);
+    
+end
+
+%%%plot sixth labels if desired
+if REMORA.lt.lVis_det.detection6.PlotLabels
+    yPos6 = plotFreq*.4;
+    labl6 = REMORA.lt.lVis_det.detection6.labels(1);
+    label6Pos = plotFreq*.45;
+    
+    %%% shorten detections to bout-level
+    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+    %is less than this, combine into a bout
+    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection6.starts,REMORA.lt.lVis_det.detection6.stops,...
+        boutGap);
+    
+    plot_labels_ltsa(labl6,label6Pos,startBouts,endBouts,yPos6,col6,ltsaS,ltsaE);
+    
+end
+
+%%%plot seventh labels if desired
+if REMORA.lt.lVis_det.detection7.PlotLabels
+    yPos7 = plotFreq*.3;
+    labl7 = REMORA.lt.lVis_det.detection7.labels(1);
+    label7Pos = plotFreq*.35;
+    
+    %%% shorten detections to bout-level
+    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+    %is less than this, combine into a bout
+    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection7.starts,REMORA.lt.lVis_det.detection7.stops,...
+        boutGap);
+    
+    plot_labels_ltsa(labl7,label7Pos,startBouts,endBouts,yPos7,col7,ltsaS,ltsaE);
+    
+end
+
+%%%plot eighth labels if desired
+if REMORA.lt.lVis_det.detection8.PlotLabels
+    yPos8 = plotFreq*.2;
+    labl8 = REMORA.lt.lVis_det.detection8.labels(1);
+    label8Pos = plotFreq*.25;
+    
+    %%% shorten detections to bout-level
+    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+    %is less than this, combine into a bout
+    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection8.starts,REMORA.lt.lVis_det.detection8.stops,...
+        boutGap);
+    
+    plot_labels_ltsa(labl8,label8Pos,startBouts,endBouts,yPos8,col8,ltsaS,ltsaE);
+    
+end
 
 function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
 
