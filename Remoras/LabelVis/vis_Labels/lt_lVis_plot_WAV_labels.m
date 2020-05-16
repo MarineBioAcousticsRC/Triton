@@ -2,14 +2,14 @@ function lt_lVis_plot_WAV_labels
 
 global REMORA PARAMS HANDLES
 %%PARAMS.start.dnum = start of individual wav file! Useful for figuring out
-%%what's in window and plotting it. 
+%%what's in window and plotting it.
 
 
 %% get range times
 %create start and end times of window
 startWV = PARAMS.plot.dnum;
 winLength = HANDLES.subplt.specgram.XLim(2); %get length of window in seconds, used to compute end limit
-endWV = startWV + datenum(0,0,0,0,0,winLength); 
+endWV = startWV + datenum(0,0,0,0,0,winLength);
 
 plotFreq = PARAMS.freq1 *.9;
 colF = [1 0 0];
@@ -21,7 +21,7 @@ col5 = [0.8 1.0 1.0];
 col6 = [1.0 0 0.4];
 col7 = [1.0 0.6 0.6];
 col8 = [1.0 0.6 0.2];
-        
+
 %find detections in the window
 if REMORA.lt.lVis_det.detection.PlotLabels
     yPos1 = plotFreq*1;
@@ -30,18 +30,18 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     
     plot_labels_wav(labl1,label1Pos,REMORA.lt.lVis_det.detection.starts,REMORA.lt.lVis_det.detection.stops,yPos1,col1,startWV,endWV);
     
-      %plot changed labels 
-      changedLab = REMORA.lt.lEdit.detection;
-      falseCh = changedLab(changedLab(:,3) == 0,:);
-      oneCh = changedLab(changedLab(:,3) == 1,:);
-      twoCh = changedLab(changedLab(:,3) == 2,:);
-      threeCh = changedLab(changedLab(:,3) == 3,:);
-      fourCh = changedLab(changedLab(:,3) == 4,:);
-          fiveCh = changedLab(changedLab(:,3) == 5,:);
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
     sixCh = changedLab(changedLab(:,3) == 6,:);
     sevCh = changedLab(changedLab(:,3) == 7,:);
     eightCh = changedLab(changedLab(:,3) == 8,:);
-      
+    
     if ~isempty(falseCh)
         plot_chLab_wav(startWV,endWV,falseCh,colF,yPos1)
     end
@@ -57,7 +57,7 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     if ~isempty(fourCh)
         plot_chLab_wav(startWV,endWV,fourCh,col4,yPos1)
     end
-     if ~isempty(fiveCh)
+    if ~isempty(fiveCh)
         plot_chLab_wav(startWV,endWV,fiveCh,col5,yPos1)
     end
     if ~isempty(sixCh)
@@ -79,19 +79,19 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
     
     plot_labels_wav(labl2,label2Pos,REMORA.lt.lVis_det.detection2.starts,REMORA.lt.lVis_det.detection2.stops,yPos2,col2,startWV,endWV);
     
-        
-    %plot changed labels 
-      changedLab = REMORA.lt.lEdit.detection2;
-      falseCh = changedLab(changedLab(:,3) == 0,:);
-      oneCh = changedLab(changedLab(:,3) == 1,:);
-      twoCh = changedLab(changedLab(:,3) == 2,:);
-      threeCh = changedLab(changedLab(:,3) == 3,:);
-      fourCh = changedLab(changedLab(:,3) == 4,:);
-          fiveCh = changedLab(changedLab(:,3) == 5,:);
+    
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
     sixCh = changedLab(changedLab(:,3) == 6,:);
     sevCh = changedLab(changedLab(:,3) == 7,:);
     eightCh = changedLab(changedLab(:,3) == 8,:);
-      
+    
     if ~isempty(falseCh)
         plot_chLab_wav(startWV,endWV,falseCh,colF,yPos2)
     end
@@ -107,7 +107,7 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
     if ~isempty(fourCh)
         plot_chLab_wav(startWV,endWV,fourCh,col4,yPos2)
     end
-      if ~isempty(fiveCh)
+    if ~isempty(fiveCh)
         plot_chLab_wav(startWV,endWV,fiveCh,col5,yPos2)
     end
     if ~isempty(sixCh)
@@ -124,24 +124,24 @@ end
 %%%plot third labels if desired
 if REMORA.lt.lVis_det.detection3.PlotLabels
     yPos3 = plotFreq*.7;
-
+    
     labl3 = REMORA.lt.lVis_det.detection3.labels(1);
     label3Pos = plotFreq*.75;
     
     plot_labels_wav(labl3,label3Pos,REMORA.lt.lVis_det.detection3.starts,REMORA.lt.lVis_det.detection3.stops,yPos3,col3,startWV,endWV);
-        
-    %plot changed labels 
-      changedLab = REMORA.lt.lEdit.detection3;
-      falseCh = changedLab(changedLab(:,3) == 0,:);
-      oneCh = changedLab(changedLab(:,3) == 1,:);
-      twoCh = changedLab(changedLab(:,3) == 2,:);
-      threeCh = changedLab(changedLab(:,3) == 3,:);
-      fourCh = changedLab(changedLab(:,3) == 4,:);
-          fiveCh = changedLab(changedLab(:,3) == 5,:);
+    
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection3;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
     sixCh = changedLab(changedLab(:,3) == 6,:);
     sevCh = changedLab(changedLab(:,3) == 7,:);
     eightCh = changedLab(changedLab(:,3) == 8,:);
-      
+    
     if ~isempty(falseCh)
         plot_chLab_wav(startWV,endWV,falseCh,colF,yPos3)
     end
@@ -221,7 +221,7 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
     end
 end
 
-   %%%plot fifth labels if desired
+%%%plot fifth labels if desired
 if REMORA.lt.lVis_det.detection5.PlotLabels
     yPos5 = plotFreq.*0.5;
     labl5 = REMORA.lt.lVis_det.detection5.labels(1);
@@ -270,7 +270,7 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
     end
 end
 
- %%%plot sixth labels if desired
+%%%plot sixth labels if desired
 if REMORA.lt.lVis_det.detection6.PlotLabels
     yPos6 = plotFreq*0.4;
     labl6 = REMORA.lt.lVis_det.detection6.labels(1);
@@ -318,8 +318,8 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
         plot_chLab_wav(startWV,endWV,eightCh,col8,yPos6)
     end
 end
-    
-    %%%plot seventh labels if desired
+
+%%%plot seventh labels if desired
 if REMORA.lt.lVis_det.detection7.PlotLabels
     yPos7 = plotFreq.*0.3;
     labl7 = REMORA.lt.lVis_det.detection7.labels(1);

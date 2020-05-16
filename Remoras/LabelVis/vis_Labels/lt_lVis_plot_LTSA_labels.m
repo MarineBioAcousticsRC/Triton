@@ -29,6 +29,46 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     
     plot_labels_ltsa(labl1,label1Pos,startBouts,endBouts,yPos1,col1,ltsaS,ltsaE);
     
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
+    
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos)
+    end
+    
 end
 
 %%%plot second labels if desired
@@ -45,6 +85,45 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
     
     plot_labels_ltsa(labl2,label2Pos,startBouts,endBouts,yPos2,col2,ltsaS,ltsaE);
     
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
+    
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos2)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos2)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos2)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos2)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos2)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos2)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos2)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos2)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos2)
+    end
 end
 
 %%%plot third labels if desired
@@ -61,6 +140,45 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
     
     plot_labels_ltsa(labl3,label3Pos,startBouts,endBouts,yPos3,col3,ltsaS,ltsaE);
     
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
+    
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos3)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos3)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos3)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos3)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos3)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos3)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos3)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos3)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos3)
+    end
 end
 
 %%%plot fourth labels if desired
@@ -76,7 +194,45 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
         boutGap);
     
     plot_labels_ltsa(labl4,label4Pos,startBouts,endBouts,yPos4,col4,ltsaS,ltsaE);
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
     
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos4)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos4)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos4)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos4)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos4)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos4)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos4)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos4)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos4)
+    end
 end
 
 %%%plot fifth labels if desired
@@ -92,7 +248,45 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
         boutGap);
     
     plot_labels_ltsa(labl5,label5Pos,startBouts,endBouts,yPos5,col5,ltsaS,ltsaE);
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
     
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos5)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos5)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos5)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos5)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos5)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos5)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos5)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos5)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos5)
+    end
 end
 
 %%%plot sixth labels if desired
@@ -108,7 +302,45 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
         boutGap);
     
     plot_labels_ltsa(labl6,label6Pos,startBouts,endBouts,yPos6,col6,ltsaS,ltsaE);
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
     
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos6)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos6)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos6)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos6)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos6)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos6)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos6)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos6)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos6)
+    end
 end
 
 %%%plot seventh labels if desired
@@ -124,7 +356,45 @@ if REMORA.lt.lVis_det.detection7.PlotLabels
         boutGap);
     
     plot_labels_ltsa(labl7,label7Pos,startBouts,endBouts,yPos7,col7,ltsaS,ltsaE);
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
     
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos7)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos7)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos7)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos7)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos7)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos7)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos7)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos7)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos7)
+    end
 end
 
 %%%plot eighth labels if desired
@@ -140,145 +410,231 @@ if REMORA.lt.lVis_det.detection8.PlotLabels
         boutGap);
     
     plot_labels_ltsa(labl8,label8Pos,startBouts,endBouts,yPos8,col8,ltsaS,ltsaE);
+    %plot changed labels
+    changedLab = REMORA.lt.lEdit.detection2;
+    falseCh = changedLab(changedLab(:,3) == 0,:);
+    oneCh = changedLab(changedLab(:,3) == 1,:);
+    twoCh = changedLab(changedLab(:,3) == 2,:);
+    threeCh = changedLab(changedLab(:,3) == 3,:);
+    fourCh = changedLab(changedLab(:,3) == 4,:);
+    fiveCh = changedLab(changedLab(:,3) == 5,:);
+    sixCh = changedLab(changedLab(:,3) == 6,:);
+    sevCh = changedLab(changedLab(:,3) == 7,:);
+    eightCh = changedLab(changedLab(:,3) == 8,:);
     
+    if ~isempty(falseCh)
+        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos8)
+    end
+    if ~isempty(oneCh)
+        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos8)
+    end
+    if ~isempty(twoCh)
+        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos8)
+    end
+    if ~isempty(threeCh)
+        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos8)
+    end
+    if ~isempty(fourCh)
+        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos8)
+    end
+    if ~isempty(fiveCh)
+        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos8)
+    end
+    if ~isempty(sixCh)
+        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos8)
+    end
+    if ~isempty(sevCh)
+        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos8)
+    end
+    if ~isempty(eightCh)
+        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos8)
+    end
+end
 end
 
-function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
-
-global PARAMS HANDLES REMORA
-lablFull = [startL,stopL];
-
-startWin = find(startL >= ltsaS & startL <= ltsaE);
-endWin = find(stopL >= ltsaS & stopL <= ltsaE);
-fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
-
-startOnly = setdiff(startWin,endWin);
-endOnly = setdiff(endWin,startWin);
-winDetsStarts = [];
-winDetsStops = [];
-winDetsFull = [];
-
-if startOnly
-    winDetsStarts = [lablFull(startOnly,1),ones(size(lablFull(startOnly,1),1)).*ltsaE];
-end
-
-if endOnly
-    winDetsStops = [ones(size(lablFull(endOnly,2),1)).*ltsaS,lablFull(endOnly,2)];
-end
-
-if fullDet
-    winDetsFull = lablFull(fullDet,:);
-end
-
-if ~isempty(winDetsFull)
-    %find which raw file each detection in winDet is in
-    detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts');
-    detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops');
-    
-    
-    axes (HANDLES.subplt.ltsa)
-    hold on
-    
-    %%%what kind of plotting are we going to do? Just plot a point if detection
-    %%%range is shorter than 1 min... using this to simplify plotting if tlab
-    %%%detections are at click level
-    
-    LineThresh = 1/600;
-    
-    for iPlot = 1:size(detXstart,1)
-        detDur = detXend - detXstart;
-        if detDur < LineThresh
-            %just plot the start of a given detection
-            plot(detXstart(iPlot), yPos,'*','Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-        else
-            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
-                'MarkerSize',5,'Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+    function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
+        
+        global PARAMS HANDLES REMORA
+        lablFull = [startL,stopL];
+        
+        startWin = find(startL >= ltsaS & startL <= ltsaE);
+        endWin = find(stopL >= ltsaS & stopL <= ltsaE);
+        fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
+        
+        startOnly = setdiff(startWin,endWin);
+        endOnly = setdiff(endWin,startWin);
+        winDetsStarts = [];
+        winDetsStops = [];
+        winDetsFull = [];
+        
+        if startOnly
+            winDetsStarts = [lablFull(startOnly,1),ones(size(lablFull(startOnly,1),1)).*ltsaE];
+        end
+        
+        if endOnly
+            winDetsStops = [ones(size(lablFull(endOnly,2),1)).*ltsaS,lablFull(endOnly,2)];
+        end
+        
+        if fullDet
+            winDetsFull = lablFull(fullDet,:);
+        end
+        
+        if ~isempty(winDetsFull)
+            %find which raw file each detection in winDet is in
+            detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts');
+            detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops');
+            
+            
+            axes (HANDLES.subplt.ltsa)
+            hold on
+            
+            %%%what kind of plotting are we going to do? Just plot a point if detection
+            %%%range is shorter than 1 min... using this to simplify plotting if tlab
+            %%%detections are at click level
+            
+            LineThresh = 1/600;
+            
+            for iPlot = 1:size(detXstart,1)
+                detDur = detXend - detXstart;
+                if detDur < LineThresh
+                    %just plot the start of a given detection
+                    plot(detXstart(iPlot), yPos,'*','Color',color)
+                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+                else
+                    plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                        'MarkerSize',5,'Color',color)
+                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+                end
+            end
+            
+            %plot a line at the end of the detection file
+            if isequal(stopL(end),winDetsFull(end,2))
+                plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+                    'Color',color)
+            end
+            
+            hold off
+        end
+        
+        if ~isempty(winDetsStarts)
+            %find which raw file each detection in winDet is in
+            detXstart = lt_lVis_get_LTSA_Offset(winDetsStarts,'starts');
+            detXend = lt_lVis_get_LTSA_Offset(winDetsStarts,'stops');
+            
+            
+            axes (HANDLES.subplt.ltsa)
+            hold on
+            
+            %%%what kind of plotting are we going to do? Just plot a point if detection
+            %%%range is shorter than 1 min... using this to simplify plotting if tlab
+            %%%detections are at click level
+            
+            LineThresh = 1/600;
+            
+            for iPlot = 1:size(detXstart,1)
+                detDur = detXend - detXstart;
+                if detDur < LineThresh
+                    %just plot the start of a given detection
+                    plot(detXstart(iPlot), yPos,'*','Color',color)
+                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+                else
+                    plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                        'MarkerSize',5,'Color',color)
+                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+                end
+            end
+            
+            %plot a line at the end of the detection file
+            if isequal(stopL(end),winDetsStarts(end,2))
+                plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+                    'Color',color)
+            end
+            
+            hold off
+        end
+        
+        if ~isempty(winDetsStops)
+            %find which raw file each detection in winDet is in
+            detXstart = lt_lVis_get_LTSA_Offset(winDetsStops,'starts');
+            detXend = lt_lVis_get_LTSA_Offset(winDetsStops,'stops');
+            
+            
+            axes (HANDLES.subplt.ltsa)
+            hold on
+            
+            %%%what kind of plotting are we going to do? Just plot a point if detection
+            %%%range is shorter than 1 min... using this to simplify plotting if tlab
+            %%%detections are at click level
+            
+            LineThresh = 1/600;
+            
+            for iPlot = 1:size(detXstart,1)
+                detDur = detXend - detXstart;
+                if detDur < LineThresh
+                    %just plot the start of a given detection
+                    plot(detXstart(iPlot), yPos,'*','Color',color)
+                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+                else
+                    plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                        'MarkerSize',5,'Color',color)
+                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+                end
+            end
+            
+            %plot a line at the end of the detection file
+            if isequal(stopL(end),winDetsStops(end,2))
+                plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+                    'Color',color)
+            end
+            
+            hold off
         end
     end
-    
-    %plot a line at the end of the detection file
-    if isequal(stopL(end),winDetsFull(end,2))
-        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-            'Color',color)
-    end
-    
-    hold off
-end
 
-if ~isempty(winDetsStarts)
-    %find which raw file each detection in winDet is in
-    detXstart = lt_lVis_get_LTSA_Offset(winDetsStarts,'starts');
-    detXend = lt_lVis_get_LTSA_Offset(winDetsStarts,'stops');
-    
-    
-    axes (HANDLES.subplt.ltsa)
-    hold on
-    
-    %%%what kind of plotting are we going to do? Just plot a point if detection
-    %%%range is shorter than 1 min... using this to simplify plotting if tlab
-    %%%detections are at click level
-    
-    LineThresh = 1/600;
-    
-    for iPlot = 1:size(detXstart,1)
-        detDur = detXend - detXstart;
-        if detDur < LineThresh
-            %just plot the start of a given detection
-            plot(detXstart(iPlot), yPos,'*','Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-        else
-            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
-                'MarkerSize',5,'Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+    function plot_chLabels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
+        
+        global PARAMS HANDLES REMORA
+        lablFull = [startL,stopL];
+        fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
+        
+        if fullDet
+            winDetsFull = lablFull(fullDet,:);
         end
-    end
-    
-    %plot a line at the end of the detection file
-    if isequal(stopL(end),winDetsStarts(end,2))
-        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-            'Color',color)
-    end
-    
-    hold off
-end
-
-if ~isempty(winDetsStops)
-    %find which raw file each detection in winDet is in
-    detXstart = lt_lVis_get_LTSA_Offset(winDetsStops,'starts');
-    detXend = lt_lVis_get_LTSA_Offset(winDetsStops,'stops');
-    
-    
-    axes (HANDLES.subplt.ltsa)
-    hold on
-    
-    %%%what kind of plotting are we going to do? Just plot a point if detection
-    %%%range is shorter than 1 min... using this to simplify plotting if tlab
-    %%%detections are at click level
-    
-    LineThresh = 1/600;
-    
-    for iPlot = 1:size(detXstart,1)
-        detDur = detXend - detXstart;
-        if detDur < LineThresh
-            %just plot the start of a given detection
-            plot(detXstart(iPlot), yPos,'*','Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-        else
-            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
-                'MarkerSize',5,'Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+        
+        
+        %find which raw file each detection in winDet is in
+        detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts');
+        detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops');
+        
+        
+        axes (HANDLES.subplt.ltsa)
+        hold on
+        
+        %%%what kind of plotting are we going to do? Just plot a point if detection
+        %%%range is shorter than 1 min... using this to simplify plotting if tlab
+        %%%detections are at click level
+        
+        LineThresh = 1/600;
+        
+        for iPlot = 1:size(detXstart,1)
+            detDur = detXend - detXstart;
+            if detDur < LineThresh
+                %just plot the start of a given detection
+                plot(detXstart(iPlot), yPos,'*','Color',color)
+                text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            else
+                plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                    'MarkerSize',5,'Color',color)
+                text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            end
         end
+        
+        %plot a line at the end of the detection file
+        if isequal(stopL(end),winDetsFull(end,2))
+            plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+                'Color',color)
+        end
+        
+        hold off
+        
     end
-    
-    %plot a line at the end of the detection file
-    if isequal(stopL(end),winDetsStops(end,2))
-        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-            'Color',color)
-    end
-    
-    hold off
-end
-
-
