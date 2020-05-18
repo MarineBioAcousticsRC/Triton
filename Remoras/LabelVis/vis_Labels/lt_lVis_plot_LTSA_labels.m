@@ -6,6 +6,8 @@ global REMORA PARAMS
 %pull start and end times of window
 [ltsaS,ltsaE] = lt_lVis_get_ltsa_range;
 plotFreq = PARAMS.ltsa.f(end) *.9;
+
+colF = [1 0 0];
 col1 = [1 1 1];
 col2 = [0.8 0.4 0.8];
 col3 = [1 0.6 0];
@@ -30,7 +32,7 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     plot_labels_ltsa(labl1,label1Pos,startBouts,endBouts,yPos1,col1,ltsaS,ltsaE);
     
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
+    changedLab = REMORA.lt.lEdit.detection;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
@@ -42,31 +44,31 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos)
     end
     
 end
@@ -98,31 +100,31 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos2)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos2)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos2)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos2)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos2)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos2)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos2)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos2)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos2)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos2)
     end
 end
 
@@ -141,7 +143,7 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
     plot_labels_ltsa(labl3,label3Pos,startBouts,endBouts,yPos3,col3,ltsaS,ltsaE);
     
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
+    changedLab = REMORA.lt.lEdit.detection3;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
@@ -153,31 +155,31 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos3)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos3)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos3)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos3)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos3)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos3)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos3)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos3)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos3)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos3)
     end
 end
 
@@ -195,7 +197,7 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
     
     plot_labels_ltsa(labl4,label4Pos,startBouts,endBouts,yPos4,col4,ltsaS,ltsaE);
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
+    changedLab = REMORA.lt.lEdit.detection4;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
@@ -207,31 +209,31 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos4)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos4)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos4)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos4)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos4)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos4)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos4)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos4)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos4)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos4)
     end
 end
 
@@ -249,7 +251,7 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
     
     plot_labels_ltsa(labl5,label5Pos,startBouts,endBouts,yPos5,col5,ltsaS,ltsaE);
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
+    changedLab = REMORA.lt.lEdit.detection5;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
@@ -261,31 +263,31 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos5)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos5)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos5)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos5)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos5)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos5)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos5)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos5)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos5)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos5)
     end
 end
 
@@ -303,7 +305,7 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
     
     plot_labels_ltsa(labl6,label6Pos,startBouts,endBouts,yPos6,col6,ltsaS,ltsaE);
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
+    changedLab = REMORA.lt.lEdit.detection6;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
@@ -315,31 +317,31 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos6)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos6)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos6)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos6)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos6)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos6)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos6)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos6)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos6)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos6)
     end
 end
 
@@ -357,7 +359,7 @@ if REMORA.lt.lVis_det.detection7.PlotLabels
     
     plot_labels_ltsa(labl7,label7Pos,startBouts,endBouts,yPos7,col7,ltsaS,ltsaE);
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
+    changedLab = REMORA.lt.lEdit.detection7;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
@@ -369,31 +371,31 @@ if REMORA.lt.lVis_det.detection7.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos7)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos7)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos7)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos7)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos7)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos7)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos7)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos7)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos7)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos7)
     end
 end
 
@@ -411,7 +413,7 @@ if REMORA.lt.lVis_det.detection8.PlotLabels
     
     plot_labels_ltsa(labl8,label8Pos,startBouts,endBouts,yPos8,col8,ltsaS,ltsaE);
     %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
+    changedLab = REMORA.lt.lEdit.detection8;
     falseCh = changedLab(changedLab(:,3) == 0,:);
     oneCh = changedLab(changedLab(:,3) == 1,:);
     twoCh = changedLab(changedLab(:,3) == 2,:);
@@ -423,31 +425,31 @@ if REMORA.lt.lVis_det.detection8.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(startWV,endWV,falseCh,colF,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos8)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(startWV,endWV,oneCh,col1,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos8)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(startWV,endWV,twoCh,col2,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos8)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(startWV,endWV,threeCh,col3,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos8)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(startWV,endWV,fourCh,col4,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos8)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(startWV,endWV,fiveCh,col5,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos8)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(startWV,endWV,sixCh,col6,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos8)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(startWV,endWV,sevCh,col7,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos8)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(startWV,endWV,eightCh,col8,yPos8)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos8)
     end
 end
 end
@@ -591,10 +593,10 @@ end
         end
     end
 
-    function plot_chLabels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
+    function plot_chLabels_ltsa(ltsaS,ltsaE,chLab,color,yPos)
         
         global PARAMS HANDLES REMORA
-        lablFull = [startL,stopL];
+        lablFull = chLab(:,1:2);
         fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
         
         if fullDet
@@ -621,16 +623,14 @@ end
             if detDur < LineThresh
                 %just plot the start of a given detection
                 plot(detXstart(iPlot), yPos,'*','Color',color)
-                text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
             else
                 plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
                     'MarkerSize',5,'Color',color)
-                text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
             end
         end
         
         %plot a line at the end of the detection file
-        if isequal(stopL(end),winDetsFull(end,2))
+        if isequal(ltsaE(end),winDetsFull(end,2))
             plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
                 'Color',color)
         end

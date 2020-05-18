@@ -1,49 +1,49 @@
-function lt_lEdit_control(action)
+function lt_lEdit_control_LTSA(action)
 
 global REMORA
 
 if strcmp(action,'markFalse')
-    check = get(REMORA.lt.lEdit_verify.falseCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.falseCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('false')
     end
 elseif strcmp(action, 'mark1')
-    check = get(REMORA.lt.lEdit_verify.oneCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.oneCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('one')
     end
 elseif strcmp(action, 'mark2')
-    check = get(REMORA.lt.lEdit_verify.twoCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.twoCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('two')
     end
 elseif strcmp(action, 'mark3')
-    check = get(REMORA.lt.lEdit_verify.threeCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.threeCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('three')
     end
 elseif strcmp(action, 'mark4')
-    check = get(REMORA.lt.lEdit_verify.fourCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.fourCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('four')
     end
 elseif strcmp(action, 'mark5')
-    check = get(REMORA.lt.lEdit_verify.fiveCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.fiveCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('five')
     end
 elseif strcmp(action, 'mark6')
-    check = get(REMORA.lt.lEdit_verify.sixCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.sixCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('six')
     end
 elseif strcmp(action, 'mark7')
-    check = get(REMORA.lt.lEdit_verify.sevCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.sevCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('sev')
     end
 elseif strcmp(action, 'mark8')
-    check = get(REMORA.lt.lEdit_verify.eightCheck,'Value');
+    check = get(REMORA.lt.lEdit_verify_LTSA.eightCheck,'Value');
     if check
         lt_lEdit_mod_chLabels_LTSA('eight')
     end

@@ -26,7 +26,7 @@ set(REMORA.fig.lt.lEdit_settings,'NumberTitle','off', ...
     'Visible', 'on',...
     'ToolBar', 'none');
 
-figure(REMORA.fig.lt.lVis_settings)
+figure(REMORA.fig.lt.lEdit_settings)
 
 
 

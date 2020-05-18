@@ -1,4 +1,4 @@
-function lt_lEdit_mod_chLabels(labType)
+function lt_lEdit_mod_chLabels_LTSA(labType)
 
 global PARAMS HANDLES REMORA
 
