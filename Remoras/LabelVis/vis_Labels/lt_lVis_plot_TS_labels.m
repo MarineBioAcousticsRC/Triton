@@ -11,7 +11,7 @@ colF = [1 0 0];
 %% get range times
 %create start and end times of window
 startWV = PARAMS.plot.dnum;
-winLength = HANDLES.subplt.timeseries.XLim(2); %get length of window in seconds, used to compute end limit
+winLength = HANDLES.subplt.specgram.XLim(2); %get length of window in seconds, used to compute end limit
 endWV = startWV + datenum(0,0,0,0,0,winLength);
 
 plotMin = HANDLES.subplt.timeseries.YLim(1);
@@ -123,7 +123,7 @@ end
 if REMORA.lt.lVis_det.detection4.PlotLabels
     yPos4 = plotCen - 2*ybuff;
     labl4 = REMORA.lt.lVis_det.detection4.labels(1);
-    label4Pos = plotCen - ybuff*1.5;
+    label4Pos = plotCen + ybuff*1.5;
     
     plot_labels_wav(labl4,label4Pos,REMORA.lt.lVis_det.detection4.starts,REMORA.lt.lVis_det.detection4.stops,yPos4,col4,startWV,endWV);
     

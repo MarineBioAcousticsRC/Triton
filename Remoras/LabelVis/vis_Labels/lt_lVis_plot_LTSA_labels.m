@@ -105,8 +105,8 @@ end
 
 if ~isempty(winDetsFull)
     %find which raw file each detection in winDet is in
-    detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts',ltsaS);
-    detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops',ltsaS);
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts');
+    detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops');
     
     
     axes (HANDLES.subplt.ltsa)
@@ -142,8 +142,8 @@ end
 
 if ~isempty(winDetsStarts)
     %find which raw file each detection in winDet is in
-    detXstart = lt_lVis_get_LTSA_Offset(winDetsStarts,'starts',ltsaS);
-    detXend = lt_lVis_get_LTSA_Offset(winDetsStarts,'stops',ltsaS);
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsStarts,'starts');
+    detXend = lt_lVis_get_LTSA_Offset(winDetsStarts,'stops');
     
     
     axes (HANDLES.subplt.ltsa)
@@ -179,8 +179,8 @@ end
 
 if ~isempty(winDetsStops)
     %find which raw file each detection in winDet is in
-    detXstart = lt_lVis_get_LTSA_Offset(winDetsStops,'starts',ltsaS);
-    detXend = lt_lVis_get_LTSA_Offset(winDetsStops,'stops',ltsaS);
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsStops,'starts');
+    detXend = lt_lVis_get_LTSA_Offset(winDetsStops,'stops');
     
     
     axes (HANDLES.subplt.ltsa)
