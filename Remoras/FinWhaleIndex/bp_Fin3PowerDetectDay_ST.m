@@ -33,14 +33,18 @@ granularity = REMORA.bp.settings.granularity; %type of granularity, allowed: cal
 binsize = REMORA.bp.settings.binsize;   %in minutes; this is one hour
 call = '20Hz'; %string to describe calls of interest
 callsubtype = '';
+
 xml_dir = REMORA.bp.settings.outDir; %location of output XML, notice double backslash (java thing).
 %xml_dir = 'E:\\General LF Data Analysis\\Fin 20Hz detector\\detector output\\'; %location of output XML, notice double backslash (java thing).
-new_filename = PARAMS.ltsa.infile;
-xml_filename = new_filename(1:strfind(new_filename,'.ltsa')-1);  %remove ltsa from filename
-xml_out= strcat(xml_dir,xml_filename,'_20finDPI.xml');  %unique identifier for daily power index
+new_filename = dir(strcat(REMORA.bp.settings.inDir,'\*.ltsa'));
+xml_filename = new_filename.name(1:strfind(new_filename.name,'.ltsa')-1);  %remove ltsa from filename
+xml_out= strcat(xml_dir,'\',xml_filename,'_20finDPI.xml');  %unique identifier for daily power index
 csv_out=strcat(xml_dir,'\',xml_filename,'_20finDPI.csv');
 
 %opening LTSA file to be able to continue reading from it
+if isempty(PARAMS.ltsa.inpath) || isempty(PARAMS.ltsa.infile)
+    error('Load an LTSA file');
+end
 fid = fopen([PARAMS.ltsa.inpath,PARAMS.ltsa.infile],'r');
 nbin = floor((PARAMS.ltsa.tseg.hr * 60 *60 ) / PARAMS.ltsa.tave);
 skip = PARAMS.ltsa.byteloc(PARAMS.ltsa.plotStartRawIndex) + ....
@@ -66,17 +70,12 @@ stleng = size(pwr,2);
 
 %load appropriate transfer function to apply to data
 tffilename = REMORA.bp.settings.tffile;
+[tf1] = bp_load_TFfile(tffilename);
 
-if ~isempty(tffilename)
-fid1 = fopen(tffilename,'r');
-[A1,count1] = fscanf(fid1,'%f %f',[2,inf]);
-freqvec = 1:1001;
-tf1 = interp1(A1(1,1:60),A1(2,1:60),freqvec,'linear','extrap');
 %apply the transfer function
 for i=1:size(pwr,2)
     %pwr(:,i) = pwr(:,i)+tf1.';
     pwr(1:1001,i) = pwr(1:1001,i)+tf1.';
-end
 end
 
 %Detector parameters

@@ -8,7 +8,7 @@ if strcmp(action,'')
     %Top of window controls:
     
 elseif strcmp(action,'setUserID')
-    userid = get(REMORA.bp_verify.useridEdtxt,'string');
+    userid = get(REMORA.bp_verify.useridEdTxt,'string');
     REMORA.bp.settings.userid = userid;
     
 elseif strcmp(action,'setInDir')
