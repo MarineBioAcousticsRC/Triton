@@ -93,9 +93,9 @@ detections = Detections();
 speciesID = 180527;%ITIS TSN for fin whales - balaenoptera physalus
 %Grab datasource info from filename
 filenm = PARAMS.ltsa.infile(1:(end-5));
-project = REMORA.settings.project;
-site = REMORA.settings.site;
-deployment = REMORA.settings.deployment;
+project = REMORA.bp.settings.project;
+site = REMORA.bp.settings.site;
+deployment = REMORA.bp.settings.deployment;
 
 detections.setSite(project, site, deployment);%set datasource info to this
 %userID

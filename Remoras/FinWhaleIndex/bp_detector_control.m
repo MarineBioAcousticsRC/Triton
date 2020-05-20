@@ -7,10 +7,7 @@ if strcmp(action,'')
     
     %Top of window controls:
     
-elseif strcmp(action,'setUserID')
-    userid = get(REMORA.bp_verify.useridEdTxt,'string');
-    REMORA.bp.settings.userid = userid;
-    
+
 elseif strcmp(action,'setInDir')
     inDir = get(REMORA.bp_verify.inDirEdTxt,'string');
     REMORA.bp.settings.inDir = inDir;
@@ -28,9 +25,27 @@ elseif strcmp(action,'setOutDir')
     REMORA.bp.settings.outDir = outDir;
    
 elseif strcmp(action,'checkTethys')
-    Tethys = get(REMORA.bp_veriyf.tethysCheck, 'Value');
+    Tethys = get(REMORA.bp_verify.tethysCheck, 'Value');
     REMORA.bp.settings.Tethys = Tethys;
+    bp_tethys_figure;
+    bp_tethys_gui;
     
+elseif strcmp(action,'setUserID')
+    userid = get(REMORA.bp_verify.useridEdTxt,'string');
+    REMORA.bp.settings.userid = userid;
+    
+elseif strcmp(action,'setProject')
+    project = get(REMORA.bp_verify.projectEdTxt,'string');
+    REMORA.bp.settings.project = project;
+    
+elseif strcmp(action,'setSite')
+    site = get(REMORA.bp_verify.siteEdTxt,'string');
+    REMORA.bp.settings.site = site;
+    
+elseif strcmp(action,'setDepl')
+    deployment = get(REMORA.bp_verify.deploymentEdTxt,'string');
+    REMORA.bp.settings.deployment = deployment;
+     
 elseif strcmp(action,'setThresh')
     threshold = str2double(get(REMORA.bp_verify.threshEdTxt,'string'));
     REMORA.bp.settings.threshold = threshold;
