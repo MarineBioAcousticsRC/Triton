@@ -598,9 +598,13 @@ function plot_chLabels_ltsa(ltsaS,ltsaE,chLab,color,yPos)
 global PARAMS HANDLES REMORA
 winDetsFull = [];
 
-lablFull = chLab(:,1:2);
-fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
-winDetsFull = lablFull(fullDet,:);
+ %%% shorten detections to bout-level
+    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+    %is less than this, combine into a bout
+    [startBouts,endBouts] = lt_lVis_defineBouts(chLab(:,1),chLab(:,2),boutGap);
+    lablFull = [startBouts,endBouts];
+    
+winDetsFull = lablFull(startBouts>= ltsaS & endBouts<=ltsaE,:);
 
 if ~isempty(winDetsFull)
     %find which raw file each detection in winDet is in
