@@ -56,6 +56,10 @@ elseif PARAMS.ltsa.fax == 2
     HANDLES.plt.ltsa = image(PARAMS.ltsa.t,PARAMS.ltsa.f/1000,c);
 end
 
+% Make sure color range is fixed.
+set(HANDLES.plt.ltsa,'CDataMapping','scaled');
+caxis([1,65]);
+
 % shift and shrink plot by dv
 dv = 0.075;
 v = get(get(HANDLES.plt.ltsa,'Parent'),'Position');
@@ -75,7 +79,8 @@ set(yl,'String','Spectrum Level [dB re counts^2/Hz]')
 % set color bar xlimit
 minp = min(min(PARAMS.ltsa.pwr));
 maxp = max(max(PARAMS.ltsa.pwr));
-set(PARAMS.ltsa.cb,'YLim',[minp maxp])
+%set(PARAMS.ltsa.cb,'YLim',[minp maxp]) %Commented out because it changes
+%colorbar to show only part of the range.
 
 % One of the child objects of the colorbar is an image, find it so we can
 % set an appropriate scale.
