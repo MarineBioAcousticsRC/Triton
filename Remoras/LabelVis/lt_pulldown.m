@@ -1,6 +1,6 @@
 function lt_pulldown(action)
 
-%%%%initializes pulldowns for label tracker 
+%%%%initializes pulldowns for label tracker
 
 global PARAMS REMORA HANDLES
 
