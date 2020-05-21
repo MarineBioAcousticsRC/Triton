@@ -52,68 +52,76 @@ elseif strcmp(action,'Save')
     
     REMORA.lt.lEdit.outDir = uigetdir('','Select directory where you want to save ID files');
     
-    if isfield(REMORA.lt.lVis_det.detection,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection;
         labels = REMORA.lt.lEdit.detectionLab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 1 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
-    if isfield(REMORA.lt.lVis_det.detection2,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection2)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection2.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection2;
         labels = REMORA.lt.lEdit.detection2Lab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 2 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
-    if isfield(REMORA.lt.lVis_det.detection3,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection3)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection3.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection3;
         labels = REMORA.lt.lEdit.detection3Lab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 3 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
-    if isfield(REMORA.lt.lVis_det.detection4,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection4)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection4.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection4;
         labels = REMORA.lt.lEdit.detection4Lab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 4 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
-    if isfield(REMORA.lt.lVis_det.detection5,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection5)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection5.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection5;
         labels = REMORA.lt.lEdit.detection5Lab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 5 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
-    if isfield(REMORA.lt.lVis_det.detection6,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection6)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection6.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection6;
         labels = REMORA.lt.lEdit.detection6Lab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 6 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
-    if isfield(REMORA.lt.lVis_det.detection7,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection7)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection7.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection7;
         labels = REMORA.lt.lEdit.detection7Lab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 7 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
-    if isfield(REMORA.lt.lVis_det.detection8,'labels')
+    if ~isempty(REMORA.lt.lEdit.detection8)
         modLab = char(extractBefore(REMORA.lt.lVis_det.detection8.files,'.tlab'));
         saveTxt = [REMORA.lt.lEdit.outDir,'\',modLab,'_modID.mat'];
         detTimes = REMORA.lt.lEdit.detection8;
         labels = REMORA.lt.lEdit.detection8Lab;
         save(saveTxt,'detTimes','labels')
-        disp('new IDs from label 8 detections saved!')
+        dispTxt = ['new IDs from label ',modLab,' saved!'];
+        disp(dispTxt)
     end
 end

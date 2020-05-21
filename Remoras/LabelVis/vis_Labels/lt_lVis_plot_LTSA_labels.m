@@ -44,31 +44,31 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     eightCh = changedLab(changedLab(:,3) == 8,:);
     
     if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos1)
     end
     if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos1)
     end
     if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos1)
     end
     if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos1)
     end
     if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos1)
     end
     if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos1)
     end
     if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos1)
     end
     if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos1)
     end
     if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos)
+        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos1l)
     end
     
 end
@@ -626,12 +626,6 @@ if ~isempty(winDetsFull)
             plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
                 'MarkerSize',5,'Color',color)
         end
-    end
-    
-    %plot a line at the end of the detection file
-    if isequal(ltsaE(end),winDetsFull(end,2))
-        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-            'Color',color)
     end
     
     hold off

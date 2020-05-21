@@ -15,10 +15,12 @@ if REMORA.lt.lVis_det.detection.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection.starts,REMORA.lt.lVis_det.detection.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        
-        ch_Labels(detXstart,detXend,'one',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            
+            ch_Labels(detXstart,detXend,'one',labType,winDets)
+        end
     end
 end
 
@@ -28,10 +30,12 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection2.starts,REMORA.lt.lVis_det.detection2.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        
-        ch_Labels(detXstart,detXend,'two',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            
+            ch_Labels(detXstart,detXend,'two',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection3.PlotLabels
@@ -40,10 +44,12 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection3.starts,REMORA.lt.lVis_det.detection3.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        
-        ch_Labels(detXstart,detXend,'three',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            
+            ch_Labels(detXstart,detXend,'three',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection4.PlotLabels
@@ -52,10 +58,12 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection4.starts,REMORA.lt.lVis_det.detection4.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        
-        ch_Labels(detXstart,detXend,'four',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            
+            ch_Labels(detXstart,detXend,'four',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection5.PlotLabels
@@ -64,10 +72,12 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection5.starts,REMORA.lt.lVis_det.detection5.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        
-        ch_Labels(detXstart,detXend,'five',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            
+            ch_Labels(detXstart,detXend,'five',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection6.PlotLabels
@@ -76,10 +86,12 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection6.starts,REMORA.lt.lVis_det.detection6.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        
-        ch_Labels(detXstart,detXend,'six',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            
+            ch_Labels(detXstart,detXend,'six',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection7.PlotLabels
@@ -88,9 +100,11 @@ if REMORA.lt.lVis_det.detection7.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection7.starts,REMORA.lt.lVis_det.detection7.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        ch_Labels(detXstart,detXend,'sev',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            ch_Labels(detXstart,detXend,'sev',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection8.PlotLabels
@@ -99,10 +113,12 @@ if REMORA.lt.lVis_det.detection8.PlotLabels
         lablFull = [REMORA.lt.lVis_det.detection8.starts,REMORA.lt.lVis_det.detection8.stops];
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-        detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
-        
-        ch_Labels(detXstart,detXend,'eight',labType,winDets)
+        if ~isempty(winDets)
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
+            
+            ch_Labels(detXstart,detXend,'eight',labType,winDets)
+        end
     end
 end
 

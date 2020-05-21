@@ -33,13 +33,15 @@ if REMORA.lt.lVis_det.detection.PlotLabels
         inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'one',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'one',labType,winDets)
+        end
     end
 end
 
@@ -51,13 +53,15 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
         inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'two',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'two',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection3.PlotLabels
@@ -68,13 +72,15 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
         inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'three',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'three',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection4.PlotLabels
@@ -85,13 +91,15 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
         inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'four',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'four',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection5.PlotLabels
@@ -99,16 +107,18 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
     yPos1 = plotCen - ybuff;
     if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
         lablFull = [REMORA.lt.lVis_det.detection5.starts,REMORA.lt.lVis_det.detection5.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        inWin = lablFull(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'five',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'five',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection6.PlotLabels
@@ -119,13 +129,15 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
         inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'six',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'six',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection7.PlotLabels
@@ -136,13 +148,15 @@ if REMORA.lt.lVis_det.detection7.PlotLabels
         inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'sev',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'sev',labType,winDets)
+        end
     end
 end
 if REMORA.lt.lVis_det.detection8.PlotLabels
@@ -153,13 +167,15 @@ if REMORA.lt.lVis_det.detection8.PlotLabels
         inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
         
         winDets = lablFull(inWin,:);
-        detstartOff = winDets(:,1) - startWV;
-        detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-        
-        detendOff = winDets(:,2) - startWV;
-        detXend = lt_convertDatenum(detendOff,'seconds');
-        
-        ch_Labels(detXstart,detXend,'eight',labType,winDets)
+        if ~isempty(winDets)
+            detstartOff = winDets(:,1) - startWV;
+            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
+            
+            detendOff = winDets(:,2) - startWV;
+            detXend = lt_convertDatenum(detendOff,'seconds');
+            
+            ch_Labels(detXstart,detXend,'eight',labType,winDets)
+        end
     end
 end
 
