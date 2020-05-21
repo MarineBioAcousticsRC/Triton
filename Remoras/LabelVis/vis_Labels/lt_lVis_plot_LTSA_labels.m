@@ -454,187 +454,187 @@ if REMORA.lt.lVis_det.detection8.PlotLabels
 end
 end
 
-    function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
-        
-        global PARAMS HANDLES REMORA
-        lablFull = [startL,stopL];
-        
-        startWin = find(startL >= ltsaS & startL <= ltsaE);
-        endWin = find(stopL >= ltsaS & stopL <= ltsaE);
-        fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
-        
-        startOnly = setdiff(startWin,endWin);
-        endOnly = setdiff(endWin,startWin);
-        winDetsStarts = [];
-        winDetsStops = [];
-        winDetsFull = [];
-        
-        if startOnly
-            winDetsStarts = [lablFull(startOnly,1),ones(size(lablFull(startOnly,1),1)).*ltsaE];
-        end
-        
-        if endOnly
-            winDetsStops = [ones(size(lablFull(endOnly,2),1)).*ltsaS,lablFull(endOnly,2)];
-        end
-        
-        if fullDet
-            winDetsFull = lablFull(fullDet,:);
-        end
-        
-        if ~isempty(winDetsFull)
-            %find which raw file each detection in winDet is in
-            detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts',ltsaS);
-            detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops',ltsaS);
-            
-            
-            axes (HANDLES.subplt.ltsa)
-            hold on
-            
-            %%%what kind of plotting are we going to do? Just plot a point if detection
-            %%%range is shorter than 1 min... using this to simplify plotting if tlab
-            %%%detections are at click level
-            
-            LineThresh = 1/600;
-            
-            for iPlot = 1:size(detXstart,1)
-                detDur = detXend - detXstart;
-                if detDur < LineThresh
-                    %just plot the start of a given detection
-                    plot(detXstart(iPlot), yPos,'*','Color',color)
-                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-                else
-                    plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
-                        'MarkerSize',5,'Color',color)
-                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-                end
-            end
-            
-            %plot a line at the end of the detection file
-            if isequal(stopL(end),winDetsFull(end,2))
-                plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-                    'Color',color)
-            end
-            
-            hold off
-        end
-        
-        if ~isempty(winDetsStarts)
-            %find which raw file each detection in winDet is in
-            detXstart = lt_lVis_get_LTSA_Offset(winDetsStarts,'starts',ltsaS);
-            detXend = lt_lVis_get_LTSA_Offset(winDetsStarts,'stops',ltsaS);
-            
-            
-            axes (HANDLES.subplt.ltsa)
-            hold on
-            
-            %%%what kind of plotting are we going to do? Just plot a point if detection
-            %%%range is shorter than 1 min... using this to simplify plotting if tlab
-            %%%detections are at click level
-            
-            LineThresh = 1/600;
-            
-            for iPlot = 1:size(detXstart,1)
-                detDur = detXend - detXstart;
-                if detDur < LineThresh
-                    %just plot the start of a given detection
-                    plot(detXstart(iPlot), yPos,'*','Color',color)
-                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-                else
-                    plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
-                        'MarkerSize',5,'Color',color)
-                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-                end
-            end
-            
-            %plot a line at the end of the detection file
-            if isequal(stopL(end),winDetsStarts(end,2))
-                plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-                    'Color',color)
-            end
-            
-            hold off
-        end
-        
-        if ~isempty(winDetsStops)
-            %find which raw file each detection in winDet is in
-            detXstart = lt_lVis_get_LTSA_Offset(winDetsStops,'starts',ltsaS);
-            detXend = lt_lVis_get_LTSA_Offset(winDetsStops,'stops',ltsaS);
-            
-            
-            axes (HANDLES.subplt.ltsa)
-            hold on
-            
-            %%%what kind of plotting are we going to do? Just plot a point if detection
-            %%%range is shorter than 1 min... using this to simplify plotting if tlab
-            %%%detections are at click level
-            
-            LineThresh = 1/600;
-            
-            for iPlot = 1:size(detXstart,1)
-                detDur = detXend - detXstart;
-                if detDur < LineThresh
-                    %just plot the start of a given detection
-                    plot(detXstart(iPlot), yPos,'*','Color',color)
-                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-                else
-                    plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
-                        'MarkerSize',5,'Color',color)
-                    text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
-                end
-            end
-            
-            %plot a line at the end of the detection file
-            if isequal(stopL(end),winDetsStops(end,2))
-                plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-                    'Color',color)
-            end
-            
-            hold off
-        end
-    end
+function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
 
-    function plot_chLabels_ltsa(ltsaS,ltsaE,chLab,color,yPos)
-        
-        global PARAMS HANDLES REMORA
-        winDetsFull = [];
-        
-        lablFull = chLab(:,1:2);
-        fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
-        winDetsFull = lablFull(fullDet,:);
-        
-        if ~isempty(winDetsFull)
-            %find which raw file each detection in winDet is in
-            detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts',ltsaS);
-            detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops',ltsaS);
-            
-            
-            axes (HANDLES.subplt.ltsa)
-            hold on
-            
-            %%%what kind of plotting are we going to do? Just plot a point if detection
-            %%%range is shorter than 1 min... using this to simplify plotting if tlab
-            %%%detections are at click level
-            
-            LineThresh = 1/600;
-            
-            for iPlot = 1:size(detXstart,1)
-                detDur = detXend - detXstart;
-                if detDur < LineThresh
-                    %just plot the start of a given detection
-                    plot(detXstart(iPlot), yPos,'*','Color',color)
-                else
-                    plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
-                        'MarkerSize',5,'Color',color)
-                end
-            end
-            
-            %plot a line at the end of the detection file
-            if isequal(ltsaE(end),winDetsFull(end,2))
-                plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
-                    'Color',color)
-            end
-            
-            hold off
-            
+global PARAMS HANDLES REMORA
+lablFull = [startL,stopL];
+
+startWin = find(startL >= ltsaS & startL <= ltsaE);
+endWin = find(stopL >= ltsaS & stopL <= ltsaE);
+fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
+
+startOnly = setdiff(startWin,endWin);
+endOnly = setdiff(endWin,startWin);
+winDetsStarts = [];
+winDetsStops = [];
+winDetsFull = [];
+
+if startOnly
+    winDetsStarts = [lablFull(startOnly,1),ones(size(lablFull(startOnly,1),1)).*ltsaE];
+end
+
+if endOnly
+    winDetsStops = [ones(size(lablFull(endOnly,2),1)).*ltsaS,lablFull(endOnly,2)];
+end
+
+if fullDet
+    winDetsFull = lablFull(fullDet,:);
+end
+
+if ~isempty(winDetsFull)
+    %find which raw file each detection in winDet is in
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts',ltsaS);
+    detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops',ltsaS);
+    
+    
+    axes (HANDLES.subplt.ltsa)
+    hold on
+    
+    %%%what kind of plotting are we going to do? Just plot a point if detection
+    %%%range is shorter than 1 min... using this to simplify plotting if tlab
+    %%%detections are at click level
+    
+    LineThresh = 1/600;
+    
+    for iPlot = 1:size(detXstart,1)
+        detDur = detXend - detXstart;
+        if detDur < LineThresh
+            %just plot the start of a given detection
+            plot(detXstart(iPlot), yPos,'*','Color',color)
+            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+        else
+            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                'MarkerSize',5,'Color',color)
+            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
         end
     end
+    
+    %plot a line at the end of the detection file
+    if isequal(stopL(end),winDetsFull(end,2))
+        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+            'Color',color)
+    end
+    
+    hold off
+end
+
+if ~isempty(winDetsStarts)
+    %find which raw file each detection in winDet is in
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsStarts,'starts',ltsaS);
+    detXend = lt_lVis_get_LTSA_Offset(winDetsStarts,'stops',ltsaS);
+    
+    
+    axes (HANDLES.subplt.ltsa)
+    hold on
+    
+    %%%what kind of plotting are we going to do? Just plot a point if detection
+    %%%range is shorter than 1 min... using this to simplify plotting if tlab
+    %%%detections are at click level
+    
+    LineThresh = 1/600;
+    
+    for iPlot = 1:size(detXstart,1)
+        detDur = detXend - detXstart;
+        if detDur < LineThresh
+            %just plot the start of a given detection
+            plot(detXstart(iPlot), yPos,'*','Color',color)
+            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+        else
+            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                'MarkerSize',5,'Color',color)
+            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+        end
+    end
+    
+    %plot a line at the end of the detection file
+    if isequal(stopL(end),winDetsStarts(end,2))
+        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+            'Color',color)
+    end
+    
+    hold off
+end
+
+if ~isempty(winDetsStops)
+    %find which raw file each detection in winDet is in
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsStops,'starts',ltsaS);
+    detXend = lt_lVis_get_LTSA_Offset(winDetsStops,'stops',ltsaS);
+    
+    
+    axes (HANDLES.subplt.ltsa)
+    hold on
+    
+    %%%what kind of plotting are we going to do? Just plot a point if detection
+    %%%range is shorter than 1 min... using this to simplify plotting if tlab
+    %%%detections are at click level
+    
+    LineThresh = 1/600;
+    
+    for iPlot = 1:size(detXstart,1)
+        detDur = detXend - detXstart;
+        if detDur < LineThresh
+            %just plot the start of a given detection
+            plot(detXstart(iPlot), yPos,'*','Color',color)
+            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+        else
+            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                'MarkerSize',5,'Color',color)
+            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+        end
+    end
+    
+    %plot a line at the end of the detection file
+    if isequal(stopL(end),winDetsStops(end,2))
+        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+            'Color',color)
+    end
+    
+    hold off
+end
+end
+
+function plot_chLabels_ltsa(ltsaS,ltsaE,chLab,color,yPos)
+
+global PARAMS HANDLES REMORA
+winDetsFull = [];
+
+lablFull = chLab(:,1:2);
+fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
+winDetsFull = lablFull(fullDet,:);
+
+if ~isempty(winDetsFull)
+    %find which raw file each detection in winDet is in
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts',ltsaS);
+    detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops',ltsaS);
+    
+    
+    axes (HANDLES.subplt.ltsa)
+    hold on
+    
+    %%%what kind of plotting are we going to do? Just plot a point if detection
+    %%%range is shorter than 1 min... using this to simplify plotting if tlab
+    %%%detections are at click level
+    
+    LineThresh = 1/600;
+    
+    for iPlot = 1:size(detXstart,1)
+        detDur = detXend - detXstart;
+        if detDur < LineThresh
+            %just plot the start of a given detection
+            plot(detXstart(iPlot), yPos,'*','Color',color)
+        else
+            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                'MarkerSize',5,'Color',color)
+        end
+    end
+    
+    %plot a line at the end of the detection file
+    if isequal(ltsaE(end),winDetsFull(end,2))
+        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+            'Color',color)
+    end
+    
+    hold off
+    
+end
+end
