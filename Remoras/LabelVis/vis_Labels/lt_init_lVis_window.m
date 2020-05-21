@@ -49,7 +49,7 @@ bgColorCoral = [1.0 0.6 0.4];
 bgColorBlue = [0 0.8 1.0];
 REMORA.lt.lVis_verify = [];
 
-%% title content 
+%% title content
 btnPos = [x(1) y(2) w h];
 labelStr = 'Load labels to visualize';
 REMORA.lt.lVis_verify.headtext = uicontrol(REMORA.fig.lt.lVis_settings, ...
@@ -65,8 +65,8 @@ REMORA.lt.lVis_verify.headtext = uicontrol(REMORA.fig.lt.lVis_settings, ...
 
 %%%work with LTSA
 % if isfield(PARAMS, 'ltsa')
-    f_enable = 'on'; %get(HANDLES.ltsa.motion.fwd, 'Enable');
-    b_enable = 'on'; %get(HANDLES.ltsa.motion.back, 'Enable');
+f_enable = 'on'; %get(HANDLES.ltsa.motion.fwd, 'Enable');
+b_enable = 'on'; %get(HANDLES.ltsa.motion.back, 'Enable');
 % else
 %     f_enable = 'off';
 %     b_enable = 'off';
@@ -74,11 +74,11 @@ REMORA.lt.lVis_verify.headtext = uicontrol(REMORA.fig.lt.lVis_settings, ...
 
 %%work with rawFile -all set to on right now for ease
 % if REMORA.lt.lVis_params.rawFile
-    f_enableRF = 'on'; %get(HANDLES.motion.fwd,'Enable');
-    next_enableRF = 'on'; %get(HANDLES.motion.nextfile,'Enable');
-    b_enableRF = 'on'; %get(HANDLES.motion.back,'Enable');
-    prev_enableRF = 'on'; %get(HANDLES.motion.prevfile,'Enable');
-    ref_enable = 'on'; %refresh button always enabled
+f_enableRF = 'on'; %get(HANDLES.motion.fwd,'Enable');
+next_enableRF = 'on'; %get(HANDLES.motion.nextfile,'Enable');
+b_enableRF = 'on'; %get(HANDLES.motion.back,'Enable');
+prev_enableRF = 'on'; %get(HANDLES.motion.prevfile,'Enable');
+ref_enable = 'on'; %refresh button always enabled
 % else
 %     f_enableRF = 'off';
 %     b_enableRF = 'off';
@@ -272,7 +272,7 @@ REMORA.lt.lVis_labels.label8Check = uicontrol(REMORA.fig.lt.lVis_settings,...
     'FontUnits','normalized', ...
     'Callback','lt_lVis_control(''Display'',''labels8'')');
 
-%% LTSA buttons 
+%% LTSA buttons
 
 labelStr = 'LTSA Motion';
 btnPos = [x(2)-w/9 y(11)-2*ybuff w*1.2 h];
@@ -284,7 +284,7 @@ REMORA.lt.lVis_verify.LTSAmotion = uicontrol(REMORA.fig.lt.lVis_settings,...
     'FontUnits','normalized', ...
     'FontWeight','bold',...
     'Visible','on');
-%% back button 
+%% back button
 
 labelStr = '<';
 btnPos = [x(1)+w/2 y(12)-ybuff w h];
@@ -313,7 +313,7 @@ REMORA.lt.lVis_labels.LTSAfwd = uicontrol(REMORA.fig.lt.lVis_settings,...
     'FontWeight','bold',...
     'Callback','lt_lVis_control(''MoveAlong'')');
 
-%% raw file buttons 
+%% raw file buttons
 
 labelStr = 'Raw File Motion';
 btnPos = [x(2) y(13)-2*ybuff w h];
@@ -325,7 +325,7 @@ REMORA.lt.lVis_verify.RFmotion = uicontrol(REMORA.fig.lt.lVis_settings,...
     'FontUnits','normalized', ...
     'FontWeight','bold',...
     'Visible','on');
-%% back button 
+%% back button
 labelStr = '<';
 btnPos = [x(1)+w/2 y(14)-ybuff w h];
 REMORA.lt.lVis_labels.RFback = uicontrol(REMORA.fig.lt.lVis_settings,...
@@ -353,7 +353,7 @@ REMORA.lt.lVis_labels.RFfwd = uicontrol(REMORA.fig.lt.lVis_settings,...
     'FontWeight','bold',...
     'Callback','lt_lVis_control(''OneStepForward'')');
 
-%% prev file button 
+%% prev file button
 labelStr = 'prev';
 btnPos = [x(1) y(14)-ybuff w/2 h];
 REMORA.lt.lVis_labels.prevF = uicontrol(REMORA.fig.lt.lVis_settings,...

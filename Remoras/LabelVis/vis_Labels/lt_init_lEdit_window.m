@@ -49,7 +49,7 @@ bgColorCoral = [1.0 0.6 0.4];
 bgColorBlue = [0 0.8 1.0];
 REMORA.lt.lEdit_verify = [];
 
-%% title content 
+%% title content
 btnPos = [x(1) y(2) w h];
 labelStr = 'Edit Open Labels';
 REMORA.lt.lEdit_verify.headtext = uicontrol(REMORA.fig.lt.lEdit_settings, ...
@@ -63,7 +63,7 @@ REMORA.lt.lEdit_verify.headtext = uicontrol(REMORA.fig.lt.lEdit_settings, ...
     'Visible','on');  %'BackgroundColor',bgColor3,...
 
 
-%% label edit buttons 
+%% label edit buttons
 
 labelStr = 'Mark as False';
 btnPos = [x(1) y(3) w*1.3 h];

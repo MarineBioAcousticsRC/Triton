@@ -1,8 +1,6 @@
 function lt_lVis_plot_WAV_labels
 
 global REMORA PARAMS HANDLES
-%%PARAMS.start.dnum = start of individual wav file! Useful for figuring out
-%%what's in window and plotting it.
 
 
 %% get range times
