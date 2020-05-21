@@ -1,6 +1,6 @@
 function lt_pulldown(action)
 
-%%%%initializes pulldowns for label tracker 
+%%%%initializes pulldowns for label tracker
 
 global PARAMS REMORA HANDLES
 
@@ -24,5 +24,8 @@ elseif strcmp(action,'visualize_labels')
     REMORA.lt.lVis_det.detection2.PlotLabels = false;
     REMORA.lt.lVis_det.detection3.PlotLabels = false;
     REMORA.lt.lVis_det.detection4.PlotLabels = false;
-    
+    REMORA.lt.lVis_det.detection5.PlotLabels = false;
+    REMORA.lt.lVis_det.detection6.PlotLabels = false;
+    REMORA.lt.lVis_det.detection7.PlotLabels = false;
+    REMORA.lt.lVis_det.detection8.PlotLabels = false;
 end

@@ -1,44 +1,23 @@
-function lt_lEdit_mod_chLabels(labType)
+function lt_lEdit_mod_chLabels_LTSA(labType)
 
 global PARAMS HANDLES REMORA
 
-%work for either WAV or TIMESERIES window
-plotFreq = PARAMS.freq1 *.9;
+%work for LTSA window
+% get LTSA range times
+%pull start and end times of window
+[ltsaS,ltsaE] = lt_lVis_get_ltsa_range;
+plotFreq = PARAMS.ltsa.f(end) *.9;
 
-%for TS
-if HANDLES.display.timeseries.Value
-    plotMin = HANDLES.subplt.timeseries.YLim(1);
-    plotMax = HANDLES.subplt.timeseries.YLim(2);
-else
-    plotMin = 0;
-    plotMax = 0;
-end
-plotCen = (plotMax+plotMin)./2;
-ybuff = (plotMax-plotCen)./7;
-
-% find in-window detections
-startWV = PARAMS.plot.dnum;
-if HANDLES.display.specgram.Value==1
-    winLength = HANDLES.subplt.specgram.XLim(2); %get length of wcindow in seconds, used to compute end limit
-else
-    winLength = HANDLES.subplt.timeseries.XLim(2);
-end
-endWV = startWV + datenum(0,0,0,0,0,winLength);
 
 if REMORA.lt.lVis_det.detection.PlotLabels
     yPos = plotFreq*1;
-    yPos1 = plotCen + 3*ybuff;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection.starts,REMORA.lt.lVis_det.detection.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'one',labType,winDets)
         end
@@ -47,18 +26,13 @@ end
 
 if REMORA.lt.lVis_det.detection2.PlotLabels
     yPos = plotFreq*.9;
-    yPos1 = plotCen+2*ybuff;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection2.starts,REMORA.lt.lVis_det.detection2.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'two',labType,winDets)
         end
@@ -66,18 +40,13 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
 end
 if REMORA.lt.lVis_det.detection3.PlotLabels
     yPos = plotFreq*.7;
-    yPos1 = plotCen+ybuff;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection3.starts,REMORA.lt.lVis_det.detection3.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'three',labType,winDets)
         end
@@ -85,18 +54,13 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
 end
 if REMORA.lt.lVis_det.detection4.PlotLabels
     yPos = plotFreq*.6;
-    yPos1 = plotCen;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection4.starts,REMORA.lt.lVis_det.detection4.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'four',labType,winDets)
         end
@@ -104,18 +68,13 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
 end
 if REMORA.lt.lVis_det.detection5.PlotLabels
     yPos = plotFreq*.5;
-    yPos1 = plotCen - ybuff;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection5.starts,REMORA.lt.lVis_det.detection5.stops];
-        inWin = lablFull(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'five',labType,winDets)
         end
@@ -123,18 +82,13 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
 end
 if REMORA.lt.lVis_det.detection6.PlotLabels
     yPos = plotFreq*.4;
-    yPos1 = plotCen - 2*ybuff;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection6.starts,REMORA.lt.lVis_det.detection6.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'six',labType,winDets)
         end
@@ -142,37 +96,26 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
 end
 if REMORA.lt.lVis_det.detection7.PlotLabels
     yPos = plotFreq*.3;
-    yPos1 = plotCen - 3*ybuff;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection7.starts,REMORA.lt.lVis_det.detection7.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
-            
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             ch_Labels(detXstart,detXend,'sev',labType,winDets)
         end
     end
 end
 if REMORA.lt.lVis_det.detection8.PlotLabels
     yPos = plotFreq*.2;
-    yPos1 = plotCen - 4*ybuff;
-    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd) || (REMORA.lt.lEdit.ychSt<=yPos1&& REMORA.lt.lEdit.ychEd>=yPos1)
+    if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection8.starts,REMORA.lt.lVis_det.detection8.stops];
-        inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
-        winDets = lablFull(inWin,:);
         if ~isempty(winDets)
-            detstartOff = winDets(:,1) - startWV;
-            detXstart = lt_convertDatenum(detstartOff,'seconds'); %convert from datenum to time in SECONDS
-            
-            detendOff = winDets(:,2) - startWV;
-            detXend = lt_convertDatenum(detendOff,'seconds');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'eight',labType,winDets)
         end
