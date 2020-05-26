@@ -83,6 +83,74 @@ if strcmp(action,'LoadLabels')
         %initialize empty spots for change labels
         REMORA.lt.lEdit.detection4 = double.empty(0,3);
         REMORA.lt.lEdit.detection4Lab = [];
+        
+    elseif strcmp(NFile,'labels5')
+        REMORA.lt.lVis_det.detection5.starts = Starts;
+        REMORA.lt.lVis_det.detection5.stops = Stops;
+        REMORA.lt.lVis_det.detection5.labels = Labels;
+        % set to display labels
+        REMORA.lt.lVis_det.detection5.PlotLabels = true;
+        set(REMORA.lt.lVis_labels.label5Check,'Value',1)
+        % add file name to gui
+        REMORA.lt.lVis_det.detection5.files = {filename};
+        set(REMORA.lt.lVis_labels.label5Check,'Enable','on')
+        set(REMORA.lt.lVis_labels.label5Check,'String',filename)
+        set(REMORA.lt.lVis_labels.label5Check,'BackgroundColor',[1 1 1])
+        
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection5 = double.empty(0,3);
+        REMORA.lt.lEdit.detection5Lab = [];
+        
+    elseif strcmp(NFile,'labels6')
+        REMORA.lt.lVis_det.detection6.starts = Starts;
+        REMORA.lt.lVis_det.detection6.stops = Stops;
+        REMORA.lt.lVis_det.detection6.labels = Labels;
+        % set to display labels
+        REMORA.lt.lVis_det.detection6.PlotLabels = true;
+        set(REMORA.lt.lVis_labels.label6Check,'Value',1)
+        % add file name to gui
+        REMORA.lt.lVis_det.detection6.files = {filename};
+        set(REMORA.lt.lVis_labels.label6Check,'Enable','on')
+        set(REMORA.lt.lVis_labels.label6Check,'String',filename)
+        set(REMORA.lt.lVis_labels.label6Check,'BackgroundColor',[1 1 1])
+        
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection6 = double.empty(0,3);
+        REMORA.lt.lEdit.detection6Lab = [];
+        
+    elseif strcmp(NFile,'labels7')
+        REMORA.lt.lVis_det.detection7.starts = Starts;
+        REMORA.lt.lVis_det.detection7.stops = Stops;
+        REMORA.lt.lVis_det.detection7.labels = Labels;
+        % set to display labels
+        REMORA.lt.lVis_det.detection7.PlotLabels = true;
+        set(REMORA.lt.lVis_labels.label7Check,'Value',1)
+        % add file name to gui
+        REMORA.lt.lVis_det.detection7.files = {filename};
+        set(REMORA.lt.lVis_labels.label7Check,'Enable','on')
+        set(REMORA.lt.lVis_labels.label7Check,'String',filename)
+        set(REMORA.lt.lVis_labels.label7Check,'BackgroundColor',[1 1 1])
+        
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection7 = double.empty(0,3);
+        REMORA.lt.lEdit.detection7Lab = [];
+        
+    elseif strcmp(NFile,'labels8')
+        REMORA.lt.lVis_det.detection8.starts = Starts;
+        REMORA.lt.lVis_det.detection8.stops = Stops;
+        REMORA.lt.lVis_det.detection8.labels = Labels;
+        % set to display labels
+        REMORA.lt.lVis_det.detection8.PlotLabels = true;
+        set(REMORA.lt.lVis_labels.label8Check,'Value',1)
+        % add file name to gui
+        REMORA.lt.lVis_det.detection8.files = {filename};
+        set(REMORA.lt.lVis_labels.label8Check,'Enable','on')
+        set(REMORA.lt.lVis_labels.label8Check,'String',filename)
+        set(REMORA.lt.lVis_labels.label8Check,'BackgroundColor',[1 1 1])
+        
+        %initialize empty spots for change labels
+        REMORA.lt.lEdit.detection8 = double.empty(0,3);
+        REMORA.lt.lEdit.detection8Lab = [];
     end
     
     %refresh window
@@ -149,6 +217,55 @@ elseif strcmp(action,'Display')
                 REMORA.lt.lVis_det.detection4.PlotLabels = true;
             else
                 REMORA.lt.lVis_det.detection4.PlotLabels = false;
+            end
+        else
+            return
+        end
+        
+    elseif strcmp(NFile,'labels5')
+        enabled = get(REMORA.lt.lVis_labels.label5Check,'Enable');
+        if strcmp (enabled,'on')
+            checked = get(REMORA.lt.lVis_labels.label5Check,'Value');
+            if checked
+                REMORA.lt.lVis_det.detection5.PlotLabels = true;
+            else
+                REMORA.lt.lVis_det.detection5.PlotLabels = false;
+            end
+        else
+            return
+        end
+    elseif strcmp(NFile,'labels6')
+        enabled = get(REMORA.lt.lVis_labels.label6Check,'Enable');
+        if strcmp (enabled,'on')
+            checked = get(REMORA.lt.lVis_labels.label6Check,'Value');
+            if checked
+                REMORA.lt.lVis_det.detection6.PlotLabels = true;
+            else
+                REMORA.lt.lVis_det.detection6.PlotLabels = false;
+            end
+        else
+            return
+        end
+    elseif strcmp(NFile,'labels7')
+        enabled = get(REMORA.lt.lVis_labels.label7Check,'Enable');
+        if strcmp (enabled,'on')
+            checked = get(REMORA.lt.lVis_labels.label7Check,'Value');
+            if checked
+                REMORA.lt.lVis_det.detection7.PlotLabels = true;
+            else
+                REMORA.lt.lVis_det.detection7.PlotLabels = false;
+            end
+        else
+            return
+        end
+    elseif strcmp(NFile,'labels8')
+        enabled = get(REMORA.lt.lVis_labels.label8Check,'Enable');
+        if strcmp (enabled,'on')
+            checked = get(REMORA.lt.lVis_labels.label8Check,'Value');
+            if checked
+                REMORA.lt.lVis_det.detection8.PlotLabels = true;
+            else
+                REMORA.lt.lVis_det.detection8.PlotLabels = false;
             end
         else
             return
