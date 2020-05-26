@@ -18,6 +18,10 @@ LinkTethys = REMORA.bp.settings.Tethys;
 
 if LinkTethys == true
 import tethys.nilus.*;
+try
+    dbNilusInit
+catch
+    disp('Nilus seems to have issues, you might not be able to link to Tethys');
 end
 
 tic
@@ -30,7 +34,7 @@ version = '3.0';  %change to reflect version of this detector
 %1.0 for call level in 5s bins where threshold is real number
 triton_version = PARAMS.ver; %change to reflect version of Triton
 granularity = REMORA.bp.settings.granularity; %type of granularity, allowed: call, encounter, binned
-binsize = REMORA.bp.settings.binsize;   %in minutes; this is one hour
+binsize = str2double(REMORA.bp.settings.binsize);   %in minutes; this is one hour
 call = '20Hz'; %string to describe calls of interest
 callsubtype = '';
 
@@ -95,9 +99,10 @@ speciesID = 180527;%ITIS TSN for fin whales - balaenoptera physalus
 filenm = PARAMS.ltsa.infile(1:(end-5));
 project = REMORA.bp.settings.project;
 site = REMORA.bp.settings.site;
-deployment = REMORA.bp.settings.deployment;
+deployment = str2double(REMORA.bp.settings.deployment);
 
 detections.setSite(project, site, deployment);%set datasource info to this
+ %This command was not working, so I commented it out.
 %userID
 detections.setUserID(userid);
 %Algorithm Information (e for element name, v for value)
@@ -193,7 +198,7 @@ while ~feof(fid)
         
         %check that the beginning of effort falls before the timestamp
         startISO = dbSerialDateToISO8601(dtime);
-        if dtime<effort(1),
+        if dtime<effort(1)
             startISO = effStart;
         end
         if LinkTethys == true
