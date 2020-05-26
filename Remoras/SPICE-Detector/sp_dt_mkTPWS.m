@@ -54,14 +54,14 @@ if isfield(REMORA,'spice_dt') && isfield(REMORA.spice_dt,'mkTPWS')
     end 
     fprintf('Search Subfolders: %0.0f\n', subDir)
 
-    if isfield(REMORA.spice_dt.mkTPWS.maxRows,'maxRows')
+    if isfield(REMORA.spice_dt.mkTPWS,'maxRows')
         maxRows = REMORA.spice_dt.mkTPWS.maxRows;
     else
         maxRows = 1800000;
     end 
     fprintf('Max Dets per File: %0.0f\n', maxRows)
 
-    if isfield(REMORA.spice_dt.mkTPWS.tsWin,'tsWin')
+    if isfield(REMORA.spice_dt.mkTPWS,'tsWin')
         tsWin = REMORA.spice_dt.mkTPWS.tsWin;
     else
         tsWin = 200;

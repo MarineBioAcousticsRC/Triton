@@ -19,11 +19,13 @@ trainSpecAll = [];
 trainTSAll = [];
 trainLabelsAll = [];
 trainTimesAll = [];
+trainAmpAll = [];
 
 testSpecAll = [];
 testTSAll = [];
 testLabelsAll = [];
 testTimesAll = [];
+testAmpAll = [];
 minGapTimeHour = boutGap/60;
 minGapTimeDnum = minGapTimeHour/24;    % gap time in datenum
 
@@ -86,6 +88,7 @@ for iT = 1:nTypes
     
     trainSetSN = [];
     trainSetSP = [];
+    trainSetAmp = [];
     sIdx = 1;
     for iBout = 1:length(trainBoutIdx)
         
@@ -101,6 +104,7 @@ for iT = 1:nTypes
             SPwidth = size(fileObj.trainMSP(1,:),2);
             trainSetSN = zeros(nExamples,SNwidth);
             trainSetSP = zeros(nExamples,SPwidth);
+            trainSetAmp = zeros(nExamples,1);
         end
         
         boutIdxRange = boutStartIdxAllAllTrain(iBout):boutEndIdxAllAllTrain(iBout);
@@ -111,8 +115,11 @@ for iT = 1:nTypes
             % load a big set, then pick what you want
             if REMORA.nn.train_test_set.useWave
                 thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
+                thisBout.amplitude = sqrt(mean(thisBout.MSN.^2,2))./...
+                    max(abs(thisBout.MSN),[],2);
             else
                 thisBout.MSN = [];
+                thisBout.amplitude = [];
             end
             if REMORA.nn.train_test_set.useSpectra
                 thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
@@ -123,6 +130,8 @@ for iT = 1:nTypes
             % Figure out which of the randomly selected training events are in this bout
             if REMORA.nn.train_test_set.useWave
                 trainSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+                trainSetAmp(sIdx:eIdx,1) = thisBout.amplitude(whichEvents,:);
+
             end
             if REMORA.nn.train_test_set.useSpectra
                 trainSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
@@ -140,8 +149,9 @@ for iT = 1:nTypes
                 sIdx = sIdx+1;
                 
             end
+            trainSetAmp = sqrt(mean(trainSetSN.^2,2))./...
+                max(abs(trainSetSN),[],2);
         end
-        
         
         fprintf('. ')
         if mod(iBout,25)==0
@@ -151,7 +161,8 @@ for iT = 1:nTypes
     fprintf('\n')
     trainTSAll = [trainTSAll;trainSetSN];
     trainSpecAll = [trainSpecAll;trainSetSP];
-    
+    trainAmpAll = [trainAmpAll;trainSetAmp];
+                 
     trainLabelsAll = [trainLabelsAll;repmat(iT,size(trainSetSN,1),1)];
     
     fprintf('  %0.0f Training examples gathered\n',length(trainLabelsAll))
@@ -166,6 +177,7 @@ for iT = 1:nTypes
     nClicksTest = sum(boutSizeAllTest);
     testSetSN = [];
     testSetSP = [];
+    testSetAmp = [];
     
     if nClicksTest == 0 
         disp(sprintf('WARNING: No ''%s'' events available for test set',typeNames{iT}))
@@ -190,6 +202,7 @@ for iT = 1:nTypes
             SPwidth = size(fileObj.trainMSP(1,:),2);
             testSetSN = zeros(nExamples,SNwidth);
             testSetSP = zeros(nExamples,SPwidth);
+            testSetAmp = zeros(nExamples,1);
         end
         
         boutIdxRange = boutStartIdxAllAllTest(iBout):boutEndIdxAllAllTest(iBout);
@@ -199,12 +212,16 @@ for iT = 1:nTypes
         if size(boutIdxRange,2)<100000
             % load a big set, then pick what you want
             if REMORA.nn.train_test_set.useWave
-                thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
+                thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);                
+                thisBout.amplitude = sqrt(mean(thisBout.MSN.^2,2))./...
+                    max(abs(thisBout.MSN),[],2);
             else
-                thisBout.MSN = [];
+                thisBout.MSN = []; 
+                thisBout.amplitude = [];
             end
+            
             if REMORA.nn.train_test_set.useSpectra
-                thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
+                thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);            
             else
                 thisBout.MSP = [];
             end
@@ -212,6 +229,7 @@ for iT = 1:nTypes
             % Figure out which of the randomly selected training events are in this bout
             if REMORA.nn.train_test_set.useWave
                 testSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
+                testSetAmp(sIdx:eIdx,1) = thisBout.amplitude(whichEvents,:);
             end
             if REMORA.nn.train_test_set.useSpectra
                 testSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
@@ -225,10 +243,13 @@ for iT = 1:nTypes
                 end
                 if REMORA.nn.train_test_set.useSpectra
                     testSetSP(sIdx,:) = fileObj.trainMSP(boutIdxRange(1)+whichEvents(iDet),:);
+
                 end
                 sIdx = sIdx+1;
                 
             end
+            testSetAmp = sqrt(mean(testSetSN.^2,2))./...
+                    max(abs(testSetSN),[],2);
         end
         
         fprintf('. ')
@@ -239,39 +260,27 @@ for iT = 1:nTypes
     fprintf('\n')
     testTSAll = [testTSAll;testSetSN];
     testSpecAll = [testSpecAll;testSetSP];
-    
+    testAmpAll = [testAmpAll;testSetAmp];
     testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN,1),1)];
     
     fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))    
     fprintf('Done with type %0.0f of %0.0f\n',iT,nTypes)
 
 end
+trainTestSetInfo = REMORA.nn.train_test_set;
 
-normSpecTrain = normalize_spectrum(trainSpecAll);
-normTSTrain = normalize_timeseries(trainTSAll);
-trainDataAll = [normSpecTrain,normTSTrain];
+normSpecTrain = nn_fn_normalize_spectrum(trainSpecAll);
+normTSTrain = nn_fn_normalize_timeseries(trainTSAll);
+trainDataAll = [normSpecTrain,normTSTrain,trainAmpAll];
 savedTrainFullfile = fullfile(saveDir,saveNameTrain);
-save(savedTrainFullfile,'trainDataAll','trainLabelsAll','typeNames','-v7.3')
+save(savedTrainFullfile,'trainDataAll','trainLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
-normSpecTest = normalize_spectrum(testSpecAll);
-normTSTest = normalize_timeseries(testTSAll);
-testDataAll = [normSpecTest,normTSTest];
+normSpecTest = nn_fn_normalize_spectrum(testSpecAll);
+normTSTest = nn_fn_normalize_timeseries(testTSAll);
+testDataAll = [normSpecTest,normTSTest,testAmpAll];
 savedTestFullfile = fullfile(saveDir,saveNameTest);
-save(savedTestFullfile,'testDataAll','testLabelsAll','typeNames','-v7.3')
+save(savedTestFullfile,'testDataAll','testLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
 % to compare:
 % confusionmat(double(testOut),y_test)
 
-function normTS = normalize_timeseries(TS)
-meanTS = TS - mean(TS,2);
-% stdTS = std(TS,0,2);
-maxTS = mean(max(abs(meanTS),[],2),2);
-normTS = meanTS./maxTS;
-normTS(isnan(normTS)) = 0;
-normTS = normTS/2+0.5;
-
-function normSpec = normalize_spectrum(SP)
-% minNormSpec = SP - mean(min(SP,[],2));
-minNormSpec = SP - min(SP,[],2);
-minNormSpec = max(minNormSpec,0);
-normSpec = minNormSpec./(max(minNormSpec,[],2));

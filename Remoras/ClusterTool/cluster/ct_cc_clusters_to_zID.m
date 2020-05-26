@@ -45,7 +45,7 @@ for iTPWS = 1:length(REMORA.ct.CC.output.inFileList)
         '(^.*)_clusters','tokens');
     if isempty(TPWSNameStem)
         warning('Bin File name does not match expected format.')
-        TPWSNameStem{1} = 'noname';
+        continue
     end
     thisIDSet = allFileIndices==iTPWS;
     zID = [allClickTimes(thisIDSet), allClickLabels(thisIDSet)];
