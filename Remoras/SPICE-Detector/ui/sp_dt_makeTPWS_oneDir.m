@@ -140,6 +140,7 @@ for itr2 = 1:lfs
         MSN = zeros(maxRows,tsWin);
         MTT = zeros(maxRows,1);
         MSP = zeros(maxRows,specLength);
-        
+        matIdxEnd = 1;
+
     end
 end

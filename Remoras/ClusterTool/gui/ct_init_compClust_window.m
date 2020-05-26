@@ -141,6 +141,9 @@ REMORA.ct.CC_verify.inFileStringTxt = uicontrol(REMORA.fig.ct.CC_settings,...
    'TooltipString',sprintf(REMORA.ct.CC_params_help.inFileString));%   'BackgroundColor',bgColor3,...
 
 % Deployment Name Wildcard Editable Text
+if ~isfield(REMORA.ct.CC_params,'inFileString')
+    REMORA.ct.CC_params.inFileString = '';
+end
 labelStr=num2str(REMORA.ct.CC_params.inFileString);
 btnPos=[x(2) y(4) w h];
 REMORA.ct.CC_verify.inFileStringEdTxt = uicontrol(REMORA.fig.ct.CC_settings,...

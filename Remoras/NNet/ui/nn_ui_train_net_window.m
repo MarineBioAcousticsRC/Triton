@@ -32,7 +32,7 @@ if initAxes
         'Visible','on');
 end
 
-clf
+clf(REMORA.fig.nn.train_net.figH)
 
 %% Title
 labelStr = 'Network Design Options';
@@ -339,6 +339,8 @@ REMORA.fig.nn.train_net.runBtn = uicontrol(REMORA.fig.nn.train_net.figH,...
     'FontUnits','normalized', ...
     'Visible','on',...
     'Callback',{@nn_ui_train_net_control,'Run'});
+
+figure(REMORA.fig.nn.train_net.figH)
 
 function nn_ui_init_train_net
 global REMORA

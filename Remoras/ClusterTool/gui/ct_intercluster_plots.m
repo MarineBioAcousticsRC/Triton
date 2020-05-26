@@ -31,7 +31,8 @@ for iF = 1:length(nodeSet)
     plot(fPlot,compositeData(iF).spectraMeanSet,'-k','lineWidth',2)
     xlim([fPlot(1),fPlot(end)])
 
-    legend(num2str(size(nodeSet{iF},2)),'location','Southeast')
+    text(.5,.1,sprintf('N = %0.0f',size(nodeSet{iF},2)),'Units','normalized',...
+        'BackgroundColor','w','Margin',1)
     plot(fPlot,compositeData(iF).specPrctile,'--k','lineWidth',2)
     grid on
     hold off
@@ -46,8 +47,10 @@ for iF = 1:length(nodeSet)
     
     hSet(3) = figure(43); % plot ICI distributions
     subplot(n1,m1,iF)
-    errorbar(p.barInt(1:s.maxICIidx) + s.barAdj,compositeData(iF).iciMean,...
-        zeros(size(compositeData(iF).iciStd)),compositeData(iF).iciStd,'.k')
+    plot(p.barInt(1:s.maxICIidx) + s.barAdj,...
+        compositeData(iF).iciMean+compositeData(iF).iciStd,':k')     
+%     errorbar(p.barInt(1:s.maxICIidx) + s.barAdj,compositeData(iF).iciMean,...
+%         zeros(size(compositeData(iF).iciStd)),compositeData(iF).iciStd,'.k')
     hold on
     bar(p.barInt(1:s.maxICIidx) + s.barAdj,compositeData(iF).iciMean,1);
     xlim([0,p.barInt(s.maxICIidx)])
@@ -58,12 +61,13 @@ for iF = 1:length(nodeSet)
     subplot(n1,m1,iF)
     imagesc(1:length(nodeSet{iF}),p.barInt(1:s.maxICIidx),[Tfinal{iF,2}./max(Tfinal{iF,2},[],2)]')
     set(gca,'ydir','normal')
-
-
+        
     hSet(5) = figure(45); % plot click rate distributions
-    subplot(n1,m1,iF)
-    imagesc(1:length(nodeSet{iF}),1:p.maxDur,[Tfinal{iF,10}./max(Tfinal{iF,10},[],2)]')
-    set(gca,'ydir','normal')
+    if size(Tfinal,2)>=10
+        subplot(n1,m1,iF)
+        imagesc(1:length(nodeSet{iF}),1:p.maxDur,[Tfinal{iF,10}./max(Tfinal{iF,10},[],2)]')
+        set(gca,'ydir','normal')
+    end
 end
 figure(41)
 mxlabel(41,'Frequency (kHz)','FontSize',16);
@@ -91,7 +95,7 @@ mtit(45,strrep(s.outputName,'_',' ' ),'FontSize',12);
 if s.saveOutput
     disp('Saving figures...')
     for iFig = 1:length(figName)
-        set(hSet(iFig),'units','inches','PaperPositionMode','auto')%,'OuterPosition',[0.25 0.25  10  7.5])
+        set(hSet(iFig),'units','inches','PaperPositionMode','auto');%,'OuterPosition',[0.25 0.25  10  7.5])
         print(hSet(iFig),'-dtiff','-r600',[figName{iFig},'.tiff'])
         saveas(hSet(iFig),[figName{iFig},'.fig'])
         fprintf('Done with figure %0.0f\n',iFig)

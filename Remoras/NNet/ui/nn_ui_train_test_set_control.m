@@ -74,13 +74,13 @@ elseif strcmp(myEvent, 'Run')
     close(REMORA.fig.nn.nn_train_test_set.figH)
     
 elseif strcmp(myEvent, 'setInDirTPWS')
-      REMORA.nn.nn_train_test_set_TPWS.inDir = ...
+    REMORA.nn.nn_train_test_set_TPWS.inDir = ...
         get(REMORA.fig.nn.nn_train_test_set_TPWS.inDirEdTxt,'String');
 elseif strcmp(myEvent, 'setSaveDirTPWS')
-      REMORA.nn.nn_train_test_set_TPWS.saveDir = ...
+    REMORA.nn.nn_train_test_set_TPWS.saveDir = ...
         get(REMORA.fig.nn.nn_train_test_set_TPWS.saveDirEdTxt,'String');
 elseif strcmp(myEvent, 'setSaveNameTPWS')
-      REMORA.nn.nn_train_test_set_TPWS.saveName = ...
+    REMORA.nn.nn_train_test_set_TPWS.saveName = ...
         get(REMORA.fig.nn.nn_train_test_set_TPWS.saveNameEdTxt,'String');
 elseif strcmp(myEvent, 'setTrainPercTPWS')
     REMORA.nn.nn_train_test_set_TPWS.trainPerc = ...
@@ -100,10 +100,23 @@ elseif strcmp(myEvent, 'setBoutGapTPWS')
     REMORA.nn.nn_train_test_set_TPWS.boutGap = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set_TPWS.boutGapEdTxt,'String'));
     
+elseif strcmp(myEvent, 'setUseSpectra')
+    REMORA.nn.train_test_set.useSpectra = ...
+        get(REMORA.fig.nn.nn_train_test_set.useSpectraCheck,'Value');
+    
+    
+elseif strcmp(myEvent, 'setUseWave')
+    REMORA.nn.train_test_set.useWave = ...
+        get(REMORA.fig.nn.nn_train_test_set.useWaveCheck,'Value');
+
+elseif strcmp(myEvent, 'setUseICI')
+    REMORA.nn.train_test_set.useICI = ...
+        get(REMORA.fig.nn.nn_train_test_set.useICICheck,'Value');
+    
     
 elseif strcmp(myEvent, 'RunTPWS')
     nn_fn_balanced_input_TPWS
 else
-    error('Unrecognized callback')
+    error('Unrecognized callback: %s', myEvent)
 end
 
