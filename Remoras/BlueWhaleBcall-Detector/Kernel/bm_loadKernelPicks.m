@@ -14,7 +14,9 @@ function bm_loadKernelPicks
 % Display number of files in directory
 % cDir = 'E:\code\BcallMethod\MATfiles\CallMats';  %Hard code option
 
-d = dir(REMORA.bm.settings.kernelDir);    % directory info
+global REMORA
+
+d = REMORA.bm.settings.kernelDir;    % directory info
 dfile = dir(strcat(d,'\*.mat'));
 nfiles = size(dfile,1);
 % fn = char(d.name);      % file names in directory
@@ -44,6 +46,9 @@ for a = 1:nfiles
 %         continue
 %     end
 end
+fid=fopen([kernelcode 'kernel.txt'],'w');
+fprintf(fid,[num2str(kernel), '\n']);
+fclose(fid);
+disp(['Kernel values are ', num2str(kernel)])
 
-disp('Kernel values are', kernel)
 end
