@@ -17,9 +17,19 @@ global PARAMS
 LinkTethys = REMORA.bp.settings.Tethys;
 
 if LinkTethys == true
-import tethys.nilus.*;
+%import tethys.nilus.*;
+server = dbInit('Server','breach.ucsd.edu','Port',9779);
 try
-    dbNilusInit
+    import java.lang.Double;
+    import nilus.Detections;
+    import nilus.Helper;
+    import nilus.AlgorithmType;
+    import nilus.DetectionEffortKind;
+    import nilus.MarshalXML;
+    import nilus.CallType;
+    import nilus.GranularityType;
+    import nilus.GranularityEnumType;
+    import nilus.Detection;
 catch
     disp('Nilus seems to have issues, you might not be able to link to Tethys');
 end
@@ -94,6 +104,9 @@ if  LinkTethys == true
     %%XML STUFF%%
 %Create Javabean
 detections = Detections();
+%m = MarshalXML();
+helper = Helper();
+%helper.createRequiredElements(detections);
 speciesID = 180527;%ITIS TSN for fin whales - balaenoptera physalus
 %Grab datasource info from filename
 filenm = PARAMS.ltsa.infile(1:(end-5));
@@ -101,7 +114,12 @@ project = REMORA.bp.settings.project;
 site = REMORA.bp.settings.site;
 deployment = str2double(REMORA.bp.settings.deployment);
 
-detections.setSite(project, site, deployment);%set datasource info to this
+%Set project, site and deployment
+dataSource = detections.getDataSource();
+dataSource.setProject(char(project));
+    dataSource.setDeployment(helper.toXsInteger(double(string(deployment))));  
+    dataSource.setSite(char(site));
+%detections.setSite(project, site, deployment);%set datasource info to this
  %This command was not working, so I commented it out.
 %userID
 detections.setUserID(userid);
@@ -122,16 +140,31 @@ vfile = PARAMS.ltsa.infile;
 vres_time = LTSAres_time;
 vres_freq = LTSAres_freq;
 
-detections.setAlgorithm({'finDetector', version, 'Energy Detector'});
+%detections.setAlgorithm({'finDetector', version, 'Energy Detector'});
 %any (even)number of arguments can be input for parameters, but make sure to
 %wrap them in {   } because matlab is a dummy with java methods
-detections.addAlgorithmParameters({ethresh,vthresh,ecallfreq,vcallfreq,...
-    enfreq1,vnfreq1,enfreq2,vnfreq2,eres_time,vres_time,eres_freq,vres_freq}); 
+%detections.addAlgorithmParameters({ethresh,vthresh,ecallfreq,vcallfreq,...
+%    enfreq1,vnfreq1,enfreq2,vnfreq2,eres_time,vres_time,eres_freq,vres_freq}); 
 %got rid of "efile,vfile," in line above to not include general filename
 %define support software
-detections.addSupportSoftware( {'Triton', triton_version,});
+%detections.addSupportSoftware( {'Triton', triton_version,});
 
 %set effort details (kind)
+kind = DetectionEffortKind();
+%call
+calltype = nilus.CallType();
+calltype.setValue('20Hz');
+kind.setCall(calltype);
+%granularity
+granularitytype = nilus.GranularityEnumType.fromValue('binned');
+granularity = nilus.GranularityType();
+granularity.setValue(granularitytype);
+kind.setGranularity(granularity);
+%speciesID
+speciestype = nilus.SpeciesIDType();
+speciestype.setValue(speciesID);
+kind.setSpeciesID(speciestype);
+kinds.add(kind);
 detections.addKind(speciesID,{granularity,call,callsubtype,binsize}); %once again, notice the {  }
 end
 
