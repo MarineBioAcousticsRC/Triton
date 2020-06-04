@@ -15,4 +15,7 @@ settings.regdate = '(?<yr>\d\d)(?<mon>\d\d)(?<day>\d\d)(?<hr>\d\d)(?<min>\d\d)(?
 settings.kernelDir = '';
 settings.kernelSite = '';
 settings.kernelDepl = '';
+settings.tmin = 25;
+settings.tmax = 35;
+settings.stsize = 2;
 REMORA.bm.settings = settings;
