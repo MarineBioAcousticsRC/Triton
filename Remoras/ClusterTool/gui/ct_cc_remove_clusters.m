@@ -108,8 +108,15 @@ close(REMORA.fig.ct.cc_postcluster)
 % end
 % enable option on composite window and show it.
 if ~isempty(REMORA.ct.CC.rmSet)
-   set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)
+    if isfield(REMORA.ct,'CC_verify')
+        set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)
+        figure(REMORA.fig.ct.CC_settings)
+    else
+        ct_init_compClust_window
+        set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)
+        
+    end
 end
 
-figure(REMORA.fig.ct.CC_settings)
+
 end

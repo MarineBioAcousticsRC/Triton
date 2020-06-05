@@ -81,6 +81,6 @@ for iF = 1:nTypes
 end
 spinH.stop
 close(REMORA.fig.ct.cc_saveClust)
-disp('Done saving training files.')
-disp_msg('Done saving training files.')
+disp(sprintf('Done saving training files to %s.', REMORA.ct.CC.output.clustDir))
+disp_msg(sprintf('Done saving training files to %s.', REMORA.ct.CC.output.clustDir))
 
