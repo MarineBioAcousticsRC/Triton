@@ -61,11 +61,11 @@ elseif strcmp(action,'setPPNoiseBefore')
     ppBS = str2double(get(REMORA.ex.verify.ppNoiseBeforeEdText,'String'));
     REMORA.ex.detect_params.ppBS = ppBS;
     
-elseif strcmp(action,'setDurAfter')
+elseif strcmp(action,'setDurLong')
     durLong_s = str2double(get(REMORA.ex.verify.durAfterEdText,'String'));
     REMORA.ex.detect_params.durLong_s = durLong_s;
     
-elseif strcmp(action,'setDurBefore')
+elseif strcmp(action,'setDurShort')
     durShort_s = str2double(get(REMORA.ex.verify.durBeforeEdText,'String'));
     REMORA.ex.detect_params.durShort_s = durShort_s;
     
