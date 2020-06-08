@@ -2,8 +2,6 @@ function bm_DetPickCompare
 %Comparison of manual picks (xlsx file) and automatic detections
 %Convert all times to numbers before running
 
-clear all;
-cd('H:\Postdoc\SanctSound\CI04_02_output\Threshold');
 %load picking data and effort
 %get excel file to read file with manual picks
 [infile,inpath]=uigetfile('*.xls','Select a xls file with manual picks');
@@ -20,9 +18,9 @@ pmatnum = ones(size(pnum)).*datenum('30-Dec-1899')+pnum;
 msize=size(pmatnum); %size of the manual picks
 
 %load directory of detections
-location = uigetdir(inpath,'Select directory with xls files with detections at various threshold');
+location = uigetdir(inpath,'Select directory with csv files with detections at various threshold');
 % location = 'F:\Logging\Site N\Detections';
-dfile = dir(strcat(location,'\*.xlsx'));
+dfile = dir(strcat(location,'\*.csv'));
 
 %Initialize misses and falses vectors
 P_prec = zeros(size(dfile,1),1);
@@ -31,21 +29,22 @@ P_rec = zeros(size(dfile,1),1);
 %cycle through all the thresholds
 for k=1:size(dfile,1)
     %location = 'G:\Data\Research\SOCAL habitat modeling\testAUG17';
-    lengname = length(dfile(1,1).name); %-4
+    %lengname = length(dfile(1,1).name); %-4
     %[dnum, txt, raw] = xlsread(strcat(location,'\',dfile(k,1).name(1:lengname)));
-    [dnum,txt] = xlsread(strcat(location,'\',dfile(k,1).name(1:lengname)));
+    %[dnum,txt] = xlsread(strcat(location,'\',dfile(k,1).name(1:lengname)));
+    res = csvread(strcat(location,'\',dfile(k,1).name),1,2);
     %convert to Matlab times
-    dnum2 = dnum(:,1);
-    dmatnum = ones(size(dnum2)).*datenum('30-Dec-1899')+dnum2; %dat =
+    dnum = res(:,1);
+    %dmatnum = ones(size(dnum)).*datenum('30-Dec-1899')+dnum; %dat =
     %dmatnum = dat(:,1);
     %code for fixing timing issue in 36R
     %dmatnum = dmatnum+datenum([0 0 0 0 0 5]);     %add 6 s for timing error
-    dsize=size(dmatnum(:,1)); %size of the detector picks
+    dsize=size(dnum(:,1)); %size of the detector picks
 
     if msize(1,1) >= dsize(1,1)
-        [Trues False Miss] = moreHumanPicks(dsize, msize, pmatnum, dmatnum);
+        [Trues False Miss] = moreHumanPicks(dsize, msize, pmatnum, dnum);
     else
-        [Trues False Miss] = moreDetPicks(dsize, msize, pmatnum, dmatnum);
+        [Trues False Miss] = moreDetPicks(dsize, msize, pmatnum, dnum);
     end
 
 %     TrueStr(k) = datestr(Trues(:,k));
@@ -57,6 +56,15 @@ for k=1:size(dfile,1)
     %clear dnum dmatnum dsize Miss False Trues;
 end
 
+try
+for l = 1:size(dfile,1)
+threshlabels = split(dfile(l).name,'.');
+labelnames{l} = threshlabels(3,1);
+end
+catch
+    disp_msg('Check if your filenames end with the threshold value, e.g. bcalls_thresh.25.csv');
+end
+
 PlotPrecision = P_prec(:,1).*100;
 PlotRecall = P_rec(:,1).*100;
 figure(1)
@@ -64,7 +72,7 @@ figure(1)
 plot(PlotRecall,PlotPrecision,'k*');
 ylabel('Precision');
 xlabel('Recall');
-
+text(PlotRecall,PlotPrecision,labelnames);
 % avQual = (P_rec+P_prec)/2;
 % plot(1:size(avQual(:,1)),avQual)
 end

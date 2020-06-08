@@ -2,7 +2,7 @@ function kernel_gen(buttonH, varargin)
 % kernel_gen(buttonH)
 % Generate a kernel blah blah blah
 
-global handles PARAMS
+global handles PARAMS HANDLES
 
 % Retrieve time/freq picks of last bounding box.
 for idx = 1:2
@@ -17,10 +17,17 @@ end
 %PARAMS.t = every time bin
 %PARAMS.f = every freq bin
 %PARAMS.pwr = matrix of amplitudes...right?
+for t = 1:2
+specstart = PARAMS.plot.dnum+dateoffset;
+picktime = tf(t).time-specstart;
+timesec = picktime/1.1574e-05;
+timesecR = round(timesec,1);
+timeidx(t)=find(PARAMS.t == timesecR);
+end
 
-boxTimeIdx = tf(1).timeidx:tf(2).timeidx;
-boxTime = PARAMS.t(boxTimeIdx);
-boxFreqIdx = tf(2).freqidx:tf(1).freqidx;
+boxTimeIdx = timeidx(1):timeidx(2);
+%boxTime = PARAMS.t(boxTimeIdx);
+boxFreqIdx = find(tf(2).freq==PARAMS.f):find(tf(1).freq==PARAMS.f);
 boxFreq = PARAMS.f(boxFreqIdx);
 
 boxFreqIdx2 = boxFreqIdx';
@@ -49,7 +56,7 @@ Call(3) = nanmean(FreqNew(floor(3/timestep):ceil(3/timestep))); %3s
 Call(4) = nanmean(FreqNew(floor(4.5/timestep):ceil(4.5/timestep))); %4.5s
 Call(5) = nanmean(FreqNew(floor(10/timestep):ceil(10/timestep))); %10s
 
-SiteDep = [handles.site.disp.String handles.deploy.disp.String];
+SiteDep = [handles.Meta.Site '_' num2str(handles.Meta.Deployment)];
 newMatFile = [SiteDep '_Bcall.mat'];
 save(newMatFile,'Call');
 disp(['B call characteristics calculated and saved.']);

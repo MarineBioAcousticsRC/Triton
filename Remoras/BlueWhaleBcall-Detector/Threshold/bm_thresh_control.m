@@ -61,5 +61,9 @@ elseif strcmp(action,'setStSize')
 elseif strcmp(action,'RunThreshCalc')
     close(REMORA.fig.bm.thresh)
     bm_init_threshcalc
+    
+elseif strcmp(action,'RunCurvePlot')
+    close(REMORA.fig.bm.thresh)
+    bm_DetPickCompare
 end
 

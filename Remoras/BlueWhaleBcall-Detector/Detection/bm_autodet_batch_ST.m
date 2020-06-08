@@ -290,25 +290,27 @@ prevcall = [];
    %date = datestr(det_times3,31);
    %results = table(date,seconds,check);
    results = [maintable,check];
-   writetable(results,PathFileListCsv{1}); 
+   filename = split(PathFileListCsv,'.csv');
+   csvname = [filename{fidx},'_Bm_thresh',num2str(thresh),'.csv'];
+   writetable(results,csvname); 
    
    %Write label file
    startTriton = maintable.abstime - dateoffset();
    endTriton = startTriton + datenum([0 0 0 0 0 10]);
    times = [startTriton, endTriton];
-   filename = split(PathFileListCsv,'.csv');
-labelname = [filename{fidx},'_Bm.tlab'];
+   
+labelname = [filename{fidx},'_Bm_thresh', num2str(thresh),'.tlab'];
 ioWriteLabel(labelname,times,'Bm','Binary',true);
 
     %Write mat file
-    matname = [filename{fidx},'_Bm.mat'];
-    settings = REMORA.bm.settings;
-    %remove padded text
-    endtime = maintable.abstime + datenum([0 0 0 0 0 10]);
-    times = [maintable.abstime,endtime];
-    BmLabels = repmat({'Bm'},size(times(:,1)));
-    save(matname,'times',...
-        'BmLabels','settings','-mat','-v7.3');
+%     matname = [filename{fidx},'_Bm_thresh',num2str(thresh),'.mat'];
+%     settings = REMORA.bm.settings;
+%     %remove padded text
+%     endtime = maintable.abstime + datenum([0 0 0 0 0 10]);
+%     times = [maintable.abstime,endtime];
+%     BmLabels = repmat({'Bm'},size(times(:,1)));
+%     save(matname,'times',...
+%         'BmLabels','settings','-mat','-v7.3');
 end
 end
 

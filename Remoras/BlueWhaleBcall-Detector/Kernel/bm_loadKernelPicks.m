@@ -25,7 +25,7 @@ nfiles = size(dfile,1);
 % fnamesz = size(fname);   % new set of file names
 % nfiles = fnamesz(1);     % number of files in directory
 disp(['Number of files in directory is ',num2str(nfiles)])
-kernelcode = [REMORA.bm.settings.kernelSite REMORA.bm.settings.kernelDepl];
+kernelcode = REMORA.bm.settings.kernelID;
 
 cd(d)
 for a = 1:nfiles
