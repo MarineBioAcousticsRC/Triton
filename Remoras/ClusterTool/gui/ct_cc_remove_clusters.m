@@ -99,8 +99,8 @@ function ct_cc_close_rm_cluster_gui(hObject,eventdata)
 global REMORA
 removeSet = find(REMORA.ct.CC.output.removeTF);
 % store bin times somewhere
-REMORA.ct.CC.rmSet = [cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,7)]),...
-    cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,9)])];
+REMORA.ct.CC.rmSet = [REMORA.ct.CC.rmSet;[cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,7)]),...
+    cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,9)])]];
 close(REMORA.fig.ct.cc_rmclusters)
 close(REMORA.fig.ct.cc_postcluster)
 % if isfield(REMORA.fig.ct,'status')
