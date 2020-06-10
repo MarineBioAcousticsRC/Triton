@@ -1,4 +1,4 @@
-function ct_cc_remove_clusters(varargin)
+function ct_cc_remove_simBins(varargin)
 
 global REMORA
 
@@ -9,21 +9,21 @@ if ~isfield(REMORA.ct.CC,'output')
     ct_load_composite_clusters
 end
 
-REMORA.fig.ct.cc_rmclusters = figure;
+REMORA.fig.ct.cc_rmsimbins = figure;
     
-set(REMORA.fig.ct.cc_rmclusters,...
+set(REMORA.fig.ct.cc_rmsimbins,...
     'Units','normalized',...
     'ToolBar', 'none',...
     'MenuBar','none',...
     'NumberTitle','off','Name',...
-    'Composite Clustering Tool - v1.0: Exclude Types',...
+    'Composite Clustering Tool - v1.0: Exclude Bins Similar to Types',...
     'Visible','on');    %
 
 
 clf
-currentH = REMORA.fig.ct.cc_rmclusters;
+currentH = REMORA.fig.ct.cc_rmsimbins;
 t1 = uicontrol(currentH,'Style','text',...
-    'String','Check boxes of clusters to exclude',...
+    'String','Check boxes of undesired clusters',...
     'Units','normalized',...
     'Position',[0.1,.8,.8,.15],...
     'HandleVisibility','on',...
@@ -41,37 +41,37 @@ fW = min(.07*nCols,.9);
 fH = min(.07*nRows,.9);
 
 default_pos = [1-fW-.05,0.05,fW,fH];
-set(REMORA.fig.ct.cc_rmclusters,'Position',default_pos)
-REMORA.ct.CC.output.removeTF = zeros(nClust,1);
+set(REMORA.fig.ct.cc_rmsimbins,'Position',default_pos)
+REMORA.ct.CC.output.removeTF_simbins = zeros(nClust,1);
 labelStr = {};
 for iEd = 1:nClust
     % Make editable name field
     labelStr{iEd} = sprintf('Cluster %0.0f',iEd);
 end
     
-REMORA.ct.CC.rm_clusters = {};
+REMORA.ct.CC.rm_simbins = {};
 for iEd = 1:nClust
     % Make editable name field
     btnPos=[colVec(iEd)+.01, rowVec(iEd), (1/nCols)*.8,(1/nRows)*.5];
-    REMORA.ct.CC.rm_clusters.labels{iEd} = uicontrol(REMORA.fig.ct.cc_rmclusters,...
+    REMORA.ct.CC.rm_simbins.labels{iEd} = uicontrol(REMORA.fig.ct.cc_rmsimbins,...
     'Style','checkbox',...
     'Units','normalized',...
     'Position',btnPos,...
     'BackgroundColor','white',...
     'ForegroundColor','k',...
     'String',labelStr{iEd},...
-    'Value',REMORA.ct.CC.output.removeTF(iEd),...
+    'Value',REMORA.ct.CC.output.removeTF_simbins(iEd),...
     'FontUnits','normalized', ...
     'HorizontalAlignment','left',...
     'Visible','on',...
-    'Callback',{@ct_cc_check_excluded,iEd});
+    'Callback',{@ct_cc_check_excluded_sb,iEd});
 end
 
 % put a "done" button
 labelStr = 'Done';
 btnPos=[.4, 0, .2, (1/nRows)*.4];
 
-REMORA.ct.CC.rm_clusters.doneBtn = uicontrol(REMORA.fig.ct.cc_rmclusters,...
+REMORA.ct.CC.rm_simbins.doneBtn = uicontrol(REMORA.fig.ct.cc_rmsimbins,...
     'Style','pushbutton',...
     'Units','normalized',...
     'Position',btnPos,...
@@ -81,39 +81,38 @@ REMORA.ct.CC.rm_clusters.doneBtn = uicontrol(REMORA.fig.ct.cc_rmclusters,...
     'FontSize',.5,...
     'Visible','on',...
     'FontWeight','bold',...
-    'Callback',@ct_cc_close_rm_cluster_gui);
+    'Callback',@ct_cc_close_rm_cluster_gui_sb);
 
 % bring to top
-figure(REMORA.fig.ct.cc_rmclusters)
+figure(REMORA.fig.ct.cc_rmsimbins)
 
 end
 
-function ct_cc_check_excluded(hObject,eventdata,editIdx)
+function ct_cc_check_excluded_sb(hObject,eventdata,editIdx)
 global REMORA
-removeTF = get(REMORA.ct.CC.rm_clusters.labels{editIdx},'Value');
-REMORA.ct.CC.output.removeTF(editIdx) = removeTF;
+removeTF_simbins = get(REMORA.ct.CC.rm_simbins.labels{editIdx},'Value');
+REMORA.ct.CC.output.removeTF_simbins(editIdx) = removeTF_simbins;
 
 end
 
-function ct_cc_close_rm_cluster_gui(hObject,eventdata)
+function ct_cc_close_rm_cluster_gui_sb(hObject,eventdata)
 global REMORA
-removeSet = find(REMORA.ct.CC.output.removeTF);
+removeSet = find(REMORA.ct.CC.output.removeTF_simbins);
 % store bin times somewhere
-REMORA.ct.CC.rmSet = [cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,7)]),...
-    cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,9)])];
-close(REMORA.fig.ct.cc_rmclusters)
+REMORA.ct.CC.sbSet = [cell2mat([REMORA.ct.CC.output.Tfinal(removeSet,1)])];
+close(REMORA.fig.ct.cc_rmsimbins)
 close(REMORA.fig.ct.cc_postcluster)
 % if isfield(REMORA.fig.ct,'status')
 %     close(REMORA.fig.ct.status)
 % end
 % enable option on composite window and show it.
-if ~isempty(REMORA.ct.CC.rmSet)
+if ~isempty(REMORA.ct.CC.sbSet)
     if isfield(REMORA.ct,'CC_verify')
-        set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)
+        set(REMORA.ct.CC_verify.rmSimBinCheck,'Enable','on','Value',1)
         figure(REMORA.fig.ct.CC_settings)
     else
         ct_init_compClust_window
-        set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)
+        set(REMORA.ct.CC_verify.rmSimBinCheck,'Enable','on','Value',1)
         
     end
 end

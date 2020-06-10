@@ -135,6 +135,10 @@ elseif strcmp(action,'rmPriorClustersTF')
     rmBinsTf = get(REMORA.ct.CC_verify.rmClustCheck,'Value');
     REMORA.ct.CC_params.rmPriorClusters = rmBinsTf;
     
+elseif strcmp(action,'rmSimBinTF')
+    rmSimBinsTf = get(REMORA.ct.CC_verify.rmSimBinCheck,'Value');
+    REMORA.ct.CC_params.rmSimBins = rmSimBinsTf;
+    
 elseif strcmp(action,'runCompositeClusters')
     REMORA.fig.ct.status = ct_cb_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
     spinH = ct_add_spinner(gcf,[0.45,0.3,0.1,0.15]);
