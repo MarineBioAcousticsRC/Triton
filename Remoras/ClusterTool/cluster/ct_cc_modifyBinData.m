@@ -90,5 +90,5 @@ binDataFinal2 = binDataFinal(goodOnes);
 
 %just gives number of bins where something was removed from it
 totalRemoved = length(rmvFlagFinal(rmvFlagFinal==1));
-rmvtxt = ['total bins removed from potential clustering = ',totalRemoved];
+rmvtxt = ['Total bins removed from potential clustering = ',num2str(totalRemoved)];
 disp(rmvtxt)

@@ -110,11 +110,26 @@ if ~isempty(REMORA.ct.CC.sbSet)
     if isfield(REMORA.ct,'CC_verify')
         set(REMORA.ct.CC_verify.rmSimBinCheck,'Enable','on','Value',1)
         REMORA.ct.CC_params.rmSimBins = 1;
+        
+        showSBParams = 'on';
+        
+        set(REMORA.ct.CC_verify.SBdiffTxt,'Visible',showSBParams)
+        set(REMORA.ct.CC_verify.SBdiffEdTxt,'Visible',showSBParams)
+        set(REMORA.ct.CC_verify.SBpercTxt,'Visible',showSBParams)
+        set(REMORA.ct.CC_verify.SBpercEdTxt,'Visible',showSBParams)
+        
         figure(REMORA.fig.ct.CC_settings)
     else
         ct_init_compClust_window
         set(REMORA.ct.CC_verify.rmSimBinCheck,'Enable','on','Value',1)
         REMORA.ct.CC_params.rmSimBins = 1;
+        
+        showSBParams = 'on';
+        
+        set(REMORA.ct.CC_verify.SBdiffTxt,'Visible',showSBParams)
+        set(REMORA.ct.CC_verify.SBdiffEdTxt,'Visible',showSBParams)
+        set(REMORA.ct.CC_verify.SBpercTxt,'Visible',showSBParams)
+        set(REMORA.ct.CC_verify.SBpercEdTxt,'Visible',showSBParams)
     end
 end
 
