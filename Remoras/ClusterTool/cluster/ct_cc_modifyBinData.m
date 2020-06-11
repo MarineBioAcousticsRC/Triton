@@ -3,16 +3,11 @@ function binDataFinal2 = ct_cc_modifyBinData(percSim,distThresh,binDataPruned,rm
 %%created by MAZ on 06/09/2020 to try and remove undesirable clusters and
 %%things like them before reclustering
 
-%%%so will use binDataPruned and Tfinal stuff to do this. So pull clusters
-%%%from Tfinal and then compare everything to those
 % rmvClus = [4,5,6];
 % distThresh = 0.1; %how far apart (normalized amplitude) can any one point be on the test spectra
 % %and still be considered something to remove (i.e., similar)?
-% percSim = 0.5; %how much similarity do you need in order to remove? 
+% percSim = 0.5; %how much similarity do you need in order to remove?
 
-%tFinal{x,1} gives the spectra of bins of that type
-%{,7} gives times of each bin
-%{,10} is mean envelope shape \
 rmvCalc = [];
 rmvFlag = [];
 rmvCalcFinal = [];
@@ -21,7 +16,7 @@ rmvFlagSubBin = [];
 
 % rmvClusMeanEnv = vertcat(Tfinal{rmvClus,10});
 
-%comparisons to everything in binDataPruned- spectra only for now 
+%comparisons to everything in binDataPruned- spectra only for now
 for iBin = 1:size(binDataPruned,1)
     simCount = 0;
     for iSub = 1:size(binDataPruned(iBin).sumSpec,1)
@@ -59,9 +54,9 @@ for iBin = 1:size(binDataPruned,1)
     rmvFlagSub = [];
 end
 
-rmvFlagRemoval = find(rmvFlagFinal==1); 
+rmvFlagRemoval = find(rmvFlagFinal==1);
 
-%% %remove unwanted types from binDataPruned
+ %remove unwanted types from binDataPruned
 binDataFinal = binDataPruned;
 
 for iRmv = 1:size(binDataPruned,1)
@@ -95,3 +90,5 @@ binDataFinal2 = binDataFinal(goodOnes);
 
 %just gives number of bins where something was removed from it
 totalRemoved = length(rmvFlagFinal(rmvFlagFinal==1));
+rmvtxt = ['total bins removed from potential clustering = ',totalRemoved];
+disp(rmvtxt)

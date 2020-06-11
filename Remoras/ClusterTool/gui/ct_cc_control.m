@@ -40,22 +40,22 @@ elseif strcmp(action,'setUseSpectraTF')
     set(REMORA.ct.CC_verify.endFreqEdTxt,'Visible',showSpectralParams)
     set(REMORA.ct.CC_verify.linearCheck,'Visible',showSpectralParams)
     set(REMORA.ct.CC_verify.diffCheck,'Visible',showSpectralParams)
-
+    
 elseif strcmp(action,'setStartFreq')
     startFreq = str2double(get(REMORA.ct.CC_verify.startFreqEdTxt,'String'));
     REMORA.ct.CC_params.startFreq = startFreq;
-
+    
 elseif strcmp(action,'setEndFreq')
     endFreq = str2double(get(REMORA.ct.CC_verify.endFreqEdTxt,'String'));
     REMORA.ct.CC_params.endFreq = endFreq;
-
+    
 elseif strcmp(action,'setLinearTF')
     linearTF = get(REMORA.ct.CC_verify.linearCheck,'Value');
     REMORA.ct.CC_params.linearTF = linearTF;
     
 elseif strcmp(action,'setDiff')
     specDiffTF = get(REMORA.ct.CC_verify.diffCheck,'Value');
-    REMORA.ct.CC_params.specDiffTF = specDiffTF;   
+    REMORA.ct.CC_params.specDiffTF = specDiffTF;
     
 elseif strcmp(action,'setUseTimesTF')
     useTimesTF = get(REMORA.ct.CC_verify.timesCheck,'Value');
@@ -72,7 +72,7 @@ elseif strcmp(action,'setUseTimesTF')
     set(REMORA.ct.CC_verify.ICIMaxTxt,'Visible',showTemporalParams)
     set(REMORA.ct.CC_verify.ICIMaxEdTxt,'Visible',showTemporalParams)
     set(REMORA.ct.CC_verify.correctForSatCheck,'Visible',showTemporalParams)
-
+    
 elseif strcmp(action,'setUseEnvShape')
     useEnvShapeTF = get(REMORA.ct.CC_verify.envCheck,'Value');
     REMORA.ct.CC_params.useEnvShape = useEnvShapeTF;
@@ -100,7 +100,7 @@ elseif strcmp(action,'setMinClust')
 elseif strcmp(action,'setNTrials')
     NTrials = str2double(get(REMORA.ct.CC_verify.NTrialsEdTxt,'String'));
     REMORA.ct.CC_params.N = NTrials;
-
+    
 elseif strcmp(action,'setSingleClustTF')
     singleClusterOnly = get(REMORA.ct.CC_verify.singleClustCheck,'Value');
     REMORA.ct.CC_params.singleClusterOnly = singleClusterOnly;
@@ -116,12 +116,12 @@ elseif strcmp(action,'setICIMax')
 elseif strcmp(action,'setCorrectForSatTF')
     correctForSatTF = get(REMORA.ct.CC_verify.correctForSatCheck,'Value');
     REMORA.ct.CC_params.correctForSaturation = correctForSatTF;
-
+    
 elseif strcmp(action,'setICIMode')
     iciModeTF = get(REMORA.ct.CC_verify.bg_r1 ,'Value');
     REMORA.ct.CC_params.iciModeTF = iciModeTF;
     REMORA.ct.CC_params.iciDistTF = ~REMORA.ct.CC_params.iciModeTF;
-
+    
 elseif strcmp(action,'setICIDist')
     iciDistTF = get(REMORA.ct.CC_verify.bg_r2 ,'Value');
     REMORA.ct.CC_params.iciDistTF = iciDistTF;
@@ -139,6 +139,26 @@ elseif strcmp(action,'rmSimBinTF')
     rmSimBinsTf = get(REMORA.ct.CC_verify.rmSimBinCheck,'Value');
     REMORA.ct.CC_params.rmSimBins = rmSimBinsTf;
     
+    if REMORA.ct.CC_params.rmSimBins
+        showSBParams = 'on';
+    else
+        showSBParams = 'off';
+    end
+    
+    set(REMORA.ct.CC_verify.SBdiffTxt,'Visible',showSBParams)
+    set(REMORA.ct.CC_verify.SBdiffEdTxt,'Visible',showSBParams)
+    set(REMORA.ct.CC_verify.SBpercTxt,'Visible',showSBParams)
+    set(REMORA.ct.CC_verify.SBpercEdTxt,'Visible',showSBParams)
+    
+    
+elseif strcmp(action,'setSBdiff')
+    sbDiff = str2num(get(REMORA.ct.CC_verify.SBdiffEdTxt,'String'));
+    REMORA.ct.CC_params.SBdiff = sbDiff;
+    
+elseif strcmp(action,'setSBperc')
+    sbPerc = str2num(get(REMORA.ct.CC_verify.SBpercEdTxt,'String'));
+    REMORA.ct.CC_params.SBperc = sbPerc;
+    
 elseif strcmp(action,'runCompositeClusters')
     REMORA.fig.ct.status = ct_cb_status_dialog('Composite clustering in progress.\n    Details in Matlab console.');
     spinH = ct_add_spinner(gcf,[0.45,0.3,0.1,0.15]);
@@ -151,7 +171,7 @@ elseif strcmp(action,'runCompositeClusters')
         % show post-clustering menu
         ct_post_cluster_ui
     else
-        REMORA.fig.ct.status = ct_cb_status_dialog('Composite clustering failed. See Matlab console for details.');   
+        REMORA.fig.ct.status = ct_cb_status_dialog('Composite clustering failed. See Matlab console for details.');
     end
     spinH.stop;
     

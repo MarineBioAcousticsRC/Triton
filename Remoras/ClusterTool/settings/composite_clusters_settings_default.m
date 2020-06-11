@@ -50,9 +50,9 @@ s.maxClust = 20000;% maximum number of bins to cluster. If you have more than
 s.subSampOnlyOnce = 1; % if your input contains more than maxClust clicks, they 
 % will be subsampled. If subSampOnlyOnce = 1, then a subsample will
 % be selected, and it will be reclustered N times. This ends up looking at
-% fewer clicks, but avoids the risk that the best set of final clusters could 
+% fewer clicks, but avoids the risk that the best set of final clusters could
 % be chosen based on the simplest subset. It's also faster.
-% If subSampOnlyOnce = 0, then a new subsample will be selected on each of 
+% If subSampOnlyOnce = 0, then a new subsample will be selected on each of
 % N iterations. This looks at more signals, but risks that the final
 % clusters will be chosen from the subset that happened to have the least
 % variability.
@@ -67,5 +67,9 @@ s.mergeTF = 0 ;
 %%%% Plotting %%%%
 s.subPlotSet = 1; % Set to 1 if you want plots with each click type as a subplot
 s.indivPlots = 1; % Set to 1 if you want separate plots for each click type
+
+s.SBdiff = 0.1; %default difference for comparing spectra of undesirable clusters to those of bins in binDataPruned
+s.SBperc = 0.9; %default percentage similarity between a bad cluster and a given bin for bin to be removed
+
 
 s.diary = 0;
