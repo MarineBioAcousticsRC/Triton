@@ -2,454 +2,77 @@ function lt_lVis_plot_LTSA_labels
 
 global REMORA PARAMS
 
-%% get LTSA range times
-%pull start and end times of window
+% get LTSA range times
+% pull start and end times of window
 [ltsaS,ltsaE] = lt_lVis_get_ltsa_range;
 plotFreq = PARAMS.ltsa.f(end) *.9;
 
+% plot colors
 colF = [1 0 0];
-col1 = [1 1 1];
-col2 = [0.8 0.4 0.8];
-col3 = [1 0.6 0];
-col4 = [0.8 0.6 1];
-col5 = [0.8 1.0 1.0];
-col6 = [1.0 0 0.4];
-col7 = [1.0 0.6 0.6];
-col8 = [1.0 0.6 0.2];
+colors = [
+    1.0 1.0 1.0
+    0.8 0.4 0.8
+    1.0 0.6 0.0
+    0.8 0.6 1.0
+    0.8 1.0 1.0
+    1.0 0.0 0.4
+    1.0 0.6 0.6
+    1.0 0.6 0.2
+    ];
 
-%find detections in the window
-if REMORA.lt.lVis_det.detection.PlotLabels
-    yPos1 = plotFreq*1;
-    labl1 = REMORA.lt.lVis_det.detection.labels(1);
-    label1Pos = plotFreq*1.05;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection.starts,REMORA.lt.lVis_det.detection.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl1,label1Pos,startBouts,endBouts,yPos1,col1,ltsaS,ltsaE);
-    
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos1)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos1)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos1)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos1)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos1)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos1)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos1)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos1)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos1l)
-    end
-    
-end
+% detection groups
+labels = {'', '2', '3', '4', '5', '6', '7', '8'};
 
-%%%plot second labels if desired
-if REMORA.lt.lVis_det.detection2.PlotLabels
-    yPos2 = plotFreq*.9;
-    labl2 = REMORA.lt.lVis_det.detection2.labels(1);
-    label2Pos = plotFreq*.95;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection2.starts,REMORA.lt.lVis_det.detection2.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl2,label2Pos,startBouts,endBouts,yPos2,col2,ltsaS,ltsaE);
-    
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection2;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos2)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos2)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos2)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos2)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos2)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos2)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos2)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos2)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos2)
-    end
-end
+% position for lines and labels
+yPos = plotFreq;
+labelPos = yPos*1.05;
 
-%%%plot third labels if desired
-if REMORA.lt.lVis_det.detection3.PlotLabels
-    yPos3 = plotFreq*.7;
-    labl3 = REMORA.lt.lVis_det.detection3.labels(1);
-    label3Pos = plotFreq*.75;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection3.starts,REMORA.lt.lVis_det.detection3.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl3,label3Pos,startBouts,endBouts,yPos3,col3,ltsaS,ltsaE);
-    
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection3;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos3)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos3)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos3)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos3)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos3)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos3)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos3)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos3)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos3)
-    end
-end
-
-%%%plot fourth labels if desired
-if REMORA.lt.lVis_det.detection4.PlotLabels
-    yPos4 = plotFreq*.6;
-    labl4 = REMORA.lt.lVis_det.detection4.labels(1);
-    label4Pos = plotFreq*.65;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection4.starts,REMORA.lt.lVis_det.detection4.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl4,label4Pos,startBouts,endBouts,yPos4,col4,ltsaS,ltsaE);
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection4;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos4)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos4)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos4)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos4)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos4)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos4)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos4)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos4)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos4)
-    end
-end
-
-%%%plot fifth labels if desired
-if REMORA.lt.lVis_det.detection5.PlotLabels
-    yPos5 = plotFreq*.5;
-    labl5 = REMORA.lt.lVis_det.detection5.labels(1);
-    label5Pos = plotFreq*.55;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection5.starts,REMORA.lt.lVis_det.detection5.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl5,label5Pos,startBouts,endBouts,yPos5,col5,ltsaS,ltsaE);
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection5;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos5)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos5)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos5)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos5)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos5)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos5)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos5)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos5)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos5)
-    end
-end
-
-%%%plot sixth labels if desired
-if REMORA.lt.lVis_det.detection6.PlotLabels
-    yPos6 = plotFreq*.4;
-    labl6 = REMORA.lt.lVis_det.detection6.labels(1);
-    label6Pos = plotFreq*.45;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection6.starts,REMORA.lt.lVis_det.detection6.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl6,label6Pos,startBouts,endBouts,yPos6,col6,ltsaS,ltsaE);
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection6;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos6)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos6)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos6)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos6)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos6)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos6)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos6)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos6)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos6)
-    end
-end
-
-%%%plot seventh labels if desired
-if REMORA.lt.lVis_det.detection7.PlotLabels
-    yPos7 = plotFreq*.3;
-    labl7 = REMORA.lt.lVis_det.detection7.labels(1);
-    label7Pos = plotFreq*.35;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection7.starts,REMORA.lt.lVis_det.detection7.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl7,label7Pos,startBouts,endBouts,yPos7,col7,ltsaS,ltsaE);
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection7;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos7)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos7)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos7)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos7)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos7)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos7)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos7)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos7)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos7)
-    end
-end
-
-%%%plot eighth labels if desired
-if REMORA.lt.lVis_det.detection8.PlotLabels
-    yPos8 = plotFreq*.2;
-    labl8 = REMORA.lt.lVis_det.detection8.labels(1);
-    label8Pos = plotFreq*.25;
-    
-    %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(REMORA.lt.lVis_det.detection8.starts,REMORA.lt.lVis_det.detection8.stops,...
-        boutGap);
-    
-    plot_labels_ltsa(labl8,label8Pos,startBouts,endBouts,yPos8,col8,ltsaS,ltsaE);
-    %plot changed labels
-    changedLab = REMORA.lt.lEdit.detection8;
-    falseCh = changedLab(changedLab(:,3) == 0,:);
-    oneCh = changedLab(changedLab(:,3) == 1,:);
-    twoCh = changedLab(changedLab(:,3) == 2,:);
-    threeCh = changedLab(changedLab(:,3) == 3,:);
-    fourCh = changedLab(changedLab(:,3) == 4,:);
-    fiveCh = changedLab(changedLab(:,3) == 5,:);
-    sixCh = changedLab(changedLab(:,3) == 6,:);
-    sevCh = changedLab(changedLab(:,3) == 7,:);
-    eightCh = changedLab(changedLab(:,3) == 8,:);
-    
-    if ~isempty(falseCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,falseCh,colF,yPos8)
-    end
-    if ~isempty(oneCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,oneCh,col1,yPos8)
-    end
-    if ~isempty(twoCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,twoCh,col2,yPos8)
-    end
-    if ~isempty(threeCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,threeCh,col3,yPos8)
-    end
-    if ~isempty(fourCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fourCh,col4,yPos8)
-    end
-    if ~isempty(fiveCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,fiveCh,col5,yPos8)
-    end
-    if ~isempty(sixCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sixCh,col6,yPos8)
-    end
-    if ~isempty(sevCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,sevCh,col7,yPos8)
-    end
-    if ~isempty(eightCh)
-        plot_chLabels_ltsa(ltsaS,ltsaE,eightCh,col8,yPos8)
+for labidx = 1:length(labels);
+    detfld = sprintf('detection%s', labels{labidx});
+    if REMORA.lt.lVis_det.(detfld).PlotLabels
+        labl = REMORA.lt.lVis_det.(detfld).labels(1);
+        
+        
+        % This ignores anything that has a start before the LTSA window
+        % and a stop after the LTSA window.
+        % We could check for this explicitly, but we'll just ignore it
+        % as it would be slower.  We might want to pad the window a bit
+        % before searching e.g. by .5 *(ltsaE - ltsaS)
+        
+        % Find detections that are within the LTSA window
+        [Lo, Hi] = lt_lVis_get_range(ltsaS, ltsaE, ...
+            REMORA.lt.lVis_det.(detfld).starts, ...
+            REMORA.lt.lVis_det.(detfld).stops);
+        
+        if ~ isempty(Lo)
+            %%% shorten detections to bout-level
+            boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+            %is less than this, combine into a bout
+            [startBouts,endBouts] = lt_lVis_defineBouts(...
+                REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
+                REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
+                boutGap);
+            
+            plot_labels_ltsa(labl, labelPos, startBouts,endBouts, ...
+                yPos, colors(labidx, :), ltsaS, ltsaE);
+            
+            %plot changed labels
+            changedLab = REMORA.lt.lEdit.(detfld);
+            for cidx = 0:8
+                ch = changedLab(changedLab(:,3) == cidx, :);
+                if ~ isempty(ch)
+                    if cidx == 0
+                        % special case not in colors matrix
+                        plot_chLabels_ltsa(ltsaS, ltsaE, ch, colF, yPos);
+                    else
+                        plot_chLabels_ltsa(ltsaS, ltsaE, ch, colors(cidx,:), yPos);
+                    end
+                end
+            end
+        end
+        
+        yPos = yPos - .1*plotFreq;
+        labelPos = labelPos - .1*plotFreq;
     end
 end
 end
@@ -487,8 +110,9 @@ if ~isempty(winDetsFull)
     detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops',ltsaS);
     
     
-    axes (HANDLES.subplt.ltsa)
-    hold on
+    % Specify axes in plot/hold command rather than using
+    % axes to set a default set of axes as this is much faster.
+    hold(HANDLES.subplt.ltsa, 'on')
     
     %%%what kind of plotting are we going to do? Just plot a point if detection
     %%%range is shorter than 1 min... using this to simplify plotting if tlab
@@ -500,22 +124,22 @@ if ~isempty(winDetsFull)
         detDur = detXend - detXstart;
         if detDur < LineThresh
             %just plot the start of a given detection
-            plot(detXstart(iPlot), yPos,'*','Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            plot(HANDLES.subplt.ltsa, detXstart(iPlot), yPos,'*','Color',color)
+            text(HANDLES.subplt.ltsa, detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
         else
-            plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+            plot(HANDLES.subplt.ltsa, [detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
                 'MarkerSize',5,'Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            text(HANDLES.subplt.ltsa, detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
         end
     end
     
     %plot a line at the end of the detection file
     if isequal(stopL(end),winDetsFull(end,2))
-        plot([detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+        plot(HANDLES.subplt.ltsa, [detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
             'Color',color)
     end
     
-    hold off
+    hold(HANDLES.subplt.ltsa, 'off');
 end
 
 if ~isempty(winDetsStarts)

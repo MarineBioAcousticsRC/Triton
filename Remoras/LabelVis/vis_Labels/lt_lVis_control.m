@@ -16,6 +16,13 @@ if strcmp(action,'LoadLabels')
     
     % Read detection label file and add detection times to remora
     [Starts, Stops, Labels] = lt_lVis_read_textFile(fileFullPath, 'Binary', true);
+    % Ensure sorted
+    if ~issorted(Starts)
+        fprintf('Sorting labels...')
+        [Starts, Permutation] = sort(Starts);
+        Stops = Stops(Permutation);  % put Stops in new order
+        fprintf('complete\n');
+    end
     if strcmp(NFile,'labels1')
         REMORA.lt.lVis_det.detection.starts = Starts;
         REMORA.lt.lVis_det.detection.stops = Stops;
@@ -292,7 +299,7 @@ elseif strcmp(action,'Display')
 elseif strcmp(action, 'TakeItBack')
     motion_ltsa('back');
     lt_lVis_plot_LTSA_labels
-    
+
     if HANDLES.display.specgram.Value
         lt_lVis_plot_WAV_labels
     end

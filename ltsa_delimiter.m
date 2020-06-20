@@ -34,13 +34,14 @@ end
 dt = floor(diff(tBin_dnum) * 24 * 60 *60);   % get time difference
 I = []; I = find(dt > PARAMS.ltsa.tave);    % find time bins > tave
 % plot delimiter lines
-axes(HANDLES.subplt.ltsa)
 yA = [min(PARAMS.ltsa.f),max(PARAMS.ltsa.f)];   % LTSA plot y limits
 xoff = tbinsz/2;    % move delimiter to edge of timebin
 if ~isempty(I)
     for d = 1:length(I)
         xA = [PARAMS.ltsa.t(I(d))+xoff,PARAMS.ltsa.t(I(d))+xoff];
-        line(xA,yA,'Color','w','LineWidth',2,'LineStyle','--');
+        % We specify the handle in the drawing command as it is much
+        % faster than using axes to change the default plot target
+        line(HANDLES.subplt.ltsa, xA,yA,'Color','w','LineWidth',2,'LineStyle','--');
     end
 else
 %     disp_msg('no LTSA delimiter, data continuous')
