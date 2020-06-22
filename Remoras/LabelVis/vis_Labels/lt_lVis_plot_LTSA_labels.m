@@ -135,7 +135,8 @@ if ~isempty(winDetsFull)
     
     %plot a line at the end of the detection file
     if isequal(stopL(end),winDetsFull(end,2))
-        plot(HANDLES.subplt.ltsa, [detXend(end) detXend(end)], [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],'-','LineWidth',2,...
+        plot(HANDLES.subplt.ltsa, [detXend(end) detXend(end)], ...
+            [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],':','LineWidth',2,...
             'Color',color)
     end
     

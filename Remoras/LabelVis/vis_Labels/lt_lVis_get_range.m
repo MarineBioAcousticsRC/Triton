@@ -1,12 +1,22 @@
 function [first, last] = lt_lVis_getrange(start, stop, varargin)
 % [first, last] = lt_lVis_getrange(start, stop, dates1, dates2, ...)
-% Given Matlab serial date (datenum) start and stop, search a list
-% of dates to find the first index in dates that is after start
-% and the last index that is before stop
-% 
-% Multiple sets of datenums may be passed in, but they must
-% all be the same length and represent measurements on the same
-% observation e.g. start and stop times
+% start, stop - Matlab serial dates (datenum)
+% date1, date2, ... - Arrays of related serial dates all of the same size.
+%    Operates on each date vector spearately and assumes that the vectors
+%    are related to one another (e.g. different measurements on the same
+%    event such as start and end time).
+%
+%    For each date vector, we find:
+%    values(first) - First date > start
+%    values(last) - Last date < stop
+%
+%    When multiple date vectors are passed in, we merge all indices,
+%    first = min([first1, first2, ...])
+%    last = max([last1, last2, ...])
+%
+% When the dates are entirely outside of the specified range,
+% first = [], last = []
+
 
 first = Inf;
 last = -Inf;
@@ -24,21 +34,29 @@ for idx = 1:length(varargin)
     end
 end
 
-if isinf(first) % Nothing found
+if isinf(first) || isinf(last) % Nothing found
     first = [];
     last = [];
 end
 
 
 function idx = binarysearch(target, values, direction)
+% idx = binarysearch(target, values, direction)
+% Given a set of values, find the index of values such that:
+% direction 1:
+%   values(idx) is the first item such that values(idx) >= target
+% direction -1
+%   values(idx) is the last item such that values(idx) <= target
 
 N = length(values);
 % Handle no search cases where target is before the start
 % or after the end, then invoke the binary search helper
-if target < values(1)
-    idx = 1;  % First value after target is values(1)
-elseif target > N
-    idx = length(values);  % First value after target is valued(end)
+if direction == 1 && (target > values(end))
+    % First value after target: no such value
+    idx = Inf;
+elseif direction == -1 && (target < values(1))
+    % Last value before target: no such value
+    idx = -Inf;
 else
     % Perform a binary search to find it.
     idx = searchhelper(1, N, target, values, direction);
@@ -52,7 +70,9 @@ function idx = searchhelper(low, high, target, values, direction)
 % within the range values[low] and values[high]
 
 midpt = floor((high - low) / 2) + low;
-% fprintf('(%d=%f, %d=%f) midpt=%d\n', low,values(low),high, values(high), midpt);
+%debug
+%fprintf('(%d=%s, %d=%s) tgt=%s midpt=%d\n', low, datestr(values(low)),high, datestr(values(high)), datestr(target), midpt);
+%fprintf('(%d=%s, %d=%s) tgt=%s midpt=%d\n', low, values(low), high, values(high), target, midpt);
 if ismember(midpt, [low, high])
     % low and high are consecutive
     % Base case of recursion, need to make a decision

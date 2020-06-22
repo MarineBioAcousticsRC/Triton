@@ -121,7 +121,7 @@ if ~isempty(winDets)
     if isequal(stopL(end),winDets(end,2))
         plot(HANDLES.subplt.timeseries, [detXend(end) detXend(end)], ...
             [HANDLES.subplt.timeseries.YLim(1) HANDLES.subplt.timeseries.YLim(2)],...
-            '-','LineWidth',2,'Color',color)
+            ':','LineWidth',2,'Color',color)
     end
 end
 

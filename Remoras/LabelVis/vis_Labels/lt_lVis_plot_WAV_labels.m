@@ -115,7 +115,7 @@ end
 %plot a line at the end of the detection file
 if ~isempty(winDets)
     if isequal(stopL(end),winDets(end,2))
-        plot(HANDLES.subplt.specgram, [detXend(end) detXend(end)], [PARAMS.freq0 PARAMS.freq1],'-','LineWidth',2,...
+        plot(HANDLES.subplt.specgram, [detXend(end) detXend(end)], [PARAMS.freq0 PARAMS.freq1],':','LineWidth',2,...
             'Color',color)
     end
 end
