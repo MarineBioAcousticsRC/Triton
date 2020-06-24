@@ -15,7 +15,7 @@ if isempty(userpath())
                     userpath('reset');
                     %set to new path,remove semicolon
                     newpath = userpath;
-                    newpath = newpath(1:end-1);
+                    newpath = newpath(1:end);
                     cd(newpath);
                 case 'n'
                     disp('OK, staying in current directory')
