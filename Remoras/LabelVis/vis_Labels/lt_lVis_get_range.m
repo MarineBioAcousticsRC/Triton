@@ -72,7 +72,7 @@ function idx = searchhelper(low, high, target, values, direction)
 midpt = floor((high - low) / 2) + low;
 %debug
 %fprintf('(%d=%s, %d=%s) tgt=%s midpt=%d\n', low, datestr(values(low)),high, datestr(values(high)), datestr(target), midpt);
-%fprintf('(%d=%s, %d=%s) tgt=%s midpt=%d\n', low, values(low), high, values(high), target, midpt);
+%fprintf('(%d=%d, %d=%d) tgt=%d midpt=%d\n', low, values(low), high, values(high), target, midpt);
 if ismember(midpt, [low, high])
     % low and high are consecutive
     % Base case of recursion, need to make a decision
