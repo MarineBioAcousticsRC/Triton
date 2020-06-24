@@ -20,18 +20,20 @@ if LinkTethys == true
 %import tethys.nilus.*;
 server = dbInit('Server','breach.ucsd.edu','Port',9779);
 try
-    import java.lang.Double;
-    import nilus.Detections;
-    import nilus.Helper;
-    import nilus.AlgorithmType;
-    import nilus.DetectionEffortKind;
-    import nilus.MarshalXML;
-    import nilus.CallType;
-    import nilus.GranularityType;
-    import nilus.GranularityEnumType;
-    import nilus.Detection;
+
+    import java.lang.Double.*;
+    import nilus.Detections.*;
+    import nilus.Helper.*;
+    import nilus.AlgorithmType.*;
+    import nilus.DetectionEffortKind.*;
+    import nilus.MarshalXML.*;
+    import nilus.CallType.*;
+    import nilus.GranularityType.*;
+    import nilus.GranularityEnumType.*;
+    import nilus.Detection.*;
 catch
     disp('Nilus seems to have issues, you might not be able to link to Tethys');
+end
 end
 
 tic
@@ -114,11 +116,14 @@ project = REMORA.bp.settings.project;
 site = REMORA.bp.settings.site;
 deployment = str2double(REMORA.bp.settings.deployment);
 
+
 %Set project, site and deployment
 dataSource = detections.getDataSource();
 dataSource.setProject(char(project));
     dataSource.setDeployment(helper.toXsInteger(double(string(deployment))));  
     dataSource.setSite(char(site));
+
+
 %detections.setSite(project, site, deployment);%set datasource info to this
  %This command was not working, so I commented it out.
 %userID
