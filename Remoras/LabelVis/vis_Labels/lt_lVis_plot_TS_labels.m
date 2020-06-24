@@ -48,12 +48,15 @@ for labidx = 1:length(labels)
         [Lo, Hi] = lt_lVis_get_range(startWV, endWV, ...
             REMORA.lt.lVis_det.(detfld).starts, ...
             REMORA.lt.lVis_det.(detfld).stops);
+        %get final detection end and pass it into plotting for dotted
+        %line
+        finalDet = REMORA.lt.lVis_det.(detfld).stops(end);
 
         if ~ isempty(Lo)
             plot_labels_wav(label, labelPos, ...
                 REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
                 REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
-                yPos, colors(labidx, :),startWV,endWV);        
+                yPos, colors(labidx, :),startWV,endWV,finalDet);        
  
             
             %plot changed labels
@@ -77,7 +80,7 @@ for labidx = 1:length(labels)
 
 end
 
-function plot_labels_wav(label,labelPos,startL, stopL, yPos, color,startWV,endWV)
+function plot_labels_wav(label,labelPos,startL, stopL, yPos, color,startWV,endWV,finalDet)
 
 global PARAMS HANDLES
 lablFull = [startL,stopL];
@@ -118,7 +121,7 @@ for iPlot = 1:size(detXstart,1)
 end
 
 if ~isempty(winDets)
-    if isequal(stopL(end),winDets(end,2))
+    if isequal(stopL(end),finalDet)
         plot(HANDLES.subplt.timeseries, [detXend(end) detXend(end)], ...
             [HANDLES.subplt.timeseries.YLim(1) HANDLES.subplt.timeseries.YLim(2)],...
             ':','LineWidth',2,'Color',color)

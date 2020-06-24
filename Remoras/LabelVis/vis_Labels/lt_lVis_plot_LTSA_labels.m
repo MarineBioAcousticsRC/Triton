@@ -52,9 +52,12 @@ for labidx = 1:length(labels);
                 REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
                 REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
                 boutGap);
+            %get final detection end and pass it into plotting for dotted
+            %line
+            finalDet = REMORA.lt.lVis_det.(detfld).stops(end);
             
             plot_labels_ltsa(labl, labelPos, startBouts,endBouts, ...
-                yPos, colors(labidx, :), ltsaS, ltsaE);
+                yPos, colors(labidx, :), ltsaS, ltsaE,finalDet);
             
             %plot changed labels
             changedLab = REMORA.lt.lEdit.(detfld);
@@ -77,7 +80,7 @@ for labidx = 1:length(labels);
 end
 end
 
-function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE)
+function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE,finalDet)
 
 global PARAMS HANDLES REMORA
 lablFull = [startL,stopL];
@@ -134,7 +137,7 @@ if ~isempty(winDetsFull)
     end
     
     %plot a line at the end of the detection file
-    if isequal(stopL(end),winDetsFull(end,2))
+    if isequal(stopL(end),finalDet)
         plot(HANDLES.subplt.ltsa, [detXend(end) detXend(end)], ...
             [PARAMS.ltsa.f(1) PARAMS.ltsa.f(end)],':','LineWidth',2,...
             'Color',color)
@@ -223,12 +226,12 @@ function plot_chLabels_ltsa(ltsaS,ltsaE,chLab,color,yPos)
 global PARAMS HANDLES REMORA
 winDetsFull = [];
 
- %%% shorten detections to bout-level
-    boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
-    %is less than this, combine into a bout
-    [startBouts,endBouts] = lt_lVis_defineBouts(chLab(:,1),chLab(:,2),boutGap);
-    lablFull = [startBouts,endBouts];
-    
+%%% shorten detections to bout-level
+boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+%is less than this, combine into a bout
+[startBouts,endBouts] = lt_lVis_defineBouts(chLab(:,1),chLab(:,2),boutGap);
+lablFull = [startBouts,endBouts];
+
 winDetsFull = lablFull(startBouts>= ltsaS & endBouts<=ltsaE,:);
 
 if ~isempty(winDetsFull)
