@@ -23,6 +23,10 @@ elseif strcmp(action, 'setDiffS')
     diffsEdText = str2double(get(REMORA.pi_verify.diffsEdText, 'string'));
     REMORA.pi.settings.diff_s = diffsEdText;
     
+elseif strcmp(action, 'setRmsASmin')
+    rmsASminEdText = str2double(get(REMORA.pi_verify.rmsASminEdText, 'string'));
+    REMORA.pi.settings.rmsASmin = rmsASminEdText;
+    
 elseif strcmp(action,'RunBatchDetection')
     close(REMORA.fig.pi.batch)
     pi_autodet_batch_ST;
