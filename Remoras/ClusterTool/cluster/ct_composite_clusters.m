@@ -92,8 +92,21 @@ for iFile = 1:length(inFileList)
     end
 end
 clear('loadedData')
-
-%%%%%%%%%% Begin main functionality %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+global REMORA
+tritonMode = 0;
+if isfield(REMORA,'ct')
+    tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and
+    % triton tools are fair game.
+end
+if  tritonMode && isfield(REMORA.ct.CC,'rm_simbins')...
+        && REMORA.ct.CC_params.rmSimBins
+    %     thresh = 0.95;
+    %     dist = 0.1;
+    specComp = REMORA.ct.CC.sbSet;
+    binDataPruned = ct_cc_modifyBinData(REMORA.ct.CC_params.SBperc,REMORA.ct.CC_params.SBdiff,binDataPruned,specComp);
+end
+% %%%%%%%%%% Begin main functionality %%%%%%%%%%%%
 %% Normalize everything
 % Spectra:
 % Put click spectra into a matrix
@@ -104,12 +117,12 @@ cRateMat = vertcat(binDataPruned.clickRate);
 clickTimes = horzcat(binDataPruned(:).clickTimes);
 
 for iEM = 1:size(binDataPruned,1)
-    if size(binDataPruned(iEM).envMean,2) == 1 
+    if size(binDataPruned(iEM).envMean,2) == 1
         binDataPruned(iEM).envMean = zeros(1,p.maxDur);
     end
-%     if size(binDataPruned(iEM).envMean,2) == 1 
-%         binDataPruned(iEM).envDur = zeros(1,p.envDur);
-%     end
+    %     if size(binDataPruned(iEM).envMean,2) == 1
+    %         binDataPruned(iEM).envDur = zeros(1,p.envDur);
+    %     end
 end
 envShape = vertcat(binDataPruned(:).envMean);
 %envDistrib = vertcat(binDataPruned(:).envDur);
@@ -184,12 +197,12 @@ subSamp = 1; % flag automatically goes to true if subsampling.
 isolatedSet = [];
 wNodeDeg = {};
 
-global REMORA
-tritonMode = 0;
-if isfield(REMORA,'ct')
-    tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
-    % triton tools are fair game.
-end
+% global REMORA
+% tritonMode = 0;
+% if isfield(REMORA,'ct')
+%     tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
+%     % triton tools are fair game.
+% end
 if  tritonMode && isfield(REMORA.ct.CC,'rm_clusters')...
     && REMORA.ct.CC_params.rmPriorClusters
     badSet = REMORA.ct.CC.rmSet;
