@@ -14,6 +14,19 @@ tsvalue = get(HANDLES.display.timeseries,'Value');
 spvalue = get(HANDLES.display.spectra,'Value');
 sgvalue = get(HANDLES.display.specgram,'Value');
 
+
+% if isfield(REMORA,'ltsa_plot_lVis_lab')
+%     if savalue
+%         REMORA.ltsa_plot_lVis_lab{1}();
+%     end
+%     if sgvalue
+%         REMORA.ltsa_plot_lVis_lab{2}();
+%     end
+%     if tsvalue
+%         REMORA.ltsa_plot_lVis_lab{3}();
+%     end
+% end
+
 % total number of plots in window
 m = savalue + tsvalue + spvalue + sgvalue;
 
@@ -144,6 +157,19 @@ end
 
 if PARAMS.ltsa.delimit.value
     ltsa_delimiter
+end
+
+
+if isfield(REMORA,'ltsa_plot_lVis_lab')
+    if savalue
+        REMORA.ltsa_plot_lVis_lab{1}();
+    end
+    if sgvalue
+        REMORA.ltsa_plot_lVis_lab{2}();
+    end
+    if tsvalue
+        REMORA.ltsa_plot_lVis_lab{3}();
+    end
 end
 
 % change time in control window to data time in plot window
