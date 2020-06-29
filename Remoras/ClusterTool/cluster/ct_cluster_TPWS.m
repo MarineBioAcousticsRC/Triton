@@ -237,7 +237,11 @@ for iC = 1:length(dateInterval)
         binData(cIdx,1).clickTimes = {ttSet}; % store click times.
         binData(cIdx,1).clusteredTF = 0;
         binData(cIdx,1).envDur = envDur;
-        binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
+        if size(envSet,1)>1
+            binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
+        elseif size(envSet,1)==1
+            binData(cIdx,1).envMean = envSet./max(envSet,[],2);
+        end
         [binData(cIdx,1).dTT,binData(cIdx,1).clickRate] = ct_compute_rate_distributions(ttSet,p);
         
         cIdx = cIdx +1;
