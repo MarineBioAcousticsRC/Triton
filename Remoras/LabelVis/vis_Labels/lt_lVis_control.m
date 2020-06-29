@@ -320,8 +320,8 @@ elseif strcmp(action, 'SmallStepBack')
         lt_lVis_plot_LTSA_labels
     end
     
-elseif strcmp(action, 'PrevRawFile')
-    motion('prevfile');
+elseif strcmp(action, 'PrevDetection')
+    motion('prevDet');
     if HANDLES.display.specgram.Value
         lt_lVis_plot_WAV_labels
     end
@@ -355,8 +355,33 @@ elseif strcmp(action, 'OneStepForward')
         lt_lVis_plot_LTSA_labels
     end
     
-elseif strcmp(action, 'NextRawFile')
-    motion('nextfile');
+elseif strcmp(action, 'NextDetection')
+    motion('nextDet');
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
+    end
+    
+elseif strcmp(action, 'NextLTSADetection')
+    motion_ltsa('nextDet');
+    if HANDLES.display.specgram.Value
+        lt_lVis_plot_WAV_labels
+    end
+    if HANDLES.display.timeseries.Value
+        lt_lVis_plot_TS_labels
+    end
+    if HANDLES.display.ltsa.Value
+        lt_lVis_plot_LTSA_labels
+    end
+    
+    
+elseif strcmp(action, 'PrevLTSADetection')
+    motion_ltsa('prevDet');
     if HANDLES.display.specgram.Value
         lt_lVis_plot_WAV_labels
     end
@@ -387,6 +412,10 @@ end
 set(REMORA.lt.lVis_labels.LTSAfwd, 'Enable', ...
     get(HANDLES.ltsa.motion.fwd, 'Enable'));
 set(REMORA.lt.lVis_labels.LTSAback, 'Enable', ...
+    get(HANDLES.ltsa.motion.back, 'Enable'));
+set(REMORA.lt.lVis_labels.nextF_LTSA, 'Enable', ...
+    get(HANDLES.ltsa.motion.fwd, 'Enable'));
+set(REMORA.lt.lVis_labels.prevF_LTSA, 'Enable', ...
     get(HANDLES.ltsa.motion.back, 'Enable'));
 
 if ~isempty(PARAMS.infile)

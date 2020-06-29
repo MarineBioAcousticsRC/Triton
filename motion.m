@@ -104,6 +104,38 @@ elseif strcmp(action,'stop')
     control('menuon')
     set(HANDLES.motion.stop,'Enable','off');	% turn off Stop button
     
+elseif strcmp(action,'nextDet')
+    [~,nextDet]= lt_lVis_envDet_rf;
+    winLength = PARAMS.tseg.sec;
+    stepFW = winLength*0.5; %where to plot next
+    PARAMS.plot.dnum = nextDet - datenum(0,0,0,0,0,stepFW);
+    
+    %rest is same as with forward button
+    PARAMS.plot.dvec = datevec(PARAMS.plot.dnum);
+    if ~isempty(PARAMS.xhd.byte_length)
+        PARAMS.plot.initbytel = PARAMS.plot.bytelength;
+    end
+    readseg
+    plot_triton
+    seconds_from_start = (PARAMS.plot.dnum - PARAMS.start.dnum) * 60 * 60 * 24;
+    set(HANDLES.time.slider, 'Value', seconds_from_start);
+    
+elseif strcmp(action,'prevDet')
+    [prevDet,~]= lt_lVis_envDet_rf;
+    winLength = PARAMS.tseg.sec;
+    stepFW = winLength*0.5; %where to plot next
+    PARAMS.plot.dnum = prevDet - datenum(0,0,0,0,0,stepFW);
+    
+    %rest is same as with normal back button
+    PARAMS.plot.dvec = datevec(PARAMS.plot.dnum);
+    if ~isempty(PARAMS.xhd.byte_length)
+        PARAMS.plot.initbytel = PARAMS.plot.bytelength;
+    end
+    readseg
+    plot_triton
+    seconds_from_start = (PARAMS.plot.dnum - PARAMS.start.dnum) * 60 * 60 * 24;
+    set(HANDLES.time.slider, 'Value', seconds_from_start);
+    
     % goto beginning of file button - plot first frame
 elseif strcmp(action,'seekbof')
     set(HANDLES.fig.ctrl, 'Pointer', 'watch');

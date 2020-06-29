@@ -66,11 +66,28 @@ elseif strcmp(action,'autob')
         motion_ltsa('back')	% step back one frame
         if PARAMS.aptime ~= 0
          pause(PARAMS.ltsa.aptime); % wait (needed on fast machines)
-        end				
+        end
     end
     % turn menus back on
     control_ltsa('menuon')
-
+    
+elseif strcmp(action,'nextDet')
+    [~,nextDet] = lt_lVis_envDet_LTSA;
+    ltsaPad = PARAMS.ltsa.tseg.hr .* 0.01; %add some padding to where next detection/previous detection displays in window
+    PARAMS.ltsa.plot.dnum = nextDet - ltsaPad;
+    PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
+    read_ltsadata
+    plot_triton
+    
+        
+elseif strcmp(action,'prevDet')
+    [prevDet,~] = lt_lVis_envDet_LTSA;
+    ltsaPad = PARAMS.ltsa.tseg.hr .* 0.01; %add some padding to where next detection/previous detection displays in window
+    PARAMS.ltsa.plot.dnum = prevDet - ltsaPad;
+    PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
+    read_ltsadata
+    plot_triton
+    
 % stop button doesn't work right away, has to click twice to stop the LTSA
 % stop button - keep current frame
 elseif strcmp(action,'stop')
