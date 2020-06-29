@@ -164,12 +164,6 @@ if isfield(REMORA,'ltsa_plot_lVis_lab')
     if savalue
         REMORA.ltsa_plot_lVis_lab{1}();
     end
-%     if sgvalue
-%         REMORA.ltsa_plot_lVis_lab{2}();
-%     end
-%     if tsvalue
-%         REMORA.ltsa_plot_lVis_lab{3}();
-%     end
 end
 
 % change time in control window to data time in plot window

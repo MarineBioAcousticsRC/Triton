@@ -51,13 +51,13 @@ for labidx = 1:length(labels)
         %get final detection end and pass it into plotting for dotted
         %line
         finalDet = REMORA.lt.lVis_det.(detfld).stops(end);
-
+        
         if ~ isempty(Lo)
             plot_labels_wav(label, labelPos, ...
                 REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
                 REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
-                yPos, colors(labidx, :),startWV,endWV,finalDet);        
- 
+                yPos, colors(labidx, :),startWV,endWV,finalDet);
+            
             
             %plot changed labels
             changedLab = REMORA.lt.lEdit.(detfld);
@@ -77,15 +77,16 @@ for labidx = 1:length(labels)
     end
     yPos = yPos - ydelta;
     labelPos = labelPos - ydelta;
-
+    
 end
 
 function plot_labels_wav(label,labelPos,startL, stopL, yPos, color,startWV,endWV,finalDet)
 
 global PARAMS HANDLES
 lablFull = [startL,stopL];
+winLength = HANDLES.subplt.timeseries.XLim(2);
 
-%just look for start time for plotting at click level 
+%just look for start time for plotting at click level
 inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
 
 winDets = lablFull(inWin,:);
@@ -105,18 +106,34 @@ LineThresh = 1*60;
 
 for iPlot = 1:size(detXstart,1)
     detDur = detXend - detXstart;
+    detXNext = [detXstart(2:end);detXstart(end)];
+    %     avgDetGap = mean(detXNext - detXstart);
+    detGap = detXNext - detXstart;
+    longGap = [];
+    %get locations to plot label text based on how far apart detections
+    %are
+    longGap = [1;find(detGap>=0.1*winLength)+1];
+    if ~isempty(longGap)
+        labelRep = repmat(label,1,length(longGap));
+        posRep = repmat(labelPos,1,length(longGap));
+    else
+        labelRep = label;
+        posRep = labelPos;
+        %if no longGaps, just plot on first detection
+        longGap = 1:length(1);
+    end
     if detDur < LineThresh
         %just plot the start of a given detection
         plot(HANDLES.subplt.timeseries, detXstart(iPlot), ...
             yPos,'*','Color',color)
-        text(HANDLES.subplt.timeseries, detXstart(1),labelPos,...
-            label,'Color',color,'FontWeight','normal')
+        text(HANDLES.subplt.timeseries, detXstart(longGap),posRep,...
+            labelRep,'Color',color,'FontWeight','normal')
     else
         plot(HANDLES.subplt.timeseries, ...
             [detXstart(iPlot) detXend(iPlot)],[yPos yPos],...
             '-','Marker','*','MarkerSize',2,'Color',color)
-        text(HANDLES.subplt.timeseries, detXstart(1),labelPos,label,...
-            'Color',color,'FontWeight','normal')
+        text(HANDLES.subplt.timeseries, detXstart(longGap),posRep,...
+            labelRep,'Color',color,'FontWeight','normal')
     end
 end
 

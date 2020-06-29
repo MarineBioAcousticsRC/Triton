@@ -46,13 +46,13 @@ for labidx = 1:length(labels);
         %get final detection end and pass it into plotting for dotted
         %line
         finalDet = REMORA.lt.lVis_det.(detfld).stops(end);
-
+        
         if ~ isempty(Lo)
             plot_labels_wav(labl,labelPos, ...
                 REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
                 REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
-                yPos, colors(labidx, :),startWV,endWV,finalDet);        
- 
+                yPos, colors(labidx, :),startWV,endWV,finalDet);
+            
             
             %plot changed labels
             changedLab = REMORA.lt.lEdit.(detfld);
@@ -72,13 +72,14 @@ for labidx = 1:length(labels);
     end
     yPos = yPos - ydelta;
     labelPos = labelPos - ydelta;
-
+    
 end
 
 function plot_labels_wav(label,labelPos,startL, stopL, yPos, color,startWV,endWV,finalDet)
 
 global PARAMS HANDLES
 lablFull = [startL,stopL];
+winLength = HANDLES.subplt.specgram.XLim(2);
 
 %just look for starts for click-level detections
 inWin = find(lablFull(:,1)>= startWV & lablFull(:,1)<=endWV);
@@ -101,17 +102,33 @@ hold(HANDLES.subplt.specgram, 'on');
 LineThresh = 1;
 
 for iPlot = 1:size(detXstart,1)
+    detXNext = [detXstart(2:end);detXstart(end)];
+    %     avgDetGap = mean(detXNext - detXstart);
+    detGap = detXNext - detXstart;
+    longGap = [];
+    %get locations to plot label text based on how far apart detections
+    %are
+    longGap = [1;find(detGap>=0.1*winLength)+1];
+    if ~isempty(longGap)
+        labelRep = repmat(label,1,length(longGap));
+        posRep = repmat(labelPos,1,length(longGap));
+    else
+        labelRep = label;
+        posRep = labelPos;
+        %if no longGaps, just plot on first detection
+        longGap = 1:length(1);
+    end
     if detDur(iPlot) < LineThresh
         %just plot the start of a given detection
         plot(HANDLES.subplt.specgram, detXstart(iPlot), yPos,'*','Color',color)
-        text(HANDLES.subplt.specgram, detXstart(1),labelPos,label,...
-            'Color',color,'FontWeight','normal')
+        text(HANDLES.subplt.specgram, detXstart(longGap),posRep,...
+            labelRep,'Color',color,'FontWeight','normal')
     else
         plot(HANDLES.subplt.specgram, ...
             [detXstart(iPlot) detXend(iPlot)],[yPos yPos],'--','Marker','*',...
             'MarkerSize',2,'Color',color)
-        text(HANDLES.subplt.specgram, ...
-            detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+        text(HANDLES.subplt.specgram, detXstart(longGap),posRep,...
+            labelRep,'Color',color,'FontWeight','normal')
     end
 end
 

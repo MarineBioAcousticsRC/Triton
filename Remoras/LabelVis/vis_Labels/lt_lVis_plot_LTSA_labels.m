@@ -84,6 +84,7 @@ function plot_labels_ltsa(label,labelPos,startL, stopL, yPos, color,ltsaS,ltsaE,
 
 global PARAMS HANDLES REMORA
 lablFull = [startL,stopL];
+winLength = HANDLES.subplt.ltsa.XLim(2);
 
 startWin = find(startL >= ltsaS & startL <= ltsaE);
 endWin = find(stopL >= ltsaS & stopL <= ltsaE);
@@ -125,14 +126,32 @@ if ~isempty(winDetsFull)
     
     for iPlot = 1:size(detXstart,1)
         detDur = detXend - detXstart;
+        detXNext = [detXstart(2:end);detXstart(end)];
+        %     avgDetGap = mean(detXNext - detXstart);
+        detGap = detXNext - detXstart;
+        longGap = [];
+        %get locations to plot label text based on how far apart detections
+        %are
+        longGap = [1;find(detGap>=0.5*winLength)+1];
+        if ~isempty(longGap)
+            labelRep = repmat(label,1,length(longGap));
+            posRep = repmat(labelPos,1,length(longGap));
+        else
+            labelRep = label;
+            posRep = labelPos;
+            %if no longGaps, just plot on first detection
+            longGap = 1:length(1);
+        end
         if detDur < LineThresh
             %just plot the start of a given detection
             plot(HANDLES.subplt.ltsa, detXstart(iPlot), yPos,'*','Color',color)
-            text(HANDLES.subplt.ltsa, detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
+                labelRep,'Color',color,'FontWeight','normal')
         else
             plot(HANDLES.subplt.ltsa, [detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
                 'MarkerSize',5,'Color',color)
-            text(HANDLES.subplt.ltsa, detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
+                labelRep,'Color',color,'FontWeight','normal')
         end
     end
     
@@ -163,14 +182,32 @@ if ~isempty(winDetsStarts)
     
     for iPlot = 1:size(detXstart,1)
         detDur = detXend - detXstart;
+        detXNext = [detXstart(2:end);detXstart(end)];
+        %     avgDetGap = mean(detXNext - detXstart);
+        detGap = detXNext - detXstart;
+        longGap = [];
+        %get locations to plot label text based on how far apart detections
+        %are
+        longGap = [1;find(detGap>=0.5*winLength)+1];
+        if ~isempty(longGap)
+            labelRep = repmat(label,1,length(longGap));
+            posRep = repmat(labelPos,1,length(longGap));
+        else
+            labelRep = label;
+            posRep = labelPos;
+            %if no longGaps, just plot on first detection
+            longGap = 1:length(1);
+        end
         if detDur < LineThresh
             %just plot the start of a given detection
             plot(detXstart(iPlot), yPos,'*','Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
+                labelRep,'Color',color,'FontWeight','normal')
         else
             plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
                 'MarkerSize',5,'Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
+                labelRep,'Color',color,'FontWeight','normal')
         end
     end
     
@@ -200,14 +237,32 @@ if ~isempty(winDetsStops)
     
     for iPlot = 1:size(detXstart,1)
         detDur = detXend - detXstart;
+        detXNext = [detXstart(2:end);detXstart(end)];
+        %     avgDetGap = mean(detXNext - detXstart);
+        detGap = detXNext - detXstart;
+        longGap = [];
+        %get locations to plot label text based on how far apart detections
+        %are
+        longGap = [1;find(detGap>=0.5*winLength)+1];
+        if ~isempty(longGap)
+            labelRep = repmat(label,1,length(longGap));
+            posRep = repmat(labelPos,1,length(longGap));
+        else
+            labelRep = label;
+            posRep = labelPos;
+            %if no longGaps, just plot on first detection
+            longGap = 1:length(1);
+        end
         if detDur < LineThresh
             %just plot the start of a given detection
             plot(detXstart(iPlot), yPos,'*','Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
+                labelRep,'Color',color,'FontWeight','normal')
         else
             plot([detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
                 'MarkerSize',5,'Color',color)
-            text(detXstart(1),labelPos,label,'Color',color,'FontWeight','normal')
+            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
+                labelRep,'Color',color,'FontWeight','normal')
         end
     end
     

@@ -230,13 +230,7 @@ elseif ~PARAMS.filter == 1 && PARAMS.ch == 1
 end
 
 if isfield(REMORA,'ltsa_plot_lVis_lab')
-%     if savalue
-%         REMORA.ltsa_plot_lVis_lab{1}();
-%     end
     if sgvalue
         REMORA.ltsa_plot_lVis_lab{2}();
     end
-%     if tsvalue
-%         REMORA.ltsa_plot_lVis_lab{3}();
-%     end
 end
