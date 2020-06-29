@@ -21,6 +21,7 @@ REMORA.nn.train_net.labelWeights = uLabelWeights;
 
 [myNetwork, trainPrefs] = nn_build_network;
 trainDataAll(isnan(trainDataAll))=0;
+trainDataAll(:,182:381)=abs(trainDataAll(:,182:381)-.5)*2;
 
 train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
 %reshape(trainDataAll,[1,size(trainDataAll,2),1,...
@@ -37,6 +38,7 @@ confusionmat(YPred,categorical(trainLabelsAll))
 
 load(REMORA.nn.train_net.testFile);
 testDataAll(isnan(testDataAll))=0;
+testDataAll(:,182:381)=abs(testDataAll(:,182:381)-.5)*2;
 test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
 
 [YPredTrain,scoresTrain] = classify(net,train4D);
@@ -50,8 +52,11 @@ bestScores = max(scoresEval,[],2);
 filenameStem = strrep(filenameStem,'_bin_train','');
 REMORA.nn.train_net.networkFilename = fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_trainedNetwork.mat']);
 REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores.mat']);
-save(REMORA.nn.train_net.networkFilename,'net')
-save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval','scoresEval','testLabelsAll')
+
+netTrainingInfo =  REMORA.nn.train_net.trainFile;
+save(REMORA.nn.train_net.networkFilename,'net','netTrainingInfo','trainTestSetInfo','typeNames')
+save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',...
+    'scoresEval','testLabelsAll','netTrainingInfo','trainTestSetInfo','typeNames')
 
 
 

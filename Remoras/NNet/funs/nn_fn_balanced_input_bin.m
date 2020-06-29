@@ -141,5 +141,6 @@ testLabelsAll = vertcat(testSetLabels{:});
 
 savedTrainFile = fullfile(saveDir,saveNameTrain);
 savedTestFile = fullfile(saveDir,saveNameTest);
-save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','typeNames','-v7.3')
-save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','typeNames','-v7.3')
+trainTestSetInfo = REMORA.nn.train_test_set;
+save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','typeNames','trainTestSetInfo','-v7.3')
+save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','typeNames','trainTestSetInfo','-v7.3')

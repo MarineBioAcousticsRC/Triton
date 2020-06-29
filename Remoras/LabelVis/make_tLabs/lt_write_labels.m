@@ -1,4 +1,4 @@
-function lt_sh_write_labels(LabelFileName, times, label, varargin)
+function lt_write_labels(LabelFileName, times, label, varargin)
 % ioWriteLabel(LabelFileName, times, label, OptionalArgs)
 % Write a Wavesurfer format label file to file LabelFileName
 %
