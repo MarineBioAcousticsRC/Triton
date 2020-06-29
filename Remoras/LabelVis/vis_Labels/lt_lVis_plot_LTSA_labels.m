@@ -132,7 +132,7 @@ if ~isempty(winDetsFull)
         longGap = [];
         %get locations to plot label text based on how far apart detections
         %are
-        longGap = [1;find(detGap>=0.5*winLength)+1];
+        longGap = [1;find(detGap>=0.33*winLength)+1];
         if ~isempty(longGap)
             labelRep = repmat(label,1,length(longGap));
             posRep = repmat(labelPos,1,length(longGap));
@@ -188,7 +188,7 @@ if ~isempty(winDetsStarts)
         longGap = [];
         %get locations to plot label text based on how far apart detections
         %are
-        longGap = [1;find(detGap>=0.5*winLength)+1];
+        longGap = [1;find(detGap>=0.33*winLength)+1];
         if ~isempty(longGap)
             labelRep = repmat(label,1,length(longGap));
             posRep = repmat(labelPos,1,length(longGap));
@@ -243,7 +243,7 @@ if ~isempty(winDetsStops)
         longGap = [];
         %get locations to plot label text based on how far apart detections
         %are
-        longGap = [1;find(detGap>=0.5*winLength)+1];
+        longGap = [1;find(detGap>=0.33*winLength)+1];
         if ~isempty(longGap)
             labelRep = repmat(label,1,length(longGap));
             posRep = repmat(labelPos,1,length(longGap));

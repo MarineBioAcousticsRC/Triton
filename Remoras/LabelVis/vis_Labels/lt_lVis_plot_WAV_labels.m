@@ -61,9 +61,9 @@ for labidx = 1:length(labels);
                 if ~ isempty(ch)
                     if cidx == 0
                         % special case not in colors matrix
-                        plot_chLab_wav(ltsaS, ltsaE, ch, colF, yPos);
+                        plot_chLab_wav(startWV, endWV, ch, colF, yPos);
                     else
-                        plot_chLab_wav(ltsaS, ltsaE, ch, colors(cidx,:), yPos);
+                        plot_chLab_wav(startWV, endWV, ch, colors(cidx,:), yPos);
                     end
                 end
             end
