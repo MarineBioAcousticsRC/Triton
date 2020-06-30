@@ -115,7 +115,7 @@ for fidx = 1:size(FileList,1)
         % Filter between 200 and 2000 Hz.
         yFilt = filtfilt(B,A,y); % Filter click.
         fprintf('max = %0.3f\n',max(yFilt))
-       
+       if max(yFilt)<=0.1
             pre_env_y=hilbert(yFilt.');
             env_y=sqrt((real(pre_env_y)).^2+(imag(pre_env_y)).^2); %Au 1993, S.178, equation 9-4
             
@@ -394,9 +394,9 @@ for fidx = 1:size(FileList,1)
 %                         delRmsBS = find(drmsBS<parm.rmsBS); %214,914
 %                         delPpBS = find(dppBS<parm.ppBS); %230,409
 %                         delDur = find(durSeg>=parm.durLong_s | durSeg<=parm.durShort_s); %230,729
-                         delDur = find(durSeg<=durShort_s); 
+%                         delDur = find(durSeg<=durShort_s); 
 %                         delUnion = unique([delRmsAS;delPpAS;delRmsBS;delPpBS;delDur]); %276,145
-                         delUnion = unique([delRmsASmin,delRmsASmax,delDur]);
+                         delUnion = unique([delRmsASmin,delRmsASmax]);
 %                         % Delete false detections.
                         expTimes(delUnion,:) = [];
                         corrVal(delUnion,:) = [];
@@ -464,7 +464,7 @@ for fidx = 1:size(FileList,1)
                     1;
                 end
             end
-        
+       end
 %                 thrTimes = zeros(size(expTimes)) * threshold;
 %         
 %                 if ~isempty(expTimes)
