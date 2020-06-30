@@ -73,18 +73,18 @@ elseif strcmp(action,'autob')
     
 elseif strcmp(action,'nextDet')
     [~,nextDet] = lt_lVis_envDet_LTSA;
-    ltsaPad = PARAMS.ltsa.tseg.hr .* 0.01; %add some padding to where next detection/previous detection displays in window
+    ltsaPad = PARAMS.ltsa.tseg.hr .* 0.001; %add some padding to where next detection/previous detection displays in window
     PARAMS.ltsa.plot.dnum = nextDet - ltsaPad;
     PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
     read_ltsadata
     plot_triton
-    
         
 elseif strcmp(action,'prevDet')
     [prevDet,~] = lt_lVis_envDet_LTSA;
-    ltsaPad = PARAMS.ltsa.tseg.hr .* 0.01; %add some padding to where next detection/previous detection displays in window
+    ltsaPad = PARAMS.ltsa.tseg.hr.*0.001; %add some padding to where next detection/previous detection displays in window
     PARAMS.ltsa.plot.dnum = prevDet - ltsaPad;
     PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
+   % if PARAMS.ltsa.plot.dnum
     read_ltsadata
     plot_triton
     

@@ -40,6 +40,15 @@ if strcmp(action,'LoadLabels')
         REMORA.lt.lEdit.detection = double.empty(0,3);
         REMORA.lt.lEdit.detectionLab = [];
         
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection.bouts.starts,REMORA.lt.lVis_det.detection.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection.starts, ...
+            REMORA.lt.lVis_det.detection.stops, ...
+            boutGap);
+        
     elseif strcmp(NFile,'labels2')
         REMORA.lt.lVis_det.detection2.starts = Starts;
         REMORA.lt.lVis_det.detection2.stops = Stops;
@@ -56,6 +65,15 @@ if strcmp(action,'LoadLabels')
         %initialize empty spots for change labels
         REMORA.lt.lEdit.detection2 = double.empty(0,3);
         REMORA.lt.lEdit.detection2Lab = [];
+        
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection2.bouts.starts,REMORA.lt.lVis_det.detection2.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection2.starts, ...
+            REMORA.lt.lVis_det.detection2.stops, ...
+            boutGap);
         
     elseif strcmp(NFile,'labels3')
         REMORA.lt.lVis_det.detection3.starts = Starts;
@@ -74,6 +92,15 @@ if strcmp(action,'LoadLabels')
         REMORA.lt.lEdit.detection3 = double.empty(0,3);
         REMORA.lt.lEdit.detection3Lab = [];
         
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection3.bouts.starts,REMORA.lt.lVis_det.detection3.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection3.starts, ...
+            REMORA.lt.lVis_det.detection3.stops, ...
+            boutGap);
+        
     elseif strcmp(NFile,'labels4')
         REMORA.lt.lVis_det.detection4.starts = Starts;
         REMORA.lt.lVis_det.detection4.stops = Stops;
@@ -90,6 +117,15 @@ if strcmp(action,'LoadLabels')
         %initialize empty spots for change labels
         REMORA.lt.lEdit.detection4 = double.empty(0,3);
         REMORA.lt.lEdit.detection4Lab = [];
+        
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection4.bouts.starts,REMORA.lt.lVis_det.detection4.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection4.starts, ...
+            REMORA.lt.lVis_det.detection4.stops, ...
+            boutGap);
         
     elseif strcmp(NFile,'labels5')
         REMORA.lt.lVis_det.detection5.starts = Starts;
@@ -108,6 +144,15 @@ if strcmp(action,'LoadLabels')
         REMORA.lt.lEdit.detection5 = double.empty(0,3);
         REMORA.lt.lEdit.detection5Lab = [];
         
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection5.bouts.starts,REMORA.lt.lVis_det.detection5.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection5.starts, ...
+            REMORA.lt.lVis_det.detection5.stops, ...
+            boutGap);
+        
     elseif strcmp(NFile,'labels6')
         REMORA.lt.lVis_det.detection6.starts = Starts;
         REMORA.lt.lVis_det.detection6.stops = Stops;
@@ -124,6 +169,15 @@ if strcmp(action,'LoadLabels')
         %initialize empty spots for change labels
         REMORA.lt.lEdit.detection6 = double.empty(0,3);
         REMORA.lt.lEdit.detection6Lab = [];
+        
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection6.bouts.starts,REMORA.lt.lVis_det.detection6.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection6.starts, ...
+            REMORA.lt.lVis_det.detection6.stops, ...
+            boutGap);
         
     elseif strcmp(NFile,'labels7')
         REMORA.lt.lVis_det.detection7.starts = Starts;
@@ -142,6 +196,15 @@ if strcmp(action,'LoadLabels')
         REMORA.lt.lEdit.detection7 = double.empty(0,3);
         REMORA.lt.lEdit.detection7Lab = [];
         
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection7.bouts.starts,REMORA.lt.lVis_det.detection7.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection7.starts, ...
+            REMORA.lt.lVis_det.detection7.stops, ...
+            boutGap);
+        
     elseif strcmp(NFile,'labels8')
         REMORA.lt.lVis_det.detection8.starts = Starts;
         REMORA.lt.lVis_det.detection8.stops = Stops;
@@ -158,6 +221,15 @@ if strcmp(action,'LoadLabels')
         %initialize empty spots for change labels
         REMORA.lt.lEdit.detection8 = double.empty(0,3);
         REMORA.lt.lEdit.detection8Lab = [];
+        
+        %calculate LTSA bouts
+        %%% shorten detections to bout-level
+        boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+        %is less than this, combine into a bout
+        [REMORA.lt.lVis_det.detection8.bouts.starts,REMORA.lt.lVis_det.detection8.bouts.stops] = lt_lVis_defineBouts(...
+            REMORA.lt.lVis_det.detection8.starts, ...
+            REMORA.lt.lVis_det.detection8.stops, ...
+            boutGap);
     end
     
     %refresh window
@@ -299,7 +371,7 @@ elseif strcmp(action,'Display')
 elseif strcmp(action, 'TakeItBack')
     motion_ltsa('back');
     lt_lVis_plot_LTSA_labels
-
+    
     if HANDLES.display.specgram.Value
         lt_lVis_plot_WAV_labels
     end
