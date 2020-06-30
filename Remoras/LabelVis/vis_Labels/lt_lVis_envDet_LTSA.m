@@ -1,6 +1,6 @@
 function [prevDet,nextDet] = lt_lVis_envDet_LTSA()
 
-global REMORA
+global REMORA PARAMS
 next = [];
 prev = [];
 
@@ -20,6 +20,10 @@ end
 
 next = [next{:}];
 prev = [prev{:}];
+
+%truncate detections to this LTSA file 
+next = next(next<=PARAMS.ltsa.dnumEnd(end));
+prev = prev(prev>=PARAMS.ltsa.dnumStart(1));
 
 if ~isempty(next)
     next_sort = sort(next);

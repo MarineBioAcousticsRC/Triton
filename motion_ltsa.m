@@ -73,22 +73,31 @@ elseif strcmp(action,'autob')
     
 elseif strcmp(action,'nextDet')
     [~,nextDet] = lt_lVis_envDet_LTSA;
-    ltsaPad = PARAMS.ltsa.tseg.hr .* 0.001; %add some padding to where next detection/previous detection displays in window
-    PARAMS.ltsa.plot.dnum = nextDet - ltsaPad;
-    PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
-    read_ltsadata
-    plot_triton
-        
+    if ~isempty(nextDet)
+        ltsaPad = PARAMS.ltsa.tseg.hr .* 0.1; %add some padding to where next detection/previous detection displays in window
+        endLoc = PARAMS.ltsa.dnumEnd(end)-datenum(0,0,0,0,PARAMS.ltsa.tseg.hr,0);
+        if endLoc< (nextDet-ltsaPad)
+            PARAMS.ltsa.plot.dnum = endLoc;
+        else
+            PARAMS.ltsa.plot.dnum = nextDet - datenum(0,0,0,0,ltsaPad,0);
+        end
+        PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
+        read_ltsadata
+        plot_triton
+    end
+    
 elseif strcmp(action,'prevDet')
     [prevDet,~] = lt_lVis_envDet_LTSA;
-    ltsaPad = PARAMS.ltsa.tseg.hr.*0.001; %add some padding to where next detection/previous detection displays in window
-    PARAMS.ltsa.plot.dnum = prevDet - ltsaPad;
-    PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
-   % if PARAMS.ltsa.plot.dnum
-    read_ltsadata
-    plot_triton
+    if ~isempty(prevDet)
+        ltsaPad = PARAMS.ltsa.tseg.hr.*0.1; %add some padding to where next detection/previous detection displays in window
+        PARAMS.ltsa.plot.dnum = prevDet - datenum(0,0,0,0,ltsaPad,0);
+        PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
+        % if PARAMS.ltsa.plot.dnum
+        read_ltsadata
+        plot_triton
+    end
     
-% stop button doesn't work right away, has to click twice to stop the LTSA
+    % stop button doesn't work right away, has to click twice to stop the LTSA
 % stop button - keep current frame
 elseif strcmp(action,'stop')
     set(HANDLES.ltsa.motion.stop,'Userdata',-1)

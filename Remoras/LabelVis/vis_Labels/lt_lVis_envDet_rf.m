@@ -23,10 +23,17 @@ for iDets = 1:length(labels)
     detId = sprintf('detection%s', labels{iDets});
     if isfield(REMORA.lt.lVis_det.(detId),'starts')
         labs = REMORA.lt.lVis_det.(detId).starts;
-        next(iDets) = labs(find(labs>endWV,1));
-        prev(iDets) = labs(find(labs<startWV,1,'last'));
+        next{iDets} = labs(find(labs>endWV,1));
+        prev{iDets} = labs(find(labs<startWV,1,'last'));
     end
 end
+
+next = [next{:}];
+prev = [prev{:}];
+
+%truncate detections to this LTSA file- just keeps things from messing up 
+next = next(next<=PARAMS.raw.dnumEnd(end));
+prev = prev(prev>=PARAMS.raw.dnumStart(1));
 
 if ~isempty(next)
     next_sort = sort(next);
