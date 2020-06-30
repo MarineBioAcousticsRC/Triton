@@ -120,6 +120,8 @@ elseif strcmp(action,'nextDet')
         plot_triton
         seconds_from_start = (PARAMS.plot.dnum - PARAMS.start.dnum) * 60 * 60 * 24;
         set(HANDLES.time.slider, 'Value', seconds_from_start);
+    else
+        disp('Last detection! No detections found after current window for this LTSA file')
     end
     
 elseif strcmp(action,'prevDet')
@@ -138,6 +140,8 @@ elseif strcmp(action,'prevDet')
         plot_triton
         seconds_from_start = (PARAMS.plot.dnum - PARAMS.start.dnum) * 60 * 60 * 24;
         set(HANDLES.time.slider, 'Value', seconds_from_start);
+    else
+        disp('First detection! No detections found prior to current window for this LTSA file')
     end
     
     % goto beginning of file button - plot first frame

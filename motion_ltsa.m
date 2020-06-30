@@ -84,6 +84,8 @@ elseif strcmp(action,'nextDet')
         PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
         read_ltsadata
         plot_triton
+    else
+        disp('Last detection! No detections found after current window for this LTSA file')
     end
     
 elseif strcmp(action,'prevDet')
@@ -95,6 +97,8 @@ elseif strcmp(action,'prevDet')
         % if PARAMS.ltsa.plot.dnum
         read_ltsadata
         plot_triton
+    else
+        disp('First detection! No detections found prior to current window for this LTSA file')
     end
     
     % stop button doesn't work right away, has to click twice to stop the LTSA

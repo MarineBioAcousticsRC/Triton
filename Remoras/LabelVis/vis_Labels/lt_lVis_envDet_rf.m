@@ -39,7 +39,6 @@ if ~isempty(next)
     next_sort = sort(next);
     nextDet = next_sort(1);
 else
-    disp('Last detection! No detections found after current window for this LTSA file')
     nextDet = [];
 end
 
@@ -47,6 +46,5 @@ if ~isempty(prev)
     prev_sort = sort(prev);
     prevDet = prev_sort(end);
 else
-    disp('First detection! No detections found prior to current window for this LTSA file')
     prevDet = [];
 end
