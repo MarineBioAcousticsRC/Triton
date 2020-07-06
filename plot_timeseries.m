@@ -6,7 +6,7 @@ function plot_timeseries
 % plots the timeseries to the main window
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global DATA HANDLES PARAMS
+global DATA HANDLES PARAMS REMORA
 
 % get which figures plotted
 savalue = get(HANDLES.display.ltsa,'Value');
@@ -92,4 +92,8 @@ if ~sgvalue
   end
 end
 
-
+if isfield(REMORA,'ltsa_plot_lVis_lab')
+    if tsvalue
+        REMORA.ltsa_plot_lVis_lab{3}();
+    end
+end
