@@ -64,13 +64,11 @@ elseif strcmp(action,'setSpecies')
     SpeciesChoice = species.opt{species.val};
     REMORA.bm.settings.species = SpeciesChoice;
     
-elseif strcmp(action,'setHARPdata')
-    HARPdataCheckbox = get(REMORA.bm_verify.HARPdataCheckbox, 'string');
-    REMORA.bm.settings.HARPdata = HARPdataCheckbox;
-    
-elseif strcmp(action,'setSoundTrapdata')
-    SoundTrapdataCheckbox = get(REMORA.bm_verify.SoundTrapdataCheckbox, 'string');
-    REMORA.bm.settings.SoundTrap = SoundTrapdataCheckbox;
+elseif strcmp(action,'setDataType')
+    datatype.val = get(REMORA.bm_verify.DataChoice, 'Value');
+    datatype.opt = get(REMORA.bm_verify.DatasChoice,'string');
+    DataChoice = Datatype.opt{datatype.val};
+    REMORA.bm.settings.datatype = DataChoice;
     
 elseif strcmp(action,'setCsvFile')
     csvCheckbox = get(REMORA.bm_verify.csvCheckbox, 'string');
