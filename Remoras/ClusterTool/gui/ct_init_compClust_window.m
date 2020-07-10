@@ -762,6 +762,9 @@ REMORA.ct.CC_verify.SBdiffTxt = uicontrol(REMORA.fig.ct.CC_settings,...
     'Visible',showSBParams);%   'BackgroundColor',bgColor3,...
 
 % Editable Text
+if ~isfield(REMORA.ct.CC_params,'SBdiff')
+    REMORA.ct.CC_params.SBdiff = [];
+end
 labelStr=num2str(REMORA.ct.CC_params.SBdiff);
 btnPos=[x(3)+w*.2 y(19) w/3 h];
 REMORA.ct.CC_verify.SBdiffEdTxt = uicontrol(REMORA.fig.ct.CC_settings,...
@@ -787,6 +790,10 @@ REMORA.ct.CC_verify.SBpercTxt = uicontrol(REMORA.fig.ct.CC_settings,...
     'Visible',showSBParams);%   'BackgroundColor',bgColor3,...
 
 % Editable Text
+
+if ~isfield(REMORA.ct.CC_params,'SBperc')
+    REMORA.ct.CC_params.SBperc = [];
+end
 labelStr=num2str(REMORA.ct.CC_params.SBperc);
 btnPos=[x(3)+w*.2 y(20) w/3 h];
 REMORA.ct.CC_verify.SBpercEdTxt = uicontrol(REMORA.fig.ct.CC_settings,...

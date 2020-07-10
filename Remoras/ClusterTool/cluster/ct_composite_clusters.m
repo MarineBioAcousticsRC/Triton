@@ -41,6 +41,17 @@ end
 % Check for output directory
 if ~exist(s.outDir,'dir')
     mkdir(s.outDir)
+else
+    oldFileList = dir(fullfile(s.outDir,['*',s.outputName,'*']));
+    if ~isempty(oldFileList)
+        waitfor(warndlg(['WARNING: You are about to overwrite prior output. ',...
+                    'If the number of clusters produced now is fewer than ',... 
+                    'produced previously, you may end up with old cluster files ',...
+                    'mixed in with new ones. To reduce risk of errors, consider ',...
+                    'deleting, changing output folder, or changing output name. (Use Control-C to stop).'],...
+                'Warning: File Overwrite','replace'));
+            
+    end
 end
 cd(s.outDir)
 if s.diary

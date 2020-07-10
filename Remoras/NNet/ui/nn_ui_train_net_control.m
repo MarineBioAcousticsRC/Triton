@@ -34,6 +34,10 @@ elseif strcmp(myEvent, 'setDropout')
     REMORA.nn.train_net.dropout = ...
         round(str2num(get(REMORA.fig.nn.train_net.dropoutEdTxt,'String')));
 
+elseif strcmp(myEvent, 'setSaveFigs')
+    REMORA.nn.train_net.saveFigs = ...
+        get(REMORA.fig.nn.train_net.saveFigsCheck,'Value');
+
 elseif strcmp(myEvent, 'Run')
     nn_train_nnet
 else
