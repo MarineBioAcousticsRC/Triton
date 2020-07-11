@@ -128,7 +128,9 @@ clf;colormap(jet)
 set(REMORA.fig.nn.training_plots{3},'name', 'Network Classifications on Test Set')
 for iR = 1:nPlots
     subplot(nRows,nCols,iR)
-    imagesc(testDataAll(double(YPredEval)==iR,:)')
+    idxToPlot = find(double(YPredEval)==iR);
+    [classScore,plotOrder] = sort(bestScores(idxToPlot),'descend');
+    imagesc(testDataAll(idxToPlot(plotOrder),:)')
     set(gca,'ydir','normal')
     title(typeNames{iR})
 end
@@ -152,5 +154,5 @@ if REMORA.nn.train_net.saveFigs
     nn_fn_save_training_figs(filenameStem)
 end
 
-disp('Training complete\n')
+disp('Training complete')
 fprintf('Output saved to:    %s\n\n',REMORA.nn.train_net.outDir)

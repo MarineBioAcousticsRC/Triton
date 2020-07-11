@@ -2,7 +2,7 @@ function nn_fn_save_training_figs(filenameStem)
 
 global REMORA
 
-disp('Saving figures\n')
+disp('Saving figures')
 saveas(REMORA.fig.nn.training_plots{1},fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_Data.png']))
 saveas(REMORA.fig.nn.training_plots{2},fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Test_Data.png']))
 saveas(REMORA.fig.nn.training_plots{3},fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Classifications_Test.png']))
@@ -15,4 +15,4 @@ trainFig = find(~cellfun(@isempty,strfind({h(:).Name},'Training Progress')),1,'f
 REMORA.fig.nn.training_plots{8} = h(trainFig);
 saveas(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.png']))
 
-disp('Done saving figs\n')
+disp('Done saving figs')
