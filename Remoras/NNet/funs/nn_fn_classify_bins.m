@@ -109,7 +109,7 @@ for iFile = 1:nFiles
         nSpecSize = size(binData(iBin).nSpec);
         subIndex = myIndex:(myIndex+nSpecSize(2)-1);
         binData(iBin).predLabels = predLabelsExpand(subIndex);
-        binData(iBin).predLabels = predScoresMaxExpand(subIndex);
+        binData(iBin).predLabelScore = predScoresMaxExpand(subIndex);
         myIndex = max(subIndex)+1;
     end
     % save all the things
@@ -117,7 +117,8 @@ for iFile = 1:nFiles
     trainTestSetInfo = trainedNet.trainTestSetInfo;
     typeNames = trainedNet.typeNames;
     save(saveFullFile,'predScoresMax','trainTestSetInfo',...
-        'netTrainingInfo','classificationInfo','typeNames','binData', '-v7.3')
+        'netTrainingInfo','classificationInfo','typeNames','binData',...
+        'f','p','TPWSfilename','-v7.3')
     fprintf('Done with file %0.0f of %0.0f: %s\n',iFile, nFiles,inFile)
     % should we plot here?
     if REMORA.nn.classify.intermedPlotCheck
