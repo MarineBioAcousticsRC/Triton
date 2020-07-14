@@ -246,7 +246,7 @@ for iEA = 1:s.N
         excludedIn = 1:size(dTTmatNorm,1);
         subSamp = 0;
     end
-    
+    s.subSamp = subSamp;
     if subSamp || iEA == 1
         % Only do this on first iteration, or on every iteration if you are subsampling
         % find pairwise distances between spectra
