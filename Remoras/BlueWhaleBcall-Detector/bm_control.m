@@ -66,8 +66,8 @@ elseif strcmp(action,'setSpecies')
     
 elseif strcmp(action,'setDataType')
     datatype.val = get(REMORA.bm_verify.DataChoice, 'Value');
-    datatype.opt = get(REMORA.bm_verify.DatasChoice,'string');
-    DataChoice = Datatype.opt{datatype.val};
+    datatype.opt = get(REMORA.bm_verify.DataChoice,'string');
+    DataChoice = datatype.opt{datatype.val};
     REMORA.bm.settings.datatype = DataChoice;
     
 elseif strcmp(action,'setCsvFile')
