@@ -25,7 +25,7 @@ for iFile = 1:nFiles
     zID = [];
     for iRow = 1:size(binData,1)
         repDims = size(clickTimes{iRow});
-        if ~isnan(predLabel(iRow))
+        if ~isnan(predLabel(iRow))&& predLabelScore(iRow)>=.95
             zIDnew = [clickTimes{iRow},...
                 repmat(predLabel(iRow),repDims),...
                 repmat(predLabelScore(iRow),repDims)];

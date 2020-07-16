@@ -75,10 +75,15 @@ bestScores = max(scoresEval,[],2);
 
 % confusionmat(YPredEval(strongScores),categorical(testLabelsAll(strongScores)))
 [~,filenameStem,~] = fileparts(REMORA.nn.train_net.trainFile);
-filenameStem = strrep(filenameStem,'_bin_train','');
-REMORA.nn.train_net.networkFilename = fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_trainedNetwork.mat']);
-REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores.mat']);
-
+if contains(filenameStem,'_bin_train')
+    filenameStem = strrep(filenameStem,'_bin_train','');
+    REMORA.nn.train_net.networkFilename = fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_trainedNetwork_bin.mat']);
+    REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores_bin.mat']);
+elseif contains(filenameStem,'_det_train')
+    filenameStem = strrep(filenameStem,'_det_train','');
+    REMORA.nn.train_net.networkFilename = fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_trainedNetwork_det.mat']);
+    REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores_det.mat']);
+end
 netTrainingInfo =  REMORA.nn.train_net.trainFile;
 save(REMORA.nn.train_net.networkFilename,'net','netTrainingInfo','trainTestSetInfo','typeNames')
 save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',...
