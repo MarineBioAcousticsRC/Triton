@@ -1,6 +1,6 @@
 
 
-function [PathFileList, FileList, PathList] = utFindFiles(SearchFileMask, SearchPathMask, SearchRecursiv),
+function [PathFileList, FileList, PathList] = utFindFiles(SearchFileMask, SearchPathMask, SearchRecursiv)
 % Find Files regarding a search mask 
 % 
 %  This function searches for files in the current directory /

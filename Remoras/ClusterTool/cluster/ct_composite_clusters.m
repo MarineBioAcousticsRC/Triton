@@ -41,6 +41,17 @@ end
 % Check for output directory
 if ~exist(s.outDir,'dir')
     mkdir(s.outDir)
+else
+    oldFileList = dir(fullfile(s.outDir,['*',s.outputName,'*']));
+    if ~isempty(oldFileList)
+        waitfor(warndlg(['WARNING: You are about to overwrite prior output. ',...
+                    'If the number of clusters produced now is fewer than ',... 
+                    'produced previously, you may end up with old cluster files ',...
+                    'mixed in with new ones. To reduce risk of errors, consider ',...
+                    'deleting, changing output folder, or changing output name. (Use Control-C to stop).'],...
+                'Warning: File Overwrite','replace'));
+            
+    end
 end
 cd(s.outDir)
 if s.diary
@@ -92,8 +103,21 @@ for iFile = 1:length(inFileList)
     end
 end
 clear('loadedData')
-
-%%%%%%%%%% Begin main functionality %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+global REMORA
+tritonMode = 0;
+if isfield(REMORA,'ct')
+    tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and
+    % triton tools are fair game.
+end
+if  tritonMode && isfield(REMORA.ct.CC,'rm_simbins')...
+        && REMORA.ct.CC_params.rmSimBins
+    %     thresh = 0.95;
+    %     dist = 0.1;
+    specComp = REMORA.ct.CC.sbSet;
+    binDataPruned = ct_cc_modifyBinData(REMORA.ct.CC_params.SBperc,REMORA.ct.CC_params.SBdiff,binDataPruned,specComp);
+end
+% %%%%%%%%%% Begin main functionality %%%%%%%%%%%%
 %% Normalize everything
 % Spectra:
 % Put click spectra into a matrix
@@ -102,6 +126,17 @@ nSpecMat = horzcat(binDataPruned.nSpec)';
 dTTmat = vertcat(binDataPruned.dTT);
 cRateMat = vertcat(binDataPruned.clickRate);
 clickTimes = horzcat(binDataPruned(:).clickTimes);
+
+for iEM = 1:size(binDataPruned,1)
+    if size(binDataPruned(iEM).envMean,2) == 1
+        binDataPruned(iEM).envMean = zeros(1,p.maxDur);
+    end
+    %     if size(binDataPruned(iEM).envMean,2) == 1
+    %         binDataPruned(iEM).envDur = zeros(1,p.envDur);
+    %     end
+end
+envShape = vertcat(binDataPruned(:).envMean);
+%envDistrib = vertcat(binDataPruned(:).envDur);
 
 clustersInBin = nan(size(dTTmat,1),1);
 tIntMat =  nan(size(dTTmat,1),1);
@@ -130,7 +165,9 @@ if s.singleClusterOnly
 else
     useBins = (nSpecMat >= s.minClicks);
 end
-
+if ~isfield(s,'useEnvShapeTF')
+    s.useEnvShapeTF = 0;
+end
 [~,s.stIdx] = min(abs(f-s.startFreq));
 [~,s.edIdx] = min(abs(f-s.endFreq));
 [specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
@@ -164,22 +201,22 @@ clickTimes = clickTimes(useBins);
 tIntMat = tIntMat(useBins);
 subOrder = subOrder(useBins);
 fileNumExpand = fileNumExpand(useBins);
-
+envShape = envShape(useBins,:);
 %% Cluster N times for evidence accumulation/robustness
-tempN = ceil(sqrt(size(cRateMat,1)*2));
 % CoMat = zeros(tempN,tempN);
 subSamp = 1; % flag automatically goes to true if subsampling.
 isolatedSet = [];
 wNodeDeg = {};
 
-global REMORA
-tritonMode = 0;
-if isfield(REMORA,'ct')
-    tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
-    % triton tools are fair game.
-end
-if  tritonMode && isfield(REMORA.ct.CC,'TfinalBad')
-    badSet = [cell2mat([REMORA.ct.CC.TfinalBad(:,7)]), cell2mat([REMORA.ct.CC.output.TfinalBad(:,9)])];
+% global REMORA
+% tritonMode = 0;
+% if isfield(REMORA,'ct')
+%     tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
+%     % triton tools are fair game.
+% end
+if  tritonMode && isfield(REMORA.ct.CC,'rm_clusters')...
+    && REMORA.ct.CC_params.rmPriorClusters
+    badSet = REMORA.ct.CC.rmSet;
     [~,removeSetIndex] = setdiff([tIntMat,subOrder],badSet,'rows');
     cRateMat = cRateMat(removeSetIndex,:);
     clickTimes = clickTimes(removeSetIndex);
@@ -189,6 +226,7 @@ if  tritonMode && isfield(REMORA.ct.CC,'TfinalBad')
     dTTmatNorm = dTTmatNorm(removeSetIndex,:);
     specNorm = specNorm(removeSetIndex,:);
     diffNormSpec = diffNormSpec(removeSetIndex,:);
+    envShape = envShape(removeSetIndex,:);
 end
 for iEA = 1:s.N
     % Select random subset if needed
@@ -208,13 +246,13 @@ for iEA = 1:s.N
         excludedIn = 1:size(dTTmatNorm,1);
         subSamp = 0;
     end
-    
+    s.subSamp = subSamp;
     if subSamp || iEA == 1
         % Only do this on first iteration, or on every iteration if you are subsampling
         % find pairwise distances between spectra
-        if s.specDiffTF
+        if s.specDiffTF && s.useSpectraTF
             [specDist,~,~] = ct_spectra_dist(diffNormSpec(excludedIn,s.stIdx:s.edIdx-1));
-        else
+        elseif s.useSpectraTF
             [specDist,~,~] = ct_spectra_dist(specNorm(excludedIn,s.stIdx:s.edIdx));
         end
         %         specSetHighs = zeros(size(specNorm(excludedIn,s.stIdx:s.edIdx)));
@@ -223,22 +261,47 @@ for iEA = 1:s.N
         
         if s.iciModeTF && s.useTimesTF % if true, use ici distributions for similarity calculations
             [iciModeDist,~,~,~] = ct_ici_dist_mode(iciModes(excludedIn),p.barInt(s.maxICIidx));
-            compDist = squareform(specDist.*sqrt(iciModeDist),'tomatrix');
-            disp('Clustering on modal ICI and spectral correlations')
+            compDist = squareform(sqrt(iciModeDist),'tomatrix');
+            fprintf('Clustering on modal ICI ')
         elseif s.iciDistTF && s.useTimesTF
             % if true, use ici distributions for similarity calculations
             [iciDist,~,~] = ct_ici_dist(dTTmatNorm(excludedIn,s.minICIidx:s.maxICIidx));
-            compDist = squareform(specDist.*iciDist,'tomatrix');
-            disp('Clustering on ICI distribution and spectral correlations')
+            compDist = squareform(iciDist,'tomatrix');
+            disp('Clustering on ICI distribution ')
         elseif s.cRateTF && s.useTimesTF
             % use click rate distributions for similarity calculations
             [cRateDist,~,~] = ct_ici_dist(cRateNorm(excludedIn,:));
-            compDist = squareform(specDist.*cRateDist,'tomatrix');
-            disp('Clustering on modal click rate and spectral correlations')
-        else
+            compDist = squareform(cRateDist,'tomatrix');
+            disp('Clustering on modal click rate ')
+        elseif s.useSpectraTF && ~s.useTimesTF
             % if nothing, only use spectra
             compDist = squareform(specDist,'tomatrix');
             disp('Clustering on spectral correlations')
+        end
+        
+        if s.useSpectraTF && s.useTimesTF
+            compDist = compDist.*squareform(specDist,'tomatrix');
+            fprintf('and spectral correlations\n')
+        else
+            fprintf('\n')% terminate the statement.
+        end
+        
+        % add cluster on waveform option:
+        if s.useEnvShape
+            disp('Add clustering on waveform envelope shape')
+            [envShapeDist,~,~] = ct_spectra_dist(envShape(excludedIn,:));
+            if exist('compDist','var')
+                compDist = compDist.*squareform(envShapeDist,'tomatrix');
+            else
+                compDist = squareform(envShapeDist,'tomatrix');
+            end
+        elseif 0%s.useEnvDur
+            [envDurDist,~,~] = ct_spectra_dist(envDur(excludedIn,:));
+            if exist('compDist','var')
+                compDist = compDist.*squareform(envDurDist,'tomatrix');
+            else
+                compDist = squareform(envDurDist,'tomatrix');
+            end
         end
         % [gv_file,isolated] = write_gephi_input(compDist, s.minClust,s.pruneThr);
         
@@ -272,16 +335,20 @@ for iEA = 1:s.N
 %             nodeVec2 = [nodeVec2,(iR+1):size(compDist,1)];
 %         end
     end
-%     
-%     if s.mergeTF
-%         [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(compDist,...
-%             tempN,specNorm);
-%     end
+    
+    tempN = size(compDist,1);
+    if s.mergeTF
+        [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(compDist,...
+            tempN,specNorm);
+        compDistOrig = compDist;
+        compDist = compDist(uMergeNodeID,uMergeNodeID);
+    end
+    numNodes = size(compDist,1);% in case pruning has happened, compute this
+    % for use in preallocation
     connectedList = nansum(compDist)>0; % isolated nodes have NAN
-    allIndices = 1:size(excludedIn,2);
+    allIndices = 1:numNodes;
     isolated = setdiff(allIndices, allIndices(connectedList));
     
-    inputSet{iEA} = setdiff(excludedIn,isolated);
     
     fprintf('Clustering for evidence accumulation: %d of %d\n',iEA,s.N)
     
@@ -291,24 +358,24 @@ for iEA = 1:s.N
     %         s.minClust,s.modular,s.pgThresh,s.javaPathVar,s.classPathVar,s.toolkitPath,gv_file);
     %     [~,nodeAssign,~,~,excludedOut] = cluster_clicks_cw_merge(specClickTf,p,...
     %         normalizeTF, mergeTF);
-    clusterID = 1:size(excludedIn,2);
-    clusterID = clusterID';
-%     if s.mergeTF
-%         clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
-%     end
+    clusterID = (1:numNodes)';
+    %clusterID = clusterID';
+    if s.mergeTF
+        clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
+    end
     clusterID(connectedList==0) = NaN;
     clusterID = ct_run_CW_cluster(clusterID,compDist,s.maxCWIterations);
     
-%     if s.mergeTF
-%         % unwind node merge by assigning nodes that were merged to the category of
-%         % their parent.
-%         for iMerge = 1:length(uMergeNodeID)
-%             thisID = uMergeNodeID(iMerge);
-%             nodeClusterID = clusterID(thisID);
-%             clusterID(mergeNodeID == thisID) = nodeClusterID;
-%         end
-%     end
-%     
+    if s.mergeTF
+        % unwind node merge by assigning nodes that were merged to the category of
+        % their parent.
+        for iMerge = 1:length(uMergeNodeID)
+            thisID = uMergeNodeID(iMerge);
+            nodeClusterID = clusterID(thisID);
+            clusterID(mergeNodeID == thisID) = nodeClusterID;
+        end
+    end
+    
     
     percentIsolated = 100*((length(clusterID)-sum(~isnan(clusterID)))./length(clusterID));
     fprintf('%0.2f %% of nodes isolated.\n',percentIsolated)
@@ -350,13 +417,15 @@ for iEA = 1:s.N
     naiItr{iEA} = nodeSet;
     fprintf('found %d clusters\n',length(nodeSet))
     isolatedSet(iEA,1) = length(setdiff(excludedIn,horzcat(nodeSet{:})));
-    
+    inputSet{iEA} = setdiff(excludedIn,isolated);
+
 end
 
 
 % Best of K partitions based on NMI filkov and Skiena 2004
 % Compute NMI
 fprintf('Calculating NMI\n')
+
 [NMIList] = ct_compute_NMI(nList,ka,naiItr,inputSet);
 % the one with the highest mean score is the best
 [bokVal,bokIdx] = max(sum(NMIList)./(size(NMIList,1)-1)); % account for empty diagonal.
@@ -369,20 +438,31 @@ if isempty(nodeSet)
     if tritonMode;disp_msg('No clusters formed');end
     return
 end
+
 clusterIDreduced = zeros(size(compDist,1),1);
 for iNodeSet = 1:length(nodeSet)
-    clusterIDreduced(nodeSet{iNodeSet}) = iNodeSet;
+    [~,setIntersect] = intersect(excludedIn,nodeSet{iNodeSet});
+    clusterIDreduced(setIntersect) = iNodeSet;
 end
 
-if tritonMode
+if tritonMode && (size(clusterIDreduced,1)<10000)
+
+    fprintf('Plotting network\n')
+
     figure(110);clf
-    G = graph(compDist);
+    G = graph(compDist);    
     h = plot(G,'layout','force');
-    set(h,'MarkerSize',8,'nodeLabel',clusterIDreduced)
-    for iClustPlot=1:size(nodeSet,2)
-        highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
-    end
+
+    set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)
+    
+%     for iClustPlot=1:size(nodeSet,2)
+%         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
+%     end    
+
+else
+    disp('Too many nodes to plot as network.')
 end
+
 
 % % Final cluster using Co-assoc mat.
 % disp('Clustering using accumulated evidence')
@@ -392,6 +472,8 @@ end
 %        minClust,pruneThr,modular,pgThresh);
 
 %% calculate means, percentiles, std devs
+fprintf('Creating output structures\n')
+
 compositeData = struct(...
     'spectraMeanSet',[],'specPrctile',{},'iciMean',[],...
     'iciStd',[],'cRateMean',[],'cRateStd',[]);
@@ -416,7 +498,7 @@ for iTF = 1:length(nodeSet)
     Tfinal{iTF,7} = tIntMat(nodeSet{iTF}); % time of bin
     Tfinal{iTF,8} = nodeSet{iTF};% primary index of bin in
     Tfinal{iTF,9} = subOrder(nodeSet{iTF}); % subIndex of bin
-    
+    Tfinal{iTF,10} = envShape(nodeSet{iTF},:); % all mean envelope shape
 end
 bestWNodeDeg = wNodeDeg{bokIdx};
 s.barAdj = .5*mode(diff(p.barInt));%p.stIdx = 2;
@@ -435,6 +517,7 @@ if s.subPlotSet
 end
 
 if s.indivPlots
+    fprintf('Making individual type plots\n')
     ct_individual_click_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,s.outDir)
 end
 % binDataUsed = binDataPruned(binIdx(useBins));

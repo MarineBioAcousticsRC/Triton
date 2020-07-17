@@ -49,10 +49,16 @@ dialogTitle = 'Choose detector settings file';
 thisPath = mfilename('fullpath');
 
 detParamsFile = uigetfile(fullfile(fileparts(fileparts(thisPath)),...
-    'settings\*.m'),dialogTitle);
+    'settings\*.m*'),dialogTitle);
 detParams = [];
-run(detParamsFile)
-
+[~,~,ext] = fileparts(detParamsFile);
+if strcmp(ext,'.mat')
+    load(detParamsFile)
+elseif strcmp(ext,'.m')
+    run(detParamsFile)
+else
+    error('Unrecognized input file type')
+end
 % merge imported params with existing params
 if isfield(REMORA.spice_dt,'detParams')
     detParams = sp_merge_detParams(detParams,REMORA.spice_dt.detParams);

@@ -15,8 +15,9 @@ end
 REMORA.ct.CC.output.s.saveOutput = 1;
 if REMORA.ct.CC.output.saveCombinedPlotsTF 
     disp('Saving combined plots...')
-    if ishandle(41)&&ishandle(42)&&ishandle(43)&&ishandle(44)
+    if ~REMORA.ct.CC.output.remakePlots &&(ishandle(41)&&ishandle(42)&&ishandle(43)&&ishandle(44))
         % if all figs exist, just save them
+        disp('Warning: Saving currently-displayed plots.')
         s = REMORA.ct.CC.output.s;
         hSet(1) = figure(41);hSet(2) = figure(42);hSet(3) = figure(43);hSet(4) = figure(44);
         figName{1} = fullfile(REMORA.ct.CC.output.figDir,sprintf('%s_autoTypes_allMeanSpec',s.outputName));
@@ -46,7 +47,7 @@ if REMORA.ct.CC.output.saveIndivPlotsTF
     ct_individual_click_plots(REMORA.ct.CC.output.p,REMORA.ct.CC.output.s,...
         REMORA.ct.CC.output.f,REMORA.ct.CC.output.nodeSet,...
         REMORA.ct.CC.output.compositeData,REMORA.ct.CC.output.Tfinal,...
-        REMORA.ct.CC.output.figDir)
+        REMORA.ct.CC.output.labelStr,REMORA.ct.CC.output.figDir)
     disp('Saving individual plots...')
 
 end

@@ -70,7 +70,7 @@ fullLabels = sp_fn_getFileset(detParams,fullFileNames);
 if ~isempty(fullFileNames)
     fprintf('Beginning detection\n\n')
     sp_dt_batch(fullFileNames,fullLabels,detParams,encounterTimes,runMode);
-    
+    disp('Detection complete.')
 else
     disp('Error: No wav/xwav files found')
 end

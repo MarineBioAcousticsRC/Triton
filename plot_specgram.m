@@ -6,7 +6,7 @@ function plot_specgram
 % Plots the spectogram to the main window
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global DATA HANDLES PARAMS
+global DATA HANDLES PARAMS REMORA
 
 % get which figures plotted
 savalue = get(HANDLES.display.ltsa,'Value');
@@ -121,6 +121,10 @@ if PARAMS.ftype ~=1 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~
     end
 end
 
+% Make sure color range is fixed.
+set(HANDLES.plt.specgram,'CDataMapping','scaled');
+caxis([1,65]);
+
 axis xy
 
 % colorbar
@@ -152,7 +156,8 @@ set(get(HANDLES.plt.specgram, 'Parent'), 'TickDir', 'out')
 minp = min(min(sg));
 % maxp = max(max(PARAMS.pwr)); 
 maxp = max(max(sg));
-set(PARAMS.cb,'YLim',[minp maxp])
+%set(PARAMS.cb,'YLim',[minp maxp]) %Commented out because it changes
+%colorbar to show only part of the range.
 
 % image (child of colorbar)
 PARAMS.cbb = findobj(get(PARAMS.cb, 'Children'), 'Type', 'image');
@@ -222,4 +227,10 @@ if PARAMS.filter == 1 && PARAMS.ch == 1
         num2str(PARAMS.ff2),' Hz'])
 elseif ~PARAMS.filter == 1 && PARAMS.ch == 1
     title([PARAMS.inpath,PARAMS.infile,' CH=',num2str(PARAMS.ch)])
+end
+
+if isfield(REMORA,'ltsa_plot_lVis_lab')
+    if sgvalue
+        REMORA.ltsa_plot_lVis_lab{2}();
+    end
 end

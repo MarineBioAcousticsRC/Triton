@@ -18,6 +18,14 @@ filenamesc = cellstr(filenames);
 date_strs = regexp(filenamesc,'\d{6}[-]\d{6}','match'); 
 date_fmt = 'yymmdd-HHMMSS';
 
+if isempty(date_strs{1}) % not a PAMguard file, try avisoft filename
+    date_fmt = 'yymmddHHMMSS';
+    date_strs = regexp(filenamesc,'\d{12}','match' );
+    if ~isempty(date_strs{1})
+        disp('Using avisoft and SoundTrap filename format yymmddHHMMSS');
+    end
+end
+
 if isempty(date_strs{1}) % not just and underscore problem, try PAMGuard filename
     date_fmt = 'yyyymmdd_HHMMSS'; % PAMGuard default file format 
     date_strs = regexp(filenamesc,'\d{8}[_]\d{6}','match');
@@ -30,7 +38,6 @@ if isempty(date_strs{1}) % using underscores presumably
     date_fmt = 'yymmdd_HHMMSS';
     date_strs = regexp(filenamesc,'\d{6}[_]\d{6}','match');
 end
-
 
 if isempty(date_strs{1}) % not a PAMguard file, try avisoft filename
     date_fmt = 'yymmddHHMMSS';

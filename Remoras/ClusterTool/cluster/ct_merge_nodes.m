@@ -5,7 +5,7 @@ mergeNodeID = 1:tempN;
 mergeNodeID = mergeNodeID';
 for iNode = 1:length(mergeNodeID)
     % find the next signal that looks like this one
-    newNum = find(distClickEFull(iNode,iNode:end)>.99,1,'first');
+    newNum = find(distClickEFull(iNode,iNode:end)>.999,1,'first');
     if ~isempty(newNum)
         % if there's a very close match, re-number the current node to that
         % new index.

@@ -18,7 +18,7 @@ elseif strcmp(action, 'setTPWSFilterString')
     REMORA.spice_dt.mkTPWS.filterString = filterString;
     
 elseif strcmp(action, 'setTPWSminRL')
-    minDBpp = get(REMORA.spice_dt_mkTPWS.minRLTxt,'String');
+    minDBpp = get(REMORA.spice_dt_mkTPWS.minRLEdTxt,'String');
     if ~isempty(minDBpp)
         minDBpp = str2num(minDBpp);
         REMORA.spice_dt.mkTPWS.minDBpp = minDBpp;
@@ -28,8 +28,14 @@ elseif strcmp(action, 'setTPWSminRL')
 elseif strcmp(action, 'setSubDirTF')
      subDirTF = get(REMORA.spice_dt_mkTPWS.subDirCheckBox,'Value');
      REMORA.spice_dt.mkTPWS.subDirTF = subDirTF;
+
+elseif strcmp(action, 'setTsWin')
+     tsWin = get(REMORA.spice_dt_mkTPWS.tsWinEdTxt ,'String');
+     REMORA.spice_dt.mkTPWS.tsWin = tsWin;
+     
 elseif strcmp(action, 'run_mkTPWS')
     sp_dt_mkTPWS
     close(REMORA.fig.sp_dt_mkTPWS)
     disp_msg('Done generating TPWS files.')
+    disp('Done generating TPWS files.')
 end

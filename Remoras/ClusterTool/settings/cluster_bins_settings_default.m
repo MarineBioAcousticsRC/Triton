@@ -7,7 +7,7 @@ p.siteName = ''; % First few letters of TPWS file names
 p.TPWSitr = 1;
 
 % Folder info:
-p.inDir = 'E:\ClusterTool\test_data\dolphin'; % where the TPWS files live, 
+p.inDir = 'E:\Code\Kait-Matlab-Code\tritons\triton1.93.20160524\triton1.93.20160524\Remoras\ClusterTool\test_data\dolphin'; % where the TPWS files live, 
 p.outDir = 'E:\ClusterTool\test_data\dolphin'; % where to save outputs
 p.recursSearch = 1; % search subfolders if true.
 
@@ -21,6 +21,9 @@ p.pruneThr = 90; % Percentage of edges between nodes that you want to prune.
 p.variableThreshold = 1; % if 0, all edges weaker than p.pruneThr are removed from graph.
 % if 1, p.pruneThr percent of edges are removed from graph. 
 p.maxCWiterations = 15;% maximum number of clustering iterations allowed per bin.
+
+p.sampleRate = 200; % Sample rate in kHz, only used if frequency vector f 
+% is not provided in TPWS files. MUCH BETTER TO PROVIDE f than rely on this!!!
 
 p.pgThresh = 0; % Percentile of nodes to remove from network using PageRank weights.
 % e.g. If you use 25, nodes with PR in the lowest 25th percentile will be

@@ -6,9 +6,10 @@ p.previousFs = 0; % make sure we build filters on first pass
 
 % get file type list
 fTypes = sp_io_getFileType(fullFiles);
-f = [];
-cParams = [];
+fOut = [];
+clickParamsOut = [];
 for idx1 = 1:N % for each data file
+    f=[];
     pTemp = p;
     outFileName = fullLabels{idx1};
     if ~pTemp.overwrite && exist(outFileName, 'file') == 2
@@ -24,7 +25,13 @@ for idx1 = 1:N % for each data file
     %labelFile = fullLabels{idx1};
     
     % read file header
-    hdr = sp_io_readXWAVHeader(fullFiles{idx1}, pTemp,'fType', fTypes(idx1));
+    try
+        hdr = sp_io_readXWAVHeader(fullFiles{idx1}, pTemp,'fType', fTypes(idx1));
+    catch
+        fprintf('Problem reading file %s\n',fullFiles{idx1})
+        hdr = [];
+    end
+   
     
     if isempty(hdr)
         warning('No header info returned for file %s',currentRecFile);
@@ -50,7 +57,7 @@ for idx1 = 1:N % for each data file
         pTemp.previousFs = previousFs;
         pTemp = sp_fn_interp_tf(pTemp);
         if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
-            pTemp.countThresh = (10^((pTemp.dBppThreshold - median(pTemp.xfrOffset))/20))/2;
+            pTemp.countThresh = (10^((pTemp.dBppThreshold - max(pTemp.xfrOffset))/20))/2;
         end
     end
     

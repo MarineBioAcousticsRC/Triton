@@ -1,13 +1,9 @@
-function sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName)
+function sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName,maxRows,tsWin)
 
 letterFlag = 0; % flag for knowing if a letter should be appended to disk name
 % inDir = fullfile(baseDir,dirSet(itr0).name);
 fileSet = what(inDir);
 lfs = length(fileSet.mat);
-clickTimesVec = [];
-ppSignalVec = [];
-specClickTfVec = [];
-tsVecStore = [];
 subTP = 1;
 fSave = [];
 
@@ -15,6 +11,13 @@ if lfs == 0
     disp_msg('no detection files found.')
     return
 end
+
+MPP =  zeros(maxRows,1);
+MSN = zeros(maxRows,tsWin);
+MTT = zeros(maxRows,1);
+MSP = [];
+matIdxStart = 1;
+matIdxEnd = 1;
 for itr2 = 1:lfs
     thisFile = fileSet.mat(itr2);
     
@@ -22,6 +25,11 @@ for itr2 = 1:lfs
         'ppSignal','specClickTf','yFiltBuff','f','durClick')
     if exist('clickTimes','var') && ~isempty(clickTimes)&& size(specClickTf,2)>1
         % specClickTf = specClickTfHR;
+        if size(MSP,1)==0 % if empty, pre-allocate now that width should be known.
+            specLength = size(specClickTf,2);
+            MSP = zeros(maxRows,specLength);
+        end
+        
         keepers = find(ppSignal >= ppThresh);
         
         ppSignal = ppSignal(keepers);
@@ -32,14 +40,25 @@ for itr2 = 1:lfs
         clickTimes = clickTimes(keepers2,:);
         ppSignal = ppSignal(keepers2);
         
+        matIdxEnd = matIdxStart+size(clickTimes,1)-1;
+        if matIdxEnd> size(MTT,1)
+            disp('Have to add more rows')
+            % have to add more rows
+            MTT = [MTT;zeros(matIdxEnd-size(MTT,1),size(MTT,2))];
+            MPP = [MPP;zeros(matIdxEnd-size(MPP,1),size(MPP,2))];
+            MSN = [MSN;zeros(matIdxEnd-size(MSN,1),size(MSN,2))];
+            MSP = [MSP;zeros(matIdxEnd-size(MSP,1),size(MSP,2))];
+            
+        end
         fileStart = datenum(hdr.start.dvec);
         if fileStart< datenum([2000,0,0])
             fileStart = fileStart + datenum([2000,0,0,0,0,0]);
         end
+        
         posDnum = (clickTimes(:,1)/(60*60*24)) + fileStart ;
-        clickTimesVec = [clickTimesVec; posDnum];
-        ppSignalVec = [ppSignalVec; ppSignal];
-        tsWin = 200;
+        MTT(matIdxStart:matIdxEnd,:) = posDnum;
+        MPP(matIdxStart:matIdxEnd,:) = ppSignal;
+        
         tsVec = zeros(length(keepers(keepers2)),tsWin);
         for iTS = 1:length(keepers(keepers2))
             thisClick = yFiltBuff{keepers(keepers2(iTS))};
@@ -73,28 +92,27 @@ for itr2 = 1:lfs
             
             tsVec(iTS,posStart:posEnd) = thisClick(sigStart:sigEnd);
         end
-        tsVecStore = [tsVecStore;tsVec];
+        MSN(matIdxStart:matIdxEnd,:) = tsVec;
         
         if iscell(specClickTf)
             spv = cell2mat(specClickTf');
-            specClickTfVec = [specClickTfVec; spv(:,keepers(keepers2))'];
+            MSP(matIdxStart:matIdxEnd,:) = spv(:,keepers(keepers2))';
         else
-            specClickTfVec = [specClickTfVec; specClickTf(keepers(keepers2),:)];
+            MSP(matIdxStart:matIdxEnd,:) = specClickTf(keepers(keepers2),:);
         end
         clickTimes = [];
         hdr = [];
         specClickTf = [];
         ppSignal = [];
+        posDnum = [];
+        matIdxStart = matIdxEnd+1;
     end
     disp_msg(sprintf('Done with file %d of %d',itr2,lfs))
     drawnow
     
-    if (size(clickTimesVec,1)>= 1800000 && (lfs-itr2>=10))|| itr2 == lfs
+    if (matIdxEnd>= maxRows && (lfs-itr2>=10))|| itr2 == lfs
         
-        MSN = tsVecStore;
-        MTT = clickTimesVec;
-        MPP = ppSignalVec;
-        MSP = specClickTfVec;
+        
         if itr2 == lfs && letterFlag == 0
             ttppOutName =  [fullfile(outDir,outName),'_Delphin_TPWS1','.mat'];
             subTP = 1;
@@ -104,19 +122,25 @@ for itr2 = 1:lfs
             subTP = subTP+1;
             letterFlag = 1;
         end
+        
+        %remove rows of zeros if applicable
+        rmvZeroIdx = MTT ~= 0;
+        
+        MTT = MTT(rmvZeroIdx);
+        MSP = MSP(rmvZeroIdx,:);
+        MSN = MSN(rmvZeroIdx,:);
+        MPP = MPP(rmvZeroIdx);
+        
         f = fSave;
         disp_msg('Saving...');drawnow
         save(ttppOutName,'MTT','MPP','MSP','MSN','f','-v7.3')
         
-        MTT = [];
-        MPP = [];
-        MSP = [];
-        MSN = [];
-        
-        clickTimesVec = [];
-        ppSignalVec = [];
-        specClickTfVec = [];
-        tsVecStore = [];
-        
+        matIdxStart = 1;
+        MPP = zeros(maxRows,1);
+        MSN = zeros(maxRows,tsWin);
+        MTT = zeros(maxRows,1);
+        MSP = zeros(maxRows,specLength);
+        matIdxEnd = 1;
+
     end
 end

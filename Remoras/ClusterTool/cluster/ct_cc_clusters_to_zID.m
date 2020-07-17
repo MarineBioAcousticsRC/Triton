@@ -35,13 +35,17 @@ for iT = 1:size(mergedLabels,2)
     allFileIndices = [allFileIndices;theseFileIndices];
 end
 
-
+if ~isdir(REMORA.ct.CC.output.idDir)
+    sprintf('Making output folder %s\n',REMORA.ct.CC.output.idDir)
+    mkdir(REMORA.ct.CC.output.idDir)
+end
 REMORA.ct.CC.output.inFileList;
 for iTPWS = 1:length(REMORA.ct.CC.output.inFileList)
     TPWSNameStem = regexp(REMORA.ct.CC.output.inFileList(iTPWS).name,...
         '(^.*)_clusters','tokens');
     if isempty(TPWSNameStem)
-        error('Bin File name does not match expected format.')
+        warning('Bin File name does not match expected format.')
+        continue
     end
     thisIDSet = allFileIndices==iTPWS;
     zID = [allClickTimes(thisIDSet), allClickLabels(thisIDSet)];

@@ -19,16 +19,21 @@ if isfield(REMORA,'spice_dt') && isfield(REMORA.spice_dt,'mkTPWS')
     else
         baseDir = uigetdir('','Please select folder of detection files or file folders');
     end
+    fprintf('Base Folder: %s\n', baseDir)
     if isfield(REMORA.spice_dt.mkTPWS,'outDir')
         outDir = REMORA.spice_dt.mkTPWS.outDir;
     else
         outDir = uigetdir('','Please select folder of detection files or file folders');
     end
+    fprintf('Output Folder: %s\n', outDir)
+
     if isfield(REMORA.spice_dt.mkTPWS,'filterString')
         siteName = REMORA.spice_dt.mkTPWS.filterString;
     else
         siteName = '';% site name wildcard, used to restrict input files
     end
+    fprintf('Wildcard: %s\n', siteName)
+
     if isfield(REMORA.spice_dt.mkTPWS,'minDBpp')
         % minimum RL in dBpp. If detections have RL below this
         % threshold, they will be excluded from the output file. Useful if you have
@@ -40,11 +45,29 @@ if isfield(REMORA,'spice_dt') && isfield(REMORA.spice_dt,'mkTPWS')
     else
         ppThresh = -inf;
     end
+    fprintf('Min. RL: %0.0f\n', ppThresh)
+
     if isfield(REMORA.spice_dt.mkTPWS,'subDirTF')
         subDir = REMORA.spice_dt.mkTPWS.subDirTF;
     else
         subDir = 1;
     end 
+    fprintf('Search Subfolders: %0.0f\n', subDir)
+
+    if isfield(REMORA.spice_dt.mkTPWS,'maxRows')
+        maxRows = REMORA.spice_dt.mkTPWS.maxRows;
+    else
+        maxRows = 1800000;
+    end 
+    fprintf('Max Dets per File: %0.0f\n', maxRows)
+
+    if isfield(REMORA.spice_dt.mkTPWS,'tsWin')
+        tsWin = REMORA.spice_dt.mkTPWS.tsWin;
+    else
+        tsWin = 200;
+    end 
+    fprintf('Waveform Samples: %0.0f\n', tsWin)
+
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % check if the output file exists, if not, make it
@@ -61,7 +84,7 @@ if ~subDir
     [~,outName] = fileparts(baseDir);
     outName = strrep(outName,'_metadata','');
     
-    sp_dt_makeTPWS_oneDir(baseDir,letterCode,ppThresh,outDir,outName)
+    sp_dt_makeTPWS_oneDir(baseDir,letterCode,ppThresh,outDir,outName,maxRows,tsWin)
     disp_msg(sprintf('Done with directory %s',baseDir))
 
 else 
@@ -77,7 +100,7 @@ else
                 ~strcmp(dirSet(itr0).name,'..')
             inDir = fullfile(dirSet(itr0).folder,dirSet(itr0).name);
             outName = dirSet(itr0).name;
-            sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName)
+            sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName,maxRows,tsWin)
             disp_msg(sprintf('Done with directory %d of %d \n',itr0,length(dirSet)))
             drawnow
         end

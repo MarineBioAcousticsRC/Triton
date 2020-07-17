@@ -37,7 +37,7 @@ end
 maxNrawfiles = PARAMS.ltsa.nrftot + 100;          % maximum number of raw files + a few more
 
 lhsz = 64;         % LTSA header size [bytes]
-rhsz = 64 + 40;    % LTSA rawfile header (directory) size (add 40 bytes for longer (upto 80 char) xwav files names
+rhsz = 64 + 40;    % LTSA rawfile header (directory) size (add 40 bytes for longer (up to 80 char) xwav files names)
 dirStartLoc = lhsz + 1;                               % directory start location in bytes
 dataStartLoc = rhsz * maxNrawfiles + lhsz;           % data start location in bytes
 
