@@ -12,6 +12,7 @@ rmsASmin = REMORA.pi.settings.rmsASmin;
 rmsASmax = REMORA.pi.settings.rmsASmax;
 durLong_s = REMORA.pi.settings.durLong_s;
 durShort_s = REMORA.pi.settings.durShort_s;
+maxcorr= REMORA.pi.settings.maxcorr;
 
 % Parm stores parameters, to be used in TethysXML output.
 %parm.threshold = 0.003; % Threshold for correlation coefficient.
@@ -377,6 +378,9 @@ for fidx = 1:size(FileList,1)
                         % Calculate duration.
                         durSeg = (expTimes(2) - expTimes(1))/fs;
                         
+                        % Calculate correlation value for this detection:
+                        thiscorrVal=corrVal(eidx,:);
+                        
                         % Calculate delta / signal to noise in rms and pp.
                         drmsAS = rmsDetSeg - rmsNAfterSeg;
 %                         dppAS = ppDetSeg - ppNAfterSeg;
@@ -395,8 +399,11 @@ for fidx = 1:size(FileList,1)
 %                         delPpBS = find(dppBS<parm.ppBS); %230,409
 %                         delDur = find(durSeg>=parm.durLong_s | durSeg<=parm.durShort_s); %230,729
                          delDur = find(durSeg<=durShort_s); 
+                         %Delete values greater than set max correlation
+                         %value
+                         delCor = find(thiscorrVal(1,1)>=maxcorr);
 %                         delUnion = unique([delRmsAS;delPpAS;delRmsBS;delPpBS;delDur]); %276,145
-                         delUnion = unique([delRmsASmin,delRmsASmax,delDur]);
+                         delUnion = unique([delRmsASmin,delRmsASmax,delDur,delCor]);
 %                         % Delete false detections.
                         expTimes(delUnion,:) = [];
                         corrVal(delUnion,:) = [];
