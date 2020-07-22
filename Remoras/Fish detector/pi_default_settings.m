@@ -14,6 +14,7 @@ settings.ppBS = 3; % PP noise before signal.
 settings.durLong_s = 11; % Durations >= durAfter_s (s) will be eliminated.
 settings.durShort_s = .005; % Durations >= dur_s (s) will be eliminated.
 settings.maxcorr = 3e-8; %Correlations >= maxcorr will be eliminated.
+settings.medcorr = 1.6e-8; %Removes signals greater than this median correlation value.
 
 settings.baseDir = 'G:\Site\data\df100'; % Example base directory.
 settings.outDir = 'G:\Site\Detections'; % Example output directory.

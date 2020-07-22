@@ -13,6 +13,7 @@ rmsASmax = REMORA.pi.settings.rmsASmax;
 durLong_s = REMORA.pi.settings.durLong_s;
 durShort_s = REMORA.pi.settings.durShort_s;
 maxcorr= REMORA.pi.settings.maxcorr;
+medcorr = REMORA.pi.settings.medcorr;
 
 % Parm stores parameters, to be used in TethysXML output.
 %parm.threshold = 0.003; % Threshold for correlation coefficient.
@@ -220,6 +221,7 @@ for fidx = 1:size(FileList,1)
                     ppNBefore = [];
                     ppNAfter = [];
                     ppDet = [];
+                    newcorrval = [];
                     for eidx = 1:size(expConv,1)
                         % Pull out signal of the length of template, relative to
                         % when convolusion starts being above threshold.
@@ -402,11 +404,14 @@ for fidx = 1:size(FileList,1)
                          %Delete values greater than set max correlation
                          %value
                          delCor = find(thiscorrVal(1,1)>=maxcorr);
+                         %Delete values greater than set med correlation
+                         %value
+                         delCorMed = find(thiscorrVal(1,2)>=medcorr);
 %                         delUnion = unique([delRmsAS;delPpAS;delRmsBS;delPpBS;delDur]); %276,145
-                         delUnion = unique([delRmsASmin,delRmsASmax,delDur,delCor]);
+                         delUnion = unique([delRmsASmin,delRmsASmax,delDur,delCor,delCorMed]);
 %                         % Delete false detections.
                         expTimes(delUnion,:) = [];
-                        corrVal(delUnion,:) = [];
+                        thiscorrVal(delUnion,:) = [];
                         durSeg(delUnion) = [];
                         rmsNBeforeSeg(delUnion) = [];
                         rmsNAfterSeg(delUnion) = [];
@@ -428,6 +433,7 @@ for fidx = 1:size(FileList,1)
                             rmsNBefore = [rmsNBefore; rmsNBeforeSeg];
                             rmsNAfter = [rmsNAfter; rmsNAfterSeg];
                             rmsDet = [rmsDet; rmsDetSeg];
+                            newcorrval = [newcorrval; thiscorrVal];
 %                             ppNBefore = [ppNBefore; ppNBeforeSeg];
 %                             ppNAfter = [ppNAfter; ppNAfterSeg];
 %                             ppDet = [ppDet; ppDetSeg];
@@ -460,7 +466,7 @@ for fidx = 1:size(FileList,1)
                     
                     allSmpPts = [allSmpPts; smpPts];
                     allExp = [allExp; dateExp];
-                    allCorrVal = [allCorrVal; corrVal];
+                    allCorrVal = [allCorrVal; newcorrval];
                     allDur = [allDur; durExp];
                     allRmsNBefore = [allRmsNBefore; rmsNBefore];
                     allRmsNAfter = [allRmsNAfter; rmsNAfter];
