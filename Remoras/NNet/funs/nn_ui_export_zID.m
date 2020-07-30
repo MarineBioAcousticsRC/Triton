@@ -58,7 +58,7 @@ bgColor = [1 1 1];  % white
 bgColorRed = [1 .6 .6];  % red
 bgColorGray = [.86 .86 .86];  % gray
 bgColor3 = [.68,.92,0]; % a green
-bgColor4 = [.75 .875 1]; % light blue 
+bgColor4 = [.75 .875 1]; % light blue
 
 %% Title
 labelStr = 'Export Network Labels to DetEdit ID Format';
@@ -129,10 +129,12 @@ REMORA.fig.nn.exportzID.inDirTxt = uicontrol(REMORA.fig.nn.exportzID.figH,...
     'FontUnits','normalized', ...
     'Visible','on');%   'BackgroundColor',bgColor3,...
 
-if ~isfield(REMORA.nn.exportzID,'inDir')
-    REMORA.nn.exportzID.inDir = 'C:\';
-end
 
+if ~isfield(REMORA.nn.exportzID,'inDir')
+    
+    REMORA.nn.exportzID.inDir = 'C:\';
+    
+end
 btnPos=[x(1)+w/4 y(6) .85 h];
 REMORA.fig.nn.exportzID.inDirEdTxt = uicontrol(REMORA.fig.nn.exportzID.figH,...
     'Style','edit',...

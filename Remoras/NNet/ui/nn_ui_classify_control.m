@@ -64,6 +64,7 @@ elseif strcmp(action,'intermedPlotCheck')
     
 elseif strcmp(action,'Run')
     nn_fn_classify
+    nn_ui_post_classification_window
 else
     fprintf('Action ''%s'' not recognized.\n',action)
 end

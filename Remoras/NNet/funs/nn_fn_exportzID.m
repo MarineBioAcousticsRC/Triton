@@ -17,15 +17,18 @@ end
 for iFile = 1:nFiles
     load(fullfile(dirList(iFile).folder,dirList(iFile).name))
     % Flatten binData
+    if ~exist('binData','var')
+        continue
+    end
     clickTimes = [binData(:).clickTimes]';
     predLabel = [binData(:).predLabels]';
     predLabelScore = [binData(:).predLabelScore]';
     
     % Concatenate by row
     zID = [];
-    for iRow = 1:size(binData,1)
+    for iRow = 1:size(clickTimes,1)
         repDims = size(clickTimes{iRow});
-        if ~isnan(predLabel(iRow))&& predLabelScore(iRow)>=.95
+        if ~isnan(predLabel(iRow))
             zIDnew = [clickTimes{iRow},...
                 repmat(predLabel(iRow),repDims),...
                 repmat(predLabelScore(iRow),repDims)];

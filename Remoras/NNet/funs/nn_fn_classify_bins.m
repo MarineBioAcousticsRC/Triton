@@ -1,7 +1,7 @@
 function nn_fn_classify_bins
 
 global REMORA
-minSize = 5;
+minSize = 1;
 disp('Classifying bins from cluster bins output files')
 % load network
 trainedNet = load(REMORA.nn.classify.networkPath);
@@ -100,9 +100,9 @@ for iFile = 1:nFiles
     predScoresMax = max(predScores,[],2);
     predLabels = double(predLabels);
     % map bin labels back into binData
-    predLabelsExpand = nan(size([binData(:).nSpec]',1));
+    predLabelsExpand = nan(size([binData(:).nSpec]',1),1);
     predLabelsExpand(goodSize) = predLabels;
-    predScoresMaxExpand = nan(size([binData(:).nSpec]',1));
+    predScoresMaxExpand = nan(size([binData(:).nSpec]',1),1);
     predScoresMaxExpand(goodSize) = predScoresMax;
     myIndex = 1;
     for iBin = 1:size(binData,1)

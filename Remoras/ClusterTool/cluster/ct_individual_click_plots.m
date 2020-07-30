@@ -92,7 +92,7 @@ for iF = 1:length(nodeSet)
 %     set(h2im,'Position',[hs3Pos(1),hs2Pos(2),hs2Pos(3)-.01,hs2Pos(4)])
 %%
     if s.saveOutput
-        figName = fullfile(outDir,sprintf('%s_AutoType%d',s.outputName,iF));
+        figName = fullfile(outDir,sprintf('%s_type%d',s.outputName,iF));
         print(gcf,'-dtiff','-r600',[figName,'.tif'])
         saveas(gcf,[figName,'.fig'])
         fprintf('Done saving cluster %0.0f of %0.0f\n',iF,length(nodeSet))
