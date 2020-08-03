@@ -27,11 +27,9 @@ labels = {'', '2', '3', '4', '5', '6', '7', '8'};
 yPos = plotFreq;
 labelPos = yPos*1.05;
 
-for labidx = 1:length(labels);
+for labidx = 1:length(labels)
     detfld = sprintf('detection%s', labels{labidx});
-    if REMORA.lt.lVis_det.(detfld).PlotLabels
-        labl = REMORA.lt.lVis_det.(detfld).labels(1);
-        
+    if REMORA.lt.lVis_det.(detfld).PlotLabels       
         
         % This ignores anything that has a start before the LTSA window
         % and a stop after the LTSA window.
@@ -46,15 +44,19 @@ for labidx = 1:length(labels);
         
         if ~ isempty(Lo)
             %%% shorten detections to bout-level
-            boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
+%             boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
             %is less than this, combine into a bout
-            [startBouts,endBouts] = lt_lVis_defineBouts(...
-                REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
-                REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
-                boutGap);
+%             [startBouts,endBouts] = lt_lVis_defineBouts(...
+%                 REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
+%                 REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
+%                 boutGap);
+            startBouts = REMORA.lt.lVis_det.(detfld).starts(Lo:Hi);
+            endBouts = REMORA.lt.lVis_det.(detfld).stops(Lo:Hi);
             %get final detection end and pass it into plotting for dotted
             %line
             finalDet = REMORA.lt.lVis_det.(detfld).stops(end);
+            
+            labl = REMORA.lt.lVis_det.(detfld).labels(Lo:Hi);
             
             plot_labels_ltsa(labl, labelPos, startBouts,endBouts, ...
                 yPos, colors(labidx, :), ltsaS, ltsaE,finalDet);
@@ -122,37 +124,36 @@ if ~isempty(winDetsFull)
     %%%range is shorter than 1 min... using this to simplify plotting if tlab
     %%%detections are at click level
     
-    LineThresh = 1/600;
+    %LineThresh = 1/600;
     
     for iPlot = 1:size(detXstart,1)
-        detDur = detXend - detXstart;
-        detXNext = [detXstart(2:end);detXstart(end)];
-        %     avgDetGap = mean(detXNext - detXstart);
-        detGap = detXNext - detXstart;
-        longGap = [];
+%         detDur = detXend - detXstart;
+%         detXNext = [detXstart(2:end);detXstart(end)];
+%         %     avgDetGap = mean(detXNext - detXstart);
+%         detGap = detXNext - detXstart;
+%         longGap = [];
         %get locations to plot label text based on how far apart detections
         %are
-        longGap = [1;find(detGap>=0.33*winLength)+1];
-        if ~isempty(longGap)
-            labelRep = repmat(label,1,length(longGap));
-            posRep = repmat(labelPos,1,length(longGap));
-        else
-            labelRep = label;
-            posRep = labelPos;
+%         longGap = [1;find(detGap>=0.33*winLength)+1];
+%         if ~isempty(longGap)
+             %repmat(label,1,length(longGap));
+%         else
+%             labelRep = label;
+%             posRep = labelPos;
             %if no longGaps, just plot on first detection
-            longGap = 1:length(1);
-        end
-        if detDur < LineThresh
-            %just plot the start of a given detection
-            plot(HANDLES.subplt.ltsa, detXstart(iPlot), yPos,'*','Color',color)
-            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
-                labelRep,'Color',color,'FontWeight','normal')
-        else
+%             longGap = 1:length(1);
+%         end
+%         if detDur < LineThresh
+%             %just plot the start of a given detection
+%             plot(HANDLES.subplt.ltsa, detXstart(iPlot), yPos,'*','Color',color)
+%             text(HANDLES.subplt.ltsa, detXstart(iPlot),posRep,...
+%                 labelRep,'Color',color,'FontWeight','normal')
+%         else
             plot(HANDLES.subplt.ltsa, [detXstart(iPlot) detXend(iPlot)],[yPos yPos],'-','LineWidth',2,'Marker','*',...
                 'MarkerSize',5,'Color',color)
-            text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
-                labelRep,'Color',color,'FontWeight','normal')
-        end
+            text(HANDLES.subplt.ltsa, detXstart(iPlot),labelPos,...
+                label(iPlot),'Color',color,'FontWeight','normal')
+%         end
     end
     
     %plot a line at the end of the detection file
