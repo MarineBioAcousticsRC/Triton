@@ -254,9 +254,9 @@ elseif strcmp(action,'Display')
         if strcmp(enabled,'on')
             checked = get(REMORA.lt.lVis_labels.label1Check,'Value');
             if checked
-                REMORA.lt.lVis_det.detection1.PlotLabels = true;
+                REMORA.lt.lVis_det.detection.PlotLabels = true;
             else
-                REMORA.lt.lVis_det.detection1.PlotLabels = false;
+                REMORA.lt.lVis_det.detection.PlotLabels = false;
             end
         else
             return
