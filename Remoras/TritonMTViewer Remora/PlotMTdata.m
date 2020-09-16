@@ -58,6 +58,9 @@ if (get(handles.pushbutton2,'Value')||get(handles.checkbox1,'Value'))
     updated_start_i = handles.index_newstart_i ;
     updated_end_i = handles.index_newend_i ;
     
+    updated_start_s = handles.index_newstart_s;
+    updated_end_s = handles.index_newend_s;
+    
     axes(handles.axes6)
         cla
         %get(handles.axes6)
@@ -109,7 +112,17 @@ if (get(handles.pushbutton2,'Value')||get(handles.checkbox1,'Value'))
 %         else
 %             legend('hide')
 %         end
-    
+       axes(handles.axes10)
+        cla
+        plot(all.speed.JJ(updated_start_s:updated_end_s,end),all.speed.JJ(updated_start_s:updated_end_s,1),':b'); axis tight;
+        UpdateAxis('x')
+        set(gca, 'XTick',[],'Tag','Speed','NextPlot','add');
+        ylabel('Speed [m/s]');
+%         if get(handles.checkbox3,'Value') && ~get(handles.checkbox1,'Value')
+%             legend('I','J','K','Location','northwest')
+%         else
+%             legend('hide')
+%         end
 else
     axes(handles.axes6)
         %get(handles.axes6) ;
@@ -152,6 +165,12 @@ else
         UpdateAxis('x')
         set(gca, 'XColor','k','YColor','k','FontSize',9,'Tag','Acceleration IJK','NextPlot','add');
         ylabel('Acceleration [mGal]');
+    axes(handles.axes10)
+        cla
+        plot(all.speed.JJ(updated_start_s:updated_end_s,end),all.speed.JJ(updated_start_s:updated_end_s,1),':b'); axis tight;
+        UpdateAxis('x')
+        set(gca, 'XTick',[],'Tag','Speed','NextPlot','add');
+        ylabel('Speed [m/s]');
 end
 
 

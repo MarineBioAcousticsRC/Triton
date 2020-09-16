@@ -1,3 +1,4 @@
+function speedcalc()
 % example simple implementation of TagJiggle.m & SpeedFromRMS.m
 
 % Step 1- set up variables and calculate tag jiggle RMS amplitude for each axis
@@ -8,17 +9,26 @@
 % load downsampled whale data with pitch, roll, p, fs, etc.
 %load('mn160727-11 10Hzprh.mat'); 
 
-global all
+global all handles REMORA
 
 Afs = all.srate;
-fs = 10;
+filt = [REMORA.MT.settings.highpass REMORA.MT.settings.lowpass]; %[10 90]
+fs = REMORA.MT.settings.fs; %10;
+binSize = REMORA.MT.settings.bin; %0.5
+filterSize = 0.5; 
+minDepth = 10; 
+minPitch = 45;
+minSpeed = 0.5; 
+minTime = 0.2;
+
 p = all.press(:,1);
 A = [all.iaccel(:,1), all.jaccel(:,1), all.kaccel(:,1)];
-% Afs if the sample rate of the accelerometer data, fs is the (usually downsampled) sample rate of the tag data at which you will want the final speed values to match.
-JX = TagJiggle(all.iaccel(:,1),Afs,fs,[10 90],.5); %[10 90] and 0.5 are default choices, can also input [].  If Afs<180, only a high pass filter at 10 Hz is used.
-JY = TagJiggle(all.jaccel(:,1),Afs,fs,[10 90],.5);
-JZ = TagJiggle(all.kaccel(:,1),Afs,fs,[10 90],.5);
-J = TagJiggle(A,Afs,fs,[10 90],.5);
+
+% Afs is the sample rate of the accelerometer data, fs is the (usually downsampled) sample rate of the tag data at which you will want the final speed values to match.
+JX = TagJiggle(all.iaccel(:,1),Afs,fs,filt,binSize); %[10 90] and 0.5 are default choices, can also input [].  If Afs<180, only a high pass filter at 10 Hz is used.
+JY = TagJiggle(all.jaccel(:,1),Afs,fs,filt,binSize);
+JZ = TagJiggle(all.kaccel(:,1),Afs,fs,filt,binSize);
+J = TagJiggle(A,Afs,fs,filt,binSize);
 
 % if you've calculated flownoise RMS values, speedFromRMS can compare the speed from jiggle method to the speed from the flownoise method.
 if exist('flownoise','var') && sum(isnan(flownoise)) ~= length(flownoise) 
@@ -33,12 +43,7 @@ tagslips = [INFO.tagslip.Wchange; length(p)]; % creates a vector of indices indi
 else
     tagslips = [];
 end
-binSize = 0.5;
-filterSize = 0.5; 
-minDepth = 10; 
-minPitch = 45;
-minSpeed = 0.5; 
-minTime = 0.2;
+
 % tagon is an index indicating data points that are on the animal.
 %plot data to find tag on and tag off time
 figure; plot(p)
@@ -48,10 +53,30 @@ tagon = zeros(length(p),1);
 tagon(pos(1,1):pos(2,1),:) = 1;
 tagon = logical(tagon);
 df=800/10;
-y = decdc(A,df); %This leads to an array that is one shorter than the resampled accelerometer data...
-[pitch, roll] = a2pr(y);
-p=p(1:(end-1),:);
-RMS = RMS(1:(end-1),:);
+%y = decdc(A,df); %This leads to an array that is one shorter than the resampled accelerometer data...
+[pitch, roll] = a2pr(A,Afs,fs);
+
+%Filtering pitch and roll to match the other variables:
+DN = (0:1/fs:(size(pitch,1)-1)/Afs)'/24/60/60;
+Atime = (0:size(pitch,1)-1)'/24/60/60/Afs;
+Xtime = Atime(round(Afs*binSize/2):round(Afs/fs):end); %start half bin seconds in (so that the jiggle bins are centered and are bin seconds long each) and go every 1/fs second, that should get in the middle of the buffer
+Xtime = Xtime(1:size(pitch,2));
+k = 1; [~,j] = min(abs(DN-(Xtime(1)-1/fs/2/24/60/60))); pitchfilt(j) = pitch(k);
+for k = 1:length(Xtime);
+    j2 = find(DN(j:min(j+fs,length(DN)))<=Xtime(k)+1/fs/2/24/60/60,1,'last')+j-1;% find the times that are within 1/fs/2 seconds of Xtime(k)
+    if isempty(j2); [~,j] = min(abs(DN-(Xtime(k)-1/fs/2/24/60/60)));[~,j2] = min(abs(DN-(Xtime(k)+1/fs/2/24/60/60))); end
+    pitchfilt(j:j2) = pitch(k);
+    j = j2+1;
+end
+
+k = 1; [~,j] = min(abs(DN-(Xtime(1)-1/fs/2/24/60/60))); rollfilt(j) = roll(k);
+for k = 1:length(Xtime);
+    j2 = find(DN(j:min(j+fs,length(DN)))<=Xtime(k)+1/fs/2/24/60/60,1,'last')+j-1;% find the times that are within 1/fs/2 seconds of Xtime(k)
+    if isempty(j2); [~,j] = min(abs(DN-(Xtime(k)-1/fs/2/24/60/60)));[~,j2] = min(abs(DN-(Xtime(k)+1/fs/2/24/60/60))); end
+    rollfilt(j:j2) = roll(k);
+    j = j2+1;
+end
+
 %% Now everything is set up to run SpeedFromRMS.  On the first graph you can
 % further threshold the parameters minDepth, minPitch and maxRoll by
 % clicking on the colorbar for each axis.  For instance, click at 60 to set
@@ -106,6 +131,9 @@ end
 
 whaleID = INFO.whaleName;
 save([whaleID 'speed.mat'],'speed','speedstats','JigRMS'); % or save the values within your prh file;
-
+handles.speed = speed;
+handles.speedstats = speedstats;
+handles.JigRMS = JigRMS;
+end
 % check your values;
-figure; ax =  plotyy(1:length(p),p,1:length(p),speed.JJ); set(ax(1),'ydir','rev');
+%figure; ax =  plotyy(1:length(p),p,1:length(p),speed.JJ); set(ax(1),'ydir','rev');
