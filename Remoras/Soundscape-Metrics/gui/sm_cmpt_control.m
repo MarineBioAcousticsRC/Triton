@@ -8,11 +8,11 @@ if strcmp(action, '')
 % Change Directory Settings:
 
 elseif strcmp(action,'indirSel')
-    REMORA.sm.verify.indir.String = uigetdir(REMORA.sm.cmpt.indir,'Select Directory With WAV Files');
+    REMORA.sm.verify.indir.String = uigetdir(REMORA.sm.cmpt.indir,'Select Directory With LTSA Files');
     REMORA.sm.cmpt.indir = REMORA.sm.verify.indir.String;
 
 elseif strcmp(action,'outdirSel')
-    REMORA.sm.verify.outdir.String = uigetdir(REMORA.sm.cmpt.outdir,'Select Directory for LTSA Output Files');
+    REMORA.sm.verify.outdir.String = uigetdir(REMORA.sm.cmpt.outdir,'Select Directory for Output Files');
     REMORA.sm.cmpt.outdir = REMORA.sm.verify.outdir.String;
 
     

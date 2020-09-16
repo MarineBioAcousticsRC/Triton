@@ -50,6 +50,11 @@ REMORA.sm.cmpt.pre.rembins = [REMORA.sm.cmpt.avgbins(thisavgbins,:); ...
 % preallocate toc
 timebintoc = zeros(REMORA.sm.cmpt.pre.thisltsa,1);
 
+% start counter for display
+count = 0;
+seg = 0;
+seg0 = 0;
+
 %% cycle through time bins
 for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
     timebintic = tic;
@@ -223,10 +228,19 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
                 % if power spectral density selected
                 if REMORA.sm.cmpt.psd
                     % compute percentiles
-                    REMORA.sm.cmpt.pre.prcpsd = 10*log10(prctile(REMORA.sm.cmpt.pre.pwr,p));
-                    if REMORA.sm.cmpt.avgf == 1
-                        % crop to lower band edge
-                        REMORA.sm.cmpt.pre.prcpsd = REMORA.sm.cmpt.pre.prcpsd(:,poslow:end);
+                    if REMORA.sm.cmpt.avgt>1
+                        REMORA.sm.cmpt.pre.prcpsd = 10*log10(prctile(REMORA.sm.cmpt.pre.pwr,p));
+                        if REMORA.sm.cmpt.avgf == 1
+                            % crop to lower band edge
+                            REMORA.sm.cmpt.pre.prcpsd = REMORA.sm.cmpt.pre.prcpsd(:,poslow:end);
+                        end
+                    else
+                        REMORA.sm.cmpt.pre.prcpsd = ones(length(p),size(REMORA.sm.cmpt.pre.pwr,2))*NaN;
+                        REMORA.sm.cmpt.pre.prcpsd(5,:) = 10*log10(REMORA.sm.cmpt.pre.pwr);
+                        if REMORA.sm.cmpt.avgf == 1
+                            % crop to lower band edge
+                            REMORA.sm.cmpt.pre.prcpsd = REMORA.sm.cmpt.pre.prcpsd(:,poslow:end);
+                        end
                     end
                 end
 
@@ -252,18 +266,35 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             sm_cmpt_writeout(tidx)
             
             timebintoc(tidx) = toc(timebintic);
+            
             % display progress
-            disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
-                ' computed; ',datestr(thisstart),' - ',datestr(thisend),'; duration ',num2str(timebintoc(tidx)),' s'])
-
+            if REMORA.sm.cmpt.avgt>=3600 %display every hour, otherwise reduce output
+                disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
+                     ' computed; ',datestr(thisstart),' - ',datestr(thisend+dateoffset),'; duration ',num2str(timebintoc(tidx)),' s'])
+            else %display progress every hour
+                count = count+REMORA.sm.cmpt.avgt;
+                seg = seg + 1;
+                if count >=3600
+                    disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
+                        ' computed; ',datestr(thisend+dateoffset),'; duration ',...
+                        num2str(timebintoc(tidx)),' s; ', num2str(seg),' segnents'])
+                    count = 0;
+                    seg = 0;
+                end
+            end
         end
     else
         perc = (length(hidx) + length(REMORA.sm.cmpt.pre.timeavgs))/...
             REMORA.sm.cmpt.avgt;
         % display progress
-        disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
-                ' NOT computed; ',datestr(thisstart),' - ',datestr(thisend),'; duration ',num2str(timebintoc(tidx)),' s'])
-        disp(['Not enough coverage: ',num2str(perc*100),'%; '])
+        count = count+REMORA.sm.cmpt.avgt;
+        seg0 = seg0 + 1;
+        if count >=3600
+            disp(['Time averages NOT computed since last print: ',num2str(seg),' segnents; ',...
+                datestr(thisend+dateoffset),'; ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),'; duration ',...
+                        num2str(timebintoc(tidx)),' s; '])
+            count = 0;
+        end
     end
     
     % if the last time average was calculated and no remaining data
