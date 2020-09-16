@@ -22,6 +22,18 @@ elseif strcmp(myEvent, 'setSaveName')
     REMORA.nn.train_test_set.saveName = ...
         get(REMORA.fig.nn.nn_train_test_set.saveNameEdTxt,'String');
     
+elseif strcmp(myEvent, 'setBinWild')
+    REMORA.nn.train_test_set.binWild = ...
+        get(REMORA.fig.nn.nn_train_test_set.binWildEdTxt,'String');
+    if isempty(REMORA.nn.train_test_set.binWild)
+        REMORA.nn.train_test_set.binWild = '*.mat';
+    end
+elseif strcmp(myEvent, 'setDetWild')
+    REMORA.nn.train_test_set.detWild = ...
+        get(REMORA.fig.nn.nn_train_test_set.detWildEdTxt,'String');
+    if isempty(REMORA.nn.train_test_set.detWild)
+        REMORA.nn.train_test_set.detWild = '*.mat';
+    end
 elseif strcmp(myEvent, 'setTrainPerc')
     REMORA.nn.train_test_set.trainPerc = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set.trainPercEdTxt,'String'));
@@ -108,7 +120,7 @@ elseif strcmp(myEvent, 'setUseSpectra')
 elseif strcmp(myEvent, 'setUseWave')
     REMORA.nn.train_test_set.useWave = ...
         get(REMORA.fig.nn.nn_train_test_set.useWaveCheck,'Value');
-
+    
 elseif strcmp(myEvent, 'setUseICI')
     REMORA.nn.train_test_set.useICI = ...
         get(REMORA.fig.nn.nn_train_test_set.useICICheck,'Value');

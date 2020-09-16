@@ -40,7 +40,13 @@ for iF = 1:nTypes
         
         thisType.tIntMat = REMORA.ct.CC.output.tIntMat(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
         inFileList = REMORA.ct.CC.output.inFileList;
+
         [~,outputNameRoot,~] = fileparts(REMORA.ct.CC_params.outputName);
+
+        binLevelOutputFile = fullfile(newDir,[REMORA.ct.CC_params.outputName,'_', thisName,'_binLevel.mat']);
+
+        outputNameRoot = REMORA.ct.CC_params.outputName;
+
         binLevelOutputFile = fullfile(newDir,[outputNameRoot,'_', thisName,'_binLevel.mat']);
         save(binLevelOutputFile,'thisType','inFileList','-v7.3');
         fprintf('Done saving bin-level output for %s...\n',uNames{iF})
@@ -69,7 +75,9 @@ for iF = 1:nTypes
 
             trainMSN = MSN(I,:);
             trainMSP = MSP(I,:);
+
             [~,outputName,~] = fileparts(TPWSname);
+
             detLevelOutputFile = fullfile(newDir,sprintf('%s_%s_file%0.0f_detLevel.mat',...
                 outputName,thisName,iTPWS));
             fprintf('Saving detection-level file %0.0f of %0.0f\n',iTPWS,length(thisTPWSList))

@@ -8,11 +8,11 @@ figure(43);clf(43);set(gcf,'Units','normalized','Position',[.5,.05,.48,.4])
 figure(44);clf(44);set(gcf,'Units','normalized','Position',[.5,.52,.48,.4])
 figure(45);clf(45);set(gcf,'Units','normalized','Position',[.5,.52,.48,.4])
 
-figName{1} = fullfile(figDir,sprintf('%s_autoTypes_allMeanSpec',s.outputName));
-figName{2} = fullfile(figDir,sprintf('%s_autoTypes_allCatSpec',s.outputName));
-figName{3} = fullfile(figDir,sprintf('%s_autoTypes_allICI',s.outputName));
-figName{4} = fullfile(figDir,sprintf('%s_autoTypes_allICIimage',s.outputName));
-figName{5} = fullfile(figDir,sprintf('%s_autoTypes_allWaveEnv',s.outputName));
+figName{1} = fullfile(figDir,sprintf('%s_allMeanSpec',s.outputName));
+figName{2} = fullfile(figDir,sprintf('%s_allCatSpec',s.outputName));
+figName{3} = fullfile(figDir,sprintf('%ss_allICI',s.outputName));
+figName{4} = fullfile(figDir,sprintf('%s_allICIimage',s.outputName));
+figName{5} = fullfile(figDir,sprintf('%s_allWaveEnv',s.outputName));
 
 for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles

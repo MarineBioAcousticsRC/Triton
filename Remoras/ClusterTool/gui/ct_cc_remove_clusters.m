@@ -110,10 +110,12 @@ close(REMORA.fig.ct.cc_postcluster)
 if ~isempty(REMORA.ct.CC.rmSet)
     if isfield(REMORA.ct,'CC_verify')
         set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)
+        REMORA.ct.CC_params.rmPriorClusters = 1;
         figure(REMORA.fig.ct.CC_settings)
     else
         ct_init_compClust_window
         set(REMORA.ct.CC_verify.rmClustCheck,'Enable','on','Value',1)
+        REMORA.ct.CC_params.rmPriorClusters = 1;
         
     end
 end

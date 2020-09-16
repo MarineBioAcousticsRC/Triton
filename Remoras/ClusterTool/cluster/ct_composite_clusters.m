@@ -41,6 +41,17 @@ end
 % Check for output directory
 if ~exist(s.outDir,'dir')
     mkdir(s.outDir)
+else
+    oldFileList = dir(fullfile(s.outDir,['*',s.outputName,'*']));
+    if ~isempty(oldFileList)
+        waitfor(warndlg(['WARNING: You are about to overwrite prior output. ',...
+                    'If the number of clusters produced now is fewer than ',... 
+                    'produced previously, you may end up with old cluster files ',...
+                    'mixed in with new ones. To reduce risk of errors, consider ',...
+                    'deleting, changing output folder, or changing output name. (Use Control-C to stop).'],...
+                'Warning: File Overwrite','replace'));
+            
+    end
 end
 cd(s.outDir)
 if s.diary
@@ -92,8 +103,21 @@ for iFile = 1:length(inFileList)
     end
 end
 clear('loadedData')
-
-%%%%%%%%%% Begin main functionality %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+global REMORA
+tritonMode = 0;
+if isfield(REMORA,'ct')
+    tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and
+    % triton tools are fair game.
+end
+if  tritonMode && isfield(REMORA.ct.CC,'rm_simbins')...
+        && REMORA.ct.CC_params.rmSimBins
+    %     thresh = 0.95;
+    %     dist = 0.1;
+    specComp = REMORA.ct.CC.sbSet;
+    binDataPruned = ct_cc_modifyBinData(REMORA.ct.CC_params.SBperc,REMORA.ct.CC_params.SBdiff,binDataPruned,specComp);
+end
+% %%%%%%%%%% Begin main functionality %%%%%%%%%%%%
 %% Normalize everything
 % Spectra:
 % Put click spectra into a matrix
@@ -104,12 +128,12 @@ cRateMat = vertcat(binDataPruned.clickRate);
 clickTimes = horzcat(binDataPruned(:).clickTimes);
 
 for iEM = 1:size(binDataPruned,1)
-    if size(binDataPruned(iEM).envMean,2) == 1 
+    if size(binDataPruned(iEM).envMean,2) == 1
         binDataPruned(iEM).envMean = zeros(1,p.maxDur);
     end
-%     if size(binDataPruned(iEM).envMean,2) == 1 
-%         binDataPruned(iEM).envDur = zeros(1,p.envDur);
-%     end
+    %     if size(binDataPruned(iEM).envMean,2) == 1
+    %         binDataPruned(iEM).envDur = zeros(1,p.envDur);
+    %     end
 end
 envShape = vertcat(binDataPruned(:).envMean);
 %envDistrib = vertcat(binDataPruned(:).envDur);
@@ -184,12 +208,12 @@ subSamp = 1; % flag automatically goes to true if subsampling.
 isolatedSet = [];
 wNodeDeg = {};
 
-global REMORA
-tritonMode = 0;
-if isfield(REMORA,'ct')
-    tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
-    % triton tools are fair game.
-end
+% global REMORA
+% tritonMode = 0;
+% if isfield(REMORA,'ct')
+%     tritonMode = 1; % if REMORA.ct is populated, assume we're running through a triton gui and 
+%     % triton tools are fair game.
+% end
 if  tritonMode && isfield(REMORA.ct.CC,'rm_clusters')...
     && REMORA.ct.CC_params.rmPriorClusters
     badSet = REMORA.ct.CC.rmSet;
@@ -222,7 +246,7 @@ for iEA = 1:s.N
         excludedIn = 1:size(dTTmatNorm,1);
         subSamp = 0;
     end
-    
+    s.subSamp = subSamp;
     if subSamp || iEA == 1
         % Only do this on first iteration, or on every iteration if you are subsampling
         % find pairwise distances between spectra

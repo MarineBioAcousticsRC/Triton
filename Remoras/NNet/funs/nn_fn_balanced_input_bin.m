@@ -31,7 +31,7 @@ for iD = 1:size(typeList,1)
     thisTypeDir = fullfile(typeList(iD).folder,typeList(iD).name);
     [~,typeID] = fileparts(thisTypeDir);
     typeNames{iD,1} = typeID;
-    matList = dir(fullfile(thisTypeDir,'*binLevel.mat'));
+    matList = dir(fullfile(thisTypeDir,REMORA.nn.train_test_set.binWild));
    
     clusterSpectra = [];
     clusterICI = [];
@@ -55,7 +55,9 @@ for iD = 1:size(typeList,1)
     clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);
     clusterSpectra = clusterSpectraMin./max(clusterSpectraMin,[],2);
     clusterICI = clusterICI(I,:);
-
+    if ~isempty(clusterWave)
+        clusterWave = clusterWave(I,:);
+    end
     % find bouts
     [boutSize,boutStartIdx,...
         boutStartTime,boutEndIdx,...

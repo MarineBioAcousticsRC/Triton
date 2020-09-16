@@ -28,4 +28,13 @@ elseif strcmp(action,'visualize_labels')
     REMORA.lt.lVis_det.detection6.PlotLabels = false;
     REMORA.lt.lVis_det.detection7.PlotLabels = false;
     REMORA.lt.lVis_det.detection8.PlotLabels = false;
+    
+    %initialize settings for auto-updates in triton windows
+    if ~isfield(REMORA,'ltsa_plot_lVis_lab')
+        REMORA.ltsa_plot_lVis_lab = {};
+    end
+    REMORA.ltsa_plot_lVis_lab{end+1} = @lt_lVis_plot_LTSA_labels;
+    REMORA.ltsa_plot_lVis_lab{end+1} = @lt_lVis_plot_WAV_labels;
+    REMORA.ltsa_plot_lVis_lab{end+1} = @lt_lVis_plot_TS_labels;
+
 end
