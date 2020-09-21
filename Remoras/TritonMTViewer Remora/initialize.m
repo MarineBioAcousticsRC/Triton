@@ -12,9 +12,10 @@
 % varible that holds all the graphical buttons and windows of triton
 global HANDLES REMORA PARAMS
 
-% our "Localization" button is added to the tool menu
+%MT_loadData;
+%our "Localization" button is added to the tool menu
 REMORA.TritonMTViewer = uimenu(HANDLES.remmenu,'Label','TritonMTViewer', ...
-                       'Callback', 'TritonMTViewer_gui1');
+                      'Callback', 'TritonMTViewer_gui1');
                    
 % allow "TritonMTViewer" Remora to use the mouse click down button in the main
 % Plot Window 

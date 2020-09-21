@@ -1,4 +1,4 @@
-function speedcalc()
+function [speed, speedstats, JigRMS] = speedcalc()
 % example simple implementation of TagJiggle.m & SpeedFromRMS.m
 
 % Step 1- set up variables and calculate tag jiggle RMS amplitude for each axis
@@ -9,17 +9,17 @@ function speedcalc()
 % load downsampled whale data with pitch, roll, p, fs, etc.
 %load('mn160727-11 10Hzprh.mat'); 
 
-global all handles REMORA
+global all REMORA
 
 Afs = all.srate;
 filt = [REMORA.MT.settings.highpass REMORA.MT.settings.lowpass]; %[10 90]
 fs = REMORA.MT.settings.fs; %10;
 binSize = REMORA.MT.settings.bin; %0.5
-filterSize = 0.5; 
-minDepth = 10; 
-minPitch = 45;
-minSpeed = 0.5; 
-minTime = 0.2;
+filterSize = REMORA.MT.settings.filter; 
+minDepth = REMORA.MT.settings.minDepth; 
+minPitch = REMORA.MT.settings.minPitch;
+minSpeed = REMORA.MT.settings.minSpeed; 
+minTime = REMORA.MT.settings.minTime;
 
 p = all.press(:,1);
 A = [all.iaccel(:,1), all.jaccel(:,1), all.kaccel(:,1)];
@@ -46,9 +46,10 @@ end
 
 % tagon is an index indicating data points that are on the animal.
 %plot data to find tag on and tag off time
-figure; plot(p)
+figure(7); plot(p)
 title('Find start and end time of tag on animal');
 pos = ginput(2);
+close figure 7
 tagon = zeros(length(p),1);
 tagon(pos(1,1):pos(2,1),:) = 1;
 tagon = logical(tagon);
@@ -57,25 +58,30 @@ df=800/10;
 [pitch, roll] = a2pr(A,Afs,fs);
 
 %Filtering pitch and roll to match the other variables:
-DN = (0:1/fs:(size(pitch,1)-1)/Afs)'/24/60/60;
-Atime = (0:size(pitch,1)-1)'/24/60/60/Afs;
-Xtime = Atime(round(Afs*binSize/2):round(Afs/fs):end); %start half bin seconds in (so that the jiggle bins are centered and are bin seconds long each) and go every 1/fs second, that should get in the middle of the buffer
-Xtime = Xtime(1:size(pitch,2));
-k = 1; [~,j] = min(abs(DN-(Xtime(1)-1/fs/2/24/60/60))); pitchfilt(j) = pitch(k);
-for k = 1:length(Xtime);
-    j2 = find(DN(j:min(j+fs,length(DN)))<=Xtime(k)+1/fs/2/24/60/60,1,'last')+j-1;% find the times that are within 1/fs/2 seconds of Xtime(k)
-    if isempty(j2); [~,j] = min(abs(DN-(Xtime(k)-1/fs/2/24/60/60)));[~,j2] = min(abs(DN-(Xtime(k)+1/fs/2/24/60/60))); end
-    pitchfilt(j:j2) = pitch(k);
-    j = j2+1;
-end
+pitchfilt = decdc(pitch,df);
+rollfilt = decdc(roll,df);
+pitchfilt = vertcat(pitchfilt,0);
+rollfilt = vertcat(rollfilt,0);
 
-k = 1; [~,j] = min(abs(DN-(Xtime(1)-1/fs/2/24/60/60))); rollfilt(j) = roll(k);
-for k = 1:length(Xtime);
-    j2 = find(DN(j:min(j+fs,length(DN)))<=Xtime(k)+1/fs/2/24/60/60,1,'last')+j-1;% find the times that are within 1/fs/2 seconds of Xtime(k)
-    if isempty(j2); [~,j] = min(abs(DN-(Xtime(k)-1/fs/2/24/60/60)));[~,j2] = min(abs(DN-(Xtime(k)+1/fs/2/24/60/60))); end
-    rollfilt(j:j2) = roll(k);
-    j = j2+1;
-end
+% DN = (0:1/fs:(size(pitch,1)-1)/Afs)'/24/60/60;
+% Atime = (0:size(pitch,1)-1)'/24/60/60/Afs;
+% Xtime = Atime(round(Afs*binSize/2):round(Afs/fs):end); %start half bin seconds in (so that the jiggle bins are centered and are bin seconds long each) and go every 1/fs second, that should get in the middle of the buffer
+% Xtime = Xtime(1:size(pitch,1));
+% k = 1; [~,j] = min(abs(DN-(Xtime(1)-1/fs/2/24/60/60))); pitchfilt(j) = pitch(k);
+% for k = 1:length(Xtime);
+%     j2 = find(DN(j:min(j+fs,length(DN)))<=Xtime(k)+1/fs/2/24/60/60,1,'last')+j-1;% find the times that are within 1/fs/2 seconds of Xtime(k)
+%     if isempty(j2); [~,j] = min(abs(DN-(Xtime(k)-1/fs/2/24/60/60)));[~,j2] = min(abs(DN-(Xtime(k)+1/fs/2/24/60/60))); end
+%     pitchfilt(j:j2) = pitch(k);
+%     j = j2+1;
+% end
+% 
+% k = 1; [~,j] = min(abs(DN-(Xtime(1)-1/fs/2/24/60/60))); rollfilt(j) = roll(k);
+% for k = 1:length(Xtime);
+%     j2 = find(DN(j:min(j+fs,length(DN)))<=Xtime(k)+1/fs/2/24/60/60,1,'last')+j-1;% find the times that are within 1/fs/2 seconds of Xtime(k)
+%     if isempty(j2); [~,j] = min(abs(DN-(Xtime(k)-1/fs/2/24/60/60)));[~,j2] = min(abs(DN-(Xtime(k)+1/fs/2/24/60/60))); end
+%     rollfilt(j:j2) = roll(k);
+%     j = j2+1;
+% end
 
 %% Now everything is set up to run SpeedFromRMS.  On the first graph you can
 % further threshold the parameters minDepth, minPitch and maxRoll by
@@ -88,7 +94,7 @@ end
 % outliers near the surface or at high roll rate (uncommon).
 
 % of the following output variables, the "speed" table is the most important one.  The rest of the outputs are for documenting the fit of the speed curve
-[~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels] = SpeedFromRMS(RMS,fs,p,pitch,roll,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime);
+[~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels] = SpeedFromRMS(RMS,fs,p,pitchfilt,rollfilt,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime);
 
 %% The following section is optional, but it can help organize the data into a couple of simple structures:
 % 1) speed (a speed table with speed as well as prediction and confidence
@@ -124,16 +130,18 @@ speedstats.Thresh = speedThresh;
 X = JX; Y = JY; Z = JZ; Mag = J;
 JigRMS = table(X, Y, Z, Mag);
 
-if ~exist('SpeedPlots\','dir'); mkdir('SpeedPlots\'); end
-for fig = [1 301:300+size(speedstats.r2used,1)]
-    saveas(fig,['SpeedPlots\fig' num2str(fig) '.bmp']);
-end
+figure; ax =  plotyy(1:length(p),p,1:length(p),speed.JJ); set(ax(1),'ydir','rev');
 
-whaleID = INFO.whaleName;
-save([whaleID 'speed.mat'],'speed','speedstats','JigRMS'); % or save the values within your prh file;
-handles.speed = speed;
-handles.speedstats = speedstats;
-handles.JigRMS = JigRMS;
+if ~exist('SpeedPlots\','dir'); mkdir('SpeedPlots\'); end
+% for fig = [1 301:300+size(speedstats.r2used,1)]
+%     saveas(fig,['SpeedPlots\fig' num2str(fig) '.bmp']);
+% end
+all.speed = speed;
+all.speedstats = speedstats;
+all.JigRMS = JigRMS;
+%whaleID = INFO.whaleName;
+%save([whaleID 'speed.mat'],'speed','speedstats','JigRMS'); % or save the values within your prh file;
+
 end
 % check your values;
 %figure; ax =  plotyy(1:length(p),p,1:length(p),speed.JJ); set(ax(1),'ydir','rev');

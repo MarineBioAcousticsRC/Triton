@@ -219,7 +219,7 @@ Is1 = Is; Is2 = Is; Is3 = Is; Is4 = Is;
 minPitch2 = minPitch; minDepth2 = minDepth; sect = 'All';
 while ~isempty(button)
     sp = nan(4,1);
-    figure(1); clf;
+    figure(100); clf;
     for i = 1:4
         sp(i) = subplot(2,2,i);
         Is = Is1 & Is2 & Is3 & Is4 &Istot;

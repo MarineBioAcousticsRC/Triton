@@ -1,4 +1,5 @@
 function varargout = TritonMTViewer_gui1(varargin)
+
 % TRITONMTVIEWER_GUI1 MATLAB code for TritonMTViewer_gui1.fig
 %      TRITONMTVIEWER_GUI1, by itself, creates a new TRITONMTVIEWER_GUI1 or raises the existing
 %      singleton*.
@@ -96,7 +97,7 @@ varargout{2} = handles.strt;
 handles.data = [];
 MT_init_settings;
 MT_speed_gui;
-PlotMTdata(handles)
+ PlotMTdata(handles)
 % % load('E:\test\Global T\FullData.mat')
 %load global T;
 
