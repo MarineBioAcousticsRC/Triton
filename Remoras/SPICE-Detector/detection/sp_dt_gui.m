@@ -46,7 +46,7 @@ end
 energy = filtData.^2;
 
 [detectionsSample,detectionsSec] =  sp_dt_LR(energy,PARAMS,buffSamples,...
-    0,length(energy),p);
+    0,length(energy)/PARAMS.fs,p);
 
 %%% start HR detection on candidates
 if ~isempty(detectionsSample)
