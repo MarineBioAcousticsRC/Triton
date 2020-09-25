@@ -27,7 +27,9 @@ if REMORA.spice_dt.detParams.dBppThresholdFlag == 1||...
     if ~isfield(p,'xfrOffset') || isempty(p.xfrOffset)
         p.xfrOffset = 0;
     end
-    p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset))/20))/2;
+    [~,minxfrIdx] = min(abs(p.xfr_f-p.bpRanges(1)));
+    [~,maxxfrIdx] = min(abs(p.xfr_f-p.bpRanges(2)));
+    p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset(minxfrIdx:maxxfrIdx)))/20))/2;
     REMORA.spice_dt.detParams.countThresh = p.countThresh;
     REMORA.spice_dt.detParams.dBppThresholdFlag = 0; % set flag to off 
 end
