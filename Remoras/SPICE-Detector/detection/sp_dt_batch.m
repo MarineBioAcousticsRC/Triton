@@ -142,7 +142,7 @@ for idx1 = 1:N % for each data file
     % the remaining output files.
     clickTimes = sortrows(cParams.clickTimes);
     
-    keepFlag = sp_dt_postproc(outFileName,clickTimes,p,hdr,encounterTimes);
+    keepFlag = sp_dt_postproc(outFileName,clickTimes,pTemp,hdr,encounterTimes);
     keepIdx = find(keepFlag==1);
     
     cParams = sp_dt_prune_cParams_byIdx(cParams,keepIdx);
@@ -151,7 +151,7 @@ for idx1 = 1:N % for each data file
 %         clickParamsOut{1} = cParams;
 %         fOut{1} = f;
     end
-    sp_fn_saveDets2mat(strrep(outFileName,['.',p.ppExt],'.mat'),cParams,f,hdr,p);
+    sp_fn_saveDets2mat(strrep(outFileName,['.',pTemp.ppExt],'.mat'),cParams,f,hdr,pTemp);
     
 end
 
