@@ -57,7 +57,9 @@ for idx1 = 1:N % for each data file
         pTemp.previousFs = previousFs;
         pTemp = sp_fn_interp_tf(pTemp);
         if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
-            pTemp.countThresh = (10^((pTemp.dBppThreshold - max(pTemp.xfrOffset))/20))/2;
+            [~,minxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(1)));
+            [~,maxxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(2)));
+            pTemp.countThresh = (10^((pTemp.dBppThreshold - median(pTemp.xfrOffset(minxfrIdx:maxxfrIdx)))/20))/2;
         end
     end
     

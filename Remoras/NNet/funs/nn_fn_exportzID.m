@@ -21,8 +21,8 @@ for iFile = 1:nFiles
         continue
     end
     clickTimes = [binData(:).clickTimes]';
-    predLabel = [binData(:).predLabels]';
-    predLabelScore = [binData(:).predLabelScore]';
+    predLabel = vertcat(binData(:).predLabels);
+    predLabelScore = vertcat(binData(:).predLabelScore);
     
     % Concatenate by row
     zID = [];

@@ -31,6 +31,13 @@ end
 % make a file to write stuff to.
 diary(fullfile(REMORA.nn.train_net.outDir,['NNet_train_',datestr(now,'YYDDMM_hhmmss'),'.txt']));
 diary on
+
+% set flag for wether or not to use validation set
+REMORA.nn.train_test_set.validationTF = 0;
+if ~isempty(REMORA.nn.train_net.validFile)
+    REMORA.nn.train_test_set.validationTF = 1;
+end
+
 % figure out weights based on distribution of labels.
 uLabels = unique(trainLabelsAll);
 [labelOccurence,~] = histc(trainLabelsAll, uLabels);

@@ -110,7 +110,7 @@ for iD = 1:size(typeList,1)
     
     %% get validation set
     if REMORA.nn.train_test_set.validationTF
-        validBoutIdx = sort(randperm(nBouts,round(nBouts*(validPercent/100))))';
+        validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent/100)))))';
         fprintf('   %0.0f validation encounters selected\n',length(validBoutIdx))
         
         % pull out validation data
@@ -171,7 +171,7 @@ for iD = 1:size(typeList,1)
         testSetMSP{iD} = [];
     end
     if REMORA.nn.train_test_set.useICI
-        testSetICI{iD} = nn_fn_getSpectra_bin(clusterICI,clusterIdxTestSet,binIndicesTest);
+        testSetICI{iD} = nn_fn_getICI_bin(clusterICI,clusterIdxTestSet,binIndicesTest);
     else
         testSetICI{iD} = [];
     end

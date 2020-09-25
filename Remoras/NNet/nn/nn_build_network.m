@@ -4,6 +4,7 @@ global REMORA
 
 trainFileObj = matfile(REMORA.nn.train_net.trainFile);
 testFileObj = matfile(REMORA.nn.train_net.testFile);
+validFileObj = matfile(REMORA.nn.train_net.validFile);
 
 % Sanity check that train and test data have same dimensions.
 trainDataSize = size(trainFileObj.trainDataAll);%figure out dims of training data.
@@ -33,7 +34,7 @@ if REMORA.nn.train_test_set.validationTF
     REMORA.nn.train_net.validationFreq = floor(trainDataSize(1)/REMORA.nn.train_net.batchSize);
     vD = load(REMORA.nn.train_net.validFile);
     validation4D = table(mat2cell(vD.validDataAll,...
-        ones(size(vD.validDataAll,1),1)),categorical(vD.validlabelsAll));
+        ones(size(vD.validDataAll,1),1)),categorical(vD.validLabelsAll));
 
     trainPrefs = trainingOptions('rmsprop',...
         'MaxEpochs',REMORA.nn.train_net.nEpochs, ...
