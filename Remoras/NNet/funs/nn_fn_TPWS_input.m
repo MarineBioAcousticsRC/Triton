@@ -1,6 +1,7 @@
 inDir = 'J:\DCL_TPWS\WAT_HZ';
 binInMins = 5;
 inFileList = dir(fullfile(inDir,'*TPWS*.mat'));
+TPWSList = {inFileList.name};
 mergedSet = {};
 mergedSet.thisType.clickTimes = [];
 mergedSet.thisType.tIntMat = [];
@@ -30,6 +31,8 @@ for iFile = 1:nTPWS
     load(fullfile(inFileList(iFile).folder,inFileList(iFile).name),'MTT','MSP','MSN','f')
     load(fullfile(inFileList(iFile).folder,strrep(inFileList(iFile).name,...
        'TPWS','ID')))
+    disp('done loading')
+
     %%% need to add throw error if f changes size.
     [~,s.stIdx] = min(abs(f-s.startFreq));
     [~,s.edIdx] = min(abs(f-s.endFreq));
@@ -68,13 +71,15 @@ for iFile = 1:nTPWS
                 [~,TPWSidx,~] = intersect(MTT,clickTimes);
                 % 1: spectra
                 mySpectra = MSP(TPWSidx,:);
-                specMean = nn_norm_mean_spec(mySpectra,s.stIdx,s.edIdx);
+                [specMean,specMeanDiff] = nn_norm_mean_spec(mySpectra,s.stIdx,s.edIdx);
                 mergedSet(uSet(iU)).thisType.Tfinal{1} = [mergedSet(uSet(iU)).thisType.Tfinal{1};specMean];
                 % 2: ici distribution
                 iciDist = nn_compute_ici_distribution(clickTimes,p.barInt);
+                iciDist= iciDist./max(iciDist,[],2); % normalize to 1 max
                 mergedSet(uSet(iU)).thisType.Tfinal{2} = [mergedSet(uSet(iU)).thisType.Tfinal{2};iciDist];
-                % 3: diff spectra % not implemented
-                
+                % 3: diff spectra 
+                mergedSet(uSet(iU)).thisType.Tfinal{3} = [mergedSet(uSet(iU)).thisType.Tfinal{3};specMeanDiff];
+
                 % 4: ici mode
                 [~,iciModeIdx] = max(iciDist(:,s.minICIidx:end),[],2);
                 
@@ -84,16 +89,18 @@ for iFile = 1:nTPWS
                 end
                 iciMode = p.barInt(iciModeIdx) + p.barInt(2)./2;
                 mergedSet(uSet(iU)).thisType.Tfinal{4} = [mergedSet(uSet(iU)).thisType.Tfinal{4};iciMode];
-                % 5: mean spectrum??
-                
+                % 5: mean spectrum
+              
                 % 6: fileNumExpand(nodeSet{iTF}); % file it came from, redundant w/above
                 mergedSet(uSet(iU)).thisType.Tfinal{8} = [mergedSet(uSet(iU)).thisType.Tfinal{8};...
-                    iID]; % primart Index of bin
+                    iID]; % primary index of bin
                 mergedSet(uSet(iU)).thisType.Tfinal{9} = [mergedSet(uSet(iU)).thisType.Tfinal{9};...
                     iU]; % subIndex of bin
                 
                 % 10: mean envelope
-                envMean = mean(MSN(TPWSidx,:)./max(MSN(TPWSidx,:),[],2),1);
+                envSet = abs(hilbert(MSN(TPWSidx,:)'))';
+                envMean = mean(envSet./max(envSet,[],2),1);
+
                 mergedSet(uSet(iU)).thisType.Tfinal{10} = [mergedSet(uSet(iU)).thisType.Tfinal{10};...
                     envMean]; % subIndex of bin
             end
@@ -108,13 +115,13 @@ for iType = 1:size(mergedSet,1)
         mergedSet(iType).thisType.Tfinal{6} = mergedSet(iType,1).thisType.fileNumExpand;
         mergedSet(iType).thisType.Tfinal{7} = mergedSet(iType,1).thisType.tIntMat;
         thisType = mergedSet(iType).thisType;
-        save(fullfile(outDir,[s.outputName,'_type',num2str(iType)]),'thisType','inFileList','-v7.3');
+        save(fullfile(outDir,[s.outputName,'_type',num2str(iType)]),'f','TPWSList','thisType','inFileList','-v7.3');
         s.saveOutput = 1;
         nn_individual_click_plots(p,s,f,mergedSet(iType).thisType.Tfinal,outDir,iType)
     end
 end
 
-function specMean = nn_norm_mean_spec(mySpectra,stIdx,edIdx)
+function [specMean,specMeanDiff]= nn_norm_mean_spec(mySpectra,stIdx,edIdx)
 
     minSSsection = min(mySpectra(:,stIdx:edIdx),[],2);
     mySpectra_minNorm = (mySpectra - ...
@@ -126,6 +133,8 @@ function specMean = nn_norm_mean_spec(mySpectra,stIdx,edIdx)
     
     specMeanTemp_minNorm = specMeanTemp - min(specMeanTemp);
     specMean = specMeanTemp_minNorm/max(specMeanTemp_minNorm);
+    specMeanDiff = diff(specMean,1,2);
+
 end
 
 function iciDist = nn_compute_ici_distribution(ttSet,barInt)

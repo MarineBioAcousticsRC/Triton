@@ -1,4 +1,4 @@
-function nn_individual_click_plots(p,s,f,Tfinal,outDir)
+function nn_individual_click_plots(p,s,f,Tfinal,outDir,iType)
 
 siteNameNo_ = strrep(s.outputName,'_','\_');
 
