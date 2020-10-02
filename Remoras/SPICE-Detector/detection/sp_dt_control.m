@@ -109,6 +109,7 @@ elseif strcmp(action,'setUsePPThresh')
         usePPthresh = get(REMORA.spice_dt.PPThresholdRadio,'value');
     end
     REMORA.spice_dt.detParams.snrDet = ~usePPthresh;
+    REMORA.spice_dt.detParams.dBppThresholdFlag = 1;
     if usePPthresh
         set(REMORA.spice_dt.PPThresholdEdTxt,'Visible','on')
         set(REMORA.spice_dt.SNRThresholdEdTxt,'Visible','off')
@@ -124,6 +125,7 @@ elseif strcmp(action,'setUseSNRThresh')
         useSNRthresh = get(REMORA.spice_dt.SNRThresholdRadio,'value');
     end
     REMORA.spice_dt.detParams.snrDet = useSNRthresh;
+    REMORA.spice_dt.detParams.dBppThresholdFlag = 0;
     if useSNRthresh
         set(REMORA.spice_dt.SNRThresholdEdTxt,'Visible','on')
         set(REMORA.spice_dt.PPThresholdEdTxt,'Visible','off')
@@ -204,7 +206,7 @@ elseif strcmp(action,'SetHRBuffer')
     
 elseif strcmp(action,'SetMergeThreshold')
     mergeThr = str2num(get(REMORA.spice_dt_verify.mergeThresholdEdTxt, 'string'));
-    REMORA.spice_dt.detParams.LRbuffer = mergeThr;
+    REMORA.spice_dt.detParams.mergeThr = mergeThr;
     
 elseif strcmp(action,'SetEnergyPercentile')
     energyPrctile = str2num(get(REMORA.spice_dt_verify.energyPercEdTxt, 'string'));

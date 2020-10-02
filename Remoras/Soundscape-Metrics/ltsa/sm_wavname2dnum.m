@@ -18,11 +18,19 @@ filenamesc = cellstr(filenames);
 date_strs = regexp(filenamesc,'\d{6}[-]\d{6}','match'); 
 date_fmt = 'yymmdd-HHMMSS';
 
-if isempty(date_strs{1}) && PARAMS.ltsa.dtype==5
+if isempty(date_strs{1}) || PARAMS.ltsa.dtype==5
+    date_fmt = 'yymmddTHHMMSSZ';
+    date_strs = regexp(filenamesc,'\d{6}[T]\d{6}[Z]','match' );
+    if ~isempty(date_strs{1})
+        disp('Using SanctSound filename format yymmddTHHMMSSZ');
+    end
+end
+
+if isempty(date_strs{1}) % not a PAMguard file, try avisoft filename
     date_fmt = 'yymmddHHMMSS';
     date_strs = regexp(filenamesc,'\d{12}','match' );
     if ~isempty(date_strs{1})
-        disp('Using SoundTrap filename format yymmddHHMMSS');
+        disp('Using avisoft and SoundTrap filename format yymmddHHMMSS');
     end
 end
 
@@ -37,15 +45,6 @@ end
 if isempty(date_strs{1}) % using underscores presumably
     date_fmt = 'yymmdd_HHMMSS';
     date_strs = regexp(filenamesc,'\d{6}[_]\d{6}','match');
-end
-
-
-if isempty(date_strs{1}) % not a PAMguard file, try avisoft filename
-    date_fmt = 'yymmddHHMMSS';
-    date_strs = regexp(filenamesc,'\d{12}','match' );
-    if ~isempty(date_strs{1})
-        disp('Using avisoft filename format yymmddHHMMSS');
-    end
 end
 
 if isempty(date_strs{1})
