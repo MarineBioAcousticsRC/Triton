@@ -4,8 +4,9 @@ global REMORA
 
 trainFileObj = matfile(REMORA.nn.train_net.trainFile);
 testFileObj = matfile(REMORA.nn.train_net.testFile);
-validFileObj = matfile(REMORA.nn.train_net.validFile);
-
+if REMORA.nn.train_test_set.validationTF 
+    validFileObj = matfile(REMORA.nn.train_net.validFile);
+end
 % Sanity check that train and test data have same dimensions.
 trainDataSize = size(trainFileObj.trainDataAll);%figure out dims of training data.
 testDataSize =  size(testFileObj.testDataAll);%figure out dims of training data.

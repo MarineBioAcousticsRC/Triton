@@ -35,10 +35,13 @@ for iD = 1:size(typeList,1)
     fprintf('Beginning type %0.0f, name: %s\n',iD, typeList(iD).name)
     
     thisTypeDir = fullfile(typeList(iD).folder,typeList(iD).name);
+    
     [~,typeID] = fileparts(thisTypeDir);
     typeNames{iD,1} = typeID;
     matList = dir(fullfile(thisTypeDir,REMORA.nn.train_test_set.binWild));
-    
+    if isempty(matList)
+         disp('No files found for this type, skipping to next.')
+    end 
     clusterSpectra = [];
     clusterICI = [];
     clusterTimes = [];
@@ -58,8 +61,8 @@ for iD = 1:size(typeList,1)
     end
     [clusterTimes,I] = sort(clusterTimes);
     clusterSpectra = clusterSpectra(I,:);
-    clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);
-    clusterSpectra = clusterSpectraMin./max(clusterSpectraMin,[],2);
+%     clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);
+%     clusterSpectra = clusterSpectraMin./max(clusterSpectraMin,[],2);
     clusterICI = clusterICI(I,:);
     if ~isempty(clusterWave)
         clusterWave = clusterWave(I,:);

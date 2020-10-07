@@ -1,10 +1,11 @@
 function [savedTrainFullfile,savedTestFullfile] = nn_fn_balanced_input(inDir,saveDir,saveName,...
-    trainPercent,nExamples,boutGap)
+    trainPercent,validPercent,nExamples,boutGap)
 
 % Make a train set
 global REMORA 
 
 saveNameTrain = [saveName ,'_det_train.mat'];
+saveNameValid = [saveName ,'_det_valid.mat'];
 saveNameTest = [saveName ,'_det_test.mat'];
 if ~exist(saveDir,'dir')
     mkdir(saveDir)
@@ -26,12 +27,23 @@ testTSAll = [];
 testLabelsAll = [];
 testTimesAll = [];
 testAmpAll = [];
+
+
+validSpecAll = [];
+validTSAll = [];
+validLabelsAll = [];
+
 minGapTimeHour = boutGap/60;
 minGapTimeDnum = minGapTimeHour/24;    % gap time in datenum
 
 for iT = 1:nTypes
     fprintf('Beginning type %0.0f, name: %s\n',iT, subDirList(iT).name)
-    fList = dir(fullfile(inDir,subDirList(iT).name,'*detLevel.mat'));
+    folderPath = fullfile(subDirList(iT).folder,subDirList(iT).name);
+    fList = dir(fullfile(folderPath,'*detLevel.mat'));
+    if isempty(fList)
+         disp('No files found for this type, skipping to next.')
+         continue
+    end 
     timesCat = []; fListIdx = []; indexCat = [];
     
     % iterate over "training set" files, and load times so we can determine
@@ -62,8 +74,12 @@ for iT = 1:nTypes
 
     
     % pick training bouts
-    trainBoutIdx = sort(randperm(sum(nBouts),round(sum(nBouts)*(trainPercent/100))));
-    [~,testBoutIdx] = setdiff(1:sum(nBouts),trainBoutIdx);
+    nBoutsTotal = sum(nBouts);
+    trainBoutIdx = sort(randperm(nBoutsTotal,round(nBoutsTotal*(trainPercent/100))));
+    boutsLeft = setdiff(1:nBoutsTotal,trainBoutIdx);
+    boutsLeft = boutsLeft(randperm(length(boutsLeft)));% shuffle it
+    validBoutIdx = boutsLeft(1:max(1,floor(nBoutsTotal*(validPercent/100))));
+    [~,testBoutIdx] = setdiff(boutsLeft,validBoutIdx);
     
     fprintf('   %0.0f train encounters selected\n',length(trainBoutIdx))
     fprintf('   %0.0f test encounters selected\n',length(testBoutIdx))
@@ -77,190 +93,72 @@ for iT = 1:nTypes
     
     %% TRAIN
     boutSizeAllTrain = boutSizeAllVec(trainBoutIdx);
-    boutStartIdxAllAllTrain = boutStartIdxAllVec(trainBoutIdx);
-    boutEndIdxAllAllTrain = boutEndIdxAllVec(trainBoutIdx);
+    boutStartIdxAllTrain = boutStartIdxAllVec(trainBoutIdx);
+    boutEndIdxAllTrain = boutEndIdxAllVec(trainBoutIdx);
     fListIdxTrain = fListIdxVec(trainBoutIdx);
     
     % randomly select desired number of events across bouts
     nClicksTrain = sum(boutSizeAllTrain);
     clickIndicesTrain = sort(randi(nClicksTrain,1,nExamples));
     [~,edges,bin] = histcounts(clickIndicesTrain,[1;cumsum(boutSizeAllTrain)+1]);
-    
-    trainSetSN = [];
-    trainSetSP = [];
-    trainSetAmp = [];
-    sIdx = 1;
-    for iBout = 1:length(trainBoutIdx)
-        
-        thisFileIdx = fListIdxTrain(iBout);
-        thisTypeFile = fullfile(inDir,subDirList(iT).name,fList(thisFileIdx).name);
-        % do partial load of just clicks in bout
-        fileObj = matfile(thisTypeFile);
-        
-        if iBout == 1
-            % pre-allocate now that we know the horizontal dimensions if
-            % this is the first pass.
-            SNwidth = size(fileObj.trainMSN(1,:),2);
-            SPwidth = size(fileObj.trainMSP(1,:),2);
-            trainSetSN = zeros(nExamples,SNwidth);
-            trainSetSP = zeros(nExamples,SPwidth);
-            trainSetAmp = zeros(nExamples,1);
-        end
-        
-        boutIdxRange = boutStartIdxAllAllTrain(iBout):boutEndIdxAllAllTrain(iBout);
-        whichEvents = clickIndicesTrain(bin==iBout)-edges(iBout)+1;
-        eIdx = sIdx+size(whichEvents,2)-1;
-        
-        if size(boutIdxRange,2)<100000
-            % load a big set, then pick what you want
-            if REMORA.nn.train_test_set.useWave
-                thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);
-                thisBout.amplitude = sqrt(mean(thisBout.MSN.^2,2))./...
-                    max(abs(thisBout.MSN),[],2);
-            else
-                thisBout.MSN = [];
-                thisBout.amplitude = [];
-            end
-            if REMORA.nn.train_test_set.useSpectra
-                thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);
-            else
-                thisBout.MSP = [];
-            end
-            
-            % Figure out which of the randomly selected training events are in this bout
-            if REMORA.nn.train_test_set.useWave
-                trainSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
-                trainSetAmp(sIdx:eIdx,1) = thisBout.amplitude(whichEvents,:);
 
-            end
-            if REMORA.nn.train_test_set.useSpectra
-                trainSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
-            end
-            sIdx = sIdx+size(whichEvents,2);
-        else
-            % if that's too much to load, do it one at a time
-            for iDet = 1:length(whichEvents)
-                if REMORA.nn.train_test_set.useWave
-                    trainSetSN(sIdx,:) = fileObj.trainMSN(boutIdxRange(1)+whichEvents(iDet),:);
-                end
-                if REMORA.nn.train_test_set.useSpectra
-                    trainSetSP(sIdx,:) = fileObj.trainMSP(boutIdxRange(1)+whichEvents(iDet),:);
-                end
-                sIdx = sIdx+1;
-                
-            end
-            trainSetAmp = sqrt(mean(trainSetSN.^2,2))./...
-                max(abs(trainSetSN),[],2);
-        end
-        
-        fprintf('. ')
-        if mod(iBout,25)==0
-            fprintf('\n')
-        end
-    end
+    [trainSetSN,trainSetSP,trainSetAmp] = nn_fn_extract_examples(folderPath,fList,...
+        nExamples,fListIdxTrain,boutStartIdxAllTrain,boutEndIdxAllTrain,clickIndicesTrain,edges,bin);
+
     fprintf('\n')
     trainTSAll = [trainTSAll;trainSetSN];
     trainSpecAll = [trainSpecAll;trainSetSP];
-    trainAmpAll = [trainAmpAll;trainSetAmp];
+    %trainAmpAll = [trainAmpAll;trainSetAmp];
                  
     trainLabelsAll = [trainLabelsAll;repmat(iT,size(trainSetSN,1),1)];
     
     fprintf('  %0.0f Training examples gathered\n',length(trainLabelsAll))
 
-    %% TEST
-    boutSizeAllTest = boutSizeAllVec(testBoutIdx);
-    boutStartIdxAllAllTest = boutStartIdxAllVec(testBoutIdx);
-    boutEndIdxAllAllTest = boutEndIdxAllVec(testBoutIdx);
-    fListIdxTest = fListIdxVec(testBoutIdx);
+    %% Validation
+    boutSizeAllValid = boutSizeAllVec(validBoutIdx);
+    boutStartIdxAllValid = boutStartIdxAllVec(validBoutIdx);
+    boutEndIdxAllValid = boutEndIdxAllVec(validBoutIdx);
+    fListIdxValid = fListIdxVec(validBoutIdx);
     
     % randomly select desired number of events across bouts
-    nClicksTest = sum(boutSizeAllTest);
-    testSetSN = [];
-    testSetSP = [];
-    testSetAmp = [];
+    nClicksValid = sum(boutSizeAllValid);
+    clickIndicesValid = sort(randi(nClicksValid,1,nExamples));
+    [~,edges,bin] = histcounts(clickIndicesValid,[1;cumsum(boutSizeAllValid)+1]);
+
+    [validSetSN,validSetSP,validSetAmp] = nn_fn_extract_examples(folderPath,...
+        fList,nExamples,fListIdxValid,boutStartIdxAllValid,boutEndIdxAllValid,clickIndicesValid,edges,bin);
+
+    fprintf('\n')
+    validTSAll = [validTSAll;validSetSN];
+    validSpecAll = [validSpecAll;validSetSP];
+    %validAmpAll = [validAmpAll;validSetAmp];
+                 
+    validLabelsAll = [validLabelsAll;repmat(iT,size(validSetSN,1),1)];
     
+    fprintf('  %0.0f Validation examples gathered\n',length(validLabelsAll))
+    
+    %% TEST
+    boutSizeAllTest = boutSizeAllVec(testBoutIdx);
+    boutStartIdxAllTest = boutStartIdxAllVec(testBoutIdx);
+    boutEndIdxAllTest = boutEndIdxAllVec(testBoutIdx);
+    fListIdxTest = fListIdxVec(testBoutIdx);
+    
+    nClicksTest = sum(boutSizeAllTest);
+  
     if nClicksTest == 0 
         disp(sprintf('WARNING: No ''%s'' events available for test set',typeNames{iT}))
         continue
     end
+    % randomly select desired number of events across bouts
     clickIndicesTest = sort(randi(nClicksTest,1,nExamples));
     [N,edges,bin] = histcounts(clickIndicesTest,[1;cumsum(boutSizeAllTest)+1]);
-    
-    
-    sIdx = 1;
-    for iBout = 1:length(testBoutIdx)
-        
-        thisFileIdx = fListIdxTest(iBout);
-        thisTypeFile = fullfile(inDir,subDirList(iT).name,fList(thisFileIdx).name);
-        % do partial load of just clicks in bout
-        fileObj = matfile(thisTypeFile);
-        
-        if iBout == 1
-            % pre-allocate now that we know the horizontal dimensions if
-            % this is the first pass.
-            SNwidth = size(fileObj.trainMSN(1,:),2);
-            SPwidth = size(fileObj.trainMSP(1,:),2);
-            testSetSN = zeros(nExamples,SNwidth);
-            testSetSP = zeros(nExamples,SPwidth);
-            testSetAmp = zeros(nExamples,1);
-        end
-        
-        boutIdxRange = boutStartIdxAllAllTest(iBout):boutEndIdxAllAllTest(iBout);
-        whichEvents = clickIndicesTest(bin==iBout)-edges(iBout)+1;
-        eIdx = sIdx+size(whichEvents,2)-1;
-        
-        if size(boutIdxRange,2)<100000
-            % load a big set, then pick what you want
-            if REMORA.nn.train_test_set.useWave
-                thisBout.MSN = fileObj.trainMSN(boutIdxRange,:);                
-                thisBout.amplitude = sqrt(mean(thisBout.MSN.^2,2))./...
-                    max(abs(thisBout.MSN),[],2);
-            else
-                thisBout.MSN = []; 
-                thisBout.amplitude = [];
-            end
-            
-            if REMORA.nn.train_test_set.useSpectra
-                thisBout.MSP = fileObj.trainMSP(boutIdxRange,:);            
-            else
-                thisBout.MSP = [];
-            end
-            
-            % Figure out which of the randomly selected training events are in this bout
-            if REMORA.nn.train_test_set.useWave
-                testSetSN(sIdx:eIdx,:) = thisBout.MSN(whichEvents,:);
-                testSetAmp(sIdx:eIdx,1) = thisBout.amplitude(whichEvents,:);
-            end
-            if REMORA.nn.train_test_set.useSpectra
-                testSetSP(sIdx:eIdx,:) = thisBout.MSP(whichEvents,:);
-            end
-            sIdx = sIdx+size(whichEvents,2);
-        else
-            % if that's too much to load, do it one at a time
-            for iDet = 1:length(whichEvents)
-                if REMORA.nn.train_test_set.useWave
-                    testSetSN(sIdx,:) = fileObj.trainMSN(boutIdxRange(1)+whichEvents(iDet),:);
-                end
-                if REMORA.nn.train_test_set.useSpectra
-                    testSetSP(sIdx,:) = fileObj.trainMSP(boutIdxRange(1)+whichEvents(iDet),:);
 
-                end
-                sIdx = sIdx+1;
-                
-            end
-            testSetAmp = sqrt(mean(testSetSN.^2,2))./...
-                    max(abs(testSetSN),[],2);
-        end
-        
-        fprintf('. ')
-        if mod(iBout,25)==0
-            fprintf('\n')
-        end
-    end
-    fprintf('\n')
+    [testSetSN,testSetSP,testSetAmp] = nn_fn_extract_examples(folderPath,fList,...
+        nExamples,fListIdxTest,boutStartIdxAllTest,boutEndIdxAllTest,clickIndicesTest,edges,bin);
+ 
     testTSAll = [testTSAll;testSetSN];
     testSpecAll = [testSpecAll;testSetSP];
-    testAmpAll = [testAmpAll;testSetAmp];
+    %testAmpAll = [testAmpAll;testSetAmp];
     testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN,1),1)];
     
     fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))    
@@ -269,15 +167,30 @@ for iT = 1:nTypes
 end
 trainTestSetInfo = REMORA.nn.train_test_set;
 
+% Save training set
 normSpecTrain = nn_fn_normalize_spectrum(trainSpecAll);
 normTSTrain = nn_fn_normalize_timeseries(trainTSAll);
-trainDataAll = [normSpecTrain,normTSTrain,trainAmpAll];
+%trainDataAll = [normSpecTrain,normTSTrain];%trainAmpAll
+trainDataAll = [trainSpecAll,trainTSAll];%trainAmpAll
+
 savedTrainFullfile = fullfile(saveDir,saveNameTrain);
 save(savedTrainFullfile,'trainDataAll','trainLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
+% Save validation set
+normSpecValid = nn_fn_normalize_spectrum(validSpecAll);
+normTSValid = nn_fn_normalize_timeseries(validTSAll);
+%trainDataAll = [validSpecValid,validTSValid];%validAmpAll
+validDataAll = [validSpecAll,validTSAll];%validAmpAll
+
+savedValidFullfile = fullfile(saveDir,saveNameValid);
+save(savedValidFullfile,'validDataAll','validLabelsAll','typeNames','trainTestSetInfo','-v7.3')
+
+% Save test set
 normSpecTest = nn_fn_normalize_spectrum(testSpecAll);
 normTSTest = nn_fn_normalize_timeseries(testTSAll);
-testDataAll = [normSpecTest,normTSTest,testAmpAll];
+%testDataAll = [normSpecTest,testSpecAll];%testAmpAll
+testDataAll = [testSpecAll,testTSAll];
+
 savedTestFullfile = fullfile(saveDir,saveNameTest);
 save(savedTestFullfile,'testDataAll','testLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
