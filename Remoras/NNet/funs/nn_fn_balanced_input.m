@@ -122,11 +122,13 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksValid = sum(boutSizeAllValid);
-    clickIndicesValid = sort(randi(nClicksValid,1,nExamples));
+    
+    nExamplesValid  = round(nExamples*(validPercent/100));
+    clickIndicesValid = sort(randi(nClicksValid,1,nExamplesValid));
     [~,edges,bin] = histcounts(clickIndicesValid,[1;cumsum(boutSizeAllValid)+1]);
 
     [validSetSN,validSetSP,validSetAmp] = nn_fn_extract_examples(folderPath,...
-        fList,nExamples,fListIdxValid,boutStartIdxAllValid,boutEndIdxAllValid,clickIndicesValid,edges,bin);
+        fList,nExamplesValid,fListIdxValid,boutStartIdxAllValid,boutEndIdxAllValid,clickIndicesValid,edges,bin);
 
     fprintf('\n')
     validTSAll = [validTSAll;validSetSN];
@@ -150,11 +152,12 @@ for iT = 1:nTypes
         continue
     end
     % randomly select desired number of events across bouts
-    clickIndicesTest = sort(randi(nClicksTest,1,nExamples));
+    nExamplesTest = round(nExamples*(1-(validPercent+trainPercent)/100));
+    clickIndicesTest = sort(randi(nClicksTest,1,nExamplesTest));
     [N,edges,bin] = histcounts(clickIndicesTest,[1;cumsum(boutSizeAllTest)+1]);
 
     [testSetSN,testSetSP,testSetAmp] = nn_fn_extract_examples(folderPath,fList,...
-        nExamples,fListIdxTest,boutStartIdxAllTest,boutEndIdxAllTest,clickIndicesTest,edges,bin);
+        nExamplesTest,fListIdxTest,boutStartIdxAllTest,boutEndIdxAllTest,clickIndicesTest,edges,bin);
  
     testTSAll = [testTSAll;testSetSN];
     testSpecAll = [testSpecAll;testSetSP];

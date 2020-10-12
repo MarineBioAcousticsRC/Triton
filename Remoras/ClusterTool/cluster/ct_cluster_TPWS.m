@@ -192,7 +192,7 @@ for iC = 1:length(dateInterval)
             % WARNING: if data were subsetted, this clickClusterIds
             % is relative to the permuted subset rList in clickSubset
             binData(cIdx,1).clickSubset = rList;% store indices of the clicks that were clustered.
-            binData(cIdx,1).nIsolated = isolatedSet; % sore indices of clicks isolated from clusters
+            binData(cIdx,1).nIsolated = isolatedSet; % store indices of clicks isolated from clusters
             binData(cIdx,1).sumSpec = spectraMean; % store summary spectra
             binData(cIdx,1).nSpec = sizeCA; % store # of clicks associated with each summary spec
             binData(cIdx,1).percSpec = sizeCA./size(specSet,1); % store % of clicks associated with each summary spec
@@ -208,6 +208,7 @@ for iC = 1:length(dateInterval)
             % meanSimilarity{cIdx,:} = meanSim;
             
             if p.plotFlag 
+                figure(111);imagesc(specSet(isolatedSet,:));set(gca,'ydir','normal')
                 % plotting option
                 ct_plot_bin_clusters(p,f,spectraMean,envDistrib,thisFile,dtt,...
                     specHolder,envSetHolder,sizeCA,iC,length(dateInterval),figCounter) 
