@@ -167,7 +167,7 @@ else
         ylabel('Acceleration [mGal]');
     axes(handles.axes10)
         cla
-        plot(all.speed.JJ(updated_start_s:updated_end_s,end),all.speed.JJ(updated_start_s:updated_end_s,1),':b'); axis tight;
+        plot(all.press(:,end),all.speed.JJ(:,1),':b'); axis tight;
         UpdateAxis('x')
         set(gca, 'XTick',[],'Tag','Speed','NextPlot','add');
         ylabel('Speed [m/s]');

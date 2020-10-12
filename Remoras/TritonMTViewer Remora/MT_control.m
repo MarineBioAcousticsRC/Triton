@@ -1,4 +1,4 @@
-function bm_control(action,mySource)
+function MT_control(action,mySource)
 
 global REMORA HANDLES
 

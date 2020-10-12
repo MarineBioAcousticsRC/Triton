@@ -142,6 +142,7 @@ all.JigRMS = JigRMS;
 %whaleID = INFO.whaleName;
 %save([whaleID 'speed.mat'],'speed','speedstats','JigRMS'); % or save the values within your prh file;
 
+
 end
 % check your values;
 %figure; ax =  plotyy(1:length(p),p,1:length(p),speed.JJ); set(ax(1),'ydir','rev');

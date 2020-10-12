@@ -95,8 +95,8 @@ end
 varargout{1} = handles.out;
 varargout{2} = handles.strt;
 handles.data = [];
-MT_init_settings;
-MT_speed_gui;
+% MT_init_settings;
+% MT_speed_gui;
  PlotMTdata(handles)
 % % load('E:\test\Global T\FullData.mat')
 %load global T;

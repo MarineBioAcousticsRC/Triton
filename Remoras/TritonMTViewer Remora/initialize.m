@@ -15,8 +15,18 @@ global HANDLES REMORA PARAMS
 %MT_loadData;
 %our "Localization" button is added to the tool menu
 REMORA.TritonMTViewer = uimenu(HANDLES.remmenu,'Label','TritonMTViewer', ...
-                      'Callback', 'TritonMTViewer_gui1');
-                   
+                      'Enable', 'on','Visible','on');
+%REMORA.TritonMTViewer = uimenu(HANDLES.remmenu,'Label','TritonMTViewer', ...
+ %                     'Callback', 'TritonMTViewer_gui1');
+                  
+%Run speed detector
+uimenu(REMORA.TritonMTViewer,'Label', 'Calculate speed',...
+    'Callback','MT_init_speed');
+
+%View tag data
+uimenu(REMORA.TritonMTViewer,'Label','View tag data',...
+    'Callback', 'TritonMTViewer_gui1');
+
 % allow "TritonMTViewer" Remora to use the mouse click down button in the main
 % Plot Window 
 REMORA.pick.value = 1 ;  
