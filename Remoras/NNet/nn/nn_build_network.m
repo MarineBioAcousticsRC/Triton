@@ -33,6 +33,9 @@ layerSet = [layerSet;...
 if REMORA.nn.train_test_set.validationTF
     % validation data provided
     REMORA.nn.train_net.validationFreq = floor(trainDataSize(1)/REMORA.nn.train_net.batchSize);
+    if REMORA.nn.train_net.validationFreq <1
+        error(sprintf('Batch size (%0.0f) is too large relative to training set size (%0.0f). Reduce batch size',REMORA.nn.train_net.batchSize,trainDataSize(1)))
+    end
     vD = load(REMORA.nn.train_net.validFile);
     validation4D = table(mat2cell(vD.validDataAll,...
         ones(size(vD.validDataAll,1),1)),categorical(vD.validLabelsAll));

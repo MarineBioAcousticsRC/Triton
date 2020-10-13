@@ -169,31 +169,38 @@ for iT = 1:nTypes
 
 end
 trainTestSetInfo = REMORA.nn.train_test_set;
-
+normData = 0;
 % Save training set
-normSpecTrain = nn_fn_normalize_spectrum(trainSpecAll);
-normTSTrain = nn_fn_normalize_timeseries(trainTSAll);
-%trainDataAll = [normSpecTrain,normTSTrain];%trainAmpAll
-trainDataAll = [trainSpecAll,trainTSAll];%trainAmpAll
+if normData
+    normSpecTrain = nn_fn_normalize_spectrum(trainSpecAll);
+    normTSTrain = nn_fn_normalize_timeseries(trainTSAll);
+	trainDataAll = [normSpecTrain,normTSTrain];%trainAmpAll
+else
+    trainDataAll = [trainSpecAll,trainTSAll];%trainAmpAll
+end
 
 savedTrainFullfile = fullfile(saveDir,saveNameTrain);
 save(savedTrainFullfile,'trainDataAll','trainLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
 % Save validation set
-normSpecValid = nn_fn_normalize_spectrum(validSpecAll);
-normTSValid = nn_fn_normalize_timeseries(validTSAll);
-%trainDataAll = [validSpecValid,validTSValid];%validAmpAll
-validDataAll = [validSpecAll,validTSAll];%validAmpAll
-
+if normData
+    normSpecValid = nn_fn_normalize_spectrum(validSpecAll);
+    normTSValid = nn_fn_normalize_timeseries(validTSAll);
+    validDataAll = [normSpecValid,normTSValid];%validAmpAll
+else
+    validDataAll = [validSpecAll,validTSAll];%validAmpAll
+end
 savedValidFullfile = fullfile(saveDir,saveNameValid);
 save(savedValidFullfile,'validDataAll','validLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
 % Save test set
-normSpecTest = nn_fn_normalize_spectrum(testSpecAll);
-normTSTest = nn_fn_normalize_timeseries(testTSAll);
-%testDataAll = [normSpecTest,testSpecAll];%testAmpAll
-testDataAll = [testSpecAll,testTSAll];
-
+if normData
+    normSpecTest = nn_fn_normalize_spectrum(testSpecAll);
+    normTSTest = nn_fn_normalize_timeseries(testTSAll);
+    testDataAll = [normSpecTest,normTSTest];%testAmpAll
+else
+    testDataAll = [testSpecAll,testTSAll];
+end
 savedTestFullfile = fullfile(saveDir,saveNameTest);
 save(savedTestFullfile,'testDataAll','testLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
