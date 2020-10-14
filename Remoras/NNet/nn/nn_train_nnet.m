@@ -53,7 +53,6 @@ fprintf('\n\n\n')
 trainDataAll(isnan(trainDataAll))=0;
 
 %trainDataAll(:,182:381)=abs(trainDataAll(:,182:381)-.5)*2;
-
 train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
 %reshape(trainDataAll,[1,size(trainDataAll,2),1,...
 %    size(trainDataAll,1)]);
@@ -112,6 +111,8 @@ nn_fn_plotaccuracy(REMORA.nn.train_net.evalResultsFilename)
 accuracyPercent = 100*(sum(testLabelsAll == double(YPredEval))/size(testLabelsAll,1));
 fprintf('Overall accuracy on test dataset: %0.2f%%\n\n\n',accuracyPercent)
 
+%%% TODO: make normalization indices informed by prior steps!!!
+trainDataNorm = [nn_fn_normalize_spectrum(trainDataAll(:,1:181)),nn_fn_normalize_timeseries(trainDataAll(:,192:end))];
 nPlots = length(uLabels);
 nRows = 3;
 nCols = ceil(nPlots/nRows);
@@ -120,17 +121,20 @@ clf;colormap(jet)
 set(REMORA.fig.nn.training_plots{1},'name', 'Training Data')
 for iR = 1:nPlots
     subplot(nRows,nCols,iR)
-    imagesc(trainDataAll(trainLabelsAll==iR,:)')
+    
+    imagesc(trainDataNorm(trainLabelsAll==iR,:)')
     set(gca,'ydir','normal')
-    title(sprintf('Category %0.0f',iR))
+    title(typeNames{iR})
 end
 
 REMORA.fig.nn.training_plots{2} = figure;
 clf;colormap(jet)
 set(REMORA.fig.nn.training_plots{2},'name', 'Test Data')
+testDataNorm = [nn_fn_normalize_spectrum(testDataAll(:,1:181)),nn_fn_normalize_timeseries(testDataAll(:,192:end))];
+
 for iR = 1:nPlots
     subplot(nRows,nCols,iR)
-    imagesc(testDataAll(testLabelsAll==iR,:)')
+    imagesc(testDataNorm(testLabelsAll==iR,:)')
     set(gca,'ydir','normal')
     title(typeNames{iR})
 end
@@ -142,7 +146,7 @@ for iR = 1:nPlots
     subplot(nRows,nCols,iR)
     idxToPlot = find(double(YPredEval)==iR);
     [classScore,plotOrder] = sort(bestScores(idxToPlot),'descend');
-    imagesc(testDataAll(idxToPlot(plotOrder),:)')
+    imagesc(testDataNorm(idxToPlot(plotOrder),:)')
     set(gca,'ydir','normal')
     title(typeNames{iR})
 end
@@ -154,8 +158,10 @@ misclassSet = double(YPredEval)~=testLabelsAll;
 for iR = 1:nPlots
     thisType = double(YPredEval)==iR;
     misclassIdx = find(thisType & misclassSet);
+    [classScore,plotOrder] = sort(bestScores(misclassIdx),'descend');
+
     subplot(nRows,nCols,iR)
-    imagesc(testDataAll(misclassIdx,:)')
+    imagesc(testDataNorm(misclassIdx(plotOrder),:)')
     set(gca,'ydir','normal')
     title(typeNames{iR})
 end
