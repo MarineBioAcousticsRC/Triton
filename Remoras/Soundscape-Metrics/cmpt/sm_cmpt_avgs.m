@@ -54,7 +54,7 @@ timebintoc = zeros(REMORA.sm.cmpt.pre.thisltsa,1);
 count = 0;
 seg = 0;
 seg0 = 0;
-
+pnum = 0;
 %% cycle through time bins
 for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
     timebintic = tic;
@@ -160,11 +160,11 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
     %!!!!!!!!!!!!!!!!!!!!!!!!!!! TO TEST FOR LTSA        
             % if frequency average for psd is not 1 Hz bin, change freq binning
             if REMORA.sm.cmpt.avgf ~= 1
-                vec = 1:REMORA.sm.cmpt.avgf:size(REMORA.sm.cmpt.pre.pwr,2);
+                vec = 0:REMORA.sm.cmpt.avgf:size(REMORA.sm.cmpt.pre.pwr,2);
                 pwr = ones(size(REMORA.sm.cmpt.pre.pwr,1),length(vec)-1)*NaN;
                 for a = 1:length(vec)-1
                     pwr(:,a) = mean(REMORA.sm.cmpt.pre.pwr(:,...
-                        (vec(a):vec(a+1)-1)),2);
+                        (vec(a)+1:vec(a+1))),2);
                 end
                 % replace 1 Hz power with reduced frequency bin width power
                 REMORA.sm.cmpt.pre.pwr = pwr;
@@ -274,26 +274,37 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             else %display progress every hour
                 count = count+REMORA.sm.cmpt.avgt;
                 seg = seg + 1;
+                
                 if count >=3600
+                    pnum = pnum + 1;
+                    timehtoc(pnum) = toc(timebintic);
                     disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
                         ' computed; ',datestr(thisend+dateoffset),'; duration ',...
-                        num2str(timebintoc(tidx)),' s; ', num2str(seg),' segnents'])
+                        num2str(timehtoc(pnum)),' s; ', num2str(seg),' segments'])
                     count = 0;
                     seg = 0;
                 end
             end
         end
     else
-        perc = (length(hidx) + length(REMORA.sm.cmpt.pre.timeavgs))/...
-            REMORA.sm.cmpt.avgt;
-        % display progress
-        count = count+REMORA.sm.cmpt.avgt;
-        seg0 = seg0 + 1;
-        if count >=3600
-            disp(['Time averages NOT computed since last print: ',num2str(seg),' segnents; ',...
-                datestr(thisend+dateoffset),'; ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),'; duration ',...
-                        num2str(timebintoc(tidx)),' s; '])
-            count = 0;
+        if REMORA.sm.cmpt.avgt>=3600 %display every hour, otherwise reduce output
+            perc = (length(hidx) + length(REMORA.sm.cmpt.pre.timeavgs))/...
+                REMORA.sm.cmpt.avgt;
+            % display progress
+
+            disp(['Time average ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),...
+                    ' NOT computed; ',datestr(thisstart),' - ',datestr(thisend),'; duration ',num2str(timebintoc(tidx)),' s'])
+            disp(['Not enough coverage: ',num2str(perc*100),'%; '])
+        else %display progress every hour
+            count = count+REMORA.sm.cmpt.avgt;
+            seg0 = seg0 + 1;
+            if count >=3600
+                pnum = pnum + 1;
+                disp(['Time averages NOT computed since last print: ',num2str(seg),' segments; ',...
+                    datestr(thisend+dateoffset),'; ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),'; duration ',...
+                            num2str(timehtoc(pnum)),' s; '])
+                count = 0;
+            end
         end
     end
     
