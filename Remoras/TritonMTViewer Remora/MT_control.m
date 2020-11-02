@@ -19,16 +19,16 @@ if strcmp(action, '')
 %     REMORA.bm.settings.outDir = outDir;
       
 elseif strcmp(action,'sethighpass')
-    highpass = get(REMORA.MT_verify.highpassEdTxt, 'string');
+    highpass = str2double(get(REMORA.MT_verify.highpassEdTxt, 'string'));
     REMORA.MT.settings.highpass = highpass;
     
 elseif strcmp(action,'setlowpass')
-    lowpass = str2double(get(REMORA.MT_verify.lowpassEdText, 'string'));
+    lowpass = str2double(get(REMORA.MT_verify.lowpassEdTxt, 'string'));
     REMORA.MT.settings.lowpass = lowpass;
     
 elseif strcmp(action, 'setBinsize')
-    bin = str2double(get(REMORA.MT_verify.binsizeEdText, 'string'));
-    REMORA.bm.settings.bin = bin;
+    bin = str2double(get(REMORA.MT_verify.binsizeEdTxt, 'string'));
+    REMORA.MT.settings.bin = bin;
     
 elseif strcmp(action, 'setFs')
     fs = str2double(get(REMORA.MT_verify.fsEdText, 'string'));

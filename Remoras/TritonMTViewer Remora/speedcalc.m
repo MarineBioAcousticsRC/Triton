@@ -12,6 +12,7 @@ function [speed, speedstats, JigRMS] = speedcalc()
 global all REMORA
 
 Afs = all.srate;
+%if Afs>9
 filt = [REMORA.MT.settings.highpass REMORA.MT.settings.lowpass]; %[10 90]
 fs = REMORA.MT.settings.fs; %10;
 binSize = REMORA.MT.settings.bin; %0.5
@@ -29,7 +30,7 @@ JX = TagJiggle(all.iaccel(:,1),Afs,fs,filt,binSize); %[10 90] and 0.5 are defaul
 JY = TagJiggle(all.jaccel(:,1),Afs,fs,filt,binSize);
 JZ = TagJiggle(all.kaccel(:,1),Afs,fs,filt,binSize);
 J = TagJiggle(A,Afs,fs,filt,binSize);
-
+%end
 % if you've calculated flownoise RMS values, speedFromRMS can compare the speed from jiggle method to the speed from the flownoise method.
 if exist('flownoise','var') && sum(isnan(flownoise)) ~= length(flownoise) 
     RMS = [JX JY JZ flownoise];
