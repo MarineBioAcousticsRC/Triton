@@ -4,7 +4,7 @@ nCorrectMat125 = [];
 nClassifiedMat125 = [];
 totalClicks = [];
 totalClicks125 = [];
-
+zIDComparison = [];
 IDFileList = dir('H:\SoCal_800_ClustBins_95\DetLabels\SOCAL_E_65*ID1.mat');
 daysSet = [];
 for iFile = 1:length(IDFileList)
@@ -40,6 +40,8 @@ for iFile = 1:length(IDFileList)
     nCorrectMat = [nCorrectMat;nCorrect];
     nClassifiedMat = [nClassifiedMat;nClassified];
     
+    zIDComparison = [zIDComparison;[autoZID.typeNames(autoZID.zID(ia,2)),manualZID.typeNames(manualZID.zID(ib,2))]];
+    
     
     [~,highAmpIdx,~] = intersect(autoZID.zID(:,1),autoMPP.MTT(autoMPP.MPP>=125));
     percClassifiedbyBin125 = [];
@@ -63,6 +65,7 @@ for iFile = 1:length(IDFileList)
     end
     nCorrectMat125 = [nCorrectMat125;nCorrect125];
     nClassifiedMat125 = [nClassifiedMat125;nClassified125];
+
 end
 
 % figure;
