@@ -3,14 +3,16 @@ function [clickParamsOut,fOut] = sp_dt_batch(fullFiles,fullLabels,p,encounterTim
 
 N = size(fullFiles,1);
 p.previousFs = 0; % make sure we build filters on first pass
-
+p.whiten = 1;
+p.plot = 0;
 % get file type list
 fTypes = sp_io_getFileType(fullFiles);
 fOut = [];
 clickParamsOut = [];
+pTemp = p;
 for idx1 = 1:N % for each data file
     f=[];
-    pTemp = p;
+    
     outFileName = fullLabels{idx1};
     if ~pTemp.overwrite && exist(outFileName, 'file') == 2
         fprintf('DetectionFile %s already exists.\n',outFileName)
@@ -54,13 +56,44 @@ for idx1 = 1:N % for each data file
         % info, this step is skipped
         
         [previousFs,pTemp] = sp_fn_buildFilters(pTemp,hdr.fs);
-        pTemp.previousFs = previousFs;
-        pTemp = sp_fn_interp_tf(pTemp);
-        if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
-            [~,minxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(1)));
-            [~,maxxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(2)));
-            pTemp.countThresh = (10^((pTemp.dBppThreshold - median(pTemp.xfrOffset(minxfrIdx:maxxfrIdx)))/20))/2;
-        end
+        
+         pTemp.previousFs = previousFs;
+         pTemp = sp_fn_interp_tf(pTemp);
+         % make TF-based filter
+         if pTemp.whiten
+             %% TO DO: Make version of TF for filtering that starts at 0kHz
+             
+             pTemp = sp_fn_interp_tf_whiten(pTemp,hdr.fs);
+             
+             
+             pTemp.meanxfrOffset = mean(pTemp.xfrOffset_whiten);
+             xFrRel = (pTemp.xfrOffset_whiten-pTemp.meanxfrOffset);
+             xFrRelLin = 10.^(xFrRel/20);
+             [~,minxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(1)));
+             xFrRelLin(1:minxfrIdx) = 0;
+             Nb = 40;
+             Na = 40;
+             d = fdesign.arbmag('Nb,Na,F,A',Nb,Na,pTemp.xfr_f_whiten,xFrRelLin,hdr.fs); % single-band design
+             Hd1 = design(d,'iirlpnorm','SystemObject',true);
+             if pTemp.plot
+                 hfvt = fvtool(Hd1,'Fs', hdr.fs,'Color','White');
+             end
+         end
+         if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
+            if ~pTemp.whiten 
+                [~,minxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(1)));
+                [~,maxxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(2)));
+                
+                pTemp.countThresh = (10^((pTemp.dBppThreshold -...
+                    median(pTemp.xfrOffset(minxfrIdx:maxxfrIdx)))/20))/2;
+            else
+                [~,minxfrIdx] = min(abs(pTemp.xfr_f_whiten-pTemp.bpRanges(1)));
+                [~,maxxfrIdx] = min(abs(pTemp.xfr_f_whiten-pTemp.bpRanges(2)));
+                
+                pTemp.countThresh = (10^((pTemp.dBppThreshold -...
+                    pTemp.meanxfrOffset)/20))/2;
+            end
+         end
     end
     
     cParams = sp_dt_init_cParams(pTemp); % set up storage for HR output.
@@ -95,8 +128,39 @@ for idx1 = 1:N % for each data file
         else
             filtData = data;
         end
+        if pTemp.plot
+            figure(102);colormap(jet)
+            [~,fOut,t,psdFilt] = spectrogram(filtData,hdr.fs/10,50,hdr.fs/10,hdr.fs);
+            imagesc(t,fOut/1000,log10(psdFilt))
+            set(gca,'ydir','normal')
+            colorbar
+            set(gca,'clim',[-5,5])
+        end
+        if pTemp.whiten
+            filtData = step(Hd1,filtData')';
+            if pTemp.plot
+                figure(103);colormap(jet)
+                [~,fOut,t,psdFilt] = spectrogram(filtData,hdr.fs/10,50,hdr.fs/10,hdr.fs);
+                imagesc(t,fOut/1000,log10(psdFilt))
+                set(gca,'ydir','normal')
+                colorbar
+                set(gca,'clim',[-5,5])
+            end
+        end
         energy = filtData.^2;
-        
+        if pTemp.plot
+            figure(104);clf
+            subplot(1,2,1)
+            plot(filtData); ylabel('counts')
+            hold on
+            plot(ones(size(filtData))*(pTemp.countThresh))
+            subplot(1,2,2)
+            semilogy(energy); ylabel('energy (counts^2)')
+            hold on
+            semilogy(ones(size(energy))*(pTemp.countThresh.^2))
+            myLim = get(gca,'ylim');
+            ylim([1,myLim(2)])
+        end
         %%% Run LR detection to identify candidates
         [detectionsSample,detectionsSec] =  sp_dt_LR(energy,hdr,buffSamples,...
             startK,stopK,pTemp);
@@ -151,7 +215,20 @@ for idx1 = 1:N % for each data file
 %         clickParamsOut{1} = cParams;
 %         fOut{1} = f;
     end
-    sp_fn_saveDets2mat(strrep(outFileName,['.',p.ppExt],'.mat'),cParams,f,hdr,p);
-    
+    sp_fn_saveDets2mat(strrep(outFileName,['.',p.ppExt],'.mat'),cParams,f,hdr,pTemp);
+    if pTemp.plot
+        figure(105);clf
+        hist(cParams.ppSignalVec,100)
+        hold on;xlabel('Amplitude (db_P_P)')
+        ylabel('Counts')
+        myYLim = get(gca,'ylim');
+        plot([pTemp.dBppThreshold,pTemp.dBppThreshold],[myYLim(1),myYLim(2)],'r')
+        figure(106);clf
+        s2 = scatter(cParams.ppSignalVec,cParams.peakFrVec,'.k');
+        s2.MarkerEdgeAlpha = 0.2;
+        ylabel('Peak Frequency');  xlabel('Amplitude (dB_P_P)')
+        hold on; myYLim = get(gca,'ylim');
+        plot([pTemp.dBppThreshold,pTemp.dBppThreshold],[myYLim(1),myYLim(2)],'r')
+    end
 end
 
