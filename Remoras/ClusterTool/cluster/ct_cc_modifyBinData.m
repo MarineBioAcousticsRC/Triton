@@ -1,4 +1,4 @@
-function binDataFinal2 = ct_cc_modifyBinData(percSim,distThresh,binDataPruned,rmvClusMeanSpecs)
+function [binDataFinal2,fileNumFinal] = ct_cc_modifyBinData(percSim,distThresh,binDataPruned,rmvClusMeanSpecs,fileNum)
 
 %%created by MAZ on 06/09/2020 to try and remove undesirable clusters and
 %%things like them before reclustering
@@ -87,6 +87,7 @@ rmvFlag2(rmvFlag2==0)=[];
 goodOnes = setdiff([1:size(binDataPruned,1)],rmvFlag2);
 
 binDataFinal2 = binDataFinal(goodOnes);
+fileNumFinal = fileNum(goodOnes);
 
 %just gives number of bins where something was removed from it
 totalRemoved = length(rmvFlagFinal(rmvFlagFinal==1));

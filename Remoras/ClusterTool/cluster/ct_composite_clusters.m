@@ -115,7 +115,7 @@ if  tritonMode && isfield(REMORA.ct.CC,'rm_simbins')...
     %     thresh = 0.95;
     %     dist = 0.1;
     specComp = REMORA.ct.CC.sbSet;
-    binDataPruned = ct_cc_modifyBinData(REMORA.ct.CC_params.SBperc,REMORA.ct.CC_params.SBdiff,binDataPruned,specComp);
+    [binDataPruned,fileNum] = ct_cc_modifyBinData(REMORA.ct.CC_params.SBperc,REMORA.ct.CC_params.SBdiff,binDataPruned,specComp,fileNum);
 end
 % %%%%%%%%%% Begin main functionality %%%%%%%%%%%%
 %% Normalize everything
