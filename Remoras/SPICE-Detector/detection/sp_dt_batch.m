@@ -3,7 +3,7 @@ function [clickParamsOut,fOut] = sp_dt_batch(fullFiles,fullLabels,p,encounterTim
 
 N = size(fullFiles,1);
 p.previousFs = 0; % make sure we build filters on first pass
-p.whiten = 1;
+p.whiten = 0;
 p.plot = 0;
 % get file type list
 fTypes = sp_io_getFileType(fullFiles);
