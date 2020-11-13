@@ -36,7 +36,7 @@ for iF = 1:length(nodeSet)
     plot(fPlot,compositeData(iF).specPrctile,'--k','lineWidth',2)
     grid on
     hold off
-    ylim([0,1])
+    %ylim([0,1])
     
     hSet(2) = figure(42); % plot spectra as heatmap
     subplot(n1,m1,iF)
@@ -54,7 +54,7 @@ for iF = 1:length(nodeSet)
     hold on
     bar(p.barInt(1:s.maxICIidx) + s.barAdj,compositeData(iF).iciMean,1);
     xlim([0,p.barInt(s.maxICIidx)])
-    ylim([0,1])
+    %ylim([0,1])
     hold off
     
     hSet(4) = figure(44); % plot click rate distributions
