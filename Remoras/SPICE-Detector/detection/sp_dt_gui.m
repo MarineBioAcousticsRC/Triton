@@ -35,7 +35,7 @@ if REMORA.spice_dt.detParams.dBppThresholdFlag == 1||...
 end
 
 cParams = sp_dt_init_cParams(p); % set up storage for HR output.
-sIdx = 1;
+sIdx = 1;p.whiten = 0;
 buffSamples = p.LRbuffer*PARAMS.fs;
 if size(DATA,1)> size(DATA,2)
     filtData = filtfilt(p.fB,p.fA,DATA(:,PARAMS.ch));
@@ -47,6 +47,7 @@ energy = filtData.^2;
 
 [detectionsSample,detectionsSec] =  sp_dt_LR(energy,PARAMS,buffSamples,...
     0,length(energy)/PARAMS.fs,p);
+
 
 %%% start HR detection on candidates
 if ~isempty(detectionsSample)
