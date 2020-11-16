@@ -10,6 +10,10 @@ elseif strcmp(myEvent, 'setTestFile')
     REMORA.nn.train_net.testFile = ...
         get(REMORA.fig.nn.train_net.testFileEdTxt,'String');
     
+elseif strcmp(myEvent, 'setValidFile')
+    REMORA.nn.train_net.validFile = ...
+        get(REMORA.fig.nn.train_net.validFileEdTxt,'String');
+    
 elseif strcmp(myEvent, 'setOutDir')
     REMORA.nn.train_net.outDir = ...
         get(REMORA.fig.nn.train_net.outDirEdTxt,'String');

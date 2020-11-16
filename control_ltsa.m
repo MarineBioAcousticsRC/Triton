@@ -273,8 +273,8 @@ elseif strcmp(action,'ampadj')
         %         set(get(HANDLES.plt,'Parent'),'YScale','log');
         set(HANDLES.plt.ltsa,'CData',c(PARAMS.ltsa.fimin:PARAMS.ltsa.fimax, :));
     end
-    
-    pause(0.02)     % this is a lame hack to get colorbar to update
+    drawnow
+    % pause(0.02)     % this is a lame hack to get colorbar to update
     % after changing brightness and contrast
     % without pause it is as if the following isn't
     % executed or that it is executed before
