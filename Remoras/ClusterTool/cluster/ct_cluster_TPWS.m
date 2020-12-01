@@ -208,7 +208,7 @@ for iC = 1:length(dateInterval)
             % meanSimilarity{cIdx,:} = meanSim;
             
             if p.plotFlag 
-                figure(111);imagesc(specSet(isolatedSet,:));set(gca,'ydir','normal')
+                % figure(111);imagesc(specSet(isolatedSet,:));set(gca,'ydir','normal')
                 % plotting option
                 ct_plot_bin_clusters(p,f,spectraMean,envDistrib,thisFile,dtt,...
                     specHolder,envSetHolder,sizeCA,iC,length(dateInterval),figCounter) 

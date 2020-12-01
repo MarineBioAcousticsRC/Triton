@@ -58,8 +58,11 @@ end
 %distClickE = max((distClickE-thrP)./(1-thrP),0);
 distClickE(distClickE<thrP) = 0; 
 
-distClickEFull = squareform(distClickE);
+% figure(110);clf
+% G = graph(squareform(distClickE));
+% h = plot(G,'layout','force');
 
+distClickEFull = squareform(distClickE);
 
 if mergeTF
     [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(distClickEFull,...
