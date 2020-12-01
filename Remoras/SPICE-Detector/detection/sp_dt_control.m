@@ -175,6 +175,7 @@ elseif strcmp(action,'SetRmEcho')
 elseif strcmp(action,'SetWhiten')
     if strcmp(mySource, 'gui')
         whitenTF = get(REMORA.spice_dt.whitenCheck, 'Value');
+        REMORA.spice_dt.detParams.rebuildFilter = 1;
     else
         whitenTF = get(REMORA.spice_dt_verify.whitenCheck, 'Value');
     end

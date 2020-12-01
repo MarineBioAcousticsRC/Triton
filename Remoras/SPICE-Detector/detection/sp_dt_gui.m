@@ -15,8 +15,9 @@ if isfield(REMORA.spice_dt.detParams,'rebuildFilter')&&(REMORA.spice_dt.detParam
     REMORA.spice_dt.detParams.rebuildFilter = 0;
     p = REMORA.spice_dt.detParams;
     p = sp_fn_interp_tf(p);
+    hdr.fs = PARAMS.fs;
     if p.whiten 
-        p = sp_fn_build_whitening_filter(p);
+        p = sp_fn_build_whitening_filter(p,hdr);
     end    
     % save changes:
     REMORA.spice_dt.detParams = p;
@@ -48,8 +49,8 @@ else
     filtData = filtfilt(p.fB,p.fA,DATA(PARAMS.ch,:)');
 end
 
-if pTemp.whiten
-    filtData = step(pTemp.Hd1,filtData')';
+if p.whiten
+    filtData = step(p.Hd1,filtData')';
 end
 energy = filtData.^2;
 
