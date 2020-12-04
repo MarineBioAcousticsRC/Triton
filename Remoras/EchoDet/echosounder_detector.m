@@ -1,23 +1,12 @@
 %%%detector for running echosounders- created with testing done on Kona
 %%%data, by MAZ, on 10/30/2020
+function echosounder_detector(varargin)
 
-templateFilePath = 'G:\code\misc_code\echosounderTemplate.mat';
-dataFilePath = 'F:\';
-depName = 'HAWAII01';
-outDir = 'E:\echoTests\echoLowT\HI01-50-ICImodetest';
+global REMORA
 
-%%%%%thresholds
-lowF = 20000; %lower cutoff in Hz
-highF = 80000; %high cutoff in Hz
-prcTh = 50; %percent threshold for correlation calcuation
-gapT = 0.05; %gap time in seconds for between detections
-thresholdC = 50^2; %base threshold for c2 for keeping detections from correlation
-threshPP = -500; %threshold for ddPP difference between noise sample and signal
-ICI_range = [0.2,4]; %allowable ICI range, remove detections outside of this
-ICIpad = 0.1; %time in seconds for padding around ICI mode for allowable ICI range
-fftLength = 400;
+p = varargin{1};
 
-template = templateFilePath;
+template = p.tempPath;
 % template = fullfile(templateFilePath,'echosounderTemplate.mat'); % Make sure that this line is correct for the input template folder!
 load(template)
 
@@ -27,34 +16,25 @@ pre_env_temp=hilbert(tempData.');
 env_temp=sqrt((real(pre_env_temp)).^2+(imag(pre_env_temp)).^2); % Au 1993, S.178, equation 9-4.
 env_temp = (env_temp - min(env_temp))./max(env_temp); %normalize env_temp
 
-
-p.thresholdC = thresholdC;
-p.lowF = lowF;
-p.highF = highF;
-p.threshPP = threshPP;
-p.gapT = gapT;
-p.prcTh = prcTh;
-p.fftLength = fftLength;
-
-inFolders = dir([dataFilePath,'\',depName,'*']);
+inFolders = dir([p.dataFilePath,'\',p.depName,'*']);
 
 for iF = 1:size(inFolders,1)
     iFold = inFolders(iF).name;
     iFoldPath = fullfile(inFolders(iF).folder,inFolders(iF).name);
-    outFold = fullfile(outDir,iFold);
+    outFold = fullfile(p.outDir,iFold);
     
     if ~isdir(outFold)
         mkdir(outFold)
     end
     
-    allFiles = dir([iFoldPath,'\',depName,'*.x.wav']);
+    allFiles = dir([iFoldPath,'\',p.depName,'*.x.wav']);
     
     for iF2 = 1:size(allFiles,1)
         
         testFile = fullfile(allFiles(iF2).folder,allFiles(iF2).name);
         [rawStart,rawDur,fs,rawByteLoc] = ed_readxwavhd(testFile);
         p.fs = fs;
-        f = 0:((p.fs/2)/1000)/((fftLength/2)):((p.fs/2)/1000);
+        f = 0:((p.fs/2)/1000)/((p.fftLength/2)):((p.fs/2)/1000);
         fInd1= find(f==(p.lowF/1000));
         fInd2 = find(f==(p.highF/1000));
         f = f(fInd1:fInd2);
@@ -91,7 +71,7 @@ for iF = 1:size(inFolders,1)
             
             %%apply a BP filter to y \
             N1= 10; %order of filter; 10 chosen because it was used for explosion detector. Don't @ me.
-            [B,A] = butter(N1/2, [lowF highF]/(fs/2));
+            [B,A] = butter(N1/2, [p.lowF p.highF]/(fs/2));
             filtData = filtfilt(B,A,testData); % Filter click.
             
             pre_env_y = hilbert(filtData.');
@@ -108,13 +88,13 @@ for iF = 1:size(inFolders,1)
             
             csq = c.*c; %square c so that true peaks show up better
             
-            medianC = prctile(csq,prcTh); %calculate median
-            aboveThr = medianC + thresholdC;
+            medianC = prctile(csq,p.prcTh); %calculate median
+            aboveThr = medianC + p.thresholdC;
             
             c_above = find(csq > aboveThr); %indices saved in c_above will theoretically be useful for finding w/e that's associated with echosounder signal
             
             diffC{iR} = diff(c_above);
-            expGaps = find(diffC{iR} > gapT.*fs); %finds gaps greater than this threshold
+            expGaps = find(diffC{iR} > p.gapT.*fs); %finds gaps greater than this threshold
             
             keepCorr = [];
             keepTimes = [];
@@ -149,7 +129,7 @@ for iF = 1:size(inFolders,1)
                 
                 %get noise sample from after signal
                 if SS <= 500
-                    noiseSeg = filtData(eS:(eS+500)); 
+                    noiseSeg = filtData(eS:(eS+500));
                 else
                     %take a noise sample from before instead
                     noiseSeg = filtData((SS-500):SS);
@@ -164,7 +144,7 @@ for iF = 1:size(inFolders,1)
                 deltraw = ppSeg - ppNoise;
                 deltPP_all(iG) = deltPP;
                 
-                if deltPP >= threshPP
+                if deltPP >= p.threshPP
                     dataKeep = dataSeg;
                     timesKeep = dataTimes(c_aboveSeg);
                     corrKeep  = c(c_aboveSeg);
@@ -184,7 +164,7 @@ for iF = 1:size(inFolders,1)
                 
                 %calculate signal and noise spectras
                 if ~isempty(dataKeep)
-                    N = fftLength;
+                    N = p.fftLength;
                     sub = 10*log10(p.fs/N);
                     dataWin = hann(length(dataKeep));
                     wData = dataWin.*dataKeep;
@@ -226,8 +206,8 @@ for iF = 1:size(inFolders,1)
                 %                 plot(ICIsecs,'.')
                 %                 ylim([0 3])
                 modeICI = mode(ICIsecs);
-                if modeICI >= ICI_range(1) & modeICI <= ICI_range(2)
-                    ICImode = [(modeICI-ICIpad),(modeICI+ICIpad)];
+                if modeICI >= p.lowICI & modeICI <= p.highICI
+                    ICImode = [(modeICI-p.ICIpad),(modeICI+p.ICIpad)];
                     keepIDs = find(ICIsecs>=ICImode(1) & ICIsecs<=ICImode(2));
                 else
                     keepIDs = [];
