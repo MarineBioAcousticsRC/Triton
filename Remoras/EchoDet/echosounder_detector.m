@@ -2,9 +2,11 @@
 %%%data, by MAZ, on 10/30/2020
 function echosounder_detector(varargin)
 
-global REMORA
-
 p = varargin{1};
+
+%get TF for use in ppSignal
+TF = fopen(p.TFpath);
+[TFused,~] = fscanf(TF,'%f %f',[2,inf]);
 
 template = p.tempPath;
 % template = fullfile(templateFilePath,'echosounderTemplate.mat'); % Make sure that this line is correct for the input template folder!
@@ -55,6 +57,7 @@ for iF = 1:size(inFolders,1)
         diffC = [];
         csq = [];
         keepIDs = [];
+        dataPP = [];
         
         for iR = 1:size(rawDur,2)
             %get start and end of xwav file
@@ -120,8 +123,8 @@ for iF = 1:size(inFolders,1)
                 eS = c_aboveSeg(end);
                 
                 %%calculate ppRL and remove if lower than thresh
-                
-                dataSeg = filtData(SS:eS);
+                %add 100 points to make sure get full detection timeseries 
+                dataSeg = filtData(SS:(eS+300));
                 highP = max(dataSeg);
                 lowP = min(dataSeg);
                 ppSeg = highP + abs(lowP);
@@ -182,6 +185,12 @@ for iF = 1:size(inFolders,1)
                     spNoiseKeep(iG,:) = spNoise(fInd1:fInd2);
                 end
                 
+                %get ppsignal to keep and add TF value at peak frequency
+                [~,peakIdx] = max(spDataKeep(iG,:));
+                
+                TF_fs = TFused(1,:)./1000;
+                [~,fLoc] = min(abs(f(peakIdx)-TF_fs));
+                dataPP(iG) = ppRLSeg + TFused(2,fLoc);
                 
                 detDur_keep{iG} = detDur;
                 keepWV{iG} = segWAV;
@@ -215,18 +224,20 @@ for iF = 1:size(inFolders,1)
             end
             
             if ~isempty(keepIDs)
-                dataSeg_final{iR} = keepTS{keepIDs};
-                keepCorr_final{iR} = keepCorr{keepIDs};
-                keepTimes_final{iR} = keepTimes{keepIDs};
+                ppSignal_final{iR} = dataPP(keepIDs);
+                dataSeg_final{iR} = keepTS(keepIDs);
+                keepCorr_final{iR} = keepCorr(keepIDs);
+                keepTimes_final{iR} = keepTimes(keepIDs);
                 ED_stTimes_final{iR} = ED_stTimes(keepIDs);
-                noiseSeg_final{iR} = noiseTS{keepIDs};
+                noiseSeg_final{iR} = noiseTS(keepIDs);
                 %             deltPP_final{iR} = deltPP_all{keepIDs};
-                keepWV_final{iR} = keepWV{keepIDs};
-                detDur_final{iR} = detDur_keep{keepIDs};
+                keepWV_final{iR} = keepWV(keepIDs);
+                detDur_final{iR} = detDur_keep(keepIDs);
                 spNoise_final{iR} = spNoiseKeep(keepIDs,:);
                 spData_final{iR} = spDataKeep(keepIDs,:);
             else
                 dataSeg_final{iR} = [];
+                ppSignal_final{iR} = [];
                 keepCorr_final{iR} = [];
                 keepTimes_final{iR} = [];
                 ED_stTimes_final{iR} =[];
@@ -249,11 +260,12 @@ for iF = 1:size(inFolders,1)
         noiseSeg_final = noiseSeg_final(~cellfun('isempty',noiseSeg_final));
         spData_final = spData_final(~cellfun('isempty',spData_final));
         spNoise_final = spNoise_final(~cellfun('isempty',spNoise_final));
+        ppSignal_final = ppSignal_final(~cellfun('isempty',ppSignal_final));
         
         outName = [char(extractBefore(allFiles(iF2).name,'.x')),'echo.mat'];
         saveFile = fullfile(outFold,outName);
         
-        save(saveFile,'ED_stTimes_final','p','keepCorr_final','noiseSeg_final','dataSeg_final','keepWV_final','detDur_final','f','spData_final','spNoise_final','-v7.3');%,'deltPP_final','-v7.3');%'diffC','csq','-v7.3')
+        save(saveFile,'ED_stTimes_final','p','keepCorr_final','noiseSeg_final','dataSeg_final','keepWV_final','detDur_final','f','spData_final','spNoise_final','ppSignal_final','-v7.3');%,'deltPP_final','-v7.3');%'diffC','csq','-v7.3')
         dispTxt = ['Done with file ',allFiles(iF2).name];
         disp(dispTxt)
         
