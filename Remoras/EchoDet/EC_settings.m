@@ -13,6 +13,6 @@ p.gapT = 0.05; %gap time in seconds for between detections
 p.thresholdC = 50^2; %base threshold for c2 for keeping detections from correlation
 p.threshPP = -500; %threshold for ddPP difference between noise sample and signal
 p.lowICI = 0.2; %allowable ICI range, remove detections outside of this
-p.highICI = 5; 
+p.highICI = 5;
 p.ICIpad = 0.1; %time in seconds for padding around ICI mode for allowable ICI range
 p.fftLength = 400; %length of fft for spectral calculation. Would not recommend modification!

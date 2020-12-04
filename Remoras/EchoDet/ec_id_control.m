@@ -10,8 +10,8 @@ elseif strcmp(action, 'setfilePath')
     filePath = get(REMORA.ec.id_verify.filePathTxt,'string');
     REMORA.ec.id_params.inDir = filePath;
     
-elseif strcmp(action, 'setoutPath')
-    outPath = get(REMORA.ec.id_verify.outNameTxt,'string');
+elseif strcmp(action, 'setoutName')
+    outPath = get(REMORA.ec.id_verify.outFileTxt,'string');
     REMORA.ec.id_params.outName = outPath;
     
 elseif strcmp(action,'runIt')

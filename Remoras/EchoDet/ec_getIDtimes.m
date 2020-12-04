@@ -4,9 +4,9 @@ function ec_getIDtimes
 
 global REMORA
 
-p = REMORA.ec.id_params;
+p2 = REMORA.ec.id_params;
 
-inAll = dir(fullfile(p.inDir,'*echo.mat'));
+inAll = dir(fullfile(p2.inDir,'*echo.mat'));
 allTimes = [];
 
 for i = 1:length(inAll)
@@ -26,9 +26,8 @@ end
 
 zID = [allTimes,ones(1,length(allTimes))'];
 
-outFile = [p.inDir,'\',p.outName,'_ID1.mat'];
+outFile = [p2.inDir,'\',p2.outName,'_ID1.mat'];
 
 save(outFile,'zID')
 
 disp(['Done with folder ',inAll(i).folder])
-    

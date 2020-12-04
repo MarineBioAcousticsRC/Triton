@@ -2,7 +2,7 @@ function ec_pulldown(action)
 
 %%%%initializes pulldowns for label tracker
 
-global PARAMS REMORA HANDLES
+global REMORA
 
 if strcmp(action, 'create_echoDet')
     %open window for starting echosounder detector
