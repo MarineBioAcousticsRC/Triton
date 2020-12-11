@@ -18,6 +18,12 @@ if strcmp(action, '')
 %     outDir = get(REMORA.bm_verify.outDirEdTxt, 'string');
 %     REMORA.bm.settings.outDir = outDir;
       
+elseif strcmp(action,'tagchoice')
+     tag.val = get(REMORA.MT_verify.tagchoice, 'Value');
+    tag.opt = get(REMORA.MT_verify.tagchoice,'string');
+    tagchoice = tag.opt{tag.val};
+    REMORA.MT.settings.tagchoice = tagchoice;
+    
 elseif strcmp(action,'sethighpass')
     highpass = str2double(get(REMORA.MT_verify.highpassEdTxt, 'string'));
     REMORA.MT.settings.highpass = highpass;

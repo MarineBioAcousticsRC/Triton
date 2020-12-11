@@ -13,6 +13,7 @@ global all REMORA
 
 Afs = all.srate;
 %if Afs>9
+tag = REMORA.MT.settings.tagchoice;
 filt = [REMORA.MT.settings.highpass REMORA.MT.settings.lowpass]; %[10 90]
 fs = REMORA.MT.settings.fs; %10;
 binSize = REMORA.MT.settings.bin; %0.5
@@ -56,13 +57,16 @@ tagon(pos(1,1):pos(2,1),:) = 1;
 tagon = logical(tagon);
 df=800/10;
 %y = decdc(A,df); %This leads to an array that is one shorter than the resampled accelerometer data...
-[pitch, roll] = a2pr(A,Afs,fs); %for 2018 data
-%[pitch, roll] = a2pr(A); %for 2015 data
+if tag == '2018'
+    [pitch, roll] = a2pr(A,Afs,fs); %for 2018 data
+    pitchfilt = decdc(pitch,df);
+    rollfilt = decdc(roll,df);
+    pitchfilt = vertcat(pitchfilt,0);
+    rollfilt = vertcat(rollfilt,0);
+else
+[pitch, roll] = a2pr(A); %for 2015 data
+end
 %Filtering pitch and roll to match the other variables:
-pitchfilt = decdc(pitch,df);
-rollfilt = decdc(roll,df);
-pitchfilt = vertcat(pitchfilt,0);
-rollfilt = vertcat(rollfilt,0);
 
 % DN = (0:1/fs:(size(pitch,1)-1)/Afs)'/24/60/60;
 % Atime = (0:size(pitch,1)-1)'/24/60/60/Afs;
@@ -95,10 +99,12 @@ rollfilt = vertcat(rollfilt,0);
 % outliers near the surface or at high roll rate (uncommon).
 
 % of the following output variables, the "speed" table is the most important one.  The rest of the outputs are for documenting the fit of the speed curve
+if tag == '2018'
 [~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels]=SpeedFromRMS(RMS,fs,p,pitchfilt,rollfilt,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime);
 %for 2018 data
+else
 [~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels] = SpeedFromRMS(RMS,fs,p,pitch,roll,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime); %for 2015 data
-
+end
 %% The following section is optional, but it can help organize the data into a couple of simple structures:
 % 1) speed (a speed table with speed as well as prediction and confidence
 % intervals).  speed.JJ will be the speed from tag jiggle in m/s.  
