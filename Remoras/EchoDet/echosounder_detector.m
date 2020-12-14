@@ -55,6 +55,7 @@ for iF = 1:size(inFolders,1)
         spNoise_final = [];
         spData_final = [];
         ICI_final = [];
+        ICI_mode = [];
         diffC = [];
         csq = [];
         keepIDs = [];
@@ -125,7 +126,7 @@ for iF = 1:size(inFolders,1)
                 eS = c_aboveSeg(end);
                 
                 %%calculate ppRL and remove if lower than thresh
-                %add 100 points to make sure get full detection timeseries 
+                %add 100 points to make sure get full detection timeseries
                 dataSeg = filtData(SS:(eS+600));
                 highP = max(dataSeg);
                 lowP = min(dataSeg);
@@ -238,6 +239,7 @@ for iF = 1:size(inFolders,1)
                 spNoise_final{iR} = spNoiseKeep(keepIDs,:);
                 spData_final{iR} = spDataKeep(keepIDs,:);
                 ICI_final{iR} = ICIsecs(keepIDs);
+                ICI_mode{iR} = modeICI;
             else
                 dataSeg_final{iR} = [];
                 ppSignal_final{iR} = [];
@@ -251,6 +253,7 @@ for iF = 1:size(inFolders,1)
                 spNoise_final{iR} = [];
                 spData_final{iR} = [];
                 ICI_final{iR} = [];
+                ICI_mode{iR} = [];
             end
             
         end
@@ -266,11 +269,12 @@ for iF = 1:size(inFolders,1)
         spNoise_final = spNoise_final(~cellfun('isempty',spNoise_final));
         ppSignal_final = ppSignal_final(~cellfun('isempty',ppSignal_final));
         ICI_final = ICI_final(~cellfun('isempty',ICI_final));
+        ICI_mode = ICI_mode(~cellfun('isempty',ICI_mode));
         
         outName = [char(extractBefore(allFiles(iF2).name,'.x')),'echo.mat'];
         saveFile = fullfile(outFold,outName);
         
-        save(saveFile,'ED_stTimes_final','ICI_final','p','keepCorr_final','noiseSeg_final','dataSeg_final','keepWV_final','detDur_final','f','spData_final','spNoise_final','ppSignal_final','-v7.3');%,'deltPP_final','-v7.3');%'diffC','csq','-v7.3')
+        save(saveFile,'ICI_mode','ED_stTimes_final','ICI_final','p','keepCorr_final','noiseSeg_final','dataSeg_final','keepWV_final','detDur_final','f','spData_final','spNoise_final','ppSignal_final','-v7.3');%,'deltPP_final','-v7.3');%'diffC','csq','-v7.3')
         dispTxt = ['Done with file ',allFiles(iF2).name];
         disp(dispTxt)
         

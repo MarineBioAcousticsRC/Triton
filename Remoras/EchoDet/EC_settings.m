@@ -1,9 +1,9 @@
-%%%%original settings for echosounder detector 
+%%%%original settings for echosounder detector
 
 p.tempPath = 'G:\code\misc_code\echosounderTemplate.mat';
 p.dataFilePath = 'F:\';
 p.depName = 'HAWAII01';
-p.outDir = 'E:\echoTests\echoLowT\HI01-50-ICImodetest';
+p.outDir = 'E:\HI01_echosounder';
 
 %%%%%thresholds
 p.lowF = 20000; %lower cutoff in Hz
