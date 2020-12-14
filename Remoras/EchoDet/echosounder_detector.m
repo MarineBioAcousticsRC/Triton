@@ -54,6 +54,7 @@ for iF = 1:size(inFolders,1)
         detDur_final = [];
         spNoise_final = [];
         spData_final = [];
+        ICI_final = [];
         diffC = [];
         csq = [];
         keepIDs = [];
@@ -66,7 +67,8 @@ for iF = 1:size(inFolders,1)
             lStart = ((rawByteLoc(iR)-rawByteLoc(1))./2)+1;
             lEnd = lStart + round(rawDur(iR)*fs)-1;
             
-            testData = audioread(testFile,[lStart lEnd]);
+            testData = audioread(testFile,[lStart lEnd],'native');
+            testData = double(testData);
             
             %get a vector of same length as testData with corresponding correct times
             %of each spot in test dataset
@@ -124,7 +126,7 @@ for iF = 1:size(inFolders,1)
                 
                 %%calculate ppRL and remove if lower than thresh
                 %add 100 points to make sure get full detection timeseries 
-                dataSeg = filtData(SS:(eS+300));
+                dataSeg = filtData(SS:(eS+600));
                 highP = max(dataSeg);
                 lowP = min(dataSeg);
                 ppSeg = highP + abs(lowP);
@@ -235,6 +237,7 @@ for iF = 1:size(inFolders,1)
                 detDur_final{iR} = detDur_keep(keepIDs);
                 spNoise_final{iR} = spNoiseKeep(keepIDs,:);
                 spData_final{iR} = spDataKeep(keepIDs,:);
+                ICI_final{iR} = ICIsecs(keepIDs);
             else
                 dataSeg_final{iR} = [];
                 ppSignal_final{iR} = [];
@@ -247,6 +250,7 @@ for iF = 1:size(inFolders,1)
                 detDur_final{iR} = [];
                 spNoise_final{iR} = [];
                 spData_final{iR} = [];
+                ICI_final{iR} = [];
             end
             
         end
@@ -261,11 +265,12 @@ for iF = 1:size(inFolders,1)
         spData_final = spData_final(~cellfun('isempty',spData_final));
         spNoise_final = spNoise_final(~cellfun('isempty',spNoise_final));
         ppSignal_final = ppSignal_final(~cellfun('isempty',ppSignal_final));
+        ICI_final = ICI_final(~cellfun('isempty',ICI_final));
         
         outName = [char(extractBefore(allFiles(iF2).name,'.x')),'echo.mat'];
         saveFile = fullfile(outFold,outName);
         
-        save(saveFile,'ED_stTimes_final','p','keepCorr_final','noiseSeg_final','dataSeg_final','keepWV_final','detDur_final','f','spData_final','spNoise_final','ppSignal_final','-v7.3');%,'deltPP_final','-v7.3');%'diffC','csq','-v7.3')
+        save(saveFile,'ED_stTimes_final','ICI_final','p','keepCorr_final','noiseSeg_final','dataSeg_final','keepWV_final','detDur_final','f','spData_final','spNoise_final','ppSignal_final','-v7.3');%,'deltPP_final','-v7.3');%'diffC','csq','-v7.3')
         dispTxt = ['Done with file ',allFiles(iF2).name];
         disp(dispTxt)
         

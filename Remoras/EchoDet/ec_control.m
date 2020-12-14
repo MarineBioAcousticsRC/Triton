@@ -18,6 +18,10 @@ elseif strcmp(action,'settempPath')
     templateFile = get(REMORA.ec.ec_verify.tempPathTxt,'string');
     REMORA.ec.ec_params.templateFilePath = templateFile;
     
+elseif strcmp(action,'setTFPath')
+    TF = get(REMORA.ec.ec_verify.TFpathTxt,'string');
+    REMORA.ec.ec_params.TFpath = TF;
+    
 elseif strcmp(action,'setdepName')
     depName = get(REMORA.ec.ec_verify.depNameTxt,'string');
     REMORA.ec.ec_params.depName = depName;
