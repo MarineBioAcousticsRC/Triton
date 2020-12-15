@@ -8,7 +8,7 @@ p = varargin{1};
 TF = fopen(p.TFpath);
 [TFused,~] = fscanf(TF,'%f %f',[2,inf]);
 
-template = p.tempPath;
+template = p.templateFilePath;
 % template = fullfile(templateFilePath,'echosounderTemplate.mat'); % Make sure that this line is correct for the input template folder!
 load(template)
 
