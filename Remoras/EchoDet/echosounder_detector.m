@@ -39,7 +39,7 @@ for iF = 1:size(inFolders,1)
     for iF2 = 1:size(allFiles,1)
         
         testFile = fullfile(allFiles(iF2).folder,allFiles(iF2).name);
-        [rawStart,rawDur,fs,rawByteLoc] = ed_readxwavhd(testFile);
+        [rawStart,rawDur,fs,rawByteLoc] = ec_readxwavhd(testFile);
         p.fs = fs;
         f = 0:((p.fs/2)/1000)/((p.fftLength/2)):((p.fs/2)/1000);
         fInd1= find(f==(p.lowF/1000));
