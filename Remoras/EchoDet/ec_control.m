@@ -8,7 +8,7 @@ if strcmp(action,'')
     
 elseif strcmp(action, 'setfilePath')
     filePath = get(REMORA.ec.ec_verify.filePathTxt,'string');
-    REMORA.ec.ec_params.filePath = filePath;
+    REMORA.ec.ec_params.dataFilePath = filePath;
     
 elseif strcmp(action, 'setoutPath')
     outPath = get(REMORA.ec.ec_verify.outPathTxt,'string');

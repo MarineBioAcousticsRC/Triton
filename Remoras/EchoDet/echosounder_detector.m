@@ -18,7 +18,12 @@ pre_env_temp=hilbert(tempData.');
 env_temp=sqrt((real(pre_env_temp)).^2+(imag(pre_env_temp)).^2); % Au 1993, S.178, equation 9-4.
 env_temp = (env_temp - min(env_temp))./max(env_temp); %normalize env_temp
 
-inFolders = dir([p.dataFilePath,'\',p.depName,'*']);
+inFolders = dir([p.dataFilePath,p.depName,'*']);
+
+if isempty(inFolders)
+    emptytxt = ['No folders matching ',p.dataFilePath,p.depName,' found!'];
+    disp(emptytxt)
+end
 
 for iF = 1:size(inFolders,1)
     iFold = inFolders(iF).name;
@@ -282,4 +287,6 @@ for iF = 1:size(inFolders,1)
     dispTxt2 = ['Done with folder ',iFold];
     disp(dispTxt2)
 end
+
+disp('Done running echosounder detector')
 

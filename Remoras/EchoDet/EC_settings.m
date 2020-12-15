@@ -1,6 +1,6 @@
 %%%%original settings for echosounder detector
 
-p.tempPath = 'G:\code\misc_code\echosounderTemplate.mat';
+p.templateFilePath = 'G:\code\misc_code\echosounderTemplate.mat';
 p.dataFilePath = 'F:\';
 p.depName = 'HAWAII01';
 p.outDir = 'E:\HI01_echosounder';
