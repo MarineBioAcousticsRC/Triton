@@ -26,7 +26,7 @@ ylim([min(min(spectraMean)),...
 hold off
 box on
 xlim([min(f),max(f)])
-ylim([0,1])
+%ylim([0,1])
 ylabel('Normalized Amplitude','Fontsize',12)
 xlabel('Frequency (kHz)','Fontsize',12)
 title('Mean Spectra' )
@@ -35,7 +35,11 @@ set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])
 % Plot envelope shape
 subplot(1,nSubplots,4)
 allEnv = cell2mat(envSetHolder');
-imagesc((allEnv./max(allEnv,[],2))')
+if p.normalizeTF
+    imagesc((allEnv./max(allEnv,[],2))')
+else
+    imagesc(allEnv')
+end
 %set(gca,'ydir','normal')
 ylabel('Samples','Fontsize',12)
 xlabel('ClickNumber','Fontsize',12)
@@ -75,11 +79,11 @@ set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])
 h2 = subplot(1,nSubplots,2);
 colormap(jet)
 allSpectra = cell2mat(specHolder');
-if ~p.normalizeTF
-    imagesc(1:size(allSpectra,1),f,min(max(allSpectra,0),1)')
-else
-    imagesc(1:size(allSpectra,1),f,allSpectra')
-end
+% if ~p.normalizeTF
+%     imagesc(1:size(allSpectra,1),f,min(max(allSpectra,0),1)')
+% else
+imagesc(1:size(allSpectra,1),f,allSpectra')
+%end
 % draw delimiters btwn click spectra if there are
 % multiple types
 if size(delimLocs,2)>1

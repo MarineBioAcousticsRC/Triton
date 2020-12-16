@@ -7,8 +7,8 @@ if isfield(HANDLES,'msg')
     p.tritonMsg = 1; % if the field exists, then we have access to triton messaging.
 end
 % Things to make set-able someday
-p.normalizeTF = 1; % flag to turn on click normalization
-p.mergeThresh = 3000; % arbitrary threshold above which node merging is attempted 
+%p.normalizeTF = 1; % flag to turn on click normalization
+p.mergeThresh = 300; % arbitrary threshold above which node merging is attempted 
 % if merging is desired. Node merging is a strategy for clustering large 
 % networks more quickly, but it comes with a cost, so you shouldn't just
 % do it for all network sizes.
@@ -150,6 +150,9 @@ for iC = 1:length(dateInterval)
     specSet = MSP(idSet,:);
     ttSet = MTT(idSet);
     envSet = abs(hilbert(MSN(idSet,:)'))';
+    if 1
+        envSet = ct_align_env(envSet);
+    end
     envDur = sum(envSet>median(median(envSet)*5),2);
     p.maxDur = size(envSet,2);
     
