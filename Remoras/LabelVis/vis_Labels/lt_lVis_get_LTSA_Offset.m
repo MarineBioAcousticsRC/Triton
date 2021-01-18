@@ -5,10 +5,14 @@ plotStart = PARAMS.ltsa.plotStartRawIndex;
 plotDiff = abs(ltsaS - PARAMS.ltsa.dnumStart(plotStart));  %where are we in the first raw file?
 rfDur = PARAMS.ltsa.dur(1); %assumes same duration of all rfs in LTSA
 startPad = rfDur - lt_convertDatenum(plotDiff,'seconds'); %figure out padding to add to detstartOff for first raw file
+tol = datenum(0,0,0,0,0,.00001);%tolerance for difference between raw file start/end and actual start time of detection
 
 if strcmp(action,'starts')
     for iWin = 1:size(inWindowDet,1)
         winDetWavIdx{iWin} = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,1)& inWindowDet(iWin,1)<=PARAMS.ltsa.dnumEnd);
+        if isempty(winDetWavIdx{iWin})&& abs(min(PARAMS.ltsa.dnumStart-inWindowDet(iWin,1)))<tol %if nothing is found, check if two are actually equal but have very small difference
+            winDetWavIdx{iWin} = find(min(PARAMS.ltsa.dnumStart - inWindowDet(iWin,1)));
+        end
         if size(winDetWavIdx{iWin},2)>1
             winDetWavIdx{iWin} = winDetWavIdx{iWin}(1);
             disp('WARNING! Detection start time found in two raw files')
@@ -28,7 +32,10 @@ elseif strcmp(action,'stops')
     
     for iWin = 1:size(inWindowDet,1)
         winDetWavIdx{iWin} = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,2)& inWindowDet(iWin,2)<=PARAMS.ltsa.dnumEnd);
-       if size(winDetWavIdx{iWin},2)>1
+        if isempty(winDetWavIdx{iWin})&& min(PARAMS.ltsa.dnumStart-inWindowDet(iWin,2))<tol %if nothing is found, check if two are actually equal but have very small difference
+            winDetWavIdx{iWin} = find(min(PARAMS.ltsa.dnumStart - inWindowDet(iWin,2)));
+        end
+        if size(winDetWavIdx{iWin},2)>1
             winDetWavIdx{iWin} = winDetWavIdx{iWin}(1);
             disp('WARNING! Detection end time found in two raw files!')
         end
