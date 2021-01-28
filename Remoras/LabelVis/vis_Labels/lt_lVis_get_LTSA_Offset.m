@@ -10,8 +10,8 @@ tol = datenum(0,0,0,0,0,.00001);%tolerance for difference between raw file start
 if strcmp(action,'starts')
     for iWin = 1:size(inWindowDet,1)
         winDetWavIdx{iWin} = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,1)& inWindowDet(iWin,1)<=PARAMS.ltsa.dnumEnd);
-        if isempty(winDetWavIdx{iWin})&& abs(min(PARAMS.ltsa.dnumStart-inWindowDet(iWin,1)))<tol %if nothing is found, check if two are actually equal but have very small difference
-            winDetWavIdx{iWin} = find(min(PARAMS.ltsa.dnumStart - inWindowDet(iWin,1)));
+        if isempty(winDetWavIdx{iWin})&& min(abs(PARAMS.ltsa.dnumStart-inWindowDet(iWin,1)))<tol %if nothing is found, check if two are actually equal but have very small difference
+            [~,winDetWavIdx{iWin}] = min(abs(PARAMS.ltsa.dnumStart - inWindowDet(iWin,1)));
         end
         if size(winDetWavIdx{iWin},2)>1
             winDetWavIdx{iWin} = winDetWavIdx{iWin}(1);
@@ -32,8 +32,8 @@ elseif strcmp(action,'stops')
     
     for iWin = 1:size(inWindowDet,1)
         winDetWavIdx{iWin} = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,2)& inWindowDet(iWin,2)<=PARAMS.ltsa.dnumEnd);
-        if isempty(winDetWavIdx{iWin})&& min(PARAMS.ltsa.dnumStart-inWindowDet(iWin,2))<tol %if nothing is found, check if two are actually equal but have very small difference
-            winDetWavIdx{iWin} = find(min(PARAMS.ltsa.dnumStart - inWindowDet(iWin,2)));
+        if isempty(winDetWavIdx{iWin})&& min(abs(PARAMS.ltsa.dnumStart-inWindowDet(iWin,2)))<tol %if nothing is found, check if two are actually equal but have very small difference
+            [~,winDetWavIdx{iWin}] = min(abs(PARAMS.ltsa.dnumStart - inWindowDet(iWin,2)));
         end
         if size(winDetWavIdx{iWin},2)>1
             winDetWavIdx{iWin} = winDetWavIdx{iWin}(1);

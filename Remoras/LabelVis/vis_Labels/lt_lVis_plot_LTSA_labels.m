@@ -277,7 +277,7 @@ if ~isempty(winDetsStops)
             %if no longGaps, just plot on first detection
             longGap = 1:length(1);
         end
-        if detDur < LineThresh
+        if abs(detDur) < LineThresh
             %just plot the start of a given detection
             plot(detXstart(iPlot), yPos,'*','Color',color)
             text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
