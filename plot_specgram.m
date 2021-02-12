@@ -6,7 +6,7 @@ function plot_specgram
 % Plots the spectogram to the main window
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global DATA HANDLES PARAMS
+global DATA HANDLES PARAMS REMORA
 
 % get which figures plotted
 savalue = get(HANDLES.display.ltsa,'Value');
@@ -227,4 +227,10 @@ if PARAMS.filter == 1 && PARAMS.ch == 1
         num2str(PARAMS.ff2),' Hz'])
 elseif ~PARAMS.filter == 1 && PARAMS.ch == 1
     title([PARAMS.inpath,PARAMS.infile,' CH=',num2str(PARAMS.ch)])
+end
+
+if isfield(REMORA,'ltsa_plot_lVis_lab')
+    if sgvalue
+        REMORA.ltsa_plot_lVis_lab{2}();
+    end
 end

@@ -56,7 +56,12 @@ if p.saveNoise
         spNoise = 20*log10(abs(fft(wNoise,N)));
         spNoiseSub = spNoise-sub;
         spNoiseSub = spNoiseSub(:,1:N/2);
-        specNoiseTf = spNoiseSub(p.specRange)+p.xfrOffset;
+        if ~p.whiten
+            specNoiseTf = spNoiseSub(p.specRange)+p.xfrOffset;
+        else
+            specNoiseTf = spNoiseSub(p.specRange)+p.meanxfrOffset;
+        end
+            
     else
         yNFilt = [];
         specNoiseTf = [];
@@ -90,8 +95,11 @@ for c = 1:size(clicks,1)
     
     %reduce data to first half of spectra
     spClickSub = spClickSub(:,1:N/2);
-    specClickTf(c,:) = spClickSub(p.specRange)+p.xfrOffset;
-    
+    if ~p.whiten
+        specClickTf(c,:) = spClickSub(p.specRange)+p.xfrOffset;
+    else
+       specClickTf(c,:) = spClickSub(p.specRange)+p.meanxfrOffset;
+    end
     %%%%%
     % calculate peak click frequency
     % max value in the first half samples of the spectrogram
@@ -190,13 +198,17 @@ for c = 1:size(clicks,1)
     % frequency to get ppSignal (dB re 1uPa)
     P = 20*log10(ppCount);
     
-    peakLow=floor(peakFr(c));
-    fLow=find(f>=peakLow);
-    
-    % add PtfN transfer function at peak frequency to P
-    tfPeak = p.xfrOffset(fLow(1));
-    ppSignal(c) = P+tfPeak;
-    
+    if ~p.whiten
+        peakLow=floor(peakFr(c));
+        fLow=find(f>=peakLow);
+        
+        % add PtfN transfer function at peak frequency to P
+        tfPeak = p.xfrOffset(fLow(1));
+        ppSignal(c) = P+tfPeak;
+    else
+        ppSignal(c) = P+p.meanxfrOffset;
+        
+    end
     % Calculate an snr value
     estSignal = sqrt(mean(yFilt{c}.^2));
     snr(c) = 10*log10(estSignal/estNoise);

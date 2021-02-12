@@ -17,7 +17,11 @@ elseif strcmp(action,'setInDir')
 elseif strcmp(action,'setOutDir')
     outDir = get(REMORA.bm_verify.outDirEdTxt, 'string');
     REMORA.bm.settings.outDir = outDir;
-        
+      
+elseif strcmp(action,'setRegDate')
+    regdate = get(REMORA.bm_verify.regdateEdTxt, 'string');
+    REMORA.bm.settings.regdate = regdate;
+    
 elseif strcmp(action,'setThresh')
     ThreshEdText = str2double(get(REMORA.bm_verify.ThreshEdText, 'string'));
     REMORA.bm.settings.thresh = ThreshEdText;

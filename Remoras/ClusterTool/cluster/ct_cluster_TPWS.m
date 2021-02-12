@@ -7,8 +7,8 @@ if isfield(HANDLES,'msg')
     p.tritonMsg = 1; % if the field exists, then we have access to triton messaging.
 end
 % Things to make set-able someday
-p.normalizeTF = 1; % flag to turn on click normalization
-p.mergeThresh = 3000; % arbitrary threshold above which node merging is attempted 
+%p.normalizeTF = 1; % flag to turn on click normalization
+p.mergeThresh = 300; % arbitrary threshold above which node merging is attempted 
 % if merging is desired. Node merging is a strategy for clustering large 
 % networks more quickly, but it comes with a cost, so you shouldn't just
 % do it for all network sizes.
@@ -150,6 +150,9 @@ for iC = 1:length(dateInterval)
     specSet = MSP(idSet,:);
     ttSet = MTT(idSet);
     envSet = abs(hilbert(MSN(idSet,:)'))';
+    if 1
+        envSet = ct_align_env(envSet);
+    end
     envDur = sum(envSet>median(median(envSet)*5),2);
     p.maxDur = size(envSet,2);
     
@@ -192,7 +195,7 @@ for iC = 1:length(dateInterval)
             % WARNING: if data were subsetted, this clickClusterIds
             % is relative to the permuted subset rList in clickSubset
             binData(cIdx,1).clickSubset = rList;% store indices of the clicks that were clustered.
-            binData(cIdx,1).nIsolated = isolatedSet; % sore indices of clicks isolated from clusters
+            binData(cIdx,1).nIsolated = isolatedSet; % store indices of clicks isolated from clusters
             binData(cIdx,1).sumSpec = spectraMean; % store summary spectra
             binData(cIdx,1).nSpec = sizeCA; % store # of clicks associated with each summary spec
             binData(cIdx,1).percSpec = sizeCA./size(specSet,1); % store % of clicks associated with each summary spec
@@ -208,6 +211,7 @@ for iC = 1:length(dateInterval)
             % meanSimilarity{cIdx,:} = meanSim;
             
             if p.plotFlag 
+                % figure(111);imagesc(specSet(isolatedSet,:));set(gca,'ydir','normal')
                 % plotting option
                 ct_plot_bin_clusters(p,f,spectraMean,envDistrib,thisFile,dtt,...
                     specHolder,envSetHolder,sizeCA,iC,length(dateInterval),figCounter) 

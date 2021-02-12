@@ -28,18 +28,25 @@ if strcmp(action,'full_detector')
 %     % load text file and create .tlab file 
 %     sh_create_tlab_file
     
-elseif strcmp(action,'load_labels')
-    
-    % set up to open gui window for motion detector
-    bm_init_visLabel_figure
-    
-    % set motion gui for detection lables
-    bm_init_visLabel_gui
-    
-elseif strcmp(action,'evaluate_detections')
-    
-    %launch evaluation gui
-    bm_evaluate
+elseif strcmp(action, 'kernel')
+    bm_init_settings
+    bm_kernel_gui
+
+elseif strcmp(action, 'optimthresh')
+    bm_init_settings
+    bm_optimthresh_gui
+% elseif strcmp(action,'load_labels')
+%     
+%     % set up to open gui window for motion detector
+%     bm_init_visLabel_figure
+%     
+%     % set motion gui for detection lables
+%     bm_init_visLabel_gui
+%     
+% elseif strcmp(action,'evaluate_detections')
+%     
+%     %launch evaluation gui
+%     bm_evaluate
     
 end
 

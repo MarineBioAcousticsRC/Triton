@@ -11,6 +11,7 @@ detParams.outDir  = [];
 
 % Set transfer function location
 detParams.tfFullFile = [];
+detParams.whiten = 0;
 % Note, if no transfer function use: parametersLR.tfFullFile = [];
 
 % Name of the deployment. This should be the first few characters in the 

@@ -1,4 +1,4 @@
-function clusterID = ct_run_CW_cluster(clusterID,distClickEFull,itrMax)
+function clusterID = ct_run_CW_cluster(clusterID,distClickEFull,p)
 % for iRow = 1:length(uMergeNodeID)
 %     distClickEFull(:,iRow) = distClickEFull(:,iRow).*...
 %      countsMergeNodeID(iRow);
@@ -10,8 +10,13 @@ list2cluster = clusterID(~isnan(clusterID));
 distClickEIdx = 1:size(distClickEFull,1);
 noChange = 0;
 cwItr = 1;
+
 % itrMax = 10;
-while ~noChange && (cwItr<=itrMax)
+if p.plotFlag
+    figure(110);clf
+    cList = colormap(110,lines);
+end
+while ~noChange && (cwItr<=p.maxCWiterations)
     rOrder = randperm(length(list2cluster));% randomize order
     noChange = 1; % set no change flag to 1, it will be flipped to 0 as soon as a change is made    
    
@@ -41,5 +46,18 @@ while ~noChange && (cwItr<=itrMax)
     end
     fprintf('Done with clustering iteration %0.0f\n',cwItr);
     cwItr = cwItr + 1;
+  
+end
+if p.plotFlag
+    
+    % G = graph(squareform(distClickE));
+    G = graph(distClickEFull,'upper');
+    h = plot(G,'layout','force');
+    uID = unique(clusterID);
+    h.EdgeColor = [.9,.9,.9];
+    for iC=1:size(uID,1)
+        highlight(h, clusterID==uID(iC),'nodeColor',cList(mod(uID(iC),64)+1,:))
+    end
 end
 fprintf('%0.0f iterations required\n',cwItr-1);
+colormap(jet)

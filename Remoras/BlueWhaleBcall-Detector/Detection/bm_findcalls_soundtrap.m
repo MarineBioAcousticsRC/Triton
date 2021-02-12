@@ -50,9 +50,12 @@ gramParams = struct( ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% end of configuration %%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 % Make spectrogram
 [gram,fRate,gramParams] = davespect(y, gramParams,I.SampleRate);
-
+if median(gram(:)) == -Inf
+   abstime=[];
+end
 % Make spectrogram correlation kernel, correlate it with spectrogram.
 [ker,vOff,hOff] = multiKernel(startF, endF, startT, endT, bandwidth, I.SampleRate, ...
     fRate, gramParams.frameSize, gramParams.zeroPad, gramParams.nOverlap, 1);
@@ -69,16 +72,21 @@ peakS = ((peakIx-1)/fRate + hOff);
 
 % Display the results: first the spectrogram, using some heuristics for
 % intensity scaling and frequency limits, and then the detection function.
+
 if DISPLAY > 0 && max(detFn)>0
     subplot(211)
     med = median(gram(:)); mx = max(gram(:));  % used for intensity scaling
+    try
     imagesc([0 nCols(gram)/fRate], [0 I.SampleRate/2], gram, [med + (mx-med)*[.25 1]])
      set(gca, 'YDir', 'normal','XLim', [0 block], 'YLim', [startF(1)+(endF(4)-startF(1))*[2.0 -1.0]])
-    %set(gca, 'YDir','reverse')
+     %set(gca, 'YDir','reverse')
     colormap(jet)
     ylabel('Hz')
     title('spectrogram of blue whale band')
-    
+    catch
+        display(['A substantial part of ',filename,' block ',num2str(blockIdx),' contains no audio'])
+        abstime = [];
+    end
 
 
     subplot(212)
@@ -96,6 +104,7 @@ if DISPLAY > 0 && max(detFn)>0
     %             pause
 end
 
+    
 
 abstime = bm_writecalls_soundtrap2 (halfblock, startTime, peakS, score);
 

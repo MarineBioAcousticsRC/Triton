@@ -66,12 +66,42 @@ elseif strcmp(action,'autob')
         motion_ltsa('back')	% step back one frame
         if PARAMS.aptime ~= 0
          pause(PARAMS.ltsa.aptime); % wait (needed on fast machines)
-        end				
+        end
     end
     % turn menus back on
     control_ltsa('menuon')
-
-% stop button doesn't work right away, has to click twice to stop the LTSA
+    
+elseif strcmp(action,'nextDet')
+    [~,nextDet] = lt_lVis_envDet_LTSA;
+    if ~isempty(nextDet)
+        ltsaPad = PARAMS.ltsa.tseg.hr .* 0.1; %add some padding to where next detection/previous detection displays in window
+        endLoc = PARAMS.ltsa.dnumEnd(end)-datenum(0,0,0,0,PARAMS.ltsa.tseg.hr,0);
+        if endLoc< (nextDet-ltsaPad)
+            PARAMS.ltsa.plot.dnum = endLoc;
+        else
+            PARAMS.ltsa.plot.dnum = nextDet - datenum(0,0,0,0,ltsaPad,0);
+        end
+        PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
+        read_ltsadata
+        plot_triton
+    else
+        disp('Last detection! No detections found after current window for this LTSA file')
+    end
+    
+elseif strcmp(action,'prevDet')
+    [prevDet,~] = lt_lVis_envDet_LTSA;
+    if ~isempty(prevDet)
+        ltsaPad = PARAMS.ltsa.tseg.hr.*0.1; %add some padding to where next detection/previous detection displays in window
+        PARAMS.ltsa.plot.dnum = prevDet - datenum(0,0,0,0,ltsaPad,0);
+        PARAMS.ltsa.save.dnum = PARAMS.ltsa.plot.dnum;
+        % if PARAMS.ltsa.plot.dnum
+        read_ltsadata
+        plot_triton
+    else
+        disp('First detection! No detections found prior to current window for this LTSA file')
+    end
+    
+    % stop button doesn't work right away, has to click twice to stop the LTSA
 % stop button - keep current frame
 elseif strcmp(action,'stop')
     set(HANDLES.ltsa.motion.stop,'Userdata',-1)

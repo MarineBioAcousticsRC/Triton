@@ -31,6 +31,7 @@ switch pick
         for idx = 1:length(time)
         
             tf.time = time(idx);
+            %tf.timeidx = timeidx(idx);
             tf.src_file = fname;  % Picked in which file?
             
             % Format the time-frequency selection and update the display
@@ -39,6 +40,7 @@ switch pick
             if isempty(freq)
                 freqstr = 'NA';
                 tf.freq = [];
+               % tf.freqidx = [];
             else
                 tf.freq = freq(idx);
                 if freq(idx) > 1000
@@ -46,6 +48,7 @@ switch pick
                 else
                     freqstr = sprintf('%.1f Hz', freq(idx));
                 end
+               % tf.freqidx = freqidx(idx);
             end
             
             timeXfreqStr = sprintf('%s  %s', ...

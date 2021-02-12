@@ -58,8 +58,13 @@ elseif strcmp(action,'setSaveDir')
 elseif strcmp(action,'selectSaveDir')
     REMORA.nn.classify.saveDir = uigetdir(pwd,'Select input folder');
     set(REMORA.fig.nn.classify.saveDirEdTxt,'String',REMORA.nn.classify.saveDir)
+    
+elseif strcmp(action,'intermedPlotCheck')
+    REMORA.nn.classify.intermedPlotCheck = get(REMORA.fig.nn.classify.intermedPlotCheck,'Value');
+    
 elseif strcmp(action,'Run')
     nn_fn_classify
+    nn_ui_post_classification_window
 else
     fprintf('Action ''%s'' not recognized.\n',action)
 end
