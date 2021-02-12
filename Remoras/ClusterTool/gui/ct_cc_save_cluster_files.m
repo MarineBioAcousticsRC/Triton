@@ -14,69 +14,97 @@ end
 % make folders
 uNames = unique(REMORA.ct.CC.output.labelStr);
 nTypes = length(uNames);
+thisName = [];
+thisTypeAll = [];
+
 for iF = 1:nTypes
     
-    thisName = uNames{iF};
-    newDir = fullfile(REMORA.ct.CC.output.clustDir,thisName);
-    if ~isdir(newDir)
-        mkdir(fullfile(REMORA.ct.CC.output.clustDir,thisName))
+    thisName{iF} = uNames{iF};
+    newDir{iF} = fullfile(REMORA.ct.CC.output.clustDir,thisName{iF});
+    if ~isdir(newDir{iF})
+        mkdir(fullfile(REMORA.ct.CC.output.clustDir,thisName{iF}))
     end
-    fprintf('Saving output for %s...\n',uNames{iF})
-    % Find all of the clusters with this name
-    cIdx = find(strcmp(thisName,REMORA.ct.CC.output.labelStr));
-    % If bin level, TPWS files are not needed
-    % This code just reproduces the individual cluster output files and
-    % places them in folders according to the cluster name. If 2 clusters
-    % have the same name, they are merged.
-    thisType = [];
-    inFileList = [];
-    thisType.fileNumExpand = REMORA.ct.CC.output.fileNumExpand(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
-    thisType.clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+    cIdx = find(strcmp(thisName{iF},REMORA.ct.CC.output.labelStr));
+    thisTypeAll(iF).clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+    thisTypeAll(iF).fileNumExpand = REMORA.ct.CC.output.fileNumExpand(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+    thisTypeAll(iF).Tfinal = vertcat(REMORA.ct.CC.output.Tfinal(cIdx,:)); % This keeps cells apart.
+    % Will need to watch out for this later.
+    
+    thisTypeAll(iF).tIntMat = REMORA.ct.CC.output.tIntMat(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+end
 
-    if REMORA.ct.CC.output.saveBinLevelDataTF
-        
-        thisType.Tfinal = vertcat(REMORA.ct.CC.output.Tfinal(cIdx,:)); % This keeps cells apart.
-        % Will need to watch out for this later.
-        
-        thisType.tIntMat = REMORA.ct.CC.output.tIntMat(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+
+%fprintf('Saving output for %s...\n',uNames{iF})
+
+
+if REMORA.ct.CC.output.saveBinLevelDataTF
+    for iF = 1:nTypes
+        % Find all of the clusters with this name
+        % cIdx = find(strcmp(thisName{iF},REMORA.ct.CC.output.labelStr));
+        % If bin level, TPWS files are not needed
+        % This code just reproduces the individual cluster output files and
+        % places them in folders according to the cluster name. If 2 clusters
+        % have the same name, they are merged.
+        % thisType(iF).clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+
         inFileList = REMORA.ct.CC.output.inFileList;
+        
         [~,outputNameRoot,~] = fileparts(REMORA.ct.CC_params.outputName);
-        binLevelOutputFile = fullfile(newDir,[outputNameRoot,'_', thisName,'_binLevel.mat']);
+        
+        binLevelOutputFile = fullfile(newDir,[REMORA.ct.CC_params.outputName,'_', thisName{iF},'_binLevel.mat']);
+        
+        outputNameRoot = REMORA.ct.CC_params.outputName;
+        binLevelOutputFile = fullfile(newDir{iF},[outputNameRoot,'_', thisName{iF},'_binLevel.mat']);
+        thisType = thisTypeAll(iF);
         save(binLevelOutputFile,'thisType','inFileList','-v7.3');
         fprintf('Done saving bin-level output for %s...\n',uNames{iF})
     end
-    
-    if REMORA.ct.CC.output.saveDetLevelDataTF
-        % if detection level, TPWS files ARE needed
-        % iterate over TPWS files. For each cluster type, save one or more files that contain
-        % the spectra, waveforms and event times of each detection in that
-        % set.
-        uInputFiles = unique(thisType.fileNumExpand);
-        thisTPWSList = REMORA.ct.CC.output.TPWSList(uInputFiles);
-        for iTPWS = 1:length(thisTPWSList)
-            TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
-            load(TPWSname,'MTT');            
-            fprintf('Loading data from %s...\n',TPWSname)
-            trainTimes = vertcat(thisType.clickTimes{(thisType.fileNumExpand...
-                == uInputFiles(iTPWS))});
+end
+
+if REMORA.ct.CC.output.saveDetLevelDataTF
+    % if detection level, TPWS files ARE needed
+    % iterate over TPWS files. For each cluster type, save one or more files that contain
+    % the spectra, waveforms and event times of each detection in that
+    % set.
+    % uInputFiles = unique(thisType.fileNumExpand);
+    thisTPWSList = REMORA.ct.CC.output.TPWSList;%(uInputFiles);
+    for iTPWS = 1:length(thisTPWSList)
+        TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
+        load(TPWSname,'MTT');
+        MSN = [];
+        MSP = [];
+        fprintf('Loading data from %s...\n',TPWSname)
+        for iF = 1:nTypes
+            %cIdx = find(strcmp(thisName{iF},REMORA.ct.CC.output.labelStr));
+            
+            % thisType.clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
+             
+            trainTimes = vertcat(thisTypeAll(iF).clickTimes{(thisTypeAll(iF).fileNumExpand...
+                == iTPWS)});
             [~,I] = intersect(MTT,trainTimes);
             if isempty(I)
                 % don't bother loading the big matrices if there are no
                 % matching times
                 continue
             end
-            load(TPWSname,'MSN','MSP');            
-
+            
+            if isempty(MSN)
+                load(TPWSname,'MSN','MSP');
+            end
             trainMSN = MSN(I,:);
             trainMSP = MSP(I,:);
+            
             [~,outputName,~] = fileparts(TPWSname);
-            detLevelOutputFile = fullfile(newDir,sprintf('%s_%s_file%0.0f_detLevel.mat',...
-                outputName,thisName,iTPWS));
-            fprintf('Saving detection-level file %0.0f of %0.0f\n',iTPWS,length(thisTPWSList))
-            save(detLevelOutputFile,'trainTimes','trainMSN','trainMSP','TPWSname')
+            
+            detLevelOutputFile = fullfile(newDir{iF},sprintf('%s_%s_file%0.0f_detLevel.mat',...
+                outputName,thisName{iF},iTPWS));
+            fprintf('Saving detection-level file %0.0f of %0.0f\n',iF,nTypes)
+            save(detLevelOutputFile,'trainTimes','trainMSN','trainMSP','TPWSname','-v7.3')
             
         end
-        fprintf('Done saving detection-level output for %s.\n',uNames{iF})
+        fprintf('Done saving detection-level output for %s.\n',TPWSname)
+        MSN = [];
+        MSP = []; 
     end
 end
 spinH.stop

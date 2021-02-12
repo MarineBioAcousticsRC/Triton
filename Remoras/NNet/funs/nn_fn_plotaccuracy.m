@@ -1,5 +1,6 @@
 function nn_fn_plotaccuracy(evalFileName)
 
+global REMORA
 load(evalFileName)
 % precision/recall
 accuracyWhole = [];
@@ -16,7 +17,8 @@ for iA = 1:length(accuracyCutoffs)
 end 
 
 
-figure(254);clf;plot(percClassified,accuracySubset,'o')
+REMORA.fig.nn.training_plots{5} = figure;
+clf;plot(percClassified,accuracySubset,'o')
 xlim([floor(min(percClassified)*100)/100,1]);
 ylim([floor(min(accuracySubset)*100)/100,1]);
 hold on

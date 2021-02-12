@@ -22,5 +22,5 @@ p.trueLabel = 'true'; %label name
 
 %%other
 p.timeOffset = 2000; %set to 0 if no offset. PIFSC data originally used started with different date than triton nums
-p.dur = 0.00001; %duration for click labels (sec), necessary for data coming from detEdit 
+p.dur = 0.0001; %duration for click labels (sec), necessary for data coming from detEdit 
 %%%%modify this later to allow for more label types?

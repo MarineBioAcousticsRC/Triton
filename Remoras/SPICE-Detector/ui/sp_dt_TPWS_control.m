@@ -31,10 +31,11 @@ elseif strcmp(action, 'setSubDirTF')
 
 elseif strcmp(action, 'setTsWin')
      tsWin = get(REMORA.spice_dt_mkTPWS.tsWinEdTxt ,'String');
-     REMORA.spice_dt.mkTPWS.tsWin = tsWin;
+     REMORA.spice_dt.mkTPWS.tsWin = str2num(tsWin);
      
 elseif strcmp(action, 'run_mkTPWS')
     sp_dt_mkTPWS
     close(REMORA.fig.sp_dt_mkTPWS)
     disp_msg('Done generating TPWS files.')
+    disp('Done generating TPWS files.')
 end

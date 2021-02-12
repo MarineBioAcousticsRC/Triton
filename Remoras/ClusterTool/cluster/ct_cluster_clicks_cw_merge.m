@@ -17,8 +17,12 @@ end
 if normalizeTF 
     [specClickTfNorm,specClickTfNormDiff] = ct_normalize_click_spectra(specClickTf,p);
 else
-    specClickTfNorm = specClickTf;
-    if p.diff; specClickTfNormDiff = diff(specClickTf1,2); end
+    if p.linearTF
+        specClickTfNorm = 10.^((specClickTf+1)./20);
+    else
+        specClickTfNorm = specClickTf;
+    end
+    if p.diff; specClickTfNormDiff = diff(specClickTfNorm,1,2); end
 end
 tempN = size(specClickTf,1);
 
@@ -38,7 +42,11 @@ end
 
 % find distance between all nodes
 if p.useEnvelope
-    distEnv = ct_compute_node_dist(envSet./max(envSet,[],2),p.wcorTF);
+    if p.normalizeTF
+        distEnv = ct_compute_node_dist(envSet./max(envSet,[],2),p.wcorTF);
+    else
+        distEnv = ct_compute_node_dist(envSet,p.wcorTF);
+    end
     % [distEnv,~,~,~] = ct_ici_dist_mode(envDur',p.maxDur);
     distClickE = distClickE.*distEnv;
 end
@@ -58,8 +66,15 @@ end
 %distClickE = max((distClickE-thrP)./(1-thrP),0);
 distClickE(distClickE<thrP) = 0; 
 
+
+
 distClickEFull = squareform(distClickE);
 
+% for iR = 1:tempN
+%     thisRowMax = max(distClickEFull(iR,min(iR+1,tempN):end));
+%     tooLow = (distClickEFull(iR,:)<thrP & distClickEFull(iR,:)<thisRowMax);
+%     distClickEFull(iR,tooLow) = 0;
+% end
 
 if mergeTF
     [mergeNodeID,uMergeNodeID,~] = ct_merge_nodes(distClickEFull,...
@@ -85,7 +100,7 @@ if mergeTF
     clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
 end
 clusterID(isnan(connectedList)) = NaN;
-clusterID = ct_run_CW_cluster(clusterID,distClickEFull,p.maxCWiterations);
+clusterID = ct_run_CW_cluster(clusterID,distClickEFull,p);
 
 
 if mergeTF
@@ -122,8 +137,16 @@ clickAssign = {};
 % Organize output into cell arrays by clusters
 if ~isempty(uniqueLabelsNew)
     for i4 = 1:length(uniqueLabelsNew)
-        thisSpectralSet = specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:);
-        thisEnvDurSet = envDur(clusterIDNew==uniqueLabelsNew(i4),:);
+        
+        thisClickSet = find(clusterIDNew==uniqueLabelsNew(i4));
+        if 1
+            thisNConnectionsSet = sum(distClickEFull>0);
+            gt1Idx = thisNConnectionsSet(thisClickSet)>1;
+            thisClickSet = thisClickSet(gt1Idx);
+        end
+        thisSpectralSet = specClickTf(thisClickSet,:);
+        thisEnvDurSet = envDur(thisClickSet,:);
+
         envDurDistrib(i4,:) = histc(thisEnvDurSet,1:p.maxDur);
         
         if ~p.linearTF
@@ -133,14 +156,22 @@ if ~isempty(uniqueLabelsNew)
             meanSpectra = mean(thisSpectralSet,1);
         end
         
-        %linearSpecMean = mean(specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:));
-        spectraMean(i4,:) = (meanSpectra-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)))...
-            ./max(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)));
-        envMean(i4,:) = mean(envSet(clusterIDNew==uniqueLabelsNew(i4),:)./max(envSet(clusterIDNew==uniqueLabelsNew(i4),:),[],2));
+        %linearSpecMean = mean(specClickTf(clusterIDNew==uniqueLabelsNew(i4),:));
+        if p.normalizeTF
+            spectraMean(i4,:) = (meanSpectra-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)))...
+                ./max(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)));
+            envMean(i4,:) = mean(envSet(thisClickSet,:)./max(envSet(thisClickSet,:),[],2));
+            
+        else
+            spectraMean(i4,:) = meanSpectra;
+            envMean(i4,:) = mean(envSet(thisClickSet,:));
+            
+
+        end
         % spectraStd(i4,:) = std(specClickTf_norm(nodeNums(clusters==clustNums(i4)),:));
-        clickAssign{i4} = find(clusterIDNew==uniqueLabelsNew(i4));
-        spectraHolder{i4} = specClickTfNorm(clusterIDNew==uniqueLabelsNew(i4),:);
-        envSetHolder{i4} = envSet(clusterIDNew==uniqueLabelsNew(i4),:);
+        clickAssign{i4} = thisClickSet;
+        spectraHolder{i4} = specClickTf(thisClickSet,:);
+        envSetHolder{i4} = envSet(thisClickSet,:);
         % imagesc(specClickTf_norm(clickAssign{i4},p.stIdx:p.edIdx)');set(gca,'ydir','normal')
     end
 end

@@ -17,6 +17,14 @@ filenamesc = cellstr(filenames);
 date_strs = regexp(filenamesc,'\d{6}[-]\d{6}','match'); 
 date_fmt = 'yymmdd-HHMMSS';
 
+if isempty(date_strs{1})
+    date_fmt = 'yymmddTHHMMSSZ';
+    date_strs = regexp(filenamesc,'\d{6}[T]\d{6}[Z]','match' );
+    if ~isempty(date_strs{1})
+        disp('Using ISO8601 date format yymmddTHHMMSSZ in filename');
+    end
+end
+
 if isempty(date_strs{1}) % not a PAMguard file, try avisoft filename
     date_fmt = 'yymmddHHMMSS';
     date_strs = regexp(filenamesc,'\d{12}','match' );

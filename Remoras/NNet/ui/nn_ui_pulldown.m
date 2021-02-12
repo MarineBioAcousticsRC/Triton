@@ -22,5 +22,8 @@ elseif strcmp(action,'train_net')
 elseif strcmp(action,'classify_data')
     
     nn_ui_classify_window
-
+    
+elseif strcmp(action,'post_classify')
+    
+    nn_ui_post_classification_window
 end

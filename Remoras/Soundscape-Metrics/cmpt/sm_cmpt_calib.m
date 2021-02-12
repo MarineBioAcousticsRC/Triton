@@ -32,8 +32,9 @@ elseif REMORA.sm.cmpt.tfval
             transferfnfile, audiofile)
     end
     freqpower = textscan(fileH, '%f %f');  % freq <whitespace> dB format
+    fclose(fileH);
     
-    REMORA.sm.cmpt.pre.fvec = 0:REMORA.sm.cmpt.avgf:REMORA.sm.cmpt.hfreq;
+    REMORA.sm.cmpt.pre.fvec = 0:1:REMORA.sm.cmpt.hfreq;
 
     % Resample to DFT resolution
     REMORA.sm.cmpt.pre.dB = interp1(freqpower{1}, freqpower{2}, REMORA.sm.cmpt.pre.fvec, 'linear', 'extrap');
