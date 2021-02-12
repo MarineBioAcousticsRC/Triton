@@ -43,8 +43,12 @@ elseif strcmp(action,'setUseEnvelopeTF')
     useEnvelope = get(REMORA.ct.CB_verify.useEnvelope,'Value');
     REMORA.ct.CB_params.useEnvelope = useEnvelope;
     
+elseif strcmp(action,'setNormalizeTF')
+    normalizeTF = get(REMORA.ct.CB_verify.normalizeTF,'Value');
+    REMORA.ct.CB_params.normalizeTF = normalizeTF;
+    
 elseif strcmp(action,'setMaxCWiterations')
-    maxCWiterations = str2double(get(REMORA.ct.CB_verify.maxCWiterationsEdText,'String'));
+    maxCWiterations = str2double(get(REMORA.ct.CB_verify.maxCWitrEdTxt,'String'));
     REMORA.ct.CB_params.maxCWiterations = min(maxCWiterations,100);
     
 elseif strcmp(action,'setMergeTF')

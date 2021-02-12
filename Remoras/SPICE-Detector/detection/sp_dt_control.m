@@ -171,6 +171,15 @@ elseif strcmp(action,'SetMaxNeighbor')
 elseif strcmp(action,'SetRmEcho')
     rmEchos = get(REMORA.spice_dt_verify.rmEchoCheckbox, 'Value');
     REMORA.spice_dt.detParams.rmEchos = rmEchos;
+
+elseif strcmp(action,'SetWhiten')
+    if strcmp(mySource, 'gui')
+        whitenTF = get(REMORA.spice_dt.whitenCheck, 'Value');
+        REMORA.spice_dt.detParams.rebuildFilter = 1;
+    else
+        whitenTF = get(REMORA.spice_dt_verify.whitenCheck, 'Value');
+    end
+    REMORA.spice_dt.detParams.whiten = whitenTF;
     
 elseif strcmp(action,'SetLockout')
     lockOut = str2double(get(REMORA.spice_dt_verify.lockoutEdTxt, 'string'));
