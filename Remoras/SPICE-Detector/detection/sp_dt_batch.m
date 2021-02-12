@@ -3,7 +3,6 @@ function [clickParamsOut,fOut] = sp_dt_batch(fullFiles,fullLabels,p,encounterTim
 
 N = size(fullFiles,1);
 p.previousFs = 0; % make sure we build filters on first pass
-p.whiten = 0;
 p.plot = 0;
 % get file type list
 fTypes = sp_io_getFileType(fullFiles);
@@ -62,37 +61,14 @@ for idx1 = 1:N % for each data file
          % make TF-based filter
          if pTemp.whiten
              %% TO DO: Make version of TF for filtering that starts at 0kHz
-             
-             pTemp = sp_fn_interp_tf_whiten(pTemp,hdr.fs);
-             
-             
-             pTemp.meanxfrOffset = mean(pTemp.xfrOffset_whiten);
-             xFrRel = (pTemp.xfrOffset_whiten-pTemp.meanxfrOffset);
-             xFrRelLin = 10.^(xFrRel/20);
-             [~,minxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(1)));
-             xFrRelLin(1:minxfrIdx) = 0;
-             Nb = 40;
-             Na = 40;
-             d = fdesign.arbmag('Nb,Na,F,A',Nb,Na,pTemp.xfr_f_whiten,xFrRelLin,hdr.fs); % single-band design
-             Hd1 = design(d,'iirlpnorm','SystemObject',true);
+             pTemp = sp_fn_build_whitening_filter(pTemp,hdr);
+            
              if pTemp.plot
                  hfvt = fvtool(Hd1,'Fs', hdr.fs,'Color','White');
              end
          end
          if ~isfield(pTemp,'countThresh') || isempty(pTemp.countThresh)
-            if ~pTemp.whiten 
-                [~,minxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(1)));
-                [~,maxxfrIdx] = min(abs(pTemp.xfr_f-pTemp.bpRanges(2)));
-                
-                pTemp.countThresh = (10^((pTemp.dBppThreshold -...
-                    median(pTemp.xfrOffset(minxfrIdx:maxxfrIdx)))/20))/2;
-            else
-                [~,minxfrIdx] = min(abs(pTemp.xfr_f_whiten-pTemp.bpRanges(1)));
-                [~,maxxfrIdx] = min(abs(pTemp.xfr_f_whiten-pTemp.bpRanges(2)));
-                
-                pTemp.countThresh = (10^((pTemp.dBppThreshold -...
-                    pTemp.meanxfrOffset)/20))/2;
-            end
+            pTemp = sp_dt_set_count_threshold(pTemp);
          end
     end
     
@@ -137,7 +113,7 @@ for idx1 = 1:N % for each data file
             set(gca,'clim',[-5,5])
         end
         if pTemp.whiten
-            filtData = step(Hd1,filtData')';
+            filtData = step(pTemp.Hd1,filtData')';
             if pTemp.plot
                 figure(103);colormap(jet)
                 [~,fOut,t,psdFilt] = spectrogram(filtData,hdr.fs/10,50,hdr.fs/10,hdr.fs);
@@ -208,7 +184,6 @@ for idx1 = 1:N % for each data file
     
     keepFlag = sp_dt_postproc(outFileName,clickTimes,pTemp,hdr,encounterTimes);
     keepIdx = find(keepFlag==1);
-    
     cParams = sp_dt_prune_cParams_byIdx(cParams,keepIdx);
     
     if strcmp(runMode,'guiRun')
