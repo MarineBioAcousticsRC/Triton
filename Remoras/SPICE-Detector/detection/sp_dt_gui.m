@@ -15,7 +15,13 @@ if isfield(REMORA.spice_dt.detParams,'rebuildFilter')&&(REMORA.spice_dt.detParam
     REMORA.spice_dt.detParams.rebuildFilter = 0;
     p = REMORA.spice_dt.detParams;
     p = sp_fn_interp_tf(p);
+    hdr.fs = PARAMS.fs;
+    if p.whiten 
+        p = sp_fn_build_whitening_filter(p,hdr);
+    end    
+    % save changes:
     REMORA.spice_dt.detParams = p;
+
 else
     p = REMORA.spice_dt.detParams;
 end
@@ -27,9 +33,8 @@ if REMORA.spice_dt.detParams.dBppThresholdFlag == 1||...
     if ~isfield(p,'xfrOffset') || isempty(p.xfrOffset)
         p.xfrOffset = 0;
     end
-    [~,minxfrIdx] = min(abs(p.xfr_f-p.bpRanges(1)));
-    [~,maxxfrIdx] = min(abs(p.xfr_f-p.bpRanges(2)));
-    p.countThresh = (10^((p.dBppThreshold - median(p.xfrOffset(minxfrIdx:maxxfrIdx)))/20))/2;
+    p = sp_dt_set_count_threshold(p);
+   
     REMORA.spice_dt.detParams.countThresh = p.countThresh;
     REMORA.spice_dt.detParams.dBppThresholdFlag = 0; % set flag to off 
 end
@@ -43,10 +48,15 @@ if size(DATA,1)> size(DATA,2)
 else
     filtData = filtfilt(p.fB,p.fA,DATA(PARAMS.ch,:)');
 end
+
+if p.whiten
+    filtData = step(p.Hd1,filtData')';
+end
 energy = filtData.^2;
 
 [detectionsSample,detectionsSec] =  sp_dt_LR(energy,PARAMS,buffSamples,...
     0,length(energy)/PARAMS.fs,p);
+
 
 %%% start HR detection on candidates
 if ~isempty(detectionsSample)

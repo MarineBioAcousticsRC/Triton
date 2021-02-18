@@ -31,4 +31,5 @@ Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM_test.m
 Settings/InstalledRemoras.cnf
 *.mat
 *.cnf
-
+Settings/InstalledRemoras.cnf
+*.prj

@@ -115,7 +115,7 @@ if  tritonMode && isfield(REMORA.ct.CC,'rm_simbins')...
     %     thresh = 0.95;
     %     dist = 0.1;
     specComp = REMORA.ct.CC.sbSet;
-    binDataPruned = ct_cc_modifyBinData(REMORA.ct.CC_params.SBperc,REMORA.ct.CC_params.SBdiff,binDataPruned,specComp);
+    [binDataPruned,fileNum] = ct_cc_modifyBinData(REMORA.ct.CC_params.SBperc,REMORA.ct.CC_params.SBdiff,binDataPruned,specComp,fileNum);
 end
 % %%%%%%%%%% Begin main functionality %%%%%%%%%%%%
 %% Normalize everything
@@ -364,7 +364,9 @@ for iEA = 1:s.N
         clusterID(~ismember(clusterID,uMergeNodeID)) = NaN;
     end
     clusterID(connectedList==0) = NaN;
-    clusterID = ct_run_CW_cluster(clusterID,compDist,s.maxCWIterations);
+    s.plotFlag = 0;
+    s.maxCWiterations = s.maxCWIterations;
+    clusterID = ct_run_CW_cluster(clusterID,compDist,s);
     
     if s.mergeTF
         % unwind node merge by assigning nodes that were merged to the category of
