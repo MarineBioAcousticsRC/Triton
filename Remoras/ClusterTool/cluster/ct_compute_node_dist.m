@@ -7,13 +7,8 @@ if ~wcorTF
 %         verySmall = specClickTf_norm_short(iB,:)<=.2;
 %         specClickTf_norm_short(iB,verySmall) = 0;
 %     end
-    % myCov = nearestSPD(nancov(specClickTf));
-    % distClick = pdist(specClickTf,'mahalanobis',myCov);
-    
     distClick = pdist(specClickTf,'correlation');
-
-    % distClickE = (exp(-distClick));
-    distClickE = max(distClick)-distClick;
+    distClickE = (exp(-distClick));
 else
     % weighted correlation
     % Wgts = 1:-1/(size(specClickTf,2)-1):0; % Vector from 1 to 0 ->
@@ -38,5 +33,4 @@ else
     
     distClickE = (exp(-real(Dwgt)));
 end
-%distClickE = sqrt(real(distClickE));
-%distClickE = distClickE.^2;
+distClickE = sqrt(real(distClickE));

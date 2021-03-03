@@ -56,6 +56,9 @@ elseif strcmp(action,'setLinearTF')
 elseif strcmp(action,'setDiff')
     specDiffTF = get(REMORA.ct.CC_verify.diffCheck,'Value');
     REMORA.ct.CC_params.specDiffTF = specDiffTF;
+elseif strcmp(action,'setNormalizeSpectraTF')
+    specNormTF = get(REMORA.ct.CC_verify.normalizeSpectraCheck,'Value');
+    REMORA.ct.CC_params.normalizeSpectra = specNormTF;
     
 elseif strcmp(action,'setUseTimesTF')
     useTimesTF = get(REMORA.ct.CC_verify.timesCheck,'Value');
@@ -67,10 +70,10 @@ elseif strcmp(action,'setUseTimesTF')
         showTemporalParams = 'off';
     end
     set(REMORA.ct.CC_verify.bg,'Visible',showTemporalParams)
-    set(REMORA.ct.CC_verify.ICIMinTxt,'Visible',showTemporalParams)
-    set(REMORA.ct.CC_verify.ICIMinEdTxt,'Visible',showTemporalParams)
-    set(REMORA.ct.CC_verify.ICIMaxTxt,'Visible',showTemporalParams)
-    set(REMORA.ct.CC_verify.ICIMaxEdTxt,'Visible',showTemporalParams)
+    %set(REMORA.ct.CC_verify.ICIMinTxt,'Visible',showTemporalParams)
+    %set(REMORA.ct.CC_verify.ICIMinEdTxt,'Visible',showTemporalParams)
+    %set(REMORA.ct.CC_verify.ICIMaxTxt,'Visible',showTemporalParams)
+    %set(REMORA.ct.CC_verify.ICIMaxEdTxt,'Visible',showTemporalParams)
     set(REMORA.ct.CC_verify.correctForSatCheck,'Visible',showTemporalParams)
     
 elseif strcmp(action,'setUseEnvShape')

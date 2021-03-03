@@ -170,7 +170,11 @@ if ~isfield(s,'useEnvShapeTF')
 end
 [~,s.stIdx] = min(abs(f-s.startFreq));
 [~,s.edIdx] = min(abs(f-s.endFreq));
-[specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
+
+if ~isfield(s,'normalizeSpectra') 
+    s.normalizeSpectra = 1;
+end
+[specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF,s);
 
 [~,s.maxICIidx] = min(abs(p.barInt-s.maxICI));
 [~,s.minICIidx] = min(abs(p.barInt-s.minICI));
