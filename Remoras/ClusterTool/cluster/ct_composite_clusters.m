@@ -126,7 +126,6 @@ nSpecMat = horzcat(binDataPruned.nSpec)';
 dTTmat = vertcat(binDataPruned.dTT);
 cRateMat = vertcat(binDataPruned.clickRate);
 clickTimes = horzcat(binDataPruned(:).clickTimes);
-
 for iEM = 1:size(binDataPruned,1)
     if size(binDataPruned(iEM).envMean,2) == 1
         binDataPruned(iEM).envMean = zeros(1,p.maxDur);
@@ -144,6 +143,7 @@ subOrder =  nan(size(dTTmat,1),1);
 binOrder =  nan(size(dTTmat,1),1);
 fileNumExpand = nan(size(dTTmat,1),1);
 clickTimesExpanded = {};
+clusteredTFmat = nan(size(dTTmat,1),1);
 stepCounter = 1;
 for iTimes = 1:size(binDataPruned,1)
     nCells = size(binDataPruned(iTimes).nSpec,2);
@@ -156,7 +156,8 @@ for iTimes = 1:size(binDataPruned,1)
     subOrder(stepCounter:stepCounter+nCells-1) = 1:size(binDataPruned(iTimes).nSpec,2);
     fileNumExpand(stepCounter:stepCounter+nCells-1) = repmat(fileNum(iTimes),...
         nCells,1);
-    
+    clusteredTFmat(stepCounter:stepCounter+nCells-1) = repmat(binDataPruned(iTimes).clusteredTF,...
+        nCells,1);
     stepCounter = stepCounter+nCells;
     
 end
@@ -165,6 +166,11 @@ if s.singleClusterOnly
 else
     useBins = (nSpecMat >= s.minClicks);
 end
+
+if isfield(s,'clusteredOnly')&& s.clusteredOnly
+    useBins = min(useBins,clusteredTFmat);
+end
+
 if ~isfield(s,'useEnvShapeTF')
     s.useEnvShapeTF = 0;
 end

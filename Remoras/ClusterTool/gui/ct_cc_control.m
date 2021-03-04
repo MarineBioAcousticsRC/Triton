@@ -134,6 +134,10 @@ elseif strcmp(action,'setClusterPruningFactor')
     clusterPruningFactor = str2double(get(REMORA.ct.CC_verify.clusterPruneEdTxt ,'String'));
     REMORA.ct.CC_params.clusterPrune = clusterPruningFactor;
     
+elseif strcmp(action,'setClusteredOnlyTF')
+    clusteredOnlyTF = get(REMORA.ct.CC_verify.clusteredOnlyCheck,'Value');
+    REMORA.ct.CC_params.clusteredOnly = clusteredOnlyTF;
+
 elseif strcmp(action,'rmPriorClustersTF')
     rmBinsTf = get(REMORA.ct.CC_verify.rmClustCheck,'Value');
     REMORA.ct.CC_params.rmPriorClusters = rmBinsTf;
