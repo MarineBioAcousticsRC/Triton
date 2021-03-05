@@ -33,6 +33,13 @@ if isfield(REMORA,'spice_dt') && isfield(REMORA.spice_dt,'mkTPWS')
         siteName = '';% site name wildcard, used to restrict input files
     end
     fprintf('Wildcard: %s\n', siteName)
+    
+    if isfield(REMORA.spice_dt.mkTPWS,'spName')
+        spName = REMORA.spice_dt.mkTPWS.spName;
+    else
+        spName = '';% species name specified in TPWS file name
+    end
+    fprintf('Species name for TPWS file name: %s\n', spName)
 
     if isfield(REMORA.spice_dt.mkTPWS,'minDBpp')
         % minimum RL in dBpp. If detections have RL below this
@@ -84,7 +91,7 @@ if ~subDir
     [~,outName] = fileparts(baseDir);
     outName = strrep(outName,'_metadata','');
     
-    sp_dt_makeTPWS_oneDir(baseDir,letterCode,ppThresh,outDir,outName,maxRows,tsWin)
+    sp_dt_makeTPWS_oneDir(baseDir,letterCode,ppThresh,outDir,outName,spName,maxRows,tsWin)
     disp_msg(sprintf('Done with directory %s',baseDir))
 
 else 
@@ -100,7 +107,7 @@ else
                 ~strcmp(dirSet(itr0).name,'..')
             inDir = fullfile(dirSet(itr0).folder,dirSet(itr0).name);
             outName = dirSet(itr0).name;
-            sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName,maxRows,tsWin)
+            sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName,spName,maxRows,tsWin)
             disp_msg(sprintf('Done with directory %d of %d \n',itr0,length(dirSet)))
             drawnow
         end
