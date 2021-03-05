@@ -10,7 +10,8 @@ if strcmp(REMORA.bm.settings.datatype, 'Wav')
 
 elseif strcmp(REMORA.bm.settings.datatype, 'XWav')
     disp_msg('Detecting blue whale B calls in xwav files');
-    bm_autodet_dir_HA;
+%    bm_autodet_dir_HA;
+    bm_autodet_dir_LB;
 
 % elseif strcmp(REMORA.bm.settings.species, 'Fin whale')
 %     disp_msg('Detecting fin whale calls');
