@@ -168,7 +168,7 @@ else
 end
 
 if isfield(s,'clusteredOnly')&& s.clusteredOnly
-    useBins = min(useBins,clusteredTFmat);
+    useBins = logical(min(useBins,clusteredTFmat));
 end
 
 if ~isfield(s,'useEnvShapeTF')
