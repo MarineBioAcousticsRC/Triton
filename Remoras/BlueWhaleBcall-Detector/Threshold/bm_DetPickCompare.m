@@ -35,16 +35,18 @@ for k=1:size(dfile,1)
     res = csvread(strcat(location,'\',dfile(k,1).name),1,2);
     %convert to Matlab times
     dnum = res(:,1);
+    sel = dnum(:)>=pmatnum(1)& dnum(:)<=pmatnum(end);
+    dnumsel = dnum(sel);    
     %dmatnum = ones(size(dnum)).*datenum('30-Dec-1899')+dnum; %dat =
     %dmatnum = dat(:,1);
     %code for fixing timing issue in 36R
     %dmatnum = dmatnum+datenum([0 0 0 0 0 5]);     %add 6 s for timing error
-    dsize=size(dnum(:,1)); %size of the detector picks
+    dsize=size(dnumsel(:,1)); %size of the detector picks
 
     if msize(1,1) >= dsize(1,1)
-        [Trues False Miss] = moreHumanPicks(dsize, msize, pmatnum, dnum);
+        [Trues False Miss] = moreHumanPicks(dsize, msize, pmatnum, dnumsel);
     else
-        [Trues False Miss] = moreDetPicks(dsize, msize, pmatnum, dnum);
+        [Trues False Miss] = moreDetPicks(dsize, msize, pmatnum, dnumsel);
     end
 
 %     TrueStr(k) = datestr(Trues(:,k));
