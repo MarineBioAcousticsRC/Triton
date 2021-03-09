@@ -2,7 +2,7 @@ function [specClickTfNorm,specClickTfNormDiff] = ct_normalize_click_spectra(spec
 
 if p.linearTF
     % convert out of log space for linear comparison
-    specClickTf = 10*((specClickTf+1)./20);
+    specClickTf = 10.^((specClickTf+1)./20);
 end
 
 % Normalize clicks on 0-1 scale

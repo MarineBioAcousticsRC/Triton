@@ -7,8 +7,8 @@ if isfield(HANDLES,'msg')
     p.tritonMsg = 1; % if the field exists, then we have access to triton messaging.
 end
 % Things to make set-able someday
-p.normalizeTF = 1; % flag to turn on click normalization
-p.mergeThresh = 3000; % arbitrary threshold above which node merging is attempted 
+%p.normalizeTF = 1; % flag to turn on click normalization
+p.mergeThresh = 300; % arbitrary threshold above which node merging is attempted 
 % if merging is desired. Node merging is a strategy for clustering large 
 % networks more quickly, but it comes with a cost, so you shouldn't just
 % do it for all network sizes.
@@ -150,6 +150,9 @@ for iC = 1:length(dateInterval)
     specSet = MSP(idSet,:);
     ttSet = MTT(idSet);
     envSet = abs(hilbert(MSN(idSet,:)'))';
+    if 1
+        envSet = ct_align_env(envSet);
+    end
     envDur = sum(envSet>median(median(envSet)*5),2);
     p.maxDur = size(envSet,2);
     
@@ -208,7 +211,7 @@ for iC = 1:length(dateInterval)
             % meanSimilarity{cIdx,:} = meanSim;
             
             if p.plotFlag 
-                figure(111);imagesc(specSet(isolatedSet,:));set(gca,'ydir','normal')
+                % figure(111);imagesc(specSet(isolatedSet,:));set(gca,'ydir','normal')
                 % plotting option
                 ct_plot_bin_clusters(p,f,spectraMean,envDistrib,thisFile,dtt,...
                     specHolder,envSetHolder,sizeCA,iC,length(dateInterval),figCounter) 
@@ -230,7 +233,7 @@ for iC = 1:length(dateInterval)
         binData(cIdx,1).nIsolated = NaN; % nothing isolated in no cluster case
         binData(cIdx,1).clickSubset =  1:nClicks; % all clicks are passed into this subset since no cluster
         binData(cIdx,1).clickClusterIds = {1:nClicks}; % all clicks are considered to be in cluster 1
-        binData(cIdx,1).sumSpec = ct_calc_norm_spec_mean(specSet);%(:,p.startFreqIdx:p.endFreqIdx)); % store summary spectra
+        binData(cIdx,1).sumSpec = ct_calc_norm_spec_mean(specSet,p);%(:,p.startFreqIdx:p.endFreqIdx)); % store summary spectra
         binData(cIdx,1).nSpec = nClicks; % store # of clicks associated with each summary spec
         binData(cIdx,1).percSpec = 1; % store % of clicks associated with each summary spec
         binData(cIdx,1).cInt = nClicks; % store number of clicks in interval
@@ -238,7 +241,11 @@ for iC = 1:length(dateInterval)
         binData(cIdx,1).clickTimes = {ttSet}; % store click times.
         binData(cIdx,1).clusteredTF = 0;
         binData(cIdx,1).envDur = envDur;
-        binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
+        if size(envSet,1)>1
+            binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
+        elseif size(envSet,1)==1
+            binData(cIdx,1).envMean = envSet./max(envSet,[],2);
+        end
         [binData(cIdx,1).dTT,binData(cIdx,1).clickRate] = ct_compute_rate_distributions(ttSet,p);
         
         cIdx = cIdx +1;

@@ -1,6 +1,6 @@
 function hSet = ct_intercluster_plots(p,s,f,nodeSet,compositeData,Tfinal,labelStr,figDir)
 
-n1 = 3; % number of rows of subplots, one subplot per type
+n1 = min([3,round(length(nodeSet)/2)]); % number of rows of subplots, one subplot per type
 m1 = ceil(length(nodeSet)/n1); % number of columns of subplots
 figure(41);clf(41);set(gcf,'Units','normalized','Position',[0.01,.05,.48,.4])
 figure(42);clf(42);set(gcf,'Units','normalized','Position',[0.01,.52,.48,.4])
@@ -40,7 +40,11 @@ for iF = 1:length(nodeSet)
     
     hSet(2) = figure(42); % plot spectra as heatmap
     subplot(n1,m1,iF)
-    imagesc(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)')
+    if s.normalizeSpectra
+        imagesc(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)')
+    else
+       imagesc(1:length(nodeSet{iF}),f,Tfinal{iF,1}')
+    end
     set(gca,'ydir','normal')
     title(labelStr{iF})
     % ylim([min(f(p.startFreqIdx)),max(f(p.endFreqIdx))])

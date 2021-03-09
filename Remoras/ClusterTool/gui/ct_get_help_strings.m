@@ -20,6 +20,8 @@ ctHelpStrings.useSpectra = ['If TRUE, correlation distance between spectra will 
 
 ctHelpStrings.useEnvelope = ['If TRUE, correlation distance between waveform envelopes will be used to compute detection similarities.'];
 
+ctHelpStrings.normalizeTF = ['If TRUE, each spectrum and waveform is normalized on [0,1] scale.'];
+
 ctHelpStrings.maxCWiterations = 'Maximum number of clustering iterations allowed per bin.';
 
 ctHelpStrings.mergeTF = ['If TRUE when a graph is large, we will attempt to reduce ',...

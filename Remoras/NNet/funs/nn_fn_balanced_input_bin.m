@@ -189,9 +189,9 @@ end
 fprintf('Minimum available unique training set size is %0.0f\n', min(trainSetSize))
 fprintf('Maximum available unique training set size is %0.0f\n', max(trainSetSize))
 
-trainDataAll = [vertcat(trainSetMSP{:}),vertcat(trainSetICI{:}),vertcat(trainSetWave{:})];
+trainDataAll = max([vertcat(trainSetMSP{:}),vertcat(trainSetICI{:}),vertcat(trainSetWave{:})],0);
 testDataAll = max([vertcat(testSetMSP{:}),vertcat(testSetICI{:}),vertcat(testSetWave{:})],0);
-validDataAll= [vertcat(validSetMSP{:}),vertcat(validSetICI{:}),vertcat(validSetWave{:})];
+validDataAll= max([vertcat(validSetMSP{:}),vertcat(validSetICI{:}),vertcat(validSetWave{:})],0);
 
 trainLabelsAll = vertcat(trainSetLabels{:});
 testLabelsAll = vertcat(testSetLabels{:});

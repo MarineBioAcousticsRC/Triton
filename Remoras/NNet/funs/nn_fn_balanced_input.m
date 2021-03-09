@@ -5,7 +5,7 @@ function [savedTrainFullfile,savedTestFullfile] = nn_fn_balanced_input(inDir,sav
 global REMORA 
 
 saveNameTrain = [saveName ,'_det_train.mat'];
-saveNameValid = [saveName ,'_det_valid.mat'];
+saveNameValid = [saveName ,'_det_validation.mat'];
 saveNameTest = [saveName ,'_det_test.mat'];
 if ~exist(saveDir,'dir')
     mkdir(saveDir)
@@ -79,6 +79,10 @@ for iT = 1:nTypes
     boutsLeft = setdiff(1:nBoutsTotal,trainBoutIdx);
     boutsLeft = boutsLeft(randperm(length(boutsLeft)));% shuffle it
     validBoutIdx = boutsLeft(1:max(1,floor(nBoutsTotal*(validPercent/100))));
+    if nBoutsTotal<=3
+        disp('Too few bouts of this type to include in validation set')
+        validBoutIdx = [];
+    end
     [~,testBoutIdx] = setdiff(boutsLeft,validBoutIdx);
     
     fprintf('   %0.0f train encounters selected\n',length(trainBoutIdx))

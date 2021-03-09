@@ -8,7 +8,7 @@ endBoutIdx = [];
 endBoutTime = [];
 binMembers = [];
 diffTimes = diff(eventTimes); % calculate time between detections in seconds
-boutIdx = find(round(diffTimes)>minGapTimeDnum);  % find start of gaps
+boutIdx = find((diffTimes)>minGapTimeDnum);  % find start of gaps
 
 if isempty(eventTimes)
     warning('No events found in this file');

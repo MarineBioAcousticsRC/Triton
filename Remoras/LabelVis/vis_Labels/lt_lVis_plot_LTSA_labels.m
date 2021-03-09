@@ -44,6 +44,28 @@ for labidx = 1:length(labels);
             REMORA.lt.lVis_det.(detfld).starts, ...
             REMORA.lt.lVis_det.(detfld).stops);
         
+        %see if any detections that are long exist
+        longDet = find(REMORA.lt.lVis_det.(detfld).starts<= ltsaS & ...
+            REMORA.lt.lVis_det.(detfld).stops>=ltsaE);
+        
+        if ~isempty(longDet)
+            global HANDLES
+            
+            %find which raw file each detection in winDet is in
+            inWindowD = [ltsaS,ltsaE];
+            detXstart = lt_lVis_get_LTSA_Offset(inWindowD,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(inWindowD,'stops',ltsaS);
+            
+            
+            hold(HANDLES.subplt.ltsa, 'on')
+            
+            plot(HANDLES.subplt.ltsa, [detXstart detXend],[yPos yPos],'-','LineWidth',2,'Marker','*',...
+                'MarkerSize',5,'Color',colors(labidx,:))
+            text(HANDLES.subplt.ltsa, detXstart,labelPos,labl,'Color',colors(labidx,:),'FontWeight','normal')
+            
+            hold(HANDLES.subplt.ltsa, 'off');
+        end
+        
         if ~ isempty(Lo)
             %%% shorten detections to bout-level
             boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
@@ -52,6 +74,7 @@ for labidx = 1:length(labels);
                 REMORA.lt.lVis_det.(detfld).starts(Lo:Hi), ...
                 REMORA.lt.lVis_det.(detfld).stops(Lo:Hi), ...
                 boutGap);
+            
             %get final detection end and pass it into plotting for dotted
             %line
             finalDet = REMORA.lt.lVis_det.(detfld).stops(end);
@@ -89,6 +112,7 @@ winLength = HANDLES.subplt.ltsa.XLim(2);
 startWin = find(startL >= ltsaS & startL <= ltsaE);
 endWin = find(stopL >= ltsaS & stopL <= ltsaE);
 fullDet = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
+% stretchDet = find(lablFull(:,1)<= ltsaS & lablFull(:,2)>=ltsaE);
 
 startOnly = setdiff(startWin,endWin);
 endOnly = setdiff(endWin,startWin);
@@ -253,7 +277,7 @@ if ~isempty(winDetsStops)
             %if no longGaps, just plot on first detection
             longGap = 1:length(1);
         end
-        if detDur < LineThresh
+        if abs(detDur) < LineThresh
             %just plot the start of a given detection
             plot(detXstart(iPlot), yPos,'*','Color',color)
             text(HANDLES.subplt.ltsa, detXstart(longGap),posRep,...
