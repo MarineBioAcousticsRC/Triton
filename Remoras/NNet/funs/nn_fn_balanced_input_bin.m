@@ -112,8 +112,14 @@ for iD = 1:size(typeList,1)
     trainSetLabels{iD} = ones(size(binIndicesTrain,2),1)*iD;
     
     %% get validation set
-    if REMORA.nn.train_test_set.validationTF
-        validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent/100)))))';
+    if REMORA.nn.train_test_set.validationTF 
+        if (nBouts-length(trainBoutIdx))<2
+            validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent/100)))))';        
+        else
+            boutsLeft = setdiff(1:nBouts,trainBoutIdx);
+            boutsLeft = boutsLeft(randperm(length(boutsLeft)));% shuffle it
+            validBoutIdx = boutsLeft(1:max(1,floor(nBouts*(validPercent/100))))';
+        end
         fprintf('   %0.0f validation encounters selected\n',length(validBoutIdx))
         
         % pull out validation data
@@ -123,7 +129,8 @@ for iD = 1:size(typeList,1)
         
         % randomly select desired number of events across bouts
         nBinsValid  = sum(boutSizeValid);
-        binIndicesValid = sort(randi(nBinsValid,1,nExamples));
+        nValidExamples = nExamples*(round(100*(validPercent/trainPercent))/100);
+        binIndicesValid = sort(randi(nBinsValid,1,nValidExamples));
         
         % binIndicesValid  = sort(randperm(nBinsValid,min(nExamples,nBinsValid )));
         clusterIdxValidSet = vertcat(boutMembership{validBoutIdx});
@@ -163,7 +170,9 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTest = sum(boutSizeTest);
-    binIndicesTest = sort(randi(nBinsTest,1,nExamples));
+    nTestExamples = nExamples*round(100*(100-validPercent-trainPercent)/trainPercent)/100;
+
+    binIndicesTest = sort(randi(nBinsTest,1,nTestExamples));
     %binIndicesTest = sort(randperm(nBinsTest,min(nExamples,nBinsTest)));
     clusterIdxTestSet = vertcat(boutMembership{testBoutIdx});
     testSetMSP{iD} = clusterSpectra(clusterIdxTestSet(binIndicesTest),:);

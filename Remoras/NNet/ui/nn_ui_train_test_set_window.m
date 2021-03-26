@@ -82,6 +82,9 @@ REMORA.fig.nn.nn_train_test_set.dataTypeTxt = uicontrol(REMORA.fig.nn.nn_train_t
 %% Bin Level Text
 labelStr = 'Bin Level';
 btnPos=[.3 .8 .25 .1];
+if ~isfield(REMORA.nn.train_test_set,'binTF') 
+    nn_ui_init_train_test_set
+end
 REMORA.fig.nn.nn_train_test_set.binCheckTxt = uicontrol(REMORA.fig.nn.nn_train_test_set.figH,...
     'Style','checkbox',...
     'Units','normalized',...
@@ -99,6 +102,9 @@ REMORA.fig.nn.nn_train_test_set.binCheckTxt = uicontrol(REMORA.fig.nn.nn_train_t
 %% Click Level Text
 labelStr = 'Detection Level';
 btnPos=[.6 .8 .25 .1];
+if ~isfield(REMORA.nn.train_test_set,'clickTF') 
+    REMORA.nn.train_test_set.clickTF = 0;
+end
 REMORA.fig.nn.nn_train_test_set.clickCheckTxt = uicontrol(REMORA.fig.nn.nn_train_test_set.figH,...
     'Style','checkbox',...
     'Units','normalized',...

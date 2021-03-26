@@ -49,8 +49,8 @@ REMORA.nn.train_net.labelWeights = uLabelWeights;
 
 [myNetwork, trainPrefs] = nn_build_network
 fprintf('\n\n\n')
-
 trainDataAll(isnan(trainDataAll))=0;
+
 
 %trainDataAll(:,182:381)=abs(trainDataAll(:,182:381)-.5)*2;
 train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
@@ -58,6 +58,8 @@ train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(
 %    size(trainDataAll,1)]);
 %net = trainNetwork(train4D,categorical(trainLabelsAll),myNetwork,trainPrefs);
 net = trainNetwork(train4D,myNetwork,trainPrefs);
+
+
 fprintf('\n\n Confusion matrix:\n')
 
 % May need a solution for older matlabs and no toolbox. In that case, keras
@@ -91,7 +93,7 @@ elseif contains(filenameStem,'_det_train')
     REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores_det.mat']);
 end
 netTrainingInfo =  REMORA.nn.train_net.trainFile;
-save(REMORA.nn.train_net.networkFilename,'net','netTrainingInfo','trainTestSetInfo','typeNames')
+save(REMORA.nn.train_net.networkFilename,'net','netTrainingInfo','trainTestSetInfo','typeNames','trainPrefs')
 save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',...
     'scoresEval','testLabelsAll','netTrainingInfo','trainTestSetInfo','typeNames')
 

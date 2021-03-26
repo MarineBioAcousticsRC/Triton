@@ -1,11 +1,17 @@
-labelList = dir('H:\SoCal_800_ClustBins_95\BinLabels\*_labels.mat');
-IDDir = 'H:\SoCal_800_ClustBins_95\BinLabels\manualZID_socal_E_65';
-IDList = dir('H:\SoCal_800_ClustBins_95\BinLabels\manualZID_socal_E_65\*ID1.mat');
+% labelList = dir('H:\SoCal_800_ClustBins_95\BinLabels\*_labels.mat');
+labelList = dir('F:\Data\Papers\AI_classification\Set used for manuscript\After_rounding_fix_bin2\Labels\*_labels.mat');
+
+IDDir = 'G:\SoCal_800_ClustBins_95\BinLabels\manualZID_socal_E_65';
+IDList = dir('G:\SoCal_800_ClustBins_95\BinLabels\manualZID_socal_E_65\*ID1.mat');
+saveDir = 'F:\Data\Papers\AI_classification\Set used for manuscript\After_rounding_fix_bin2\Labels\';
 
 typesInBin = {};
 autoLabelVec = {};
+autoLabelVecSingles = {};
 manualLabelVec = {};
+manualLabelVecSingles = {};
 autoScoreVec = [];
+autoScoreVecSingles = [];
 totalBins= 0;
 for iFile = 1:length(labelList)
     IDFile = fullfile(IDDir,strrep(labelList(iFile).name,'clusters_PR95_PPmin120_labels.mat','ID1.mat'));
@@ -20,7 +26,7 @@ for iFile = 1:length(labelList)
     
     typeNames{8} = 'MFA';
     typeNames{9} = 'other';
-    typeNames{10} = 'other';
+    typeNames{10} = 'other1';
     for iTime = 1:size(timeEdges,1)
         inBin = (zID(:,1)>=timeEdges(iTime,1)& zID(:,1)<timeEdges(iTime,2));
         typesInBin = unique(zID(inBin,2));
@@ -44,17 +50,26 @@ for iFile = 1:length(labelList)
         
         if size(autoType,1) == 1 && size(manualType,1) ==1
             autoLabelVec = [autoLabelVec;autoType];
+            autoLabelVecSingles = [autoLabelVecSingles;autoType];
             manualLabelVec = [manualLabelVec;manualType];
+            manualLabelVecSingles = [manualLabelVecSingles;manualType];
             autoScoreVec = [autoScoreVec; autoLabels.binData(iTime).predLabelScore(1)];
-            
+            autoScoreVecSingles = [autoScoreVecSingles; autoLabels.binData(iTime).predLabelScore(1)];
         elseif (size(autoType,1) == 1 && size(manualType,1) ==0)
             autoLabelVec = [autoLabelVec;autoType];
+            autoLabelVecSingles = [autoLabelVecSingles;autoType];
             manualLabelVec = [manualLabelVec;'None'];
+            manualLabelVecSingles = [manualLabelVecSingles;'None'];
             autoScoreVec = [autoScoreVec; autoLabels.binData(iTime).predLabelScore(1)];
+            autoScoreVecSingles = [autoScoreVecSingles; autoLabels.binData(iTime).predLabelScore(1)];
+
         elseif size(autoType,1) == 0 && size(manualType,1) ==1
             autoLabelVec = [autoLabelVec;'None'];
+            autoLabelVecSingles = [autoLabelVecSingles;'None'];
             manualLabelVec = [manualLabelVec;manualType];
+            manualLabelVecSingles = [manualLabelVecSingles;manualType];
             autoScoreVec = [autoScoreVec; NaN];
+            autoScoreVecSingles = [autoScoreVecSingles; NaN];
         else
             %Tally up intersections and diffs
             [C,iA,~] = intersect(autoType,manualType);
@@ -109,5 +124,47 @@ end
 xlabel('Proportion of Data Classified')
 ylabel('Classification Accuracy')
 grid on
-saveName = 'H:\SoCal_800_ClustBins_95\BinLabels\binAccuracy.mat';
-save(saveName,'autoLabelVec','manualLabelVec','autoScoreVec','totalBins','labelList','IDDir');
+saveas(gca,fullfile(saveDir,'BinAccuracy.fig'))
+saveas(gca,fullfile(saveDir,'BinAccuracy.png'))
+saveName = fullfile(saveDir,'binAccuracy.mat');
+save(saveName,'autoLabelVec','manualLabelVec','autoScoreVec',...
+    'autoLabelVecSingles','manualLabelVecSingles','autoScoreVecSingles',...
+    'totalBins','labelList','IDDir');
+    
+noLabel = ~strcmp(manualLabelVec,'None')&~strcmp(autoLabelVec,'None');
+plotconfusion(categorical(manualLabelVec(noLabel)),categorical(autoLabelVec(noLabel)))
+saveas(gca,fullfile(saveDir,'BinConfusion.fig'))
+saveas(gca,fullfile(saveDir,'BinConfusion.png'))
+
+percClassifiedbyBinSingles = [];
+percClassifiedbyRowSingles = [];
+accuracyWholeSingles = [];
+accuracyCutoffs = [0,50,75,85,90,95,98,99]./100;
+for iA = 1:length(accuracyCutoffs)
+    percClassifiedbyBinSingles(iA) = sum(autoScoreVecSingles>accuracyCutoffs(iA))/totalBins;
+    percClassifiedbyRowSingles(iA) = sum(autoScoreVecSingles>accuracyCutoffs(iA))/size(autoScoreVecSingles,1);
+    nCorrect = sum(strcmp(autoLabelVecSingles(autoScoreVecSingles>accuracyCutoffs(iA)),manualLabelVecSingles(autoScoreVecSingles>accuracyCutoffs(iA))));
+    accuracyWholeSingles(iA) = nCorrect/sum(autoScoreVecSingles>accuracyCutoffs(iA));
+end
+
+figure
+clf;plot(percClassifiedbyBinSingles,accuracyWholeSingles,'ok')
+xlim([floor(min(percClassifiedbyBinSingles)*100)/100,1]);
+ylim([floor(min(accuracyWholeSingles)*100)/100,1]);
+hold on
+myY = get(gca,'ylim');
+yLimExtent = myY(2)-myY(1);
+for iA = 1:length(accuracyCutoffs)
+    text((percClassifiedbyBinSingles(iA)+yLimExtent*(.01)),accuracyWholeSingles(iA),num2str(accuracyCutoffs(iA)),...
+        'HorizontalAlignment','Left','VerticalAlignment','bottom')
+end
+xlabel('Proportion of Data Classified')
+ylabel('Classification Accuracy')
+grid on
+saveas(gca,fullfile(saveDir,'BinAccuracySingleLabels.fig'))
+saveas(gca,fullfile(saveDir,'BinAccuracySingleLabels.png'))
+noLabelSingles = ~strcmp(manualLabelVecSingles,'None')&~strcmp(autoLabelVecSingles,'None');
+plotconfusion(categorical(manualLabelVecSingles(noLabelSingles)),categorical(autoLabelVecSingles(noLabelSingles)))
+saveas(gca,fullfile(saveDir,'BinConfusionSingleLabels.fig'))
+saveas(gca,fullfile(saveDir,'BinConfusionSingleLabels.png'))
+

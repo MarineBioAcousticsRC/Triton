@@ -5,13 +5,28 @@ nClassifiedMat125 = [];
 totalClicks = [];
 totalClicks125 = [];
 zIDComparison = [];
-IDFileList = dir('H:\SoCal_800_ClustBins_95\DetLabels\SOCAL_E_65*ID1.mat');
+%IDFileList = dir('G:\SoCal_800_ClustBins_95\DetLabels\SOCAL_E_65*ID1.mat');
+IDFileList = dir('F:\Data\Papers\AI_classification\Set used for manuscript\After_rounding_fix_det2\Train_withNormalization_v3\Labels\SOCAL_E_65*ID1.mat');
 daysSet = [];
+procFileList = {};
 for iFile = 1:length(IDFileList)
+    
     autoZID = load(fullfile(IDFileList(iFile).folder,IDFileList(iFile).name));
     autoMPP = load(fullfile('K:\SoCal_800_TPWS_done\',strrep(IDFileList(iFile).name,'ID1.mat','TPWS1.mat')),'MPP','MTT');
     daysSet = [daysSet;unique(round(autoMPP.MTT))];
-    manualZID = load(fullfile('H:\SoCal_800_ClustBins_95\BinLabels\manualZID_socal_E_65\',IDFileList(iFile).name));
+    thisGroundtruth = fullfile('G:\SoCal_800_ClustBins_95\BinLabels\manualZID_socal_E_65\',IDFileList(iFile).name);
+    if ~isfile(thisGroundtruth)
+        fprintf('No groundtruth file matching %s\n',IDFileList(iFile).name)
+        continue
+    else
+        fprintf('Processing file %s\n',IDFileList(iFile).name)
+        procFileList = [procFileList;IDFileList(iFile).name];
+    end
+    
+    manualZID = load(thisGroundtruth);
+    if ~isfield(manualZID,'typeNames')
+        manualZID.typeNames = oldTypeNames;
+    end
     totalClicks(iFile,1) = length(autoMPP.MTT);
     totalClicks125(iFile,1) = length(autoMPP.MTT(autoMPP.MPP>=125));
 
@@ -31,7 +46,7 @@ for iFile = 1:length(IDFileList)
         [C,ia,ib] = intersect(autoZID.zID(autoSet,1),manualZID.zID(:,1));
         nCorrectTF = strcmp(autoZID.typeNames(autoZID.zID(autoSet(ia),2)),manualZID.typeNames(manualZID.zID(ib,2)));
         nClassified(iA) = length(autoSet);
-        nCorrect(iA) = length(nCorrectTF);
+        nCorrect(iA) = sum(nCorrectTF);
         %     percClassifiedbyBin(iA) = sum(autoScoreVec>accuracyCutoffs(iA))/totalBins;
         %     percClassifiedbyRow(iA) = sum(autoScoreVec>accuracyCutoffs(iA))/size(autoScoreVec,1);
         %     nCorrect = sum(strcmp(autoLabelVec(autoScoreVec>accuracyCutoffs(iA)),manualLabelVec(autoScoreVec>accuracyCutoffs(iA))));
@@ -39,7 +54,8 @@ for iFile = 1:length(IDFileList)
     end
     nCorrectMat = [nCorrectMat;nCorrect];
     nClassifiedMat = [nClassifiedMat;nClassified];
-    
+    [C,ia,ib] = intersect(autoZID.zID(:,1),manualZID.zID(:,1));
+
     zIDComparison = [zIDComparison;[autoZID.typeNames(autoZID.zID(ia,2)),manualZID.typeNames(manualZID.zID(ib,2))]];
     
     
@@ -65,12 +81,14 @@ for iFile = 1:length(IDFileList)
     end
     nCorrectMat125 = [nCorrectMat125;nCorrect125];
     nClassifiedMat125 = [nClassifiedMat125;nClassified125];
+    oldTypeNames = manualZID.typeNames;
 
 end
 
-% figure;
+figure(20)
 % plot(accuracyCutoffs,sum(nCorrectMat,1)./sum(nClassifiedMat,1))
-% 
+plotconfusion(categorical(zIDComparison(:,2)),categorical(zIDComparison(:,1)))
+
 percClassified = sum(nClassifiedMat,1)./sum(totalClicks,1);
 percAccuracy = sum(nCorrectMat,1)./sum(nClassifiedMat,1);
 
@@ -81,7 +99,7 @@ figure(19);
 
 clf;plot(percClassified(2:end-1),percAccuracy(2:end-1),'ok')
 hold on
-%plot(percClassified125,percAccuracy125,'xk')
+% plot(percClassified125,percAccuracy125,'xk')
 xlim([floor(min(percClassified)*100)/100,1]);
 ylim([floor(min(percAccuracy)*100)/100,1]);
 hold on

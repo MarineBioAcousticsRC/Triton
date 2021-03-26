@@ -165,12 +165,33 @@ if s.singleClusterOnly
 else
     useBins = (nSpecMat >= s.minClicks);
 end
+
+if isfield(s,'clusteredOnly')&& s.clusteredOnly
+    useBins = logical(min(useBins,clusteredTFmat));
+end
+ 
 if ~isfield(s,'useEnvShapeTF')
     s.useEnvShapeTF = 0;
 end
 [~,s.stIdx] = min(abs(f-s.startFreq));
 [~,s.edIdx] = min(abs(f-s.endFreq));
-[specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF);
+
+if ~isfield(s,'normalizeSpectra') 
+    s.normalizeSpectra = 1;
+end
+
+if s.useEnvShape
+    noZeros = max(envShape,[],2)>0;
+    useBins = logical(min(useBins,noZeros));
+end
+% s.rmMFA = 1;
+% if s.rmMFA
+%     [~,maxLoc] = max(mean(envShape));
+%     badBins = (envShape(:,maxLoc-2)<.20&envShape(:,maxLoc+2)<.2);
+%     useBins = logical(min(useBins,~badBins));
+% 
+% end
+[specNorm,diffNormSpec] = ct_spec_norm_diff(sumSpecMat(useBins,:),s.stIdx,s.edIdx, s.linearTF,s);
 
 [~,s.maxICIidx] = min(abs(p.barInt-s.maxICI));
 [~,s.minICIidx] = min(abs(p.barInt-s.minICI));
@@ -227,6 +248,30 @@ if  tritonMode && isfield(REMORA.ct.CC,'rm_clusters')...
     specNorm = specNorm(removeSetIndex,:);
     diffNormSpec = diffNormSpec(removeSetIndex,:);
     envShape = envShape(removeSetIndex,:);
+end
+mergeSimilarNodes = 0;
+if mergeSimilarNodes
+    rmNode = zeros(size(specNorm,1),1);
+    [specDist,~,~] = ct_spectra_dist(specNorm);
+    sqSpecDist = squareform(specDist);
+    mergeNodeID = (1:size(specNorm,1))';
+    for iNode = 1:length(mergeNodeID)
+        % find the next signal that looks like this one
+        newNum = find(sqSpecDist(iNode,iNode:end)>.99,1,'first');
+        if ~isempty(newNum)
+            rmNode(iNode) = 1;
+        end
+    end
+    rmSet = ~logical(rmNode);
+    cRateMat = cRateMat(rmSet,:);
+    clickTimes = clickTimes(rmSet);
+    tIntMat = tIntMat(rmSet);
+    subOrder = subOrder(rmSet);
+    fileNumExpand = fileNumExpand(rmSet);
+    dTTmatNorm = dTTmatNorm(rmSet,:);
+    specNorm = specNorm(rmSet,:);
+    diffNormSpec = diffNormSpec(rmSet,:);
+    envShape = envShape(rmSet,:);
 end
 for iEA = 1:s.N
     % Select random subset if needed
