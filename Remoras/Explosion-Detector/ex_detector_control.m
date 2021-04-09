@@ -76,12 +76,14 @@ elseif strcmp(action,'setDurShort')
 % Running detector:
 
 elseif strcmp(action,'runExplosionDetector')
+    close(REMORA.fig.ex.detector)
     d = ex_status_dialog('Explosion detector in progress.\n   Details in MatLab console.');
     if strcmp(REMORA.ex.detect_params.datatype, 'HARP')
     ex_xcorr_explosion_p2_v4(REMORA.ex.detect_params);
     elseif strcmp(REMORA.ex.detect_params.datatype, 'Sound Trap')
         ex_xcorr_explosion_p2_v4_ST(REMORA.ex.detect_params);
     end
+    close(d)
     
     
 % Loading settings:

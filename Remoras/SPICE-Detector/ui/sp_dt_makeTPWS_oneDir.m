@@ -1,4 +1,4 @@
-function sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName,maxRows,tsWin)
+function sp_dt_makeTPWS_oneDir(inDir,letterCode,ppThresh,outDir,outName,spName,maxRows,tsWin)
 
 letterFlag = 0; % flag for knowing if a letter should be appended to disk name
 % inDir = fullfile(baseDir,dirSet(itr0).name);
@@ -114,11 +114,11 @@ for itr2 = 1:lfs
         
         
         if itr2 == lfs && letterFlag == 0
-            ttppOutName =  [fullfile(outDir,outName),'_Delphin_TPWS1','.mat'];
+            ttppOutName =  [fullfile(outDir,outName),'_',spName,'_TPWS1','.mat'];
             subTP = 1;
         else
             
-            ttppOutName = [fullfile(outDir,outName),char(letterCode(subTP)),'_Delphin_TPWS1','.mat'];
+            ttppOutName = [fullfile(outDir,outName),char(letterCode(subTP)),'_',spName,'_TPWS1','.mat'];
             subTP = subTP+1;
             letterFlag = 1;
         end
