@@ -79,6 +79,11 @@ for iFile = 1:nFiles
         iciSet = vertcat(binData.dTT);
         iciSet(tooFew,:) = [];
         iciSet = iciSet./max(iciSet,[],2);
+        icioldsize = size(iciSet,2);
+        if icioldsize ~= 51
+            iciSet = iciSet(:,1:51);
+            disp(['WARNING: truncating ICI set to 51 points from ',num2str(icioldsize)])
+        end
     end
         
     if trainedNet.trainTestSetInfo.useWave

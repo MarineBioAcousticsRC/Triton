@@ -2,6 +2,7 @@ function nn_fn_exportzID
 
 global REMORA
 
+IDfilepref = '5000_spwvici_augNoise';
 % find list of files to be read
 dirList = dir(fullfile(REMORA.nn.exportzID.inDir,[REMORA.nn.exportzID.wildcard,'*.mat']));
 nFiles = length(dirList);
@@ -40,7 +41,7 @@ for iFile = 1:nFiles
     % output name
     [~,~,myToken] = regexp(TPWSfilename,'(TPWS.)\.mat');
     if ~isempty(myToken)
-        saveFName = [TPWSfilename(1:myToken{1}(1)-1),'ID',TPWSfilename((myToken{1}(2)):end)];
+        saveFName = [TPWSfilename(1:myToken{1}(1)-1),IDfilepref,'_ID',TPWSfilename((myToken{1}(2)):end)];
     else
         warning('Could not find TPWS<n>.mat in file name, appending ID1 instead, may cause problems for DetEdit.')
         saveFName = strrep(TPWSfilename,'.mat','_ID1.mat');
