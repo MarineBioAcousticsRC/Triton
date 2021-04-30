@@ -10,6 +10,7 @@ c2_offset = REMORA.pi.settings.c2_offset;
 diff_s = REMORA.pi.settings.diff_s;
 rmsASmin = REMORA.pi.settings.rmsASmin;
 rmsASmax = REMORA.pi.settings.rmsASmax;
+rmsBS = REMORA.pi.settings.rmsBS;
 durLong_s = REMORA.pi.settings.durLong_s;
 durShort_s = REMORA.pi.settings.durShort_s;
 
@@ -77,7 +78,7 @@ for fidx = 1:size(FileList,1)
     
     % Bandpass filter y.
     Fc1 = 100;   % First Cutoff Frequency.
-    Fc2 = 950;  % Second Cutoff Frequency.
+    Fc2 = 450;  % Second Cutoff Frequency.
     
     N = 10;     % Order.
     [B,A] = butter(N/2, [Fc1 Fc2]/(fs/2));
@@ -383,7 +384,7 @@ for fidx = 1:size(FileList,1)
 %                         
 %                         drmsAS = rmsDetSeg - rmsNAfterSeg;
 %                         dppAS = ppDetSeg - ppNAfterSeg;
-%                         drmsBS = rmsDetSeg - rmsNBeforeSeg;
+                         drmsBS = rmsDetSeg - rmsNBeforeSeg;
 %                         dppBS = ppDetSeg - ppNBeforeSeg;
                         
                         % Eliminate for signal vs. noise after signal and
@@ -391,12 +392,12 @@ for fidx = 1:size(FileList,1)
                          delRmsASmin = find(drmsAS<rmsASmin); %239,028
                          delRmsASmax = find(abs(drmsAS)>rmsASmax);
 %                         delPpAS = find(dppAS<parm.ppAS); %249,166
-%                         delRmsBS = find(drmsBS<parm.rmsBS); %214,914
+                         delRmsBS = find(drmsBS<rmsBS); %214,914
 %                         delPpBS = find(dppBS<parm.ppBS); %230,409
 %                         delDur = find(durSeg>=parm.durLong_s | durSeg<=parm.durShort_s); %230,729
 %                         delDur = find(durSeg<=durShort_s); 
 %                         delUnion = unique([delRmsAS;delPpAS;delRmsBS;delPpBS;delDur]); %276,145
-                         delUnion = unique([delRmsASmin,delRmsASmax]);
+                         delUnion = unique([delRmsASmin,delRmsASmax,delRmsBS]);
 %                         % Delete false detections.
                         expTimes(delUnion,:) = [];
                         corrVal(delUnion,:) = [];
