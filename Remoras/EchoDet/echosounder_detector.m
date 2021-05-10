@@ -9,7 +9,6 @@ TF = fopen(p.TFpath);
 [TFused,~] = fscanf(TF,'%f %f',[2,inf]);
 
 template = p.templateFilePath;
-% template = fullfile(templateFilePath,'echosounderTemplate.mat'); % Make sure that this line is correct for the input template folder!
 load(template)
 
 tempData = DATA(100:800);
@@ -57,6 +56,7 @@ for iF = 1:size(inFolders,1)
         dataSeg_final = [];
         deltPP_final = [];
         detDur_final = [];
+        ppSignal_final = [];
         spNoise_final = [];
         spData_final = [];
         ICI_final = [];
