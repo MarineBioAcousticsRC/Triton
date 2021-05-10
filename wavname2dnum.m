@@ -1,11 +1,12 @@
 function [ dnums ] = wavname2dnum( filenames )
 % Parses .wav file names and converts them to matlab datenums
 % Works on single or multiple file names
-% Supports 4 filename formats:
+% Supports 5 filename formats:
 %   1.  yymmdd-HHMMSS
 %   2.  yymmdd_HHMMSS
 %   3.  yyyymmdd_HHMMSS 
 %   4.  yymmddHHMMSS
+%   5.  yyyymmddTHHMMSS
 
 % This matches both underscores and hyphens, but don't know how to handle
 % the datenum formatting...maybe useful later?
@@ -25,7 +26,7 @@ if isempty(date_strs{1})
     end
 end
 
-if isempty(date_strs{1}) % not a PAMguard file, try avisoft filename
+if isempty(date_strs{1}) % not a PAMguard file, try avisoft or Soundtrap filename
     date_fmt = 'yymmddHHMMSS';
     date_strs = regexp(filenamesc,'\d{12}','match' );
     if ~isempty(date_strs{1})
@@ -33,7 +34,7 @@ if isempty(date_strs{1}) % not a PAMguard file, try avisoft filename
     end
 end
 
-if isempty(date_strs{1}) % not just and underscore problem, try PAMGuard filename
+if isempty(date_strs{1}) % not just an underscore problem, try PAMGuard filename
     date_fmt = 'yyyymmdd_HHMMSS'; % PAMGuard default file format 
     date_strs = regexp(filenamesc,'\d{8}[_]\d{6}','match');
     if ~isempty(date_strs{1})
@@ -46,7 +47,13 @@ if isempty(date_strs{1}) % using underscores presumably
     date_strs = regexp(filenamesc,'\d{6}[_]\d{6}','match');
 end
 
-
+if isempty(date_strs{1}) % try AMAR filename - e.g., AMAR613.20190604T182000Z.wav
+    date_fmt = 'yyyymmddTHHMMSS';
+    date_strs = regexp(filenamesc,'\d{8}[T]\d{6}','match');
+    if ~isempty(date_strs{1})
+        disp('Using AMAR filename format yyyymmddTHHMMSS');
+    end
+end
 if isempty(date_strs{1})
     disp('Unknown filename date format.  Please use one of the following:');
     disp('*yymmdd-HHMMSS*.wav');
