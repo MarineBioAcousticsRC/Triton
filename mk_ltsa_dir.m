@@ -216,7 +216,7 @@ for k = 1:PARAMS.ltsa.nxwav
                 end
 
                % write ltsa values
-               calc_ltsa(data);        
+               calc_ltsa_dir(data);        
            end
         end
     end

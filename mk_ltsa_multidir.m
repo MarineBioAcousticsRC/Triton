@@ -46,7 +46,7 @@ else
     outdirs = indirs;
 
     % LTSA parameters
-    ltsa_params(indirs);
+    ltsa_params(indirs); % set taves and dfreqs
     taves = PARAMS.ltsa.taves;
     dfreqs = PARAMS.ltsa.dfreqs;
     
