@@ -218,8 +218,8 @@ for k = 1:PARAMS.ltsa.nxwav
                % write ltsa values
                calc_ltsa_dir(data);        
            end
-        end
-    end
+        end % all channels
+    end % all raw files within xwav
 %         
 %         % jump to correct place in output file to put spectral averages
 %         fseek(PARAMS.ltsa.fod,PARAMS.ltsa.byteloc(PARAMS.ltsa.rfNum),'bof');
@@ -304,7 +304,7 @@ for k = 1:PARAMS.ltsa.nxwav
     
     fclose(PARAMS.ltsa.fid);
     fprintf('Completed Processing XWAV file %d\n', k);
-    disp_msg(sprintf('Completed Processing XWAV file %d', k));
+%     disp_msg(sprintf('Completed Processing XWAV file %d', k));
 end     
 
 % close output ltsa file
