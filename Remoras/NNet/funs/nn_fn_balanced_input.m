@@ -2,7 +2,16 @@ function [savedTrainFullfile,savedTestFullfile] = nn_fn_balanced_input(inDir,sav
     trainPercent,validPercent,nExamples,boutGap)
 
 % Make a train set
-global REMORA 
+global REMORA
+normData = 1;
+myPerc = 99;
+if ~normData
+    disp('No pruning because data are not normalized.\n')
+    myPerc = 0;
+else
+    sprintf('Pruning at %0.2f\%\n',myPerc)
+end
+nExamplesPad = ceil(nExamples/(myPerc/100));
 
 saveNameTrain = [saveName ,'_det_train.mat'];
 saveNameValid = [saveName ,'_det_validation.mat'];
@@ -27,23 +36,23 @@ testTSAll = [];
 testLabelsAll = [];
 testTimesAll = [];
 testAmpAll = [];
-
+normData = 1;
 
 validSpecAll = [];
 validTSAll = [];
 validLabelsAll = [];
+validAmpAll = [];
 
 minGapTimeHour = boutGap/60;
 minGapTimeDnum = minGapTimeHour/24;    % gap time in datenum
-
 for iT = 1:nTypes
     fprintf('Beginning type %0.0f, name: %s\n',iT, subDirList(iT).name)
     folderPath = fullfile(subDirList(iT).folder,subDirList(iT).name);
     fList = dir(fullfile(folderPath,'*detLevel.mat'));
     if isempty(fList)
-         disp('No files found for this type, skipping to next.')
-         continue
-    end 
+        disp('No files found for this type, skipping to next.')
+        continue
+    end
     timesCat = []; fListIdx = []; indexCat = [];
     
     % iterate over "training set" files, and load times so we can determine
@@ -71,7 +80,7 @@ for iT = 1:nTypes
     % TODO: handle case where there is only one bout! (hint: probably
     % should be warning that there's not enough to train on).
     fprintf('   %0.0f encounters found\n',sum(nBouts))
-
+    
     
     % pick training bouts
     nBoutsTotal = sum(nBouts);
@@ -80,8 +89,9 @@ for iT = 1:nTypes
     boutsLeft = boutsLeft(randperm(length(boutsLeft)));% shuffle it
     validBoutIdx = boutsLeft(1:max(1,floor(nBoutsTotal*(validPercent/100))));
     if nBoutsTotal<=3
-        disp('Too few bouts of this type to include in validation set')
-        validBoutIdx = [];
+        disp('Too few bouts of this type to have independent validation set')
+        validBoutIdx = sort(trainBoutIdx(randperm(length(trainBoutIdx),ceil(nBoutsTotal*(validPercent/100)))));
+
     end
     [~,testBoutIdx] = setdiff(boutsLeft,validBoutIdx);
     
@@ -103,46 +113,68 @@ for iT = 1:nTypes
     
     % randomly select desired number of events across bouts
     nClicksTrain = sum(boutSizeAllTrain);
-    clickIndicesTrain = sort(randi(nClicksTrain,1,nExamples));
+    clickIndicesTrain = sort(randi(nClicksTrain,1,nExamplesPad));
     [~,edges,bin] = histcounts(clickIndicesTrain,[1;cumsum(boutSizeAllTrain)+1]);
-
+    
     [trainSetSN,trainSetSP,trainSetAmp] = nn_fn_extract_examples(folderPath,fList,...
-        nExamples,fListIdxTrain,boutStartIdxAllTrain,boutEndIdxAllTrain,clickIndicesTrain,edges,bin);
-
+        nExamplesPad,fListIdxTrain,boutStartIdxAllTrain,boutEndIdxAllTrain,clickIndicesTrain,edges,bin);
+    
     fprintf('\n')
-    trainTSAll = [trainTSAll;trainSetSN];
-    trainSpecAll = [trainSpecAll;trainSetSP];
-    %trainAmpAll = [trainAmpAll;trainSetAmp];
-                 
-    trainLabelsAll = [trainLabelsAll;repmat(iT,size(trainSetSN,1),1)];
+    
+    
+    % prune 1% noisiest examples relative to mean
+    myDistsTrain= pdist2(trainSetSP,mean(trainSetSP,1),'correlation');
+    keepersTrain = find(myDistsTrain<=prctile(myDistsTrain,myPerc));
+    if normData
+        trainSetSP = nn_fn_normalize_spectrum(trainSetSP);
+        trainSetSN = nn_fn_normalize_timeseries(trainSetSN);
+    end
+    trainTSAll = [trainTSAll;trainSetSN(keepersTrain(1:nExamples),:)];
+    trainSpecAll = [trainSpecAll;trainSetSP(keepersTrain(1:nExamples),:)];
+    trainAmpAll = [trainAmpAll;trainSetAmp(keepersTrain(1:nExamples),:)];     
+    
+    trainLabelsAll = [trainLabelsAll;repmat(iT,size(trainSetSN(keepersTrain(1:nExamples),:),1),1)];
     
     fprintf('  %0.0f Training examples gathered\n',length(trainLabelsAll))
-
+    
     %% Validation
-    boutSizeAllValid = boutSizeAllVec(validBoutIdx);
-    boutStartIdxAllValid = boutStartIdxAllVec(validBoutIdx);
-    boutEndIdxAllValid = boutEndIdxAllVec(validBoutIdx);
-    fListIdxValid = fListIdxVec(validBoutIdx);
-    
-    % randomly select desired number of events across bouts
-    nClicksValid = sum(boutSizeAllValid);
-    
-    nExamplesValid  = round(nExamples*(validPercent/100));
-    clickIndicesValid = sort(randi(nClicksValid,1,nExamplesValid));
-    [~,edges,bin] = histcounts(clickIndicesValid,[1;cumsum(boutSizeAllValid)+1]);
-
-    [validSetSN,validSetSP,validSetAmp] = nn_fn_extract_examples(folderPath,...
-        fList,nExamplesValid,fListIdxValid,boutStartIdxAllValid,boutEndIdxAllValid,clickIndicesValid,edges,bin);
-
-    fprintf('\n')
-    validTSAll = [validTSAll;validSetSN];
-    validSpecAll = [validSpecAll;validSetSP];
-    %validAmpAll = [validAmpAll;validSetAmp];
-                 
-    validLabelsAll = [validLabelsAll;repmat(iT,size(validSetSN,1),1)];
-    
-    fprintf('  %0.0f Validation examples gathered\n',length(validLabelsAll))
-    
+    if ~isempty(validBoutIdx)
+        boutSizeAllValid = boutSizeAllVec(validBoutIdx);
+        boutStartIdxAllValid = boutStartIdxAllVec(validBoutIdx);
+        boutEndIdxAllValid = boutEndIdxAllVec(validBoutIdx);
+        fListIdxValid = fListIdxVec(validBoutIdx);
+        
+        % randomly select desired number of events across bouts
+        nClicksValid = sum(boutSizeAllValid);
+        
+        nExamplesValid  = round(nExamplesPad*(validPercent/trainPercent));
+        clickIndicesValid = sort(randi(nClicksValid,1,nExamplesValid));
+        [~,edges,bin] = histcounts(clickIndicesValid,[1;cumsum(boutSizeAllValid)+1]);
+        
+        [validSetSN,validSetSP,validSetAmp] = nn_fn_extract_examples(folderPath,...
+            fList,nExamplesValid,fListIdxValid,boutStartIdxAllValid,boutEndIdxAllValid,clickIndicesValid,edges,bin);
+        
+        fprintf('\n')
+        
+        % prune 1% noisiest examples relative to mean
+        nValid = nExamples*(validPercent/trainPercent);
+        myDistsValid= pdist2(validSetSP,mean(validSetSP,1),'correlation');
+        keepersValid = find(myDistsValid<=prctile(myDistsValid,myPerc));
+        
+        if normData
+            validSetSP = nn_fn_normalize_spectrum(validSetSP);
+            validSetSN = nn_fn_normalize_timeseries(validSetSN);
+        end
+        validTSAll = [validTSAll;validSetSN(keepersValid(1:nValid),:)];
+        validSpecAll = [validSpecAll;validSetSP(keepersValid(1:nValid),:)];
+        validAmpAll = [validAmpAll;validSetAmp(keepersValid(1:nValid),:)];
+        
+        validLabelsAll = [validLabelsAll;repmat(iT,size(validSetSN(keepersValid(1:nValid),:),1),1)];
+        
+        fprintf('  %0.0f Validation examples gathered\n',length(validLabelsAll))
+    else
+        disp(sprintf('WARNING: No Validation examples for %s\n',typeNames{iT}))
+    end
     %% TEST
     boutSizeAllTest = boutSizeAllVec(testBoutIdx);
     boutStartIdxAllTest = boutStartIdxAllVec(testBoutIdx);
@@ -150,61 +182,56 @@ for iT = 1:nTypes
     fListIdxTest = fListIdxVec(testBoutIdx);
     
     nClicksTest = sum(boutSizeAllTest);
-  
-    if nClicksTest == 0 
+    
+    if nClicksTest == 0
         disp(sprintf('WARNING: No ''%s'' events available for test set',typeNames{iT}))
         continue
     end
     % randomly select desired number of events across bouts
-    nExamplesTest = round(nExamples*(1-(validPercent+trainPercent)/100));
+    testPercent = (100-validPercent-trainPercent);
+    nExamplesTest = round(nExamplesPad*(testPercent./trainPercent));
     clickIndicesTest = sort(randi(nClicksTest,1,nExamplesTest));
     [N,edges,bin] = histcounts(clickIndicesTest,[1;cumsum(boutSizeAllTest)+1]);
-
+    
     [testSetSN,testSetSP,testSetAmp] = nn_fn_extract_examples(folderPath,fList,...
         nExamplesTest,fListIdxTest,boutStartIdxAllTest,boutEndIdxAllTest,clickIndicesTest,edges,bin);
- 
-    testTSAll = [testTSAll;testSetSN];
-    testSpecAll = [testSpecAll;testSetSP];
-    %testAmpAll = [testAmpAll;testSetAmp];
-    testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN,1),1)];
     
-    fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))    
+    nTest = nExamples*(testPercent/trainPercent);
+    myDistsTest= pdist2(testSetSP,mean(testSetSP,1),'correlation');
+    keepersTest = find(myDistsTest<=prctile(myDistsTest,myPerc));
+    
+    if normData
+        testSetSP = nn_fn_normalize_spectrum(testSetSP);
+        testSetSN = nn_fn_normalize_timeseries(testSetSN);
+    end
+    testTSAll = [testTSAll;testSetSN(keepersTest(1:nTest),:)];
+    testSpecAll = [testSpecAll;testSetSP(keepersTest(1:nTest),:)];
+    testAmpAll = [testAmpAll;testSetAmp(keepersTest(1:nTest),:)];
+    
+    testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN(keepersTest(1:nTest),1)),1)];
+    
+    fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))
     fprintf('Done with type %0.0f of %0.0f\n',iT,nTypes)
+    
+end
 
-end
 trainTestSetInfo = REMORA.nn.train_test_set;
-normData = 0;
+normData = 1;
 % Save training set
-if normData
-    normSpecTrain = nn_fn_normalize_spectrum(trainSpecAll);
-    normTSTrain = nn_fn_normalize_timeseries(trainTSAll);
-	trainDataAll = [normSpecTrain,normTSTrain];%trainAmpAll
-else
-    trainDataAll = [trainSpecAll,trainTSAll];%trainAmpAll
-end
+trainDataAll = [trainSpecAll,trainTSAll];%trainAmpAll
 
 savedTrainFullfile = fullfile(saveDir,saveNameTrain);
 save(savedTrainFullfile,'trainDataAll','trainLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
 % Save validation set
-if normData
-    normSpecValid = nn_fn_normalize_spectrum(validSpecAll);
-    normTSValid = nn_fn_normalize_timeseries(validTSAll);
-    validDataAll = [normSpecValid,normTSValid];%validAmpAll
-else
-    validDataAll = [validSpecAll,validTSAll];%validAmpAll
-end
+validDataAll = [validSpecAll,validTSAll];%validAmpAll
+
 savedValidFullfile = fullfile(saveDir,saveNameValid);
 save(savedValidFullfile,'validDataAll','validLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
 % Save test set
-if normData
-    normSpecTest = nn_fn_normalize_spectrum(testSpecAll);
-    normTSTest = nn_fn_normalize_timeseries(testTSAll);
-    testDataAll = [normSpecTest,normTSTest];%testAmpAll
-else
-    testDataAll = [testSpecAll,testTSAll];
-end
+testDataAll = [testSpecAll,testTSAll];
+
 savedTestFullfile = fullfile(saveDir,saveNameTest);
 save(savedTestFullfile,'testDataAll','testLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 
