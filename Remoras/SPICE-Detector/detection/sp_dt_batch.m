@@ -9,7 +9,14 @@ fTypes = sp_io_getFileType(fullFiles);
 fOut = [];
 clickParamsOut = [];
 pTemp = p;
-for idx1 = 1:N % for each data file
+
+if isfield(p,'parpool')
+    parpool(p.parpool)
+else
+    parpool(1);
+end
+
+parfor idx1 = 1:N % for each data file
     f=[];
     
     outFileName = fullLabels{idx1};
