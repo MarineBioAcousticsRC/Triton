@@ -164,7 +164,7 @@ for k = 1:length(indirs)
 
     % make the ltsa!
     mk_ltsa_dir;
-end
+end % all directories
 
 end
 
