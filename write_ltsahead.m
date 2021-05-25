@@ -47,7 +47,7 @@ dirStartLoc = lhsz + 1;                               % directory start location
 dataStartLoc = rhsz * maxNrawfiles + lhsz;           % data start location in bytes
 
 % open output ltsa file
-fid = fopen([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile],'w');
+fid = fopen(fullfile(PARAMS.ltsa.outdir,PARAMS.ltsa.outfile),'w');
 
 % LTSA file Header - 64 bytes total
 fwrite(fid,'LTSA','char');                  % 4 bytes - file ID type
