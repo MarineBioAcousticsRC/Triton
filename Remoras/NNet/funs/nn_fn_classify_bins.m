@@ -98,6 +98,38 @@ for iFile = 1:nFiles
         waveSet(tooFew,:) = [];
     end
     
+    %correct size of specSet if 320 kHz data
+        if size(specSet,2) ~= 181
+        disp(['WARNING: specSet size= ',num2str(size(specSet,2)),' downsampling to 200'])
+        %interpolate and then downsample
+        lcb = size(specSet,2);
+        lcs = 181;
+        lc = lcm(lcb,lcs);
+        specSetMod = [];
+        
+        for iTs = 1:size(specSet,1)
+            specTemp = interp(specSet(iTs,:),(lc./lcb));
+            specSetMod(iTs,:) = downsample(specTemp,(lc/lcs))';
+        end
+        specSet = specSetMod;
+    end
+    %correct size of waveSet if it's the wrong dimensions (i.e., combining
+    %320 and 200 kHz data)
+    if size(waveSet,2) ~= 200
+        disp(['WARNING: waveSet size= ',num2str(size(waveSet,2)),' downsampling to 200'])
+        %interpolate and then downsample
+        lcb = size(waveSet,2);
+        lcs = 200;
+        lc = lcm(lcb,lcs);
+        waveSetMod = [];
+        
+        for iT = 1:size(waveSet,1)
+            waveTemp = interp(waveSet(iT,:),(lc./lcb));
+            waveSetMod(iT,:) = downsample(waveTemp,(lc/lcs))';
+        end
+        waveSet = waveSetMod;
+    end
+    
     test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
     
     % classify
