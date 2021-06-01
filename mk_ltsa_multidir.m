@@ -69,39 +69,35 @@ else
     PARAMS.ltsa.rf_skip = [];
     
     % loop through each of the sets of directories for PRE-CHECK
-%     prefixes = {1, length(indirs)};
-%     outfiles = {1, length(indirs)};
-%     dirdata = {1, length(indirs)};
-%     for k = 1:length(indirs) % could possibly skip this loop as it is done below??
-%         % if we have different parameters for each of the dirs, adjust
-%         % accordingly
-%         if length(dfreqs) > 1
-%             dfreq = dfreqs(k);
-%         else
-%             dfreq = dfreqs;
-%         end
-%         if length(taves) > 1
-%             tave = taves(k);
-%         else
-%             tave = taves;
-%         end
-%         
-%         PARAMS.ltsa.indir = char(indirs{k});
-%         PARAMS.ltsa.outdir = char(outdirs{k});
-%         PARAMS.ltsa.tave = tave;
-%         PARAMS.ltsa.dfreq = dfreq;
-%         
-%     end % loop through first to get dfreqs and taves....
-%     % then loop again to check and skip if already exists.
-%     
-    % check to see if the ltsa file already exists
-    for k = 1:length(indirs)
+    prefixes = cell(1, length(indirs));
+    outfiles = cell(1, length(indirs));
+    dirdata = cell(1, length(indirs));
+    for k = 1:length(indirs) 
+        % if we have different parameters for each of the dirs, adjust
+        % accordingly
+        if length(dfreqs) > 1
+            dfreq = dfreqs(k);
+        else
+            dfreq = dfreqs;
+        end
+        if length(taves) > 1
+            tave = taves(k);
+        else
+            tave = taves;
+        end
+        
+        PARAMS.ltsa.indir = char(indirs{k});
+        PARAMS.ltsa.outdir = char(outdirs{k});
+        PARAMS.ltsa.tave = tave;
+        PARAMS.ltsa.dfreq = dfreq;
+        
         % create the outfile and prefix
         [prefixes{k}, outfiles{k}, dirdata{k}] = gen_prefix();
         
         % make sure filenames will work
         success = ck_names(prefixes{k});
         
+        % check to see if the ltsa file already exists
         PARAMS.ltsa.indir = indirs{k};
         if exist(fullfile(PARAMS.ltsa.indir, outfiles{k}), 'file')
             choice = questdlg('LTSA file already found', 'LTSA creation', ...
@@ -111,11 +107,11 @@ else
                 ltsa_bools(k) = 1;
                 % remove parameters for this LTSA
             elseif strcmp(choice, 'Skip') % this throws error because removes and shortens lenght of indir
-                indirs(k) = nan;
-                outdirs(k) = nan;
-                prefixes(k) = nan;
-                outfiles(k) = nan;
-                dirdata(k) = nan;
+                indirs(k) = {[]};
+                outdirs(k) = {[]};
+                prefixes(k) = {[]};
+                outfiles(k) = {[]};
+                dirdata(k) = {[]};
                 taves(k) = nan;
                 dfreqs(k) = nan;
             end
@@ -124,16 +120,27 @@ else
         %         if strcmp(ans, 'Skip') || ~success
         if ~success
             disp_msg(sprintf('Skipping LTSA creation for %s\n', prefixes{k}));
-            indirs(k) = nan;
-            outdirs(k) = nan;
-            prefixes(k) = nan;
-            outfiles(k) = nan;
-            dirdata(k) = nan;
-            taves(k) = nan;
-            dfreqs(k) = [];
+                indirs(k) = {[]};
+                outdirs(k) = {[]};
+                prefixes(k) = {[]};
+                outfiles(k) = {[]};
+                dirdata(k) = {[]};
+                taves(k) = nan;
+                dfreqs(k) = nan;
         end
     end
+    
+    % remove any nans
+    indirs = indirs(~cellfun(@isempty, indirs));
+    outdirs = outdirs(~cellfun(@isempty, outdirs));
+    prefixes = prefixes(~cellfun(@isempty, prefixes));
+    outfiles = outfiles(~cellfun(@isempty, outfiles));
+    dirdata = dirdata(~cellfun(@isempty, dirdata));
+    taves = taves(~isnan(taves));
+    dfreqs = dfreqs(~isnan(dfreqs));
+    
 end
+
 
 % loop through each of the sets of directories for actual ltsa creation
 for k = 1:length(indirs)
