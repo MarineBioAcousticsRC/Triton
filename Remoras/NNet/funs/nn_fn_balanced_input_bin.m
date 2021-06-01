@@ -37,17 +37,20 @@ for iD = 1:size(typeList,1)
     thisTypeDir = fullfile(typeList(iD).folder,typeList(iD).name);
     
     [~,typeID] = fileparts(thisTypeDir);
+    
     typeNames{iD,1} = typeID;
     matList = dir(fullfile(thisTypeDir,REMORA.nn.train_test_set.binWild));
     if isempty(matList)
          disp('No files found for this type, skipping to next.')
     end 
+    matListIdx = ~contains({matList(:).name},'detLevel');
+    matList = matList(matListIdx);
     clusterSpectra = [];
     clusterICI = [];
     clusterTimes = [];
     clusterWave = [];
     for iM = 1:size(matList,1)
-        
+       
         inFile = load(fullfile(matList(iM).folder,matList(iM).name));
         for iRow = 1:size(inFile.thisType.Tfinal,1)
             clusterTimes = [clusterTimes;inFile.thisType.Tfinal{iRow,7}];
@@ -129,7 +132,7 @@ for iD = 1:size(typeList,1)
         
         % randomly select desired number of events across bouts
         nBinsValid  = sum(boutSizeValid);
-        nValidExamples = nExamples*(round(100*(validPercent/trainPercent))/100);
+        nValidExamples = round(nExamples*(round(100*(validPercent/trainPercent))/100));
         binIndicesValid = sort(randi(nBinsValid,1,nValidExamples));
         
         % binIndicesValid  = sort(randperm(nBinsValid,min(nExamples,nBinsValid )));

@@ -59,7 +59,11 @@ train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(
 %net = trainNetwork(train4D,categorical(trainLabelsAll),myNetwork,trainPrefs);
 net = trainNetwork(train4D,myNetwork,trainPrefs);
 
-
+if min(min(trainDataAll))<-1
+    normMin = -1;
+else
+    normMin = 0;
+end
 fprintf('\n\n Confusion matrix:\n')
 
 % May need a solution for older matlabs and no toolbox. In that case, keras
@@ -114,7 +118,7 @@ accuracyPercent = 100*(sum(testLabelsAll == double(YPredEval))/size(testLabelsAl
 fprintf('Overall accuracy on test dataset: %0.2f%%\n\n\n',accuracyPercent)
 
 %%% TODO: make normalization indices informed by prior steps!!!
-trainDataNorm = [nn_fn_normalize_spectrum(trainDataAll(:,1:181)),nn_fn_normalize_timeseries(trainDataAll(:,192:end))];
+% trainDataNorm = [nn_fn_normalize_spectrum(trainDataAll(:,1:181)),nn_fn_normalize_timeseries(trainDataAll(:,192:end))];
 nPlots = length(uLabels);
 nRows = 3;
 nCols = ceil(nPlots/nRows);
@@ -124,21 +128,23 @@ set(REMORA.fig.nn.training_plots{1},'name', 'Training Data')
 for iR = 1:nPlots
     subplot(nRows,nCols,iR)
     
-    imagesc(trainDataNorm(trainLabelsAll==iR,:)')
+    imagesc(trainDataAll(trainLabelsAll==iR,:)')
     set(gca,'ydir','normal')
     title(typeNames{iR})
+    set(gca,'clim',[normMin,1])
 end
 
 REMORA.fig.nn.training_plots{2} = figure;
 clf;colormap(jet)
 set(REMORA.fig.nn.training_plots{2},'name', 'Test Data')
-testDataNorm = [nn_fn_normalize_spectrum(testDataAll(:,1:181)),nn_fn_normalize_timeseries(testDataAll(:,192:end))];
+%testDataNorm = [nn_fn_normalize_spectrum(testDataAll(:,1:181)),nn_fn_normalize_timeseries(testDataAll(:,192:end))];
 
 for iR = 1:nPlots
     subplot(nRows,nCols,iR)
-    imagesc(testDataNorm(testLabelsAll==iR,:)')
+    imagesc(testDataAll(testLabelsAll==iR,:)')
     set(gca,'ydir','normal')
     title(typeNames{iR})
+    set(gca,'clim',[normMin,1])
 end
 
 REMORA.fig.nn.training_plots{3} = figure;
@@ -148,9 +154,10 @@ for iR = 1:nPlots
     subplot(nRows,nCols,iR)
     idxToPlot = find(double(YPredEval)==iR);
     [classScore,plotOrder] = sort(bestScores(idxToPlot),'descend');
-    imagesc(testDataNorm(idxToPlot(plotOrder),:)')
+    imagesc(testDataAll(idxToPlot(plotOrder),:)')
     set(gca,'ydir','normal')
     title(typeNames{iR})
+    set(gca,'clim',[normMin,1])
 end
 
 REMORA.fig.nn.training_plots{4} = figure;
@@ -163,9 +170,11 @@ for iR = 1:nPlots
     [classScore,plotOrder] = sort(bestScores(misclassIdx),'descend');
 
     subplot(nRows,nCols,iR)
-    imagesc(testDataNorm(misclassIdx(plotOrder),:)')
+    imagesc(testDataAll(misclassIdx(plotOrder),:)')
     set(gca,'ydir','normal')
-    title(typeNames{iR})
+    title(typeNames{iR})   
+    set(gca,'clim',[normMin,1])
+
 end
 
 diary off
