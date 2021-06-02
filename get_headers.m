@@ -54,7 +54,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         PARAMS.ltsahd.rfileid(m) = 1;                           % raw file id / number in this xwav file
         
         % timing stuff:
-        dnums = wavname2dnum(PARAMS.ltsa.fname(k,:),0);
+        dnums = wavname2dnum(PARAMS.ltsa.fname(k,:),0); % 0 toggles disp msg off
         if isempty(dnums)
             PARAMS.ltsahd.dnumStart(m) = datenum([0 1 1 0 0 0]);
         else

@@ -17,6 +17,15 @@ elseif PARAMS.ltsa.ftype == 2
     d = dir(fullfile(PARAMS.ltsa.indir,'*.x.wav'));    % xwav files
 end
 
+% clean up PARAMS.ltshd for this directory
+if isfield(PARAMS,'ltsahd')
+PARAMS = rmfield(PARAMS,'ltsahd');
+end
+% also clean up some items in PARAMS.ltsa
+PARAMS.ltsa.nch = [];
+PARAMS.ltsa.nave = [];
+PARAMS.ltsa.byteloc = [];
+
 PARAMS.ltsa.fname = char(d.name);      % file names in directory
 
 % % read data file headers
