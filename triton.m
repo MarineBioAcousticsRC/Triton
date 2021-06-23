@@ -31,7 +31,7 @@ warning off % this is turned off for plotting messages
 global PARAMS
 
 % PARAMS.ver = '1.93.20160524';
-PARAMS.ver = '1.0 2020 08 21 SF';
+PARAMS.ver = '1.01 2021 06 23 SF';
 disp(' ')
 disp(['         Triton version ',PARAMS.ver])
 

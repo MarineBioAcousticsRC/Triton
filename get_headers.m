@@ -15,7 +15,7 @@ PARAMS.ltsa.nxwav = fnsz(1);           % number of xwav files
 PARAMS.ltsahd.fname = char(zeros(PARAMS.ltsa.nxwav,80));         % make empty matrix - filenames need to be 80 char or less
 for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
     
-    if PARAMS.ltsa.ftype == 1       % do the following for wav files
+    if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3     % do the following for wav or flac files
         m = m + 1;
         % check wav file goodness
 %         mm = [];
@@ -37,7 +37,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
             info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
         catch ME
             disp(ME.message)
-            dmsg = sprintf('Is %s a real wave file?', ...
+            dmsg = sprintf('Is %s a real wave or flac file?', ...
                 fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
             disp(dmsg);
             PARAMS.ltsa.gen = 0; % need to cancel
