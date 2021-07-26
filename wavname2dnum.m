@@ -1,4 +1,4 @@
-function [ dnums ] = wavname2dnum( filenames )
+function [dnums] = wavname2dnum(filenames, dispOn)
 % Parses .wav file names and converts them to matlab datenums
 % Works on single or multiple file names
 % Supports 5 filename formats:
@@ -11,6 +11,10 @@ function [ dnums ] = wavname2dnum( filenames )
 % This matches both underscores and hyphens, but don't know how to handle
 % the datenum formatting...maybe useful later?
 % regexp(fname,'\d{4}[-_]\d{4}','match','split')
+
+if nargin < 2
+    dispOn = 1; % added to limit printing of dnum format during LTSA creation
+end
 
 % start with the default date format
 
@@ -55,6 +59,7 @@ if isempty(date_strs{1}) % try AMAR filename - e.g., AMAR613.20190604T182000Z.wa
         disp('Using AMAR filename format yyyymmddTHHMMSS');
     end
 end
+
 if isempty(date_strs{1})
     disp('Unknown filename date format.  Please use one of the following:');
     disp('*yymmdd-HHMMSS*.wav');
