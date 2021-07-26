@@ -13,7 +13,7 @@ function [dnums] = wavname2dnum(filenames, dispOn)
 % regexp(fname,'\d{4}[-_]\d{4}','match','split')
 
 if nargin <2
-    dispOn = 1;
+    dispOn = 1; % added to limit printing of dnum format during LTSA creation
 end
 
 % start with the default date format
