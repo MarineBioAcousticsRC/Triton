@@ -58,6 +58,7 @@ if isempty(date_strs{1}) % try AMAR filename - e.g., AMAR613.20190604T182000Z.wa
         disp('Using AMAR filename format yyyymmddTHHMMSS');
     end
 end
+
 if isempty(date_strs{1})
     disp('Unknown filename date format.  Please use one of the following:');
     disp('*yymmdd-HHMMSS*.wav');
