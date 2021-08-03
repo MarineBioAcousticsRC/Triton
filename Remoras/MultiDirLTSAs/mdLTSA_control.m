@@ -14,6 +14,28 @@ elseif strcmp(action,'setInDir')
     inDir = get(REMORA.mdLTSA_verify.inDirEdTxt, 'string');
     REMORA.mdLTSA.settings.inDir = inDir;
     
+elseif strcmp(action, 'browseInDir')
+    dir = uigetdir();
+    if ~ isnumeric(dir)
+        % user selected something
+        REMORA.mdLTSA.settings.inDir = dir;
+    end
+    
+    
+    % 
+% %%
+% % --- Executes on button press in browse.
+% function browse_Callback(hObject, eventdata, handles)
+% % hObject    handle to browse (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% dir = uigetdir();
+% if ~ isnumeric(dir)
+%     % User selected something
+%     set(handles.(mfilename).Directory, 'String', dir);
+% end
+% 
+
 % elseif strcmp(action,'setOutDir')
 %     outDir = get(REMORA.bm_verify.outDirEdTxt, 'string');
 %     REMORA.bm.settings.outDir = outDir;
