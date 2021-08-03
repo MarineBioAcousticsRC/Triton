@@ -10,10 +10,10 @@ if strcmp(action, '')
     % Note: could make this have an option to just refresh everything by making
     % these all into if rather than elseif
     
-% elseif strcmp(action,'setInDir')
-%     inDir = get(REMORA.bm_verify.inDirEdTxt, 'string');
-%     REMORA.bm.settings.inDir = inDir;
-%     
+elseif strcmp(action,'setInDir')
+    inDir = get(REMORA.mdLTSA_verify.inDirEdTxt, 'string');
+    REMORA.mdLTSA.settings.inDir = inDir;
+    
 % elseif strcmp(action,'setOutDir')
 %     outDir = get(REMORA.bm_verify.outDirEdTxt, 'string');
 %     REMORA.bm.settings.outDir = outDir;
@@ -64,9 +64,6 @@ if strcmp(action, '')
 %     SpeciesChoice = species.opt{species.val};
 %     REMORA.bm.settings.species = SpeciesChoice;
 %     
-% elseif strcmp(action,'setHARPdata')
-%     HARPdataCheckbox = get(REMORA.bm_verify.HARPdataCheckbox, 'string');
-%     REMORA.bm.settings.HARPdata = HARPdataCheckbox;
 %     
 % elseif strcmp(action,'setSoundTrapdata')
 %     SoundTrapdataCheckbox = get(REMORA.bm_verify.SoundTrapdataCheckbox, 'string');
@@ -76,6 +73,14 @@ if strcmp(action, '')
 %     csvCheckbox = get(REMORA.bm_verify.csvCheckbox, 'string');
 %     REMORA.bm.settings.saveCsv = csvCheckbox;
     
+elseif strcmp(action,'setXWAVdata')
+    XWAVdataCheckbox = get(REMORA.mdLTSA_verify.XWAVdataCheckbox, 'string');
+    REMORA.mdLTSA.settings.XWAVdata = XWAVdataCheckbox;
+
+elseif strcmp(action,'setWAVdata')
+    WAVdataCheckbox = get(REMORA.mdLTSA_verify.WAVdataCheckbox, 'string');
+    REMORA.mdLTSA.settings.WAVdata = wAVdataCheckbox;
+
 elseif strcmp(action,'RunBatchLTSA')
     close(REMORA.fig.mdLTSA.batch)
     mdLTSA_init_batch_detector;

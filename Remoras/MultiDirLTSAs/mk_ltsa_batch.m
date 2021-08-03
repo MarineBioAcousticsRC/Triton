@@ -7,24 +7,24 @@ PARAMS.ltsa.multidir = 1;
 % if we're coming from the processing code, just use the LTSA data from
 % that. if not, use user input
 % also can be used with other predefined LTSA processing information
-if isfield(REMORA, 'hrp')
-    indirs = {};
-    outdirs = {};
-    outfiles = {};
-    dfreqs = [];
-    taves = [];
-    for k = 1:size(REMORA.hrp.xwavPaths, 2)
-        if REMORA.hrp.ltsas(k)
-            % only populate if we're making an ltsa for this
-            indirs{end+1} = REMORA.hrp.xwavPaths{1,k};
-            outdirs{end+1} = REMORA.hrp.xwavPaths{1,k};
-            outfiles{end+1} = REMORA.hrp.ltsaNames(k, :);
-            dfreqs = [dfreqs, REMORA.hrp.dfreq(k)];
-            taves = [taves, REMORA.hrp.tave(k)];
-        end
-    end
-    PARAMS.ltsa.rf_skip = [];
-else
+% if isfield(REMORA, 'hrp')
+%     indirs = {};
+%     outdirs = {};
+%     outfiles = {};
+%     dfreqs = [];
+%     taves = [];
+%     for k = 1:size(REMORA.hrp.xwavPaths, 2)
+%         if REMORA.hrp.ltsas(k)
+%             % only populate if we're making an ltsa for this
+%             indirs{end+1} = REMORA.hrp.xwavPaths{1,k};
+%             outdirs{end+1} = REMORA.hrp.xwavPaths{1,k};
+%             outfiles{end+1} = REMORA.hrp.ltsaNames(k, :);
+%             dfreqs = [dfreqs, REMORA.hrp.dfreq(k)];
+%             taves = [taves, REMORA.hrp.tave(k)];
+%         end
+%     end
+%     PARAMS.ltsa.rf_skip = [];
+% else
     % manual entry - pick a directory that contains the xwav dirs where
     % LTSA creation is desired
     dir_name = uigetdir('D:\');
@@ -139,7 +139,7 @@ else
     taves = taves(~isnan(taves));
     dfreqs = dfreqs(~isnan(dfreqs));
     
-end
+% end
 
 
 % loop through each of the sets of directories for actual ltsa creation
