@@ -6,7 +6,7 @@
 global HANDLES REMORA PARAMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-REMORA.mdLTSA.menu = uimenu(HANDLES.remmenu,'Label','&Batch LTSA Creation',...
+REMORA.mdLTSA.menu = uimenu(HANDLES.remmenu,'Label','&Batch LTSAs',...
     'Enable','on','Visible','on');
 
 % Batch create LTSAs over multiple directories
