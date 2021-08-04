@@ -4,6 +4,6 @@ global REMORA
 
 %% Actually run the mk_ltsa code! 
     disp_msg('Creating LTSAs');
-    mk_ltsa_batch
+    mdLTSA_mk_ltsa_batch
     
 end

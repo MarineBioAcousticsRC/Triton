@@ -189,7 +189,7 @@ for k = 1:length(indirs)
     end
     
     % make the ltsa!
-    mk_ltsa_dir;
+    mdLTSA_mk_ltsa_dir;
     fprintf('\nFinished LTSA for directory %s\n', PARAMS.ltsa.indir) 
     % fprintf('Press any key to continue...\n')
 %     pause
