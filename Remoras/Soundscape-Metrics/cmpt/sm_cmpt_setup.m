@@ -50,22 +50,28 @@ for ridx = 1:PARAMS.ltsa.nrftot
     [~, minPos] = min(abs(REMORA.sm.cmpt.header(:,1)-PARAMS.ltsa.dnumStart(ridx)));
     % compute vector of byte locations for each average * 4 bytes for
     % 'single' precision
-    bytevec = PARAMS.ltsa.byteloc(ridx):PARAMS.ltsa.nf*4:...
-        (PARAMS.ltsa.byteloc(ridx)+PARAMS.ltsa.nf*(PARAMS.ltsa.nave(ridx)-1)*4);
-    bytevec = bytevec.'; %transpose
-    % keep or discard average; currently keep all, need to add logic for
-    % erroneous data
-    if REMORA.sm.cmpt.dw == 1 %do this for xwav files
-        keep = ones(length(bytevec),1);
-        % define how many time bins for disk write
-        tbin = REMORA.sm.cmpt.remove/PARAMS.ltsa.dfreq;
-        keep(1:tbin) = 0;
-    else %do this for wav files
-        keep = ones(length(bytevec),1);
+    if PARAMS.ltsa.nave(ridx)>0
+        bytevec = PARAMS.ltsa.byteloc(ridx):PARAMS.ltsa.nf*4:...
+            (PARAMS.ltsa.byteloc(ridx)+PARAMS.ltsa.nf*(PARAMS.ltsa.nave(ridx)-1)*4);
+        bytevec = bytevec.'; %transpose
+        % keep or discard average; currently keep all, need to add logic for
+        % erroneous data
+        if REMORA.sm.cmpt.dw == 1 %do this for xwav files
+            keep = ones(length(bytevec),1);
+            % define how many time bins for disk write
+            tbin = REMORA.sm.cmpt.remove/PARAMS.ltsa.dfreq;
+            if tbin<length(keep)
+                keep(1:tbin) = 0;
+            else
+                keep = zeros(length(bytevec),1);
+            end
+        else %do this for wav files
+            keep = ones(length(bytevec),1);
+        end
+        % fill into position of header matrices
+        REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),2) = bytevec;
+        REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),3) = keep;
     end
-    % fill into position of header matrices
-    REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),2) = bytevec;
-    REMORA.sm.cmpt.header(minPos:(minPos+length(bytevec)-1),3) = keep;
 end
 
 %check for NaN in last row; would occur if partial second and hence not computed

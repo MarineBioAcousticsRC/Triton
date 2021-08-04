@@ -27,6 +27,8 @@ function dbSubmit(varargin)
 queryH = [];
 if length(varargin) >= 2 && isnumeric(varargin{1}) && ishandle(varargin{1})
     varargin(1:2) = [];
+elseif length(varargin) >= 2 && isgraphics(varargin{1}) && ishandle(varargin{1})
+    varargin(1:2) = [];
 end
 
 %check for handler as first argument, shift varargin if so
