@@ -45,7 +45,7 @@ elseif strcmp(action, 'setDataType')
     
 elseif strcmp(action,'RunBatchLTSA')
     close(REMORA.fig.mdLTSA.batch)
-    mdLTSA_init_batch_detector;
+    mdLTSA_init_batch_ltsa;
 end
 
 
