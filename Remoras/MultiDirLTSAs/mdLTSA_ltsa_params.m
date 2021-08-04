@@ -21,7 +21,7 @@ for ci = 2:c
 end
 
 btnPos = [0,0,w,h];
-fig = figure('Name', 'Choose taves & dfreqs', 'Units', 'normalized', ...
+fig = figure('Name', 'Check taves and dfreqs', 'Units', 'normalized', ...
     'Position', btnPos, 'MenuBar', 'none', 'NumberTitle', 'off');
 movegui(gcf, 'center');
 
@@ -71,4 +71,20 @@ btnPos = [x(3), y(1), bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
     'Style', 'push', 'String', labelStr, 'Callback', {@okay, fig, fig_taves, fig_dfreqs});
 uiwait;
+end
+
+
+
+function okay(~, ~, fig, fig_taves, fig_dfreqs)
+
+global PARAMS
+
+% close figure and assign values
+PARAMS.ltsa.taves = zeros(length(fig_taves), 1);
+PARAMS.ltsa.dfreqs = zeros(length(fig_dfreqs), 1);
+for d = 1:length(fig_taves)
+    PARAMS.ltsa.taves(d) = str2num(get(fig_taves{d}, 'String'));
+    PARAMS.ltsa.dfreqs(d) = str2num(get(fig_dfreqs{d}, 'String'));
+end
+close(fig);
 end

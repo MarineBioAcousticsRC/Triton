@@ -42,7 +42,15 @@ elseif strcmp(action, 'browseInDir')
 elseif strcmp(action, 'setDataType')
     dataType = get(REMORA.fig.mdLTSA.dataType_buttongroup.SelectedObject, 'Tag');
     REMORA.mdLTSA.settings.dataType = dataType;
-    
+  
+elseif strcmp(action,'settave')
+    tave = get(REMORA.mdLTSA_verify.taveEdTxt, 'string');
+    REMORA.mdLTSA.settings.tave = tave;
+
+elseif strcmp(action,'setdfreq')
+    dfreq = get(REMORA.mdLTSA_verify.dfreqEdTxt, 'string');
+    REMORA.mdLTSA.setting.dfreq = dfreq;
+
 elseif strcmp(action,'RunBatchLTSA')
     close(REMORA.fig.mdLTSA.batch)
     mdLTSA_init_batch_ltsa;
