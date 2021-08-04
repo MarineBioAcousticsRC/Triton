@@ -1,10 +1,10 @@
-function mdLTSA_init_batch_detector
+function mdLTSA_init_batch_ltsa
 
 global REMORA
 
 
 %% Actually run the mk_ltsa code! 
     disp_msg('Creating LTSAs');
-    bm_autodet_batch_ST;
+    mk_ltsa_batch
     
 end
