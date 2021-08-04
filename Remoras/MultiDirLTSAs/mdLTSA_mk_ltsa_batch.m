@@ -51,6 +51,8 @@ PARAMS.ltsa.multidir = 1;
     outdirs = indirs;
     
     % LTSA parameters
+    % default is same for all directories as set in initial window, but can
+    % modify by directory if desired
     mdLTSA_ltsa_params(indirs); % set taves and dfreqs
     taves = PARAMS.ltsa.taves;
     dfreqs = PARAMS.ltsa.dfreqs;
@@ -64,11 +66,13 @@ PARAMS.ltsa.multidir = 1;
         % specify data type -1 HRP, 2 ARP, 3 OBS? Pulling these nums from
         % ck_ltsaparams.m
         PARAMS.ltsa.dtype =  1; % 1 for HRP data
-    else % all wav files? Maybe not...but leaving for now.
+    elseif PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3 % wav or flac
         PARAMS.ltsa.dtype = 4; % standard wav/ishmael format?
     end
     
-    % raw files to skip. leave this empty if no rfs wanted to skip
+    % raw files to skip. 
+    % * this is specific to HRPs?
+    % leave this empty if no rfs wanted to skip
     %PARAMS.ltsa.rf_skip = [47957  47986  47989  48016  48019  48045  48048  48051  48081  48541];
     %     PARAMS.ltsa.rf_skip = [11716  11715];
     PARAMS.ltsa.rf_skip = [];
@@ -415,18 +419,5 @@ end
 % uiwait;
 % end
 
-function okay(~, ~, fig, fig_taves, fig_dfreqs)
-
-global PARAMS
-
-% close figure and assign values
-PARAMS.ltsa.taves = zeros(length(fig_taves), 1);
-PARAMS.ltsa.dfreqs = zeros(length(fig_dfreqs), 1);
-for d = 1:length(fig_taves)
-    PARAMS.ltsa.taves(d) = str2num(get(fig_taves{d}, 'String'));
-    PARAMS.ltsa.dfreqs(d) = str2num(get(fig_dfreqs{d}, 'String'));
-end
-close(fig);
-end
 
 
