@@ -1,4 +1,4 @@
-function mdLTSA_k_ltsa_dir()
+function mdLTSA_mk_ltsa_dir()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % mk_ltsa.m
