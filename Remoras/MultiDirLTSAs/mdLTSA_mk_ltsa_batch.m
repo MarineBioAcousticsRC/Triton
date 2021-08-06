@@ -8,7 +8,6 @@ dir_name = REMORA.mdLTSA.settings.inDir;
 if dir_name == 0; disp_msg('Window closed. Exiting.'); return; end
 
 a = REMORA.mdLTSA.settings.dataType;
-%     a = questdlg('WAV or XWAV?', 'File type', 'WAV', 'XWAV', 'XWAV');
 if strcmp(a, 'WAV')
     PARAMS.ltsa.ftype = 1;
     indirs = find_dirs(dir_name, '*.wav');
@@ -23,6 +22,11 @@ else
     return
 end
 
+% if there is no files...abort. 
+if isempty(indirs)
+    disp_msg('No files in directory. Exiting.');
+    return
+end
 % save output files in same locations
 outdirs = indirs;
 
@@ -38,9 +42,9 @@ dfreqs = PARAMS.ltsa.dfreqs;
 
 PARAMS.ltsa.ch = 1; % which channel do you want to process?
 %     PARAMS.ltsa.ftype = 2; % 2 for xwavs, 1 for wavs
+
+% set data type based on file type 2 = XWAV/HARP, 1 or 3 = WAV/FLAC
 if PARAMS.ltsa.ftype == 2
-    % specify data type -1 HRP, 2 ARP, 3 OBS? Pulling these nums from
-    % ck_ltsaparams.m
     PARAMS.ltsa.dtype =  1; % 1 for HRP data
 elseif PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3 % wav or flac
     PARAMS.ltsa.dtype = 4; % standard wav/ishmael format?

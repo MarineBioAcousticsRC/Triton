@@ -1,5 +1,6 @@
 function mdLTSA_ltsa_params(dirs) 
 
+global REMORA
 % creates gui window to define ltsa settings
 mycolor = [.8,.8,.8];
 r = length(dirs) + 2;
@@ -53,13 +54,13 @@ for d = 1:length(dirs)
         'HorizontalAlign', 'left');
     
     % tave
-    labelStr = '5';
+    labelStr = REMORA.mdLTSA.settings.tave;
     btnPos = [x(3), y(end-d), 0.5*bw, bh];
     fig_taves{end+1} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
         'Style', 'edit', 'String', labelStr);
     
     % dfreq
-    labelStr = '100';
+    labelStr = REMORA.mdLTSA.settings.dfreq;
     btnPos = [x(3)+x(2)*0.5, y(end-d), 0.5*bw, bh];
     fig_dfreqs{end+1} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
         'Style', 'edit', 'String', labelStr);
