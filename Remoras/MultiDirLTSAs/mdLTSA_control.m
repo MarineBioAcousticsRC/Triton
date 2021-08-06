@@ -21,25 +21,7 @@ elseif strcmp(action, 'browseInDir')
          set(REMORA.mdLTSA_verify.inDirEdTxt, 'string', dir);
         REMORA.mdLTSA.settings.inDir = dir;
     end
-    
-    
-% 
-% 
-% elseif strcmp(action,'setSpecies')
-%     species.val = get(REMORA.bm_verify.SpeciesChoice, 'Value');
-%     species.opt = get(REMORA.bm_verify.SpeciesChoice,'string');
-%     SpeciesChoice = species.opt{species.val};
-%     REMORA.bm.settings.species = SpeciesChoice;
-%     
-% elseif strcmp(action,'setXWAVdata')
-%     XWAVdataCheckbox = get(REMORA.mdLTSA_verify.XWAVCheckbox, 'string');
-%     REMORA.mdLTSA.settings.XWAVdata = XWAVdataCheckbox;
-% 
-% elseif strcmp(action,'setWAVdata')
-%     WAVdataCheckbox = get(REMORA.mdLTSA_verify.WAVCheckbox, 'string');
-%     REMORA.mdLTSA.settings.WAVdata = WAVdataCheckbox;
-
-elseif strcmp(action, 'setDataType')
+    elseif strcmp(action, 'setDataType')
     dataType = get(REMORA.fig.mdLTSA.dataType_buttongroup.SelectedObject, 'Tag');
     REMORA.mdLTSA.settings.dataType = dataType;
   
