@@ -231,7 +231,7 @@ for k = 1:PARAMS.ltsa.nxwav
                 end
                 
                 % write ltsa values
-                calc_ltsa_dir(data);
+                mdLTSA_calc_ltsa_dir(data);
             end
         end % all channels
     end % all raw files within xwav
