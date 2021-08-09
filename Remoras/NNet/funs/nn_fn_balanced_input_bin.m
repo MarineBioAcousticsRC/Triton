@@ -55,7 +55,13 @@ for iD = 1:size(typeList,1)
         for iRow = 1:size(inFile.thisType.Tfinal,1)
             clusterTimes = [clusterTimes;inFile.thisType.Tfinal{iRow,7}];
             clusterSpectra = [clusterSpectra;inFile.thisType.Tfinal{iRow,1}];
-            clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+            try 
+                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+            catch
+                nRows = size(inFile.thisType.Tfinal{iRow,2},1);
+                nCols = size(clusterICI,2)- size(inFile.thisType.Tfinal{iRow,2},2);
+                clusterICI = [clusterICI;[inFile.thisType.Tfinal{iRow,2},zeros(nRows,nCols)]];
+            end
             if size(inFile.thisType.Tfinal,2)>=10
                 clusterWave = [clusterWave;inFile.thisType.Tfinal{iRow,10}];
             end
