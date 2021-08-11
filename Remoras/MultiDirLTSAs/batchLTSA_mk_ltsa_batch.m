@@ -1,7 +1,15 @@
-function batchLTSA_mk_ltsa_batch()
+function batchLTSA_mk_ltsa_batch(precheck)
 
 global PARAMS REMORA
 
+% load in data from precheck
+indirs =    precheck.indirs;
+outdirs =   precheck.outdirs;
+prefixes =  precheck.prefixes;
+outfiles =  precheck.outfiles;
+dirdata =   precheck.dirdata;
+taves =     precheck.taves;
+dfreqs =    precheck.dfreqs;
 
 % loop through each of the sets of directories for actual ltsa creation
 for k = 1:length(indirs)
@@ -27,8 +35,8 @@ for k = 1:length(indirs)
     
     %     prefix = prefixes{k};
     
-    % run from matlab command line
-    if ~isfield(REMORA, 'hrp')
+    % run from matlab command line 
+    if ~isfield(REMORA, 'hrp') % this *else* isn't tested...carry over from Ann Allen*
         d = dirdata{k};
         if ~isfield(d, 'dataID') % non xwav/typical dir
             fprintf('\nMaking LTSA for directory %s\n', PARAMS.ltsa.indir)
@@ -37,6 +45,7 @@ for k = 1:length(indirs)
         end
         % run from procFun
     else
+        % untested...
         fprintf('\nMaking LTSA for %s disk %s df %i\n', REMORA.hrp.dataID, REMORA.hrp.disk, REMORA.hrp.dfs(k));
     end
     

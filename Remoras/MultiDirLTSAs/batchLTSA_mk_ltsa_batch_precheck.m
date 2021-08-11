@@ -1,4 +1,4 @@
-function batchLTSA_mk_ltsa_batch_precheck()
+function precheck = batchLTSA_mk_ltsa_batch_precheck()
 
 global PARAMS REMORA
 
@@ -120,13 +120,13 @@ for k = 1:length(indirs)
 end
 
 % remove any nans
-indirs = indirs(~cellfun(@isempty, indirs));
-outdirs = outdirs(~cellfun(@isempty, outdirs));
-prefixes = prefixes(~cellfun(@isempty, prefixes));
-outfiles = outfiles(~cellfun(@isempty, outfiles));
-dirdata = dirdata(~cellfun(@isempty, dirdata));
-taves = taves(~isnan(taves));
-dfreqs = dfreqs(~isnan(dfreqs));
+precheck.indirs = indirs(~cellfun(@isempty, indirs));
+precheck.outdirs = outdirs(~cellfun(@isempty, outdirs));
+precheck.prefixes = prefixes(~cellfun(@isempty, prefixes));
+precheck.outfiles = outfiles(~cellfun(@isempty, outfiles));
+precheck.dirdata = dirdata(~cellfun(@isempty, dirdata));
+precheck.taves = taves(~isnan(taves));
+precheck.dfreqs = dfreqs(~isnan(dfreqs));
 
 
 
