@@ -10,13 +10,13 @@ if dir_name == 0; disp_msg('Window closed. Exiting.'); return; end
 a = REMORA.batchLTSA.settings.dataType;
 if strcmp(a, 'WAV')
     PARAMS.ltsa.ftype = 1;
-    indirs = find_dirs(dir_name, '*.wav');
+    indirs = batchLTSA_find_dirs(dir_name, '*.wav');
 elseif strcmp(a, 'FLAC')
     PARAMS.ltsa.ftype = 3;
-    indirs = find_dirs(dir_name, '*.flac');
+    indirs = batchLTSA_find_dirs(dir_name, '*.flac');
 elseif strcmp(a, 'XWAV')
     PARAMS.ltsa.ftype = 2;
-    indirs = find_dirs(dir_name, '*.x.wav');
+    indirs = batchLTSA_find_dirs(dir_name, '*.x.wav');
 else
     disp_msg('Window closed. Exiting.');
     return
@@ -81,7 +81,7 @@ for k = 1:length(indirs)
     PARAMS.ltsa.dfreq = dfreq;
     
     % create the outfile and prefix
-    [prefixes{k}, outfiles{k}, dirdata{k}] = gen_prefix();
+    [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix();
     
     % make sure filenames will work
     success = ck_names(prefixes{k});
@@ -131,3 +131,46 @@ dfreqs = dfreqs(~isnan(dfreqs));
 
 
 end
+
+%% check to see if the xwav/wav names are compatible with ltsa format
+function success = ck_names(prefix)
+
+global PARAMS
+
+success = 1;
+
+% find filenames for xwav/wav
+if PARAMS.ltsa.ftype == 1
+    files = dir(fullfile(PARAMS.ltsa.indir, '*.wav'));
+elseif PARAMS.ltsa.ftype == 2
+    files = dir(fullfile(PARAMS.ltsa.indir, '*.x.wav'));
+end
+
+% check to see if filenames are the same length
+prev_fname = files(1).name;
+for x = 1:length(files)
+    curr_fname = files(x).name;
+    if length(prev_fname) ~= length(curr_fname)
+        success = 0;
+        break;
+    end
+end
+
+% check to see if filenames contain timestamps (wavs only! xwavs have
+% timing info in headers)
+if PARAMS.ltsa.ftype == 1
+    fname = files(1).name;
+    dnum = wavname2dnum(fname);
+    
+    % datenumber isn't in filenames
+    if isempty(dnum); success = 0; end
+end
+
+% if we don't like the format, offer to change wav/xwav filenames
+if ~success; success = rename_wavs(prefix); end
+
+% either continue with ltsa creation or return
+if success; success = 1; return; end;
+end
+
+

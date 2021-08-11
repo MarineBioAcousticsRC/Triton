@@ -22,7 +22,7 @@ elseif strcmp(action, 'browseInDir')
         REMORA.batchLTSA.settings.inDir = dir;
     end
     elseif strcmp(action, 'setDataType')
-    dataType = get(REMORA.fig.batchLTSA.dataType_buttongroup.SelectedObject, 'Tag');
+    dataType = get(REMORA.fig.dataType_buttongroup.SelectedObject, 'Tag');
     REMORA.batchLTSA.settings.dataType = dataType;
   
 elseif strcmp(action,'settave')
