@@ -1,4 +1,4 @@
-function mdLTSA_init_settings
+function batchLTSA_init_settings
 
 global REMORA
 
@@ -8,6 +8,6 @@ settings.tave = '5';
 settings.dfreq = '100';
 settings.dataType = 'XWAV'; % default is XWAV
 
-REMORA.mdLTSA.settings = settings;
+REMORA.batchLTSA.settings = settings;
 
 end

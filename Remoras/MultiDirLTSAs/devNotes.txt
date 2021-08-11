@@ -1,0 +1,15 @@
+README Notes to Self About Remoras
+
+initialize.m
+- sets up the pull down menu. use 'Callback' to reference an action in _pulldown.m to make something happen. 
+
+_pulldown.m
+- function that outlines possible 'actions' triggered by selection of something in the pulldown menu, then calls new functions for those actions. 
+*for now just 1 action possible here. 
+	action is: batch_ltsas
+	- this triggers setting up the GUI figure (_init_batch_figure.m), some initial settings (_init_settings.m), and then the actual gui (_init_batch_gui.m)
+
+_init_batch_figure.m
+- defines GUI figure size, position, color, etc. 
+
+

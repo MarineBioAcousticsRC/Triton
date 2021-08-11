@@ -1,4 +1,4 @@
-function mdLTSA_ltsa_params(dirs) 
+function batchLTSA_ltsa_params(dirs) 
 
 global REMORA
 % creates gui window to define ltsa settings
@@ -54,13 +54,13 @@ for d = 1:length(dirs)
         'HorizontalAlign', 'left');
     
     % tave
-    labelStr = REMORA.mdLTSA.settings.tave;
+    labelStr = REMORA.batchLTSA.settings.tave;
     btnPos = [x(3), y(end-d), 0.5*bw, bh];
     fig_taves{end+1} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
         'Style', 'edit', 'String', labelStr);
     
     % dfreq
-    labelStr = REMORA.mdLTSA.settings.dfreq;
+    labelStr = REMORA.batchLTSA.settings.dfreq;
     btnPos = [x(3)+x(2)*0.5, y(end-d), 0.5*bw, bh];
     fig_dfreqs{end+1} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
         'Style', 'edit', 'String', labelStr);
@@ -75,7 +75,7 @@ uiwait;
 end
 
 
-
+%% okay button
 function okay(~, ~, fig, fig_taves, fig_dfreqs)
 
 global PARAMS

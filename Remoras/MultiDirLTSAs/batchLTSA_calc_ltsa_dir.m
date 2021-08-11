@@ -1,10 +1,10 @@
-function mdLTSA_calc_ltsa_dir(data)
+function batchLTSA_calc_ltsa_dir(data)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % calculate spectral averages and save to ltsa file
 %
-% called by mdLTSA_mk_ltsa_dir
+% called by batchLTSA_mk_ltsa_dir
 % copied from A.Allen 1.93.20190212
-% adapted to MultiDirLTSA Remora by S. Fregosi 2021 08 09
+% adapted to BatchLTSA Remora by S. Fregosi 2021 08 09
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS 

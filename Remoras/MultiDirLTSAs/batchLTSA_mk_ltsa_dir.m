@@ -1,4 +1,4 @@
-function mdLTSA_mk_ltsa_dir()
+function batchLTSA_mk_ltsa_dir()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % mk_ltsa.m
@@ -231,7 +231,7 @@ for k = 1:PARAMS.ltsa.nxwav
                 end
                 
                 % write ltsa values
-                mdLTSA_calc_ltsa_dir(data);
+                batchLTSA_calc_ltsa_dir(data);
             end
         end % all channels
     end % all raw files within xwav
