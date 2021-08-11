@@ -10,13 +10,13 @@ if dir_name == 0; disp_msg('Window closed. Exiting.'); return; end
 a = REMORA.batchLTSA.settings.dataType;
 if strcmp(a, 'WAV')
     PARAMS.ltsa.ftype = 1;
-    indirs = batchLTSA_find_dirs(dir_name, '*.wav');
+    indirs = find_dirs(dir_name, '*.wav');
 elseif strcmp(a, 'FLAC')
     PARAMS.ltsa.ftype = 3;
-    indirs = batchLTSA_find_dirs(dir_name, '*.flac');
+    indirs = find_dirs(dir_name, '*.flac');
 elseif strcmp(a, 'XWAV')
     PARAMS.ltsa.ftype = 2;
-    indirs = batchLTSA_find_dirs(dir_name, '*.x.wav');
+    indirs = find_dirs(dir_name, '*.x.wav');
 else
     disp_msg('Window closed. Exiting.');
     return
@@ -131,6 +131,49 @@ dfreqs = dfreqs(~isnan(dfreqs));
 
 
 end
+
+%% find dirs function
+
+function dirs = find_dirs(d, ftype)
+
+cd(d);
+dirs = {};
+
+% find each of the subdirectories
+files = dir;
+inds = find(vertcat(files.isdir));
+subdirs = {};
+subdirs_xwav = {};
+for k = 1:length(inds)
+    ind = inds(k);
+    if ~strcmp(files(ind).name, '.') && ~strcmp(files(ind).name, '..')
+        subdirs{end+1} = fullfile(d, files(ind).name);
+    end
+end
+
+% for each subdirectory, check for xwavs and append to list of indirs
+for k = 1:size(subdirs, 2)
+    subdirs_xwav = find_dirs(subdirs{k}, ftype);
+    dirs = cat_cell(dirs, subdirs_xwav);
+end
+cd(d);
+if ~isempty(dir(ftype))
+    dirs{end+1} = d;
+end
+
+end
+
+
+
+%% concatenate two cell arrays cause APPARENTLY THIS ISN'T EASY IN MATLAB
+function c1 = cat_cell(c1, c2)
+
+for k = 1:size(c2, 2)
+    c1{end+1} = c2{k};
+end
+end
+
+
 
 %% check to see if the xwav/wav names are compatible with ltsa format
 function success = ck_names(prefix)

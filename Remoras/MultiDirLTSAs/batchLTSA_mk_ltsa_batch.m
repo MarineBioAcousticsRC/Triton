@@ -53,13 +53,3 @@ end
 
 
 
-%% concatenate two cell arrays cause APPARENTLY THIS ISN'T EASY IN MATLAB
-function c1 = cat_cell(c1, c2)
-
-for k = 1:size(c2, 2)
-    c1{end+1} = c2{k};
-end
-end
-
-
-
