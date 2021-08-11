@@ -14,8 +14,8 @@ dirdat = struct;
 exp = '^[\w-_]+(?=_disk)';
 dataID = regexp(dirname, exp, 'match');
 
-% traditional xwav/wav filename format
-if ~isempty(dataID)
+% build prefix based on traditional xwav or wav filename format
+if ~isempty(dataID) % yes, typical xwav header
     dataID = char(dataID(1,:));
     
     exp = 'disk(\d{2})[_df]*([0-9]*)';
@@ -57,7 +57,7 @@ end
 % (80 characters!)
 if PARAMS.ltsa.ftype == 2 % xwavs
     lim = 60;
-elseif PARAMS.ltsa.ftype == 1 % wavs
+elseif PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3 % wavs
     lim = 62;
 end
 

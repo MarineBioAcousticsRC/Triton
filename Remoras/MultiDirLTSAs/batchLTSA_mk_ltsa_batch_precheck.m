@@ -7,16 +7,20 @@ PARAMS.ltsa.multidir = 1;
 dir_name = REMORA.batchLTSA.settings.inDir;
 if dir_name == 0; disp_msg('Window closed. Exiting.'); return; end
 
+% find sound files and set dtype based on file type
 a = REMORA.batchLTSA.settings.dataType;
 if strcmp(a, 'WAV')
     PARAMS.ltsa.ftype = 1;
     indirs = find_dirs(dir_name, '*.wav');
+    PARAMS.ltsa.dtype = 4; % standard wav
 elseif strcmp(a, 'FLAC')
     PARAMS.ltsa.ftype = 3;
     indirs = find_dirs(dir_name, '*.flac');
+    PARAMS.ltsa.dtype = 4; % standard wav
 elseif strcmp(a, 'XWAV')
     PARAMS.ltsa.ftype = 2;
     indirs = find_dirs(dir_name, '*.x.wav');
+    PARAMS.ltsa.dtype =  1; % 1 for HRP data
 else
     disp_msg('Window closed. Exiting.');
     return
@@ -37,25 +41,16 @@ batchLTSA_ltsa_params(indirs); % set taves and dfreqs
 taves = PARAMS.ltsa.taves;
 dfreqs = PARAMS.ltsa.dfreqs;
 
-%     taves = 5;
-%     dfreqs = [100, 1, 10];
+% channels to process
+% PARAMS.ltsa.ch = REMORA.batchLTSA.settings.numChannels;
+% PARAMS.ltsa.ch = 1; % which channel do you want to process?
 
-PARAMS.ltsa.ch = 1; % which channel do you want to process?
-%     PARAMS.ltsa.ftype = 2; % 2 for xwavs, 1 for wavs
-
-% set data type based on file type 2 = XWAV/HARP, 1 or 3 = WAV/FLAC
-if PARAMS.ltsa.ftype == 2
-    PARAMS.ltsa.dtype =  1; % 1 for HRP data
-elseif PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3 % wav or flac
-    PARAMS.ltsa.dtype = 4; % standard wav/ishmael format?
-end
-
-% raw files to skip.
-% * this is specific to HRPs?
-% leave this empty if no rfs wanted to skip
-%PARAMS.ltsa.rf_skip = [47957  47986  47989  48016  48019  48045  48048  48051  48081  48541];
-%     PARAMS.ltsa.rf_skip = [11716  11715];
-PARAMS.ltsa.rf_skip = [];
+% % raw files to skip.
+% % * this is specific to HRPs?
+% % leave this empty if no rfs wanted to skip
+% %PARAMS.ltsa.rf_skip = [47957  47986  47989  48016  48019  48045  48048  48051  48081  48541];
+% %     PARAMS.ltsa.rf_skip = [11716  11715];
+% PARAMS.ltsa.rf_skip = [];
 
 % loop through each of the sets of directories for PRE-CHECK
 prefixes = cell(1, length(indirs));
@@ -185,6 +180,8 @@ success = 1;
 % find filenames for xwav/wav
 if PARAMS.ltsa.ftype == 1
     files = dir(fullfile(PARAMS.ltsa.indir, '*.wav'));
+elseif PARAMS.ltsa.ftype == 3
+    files = dir(fullfile(PARAMS.ltsa.indir, '*.flac'));
 elseif PARAMS.ltsa.ftype == 2
     files = dir(fullfile(PARAMS.ltsa.indir, '*.x.wav'));
 end
@@ -201,7 +198,7 @@ end
 
 % check to see if filenames contain timestamps (wavs only! xwavs have
 % timing info in headers)
-if PARAMS.ltsa.ftype == 1
+if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3
     fname = files(1).name;
     dnum = wavname2dnum(fname);
     
@@ -213,7 +210,7 @@ end
 if ~success; success = rename_wavs(prefix); end
 
 % either continue with ltsa creation or return
-if success; success = 1; return; end;
+if success; success = 1; return; end
 end
 
 
