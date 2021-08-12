@@ -51,7 +51,7 @@ for k = 1:length(indirs)
     
     % make the ltsa!
     batchLTSA_mk_ltsa_dir;
-    fprintf('\nFinished LTSA for directory %s\n', PARAMS.ltsa.indir)
+    fprintf('Finished LTSA for directory %s\n', PARAMS.ltsa.indir)
     % fprintf('Press any key to continue...\n')
     %     pause
 end % all directories

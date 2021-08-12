@@ -125,5 +125,6 @@ end
 PARAMS.ltsa.nrftot = m;     % total number of raw files
 PARAMS.ltsa.ver = 4;    % 32 bits (~ 4billon nave and nrftot allowed)
 
+disp(['Number of channels: ', num2str(PARAMS.ltsa.nch(1))])
 disp(['Total number of raw files: ',num2str(PARAMS.ltsa.nrftot)])
 disp(['LTSA version ',num2str(PARAMS.ltsa.ver)])

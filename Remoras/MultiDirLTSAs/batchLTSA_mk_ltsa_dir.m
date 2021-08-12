@@ -3,7 +3,7 @@ function batchLTSA_mk_ltsa_dir()
 %
 % mk_ltsa_dir.m
 %
-% make long-term spectral averages from XWAV or WAV files in multiple 
+% make long-term spectral averages from XWAV or WAV files in multiple
 % nested directories
 %
 % edits made 2021 05 10 S. Fregosi to work for DASBRs/Soundtraps and latest
@@ -13,7 +13,7 @@ function batchLTSA_mk_ltsa_dir()
 global PARAMS REMORA
 
 % wav data
-if PARAMS.ltsa.ftype == 1 
+if PARAMS.ltsa.ftype == 1
     d = dir(fullfile(PARAMS.ltsa.indir, '*.wav')); % wav files
 elseif PARAMS.ltsa.ftype == 3
     d = dir(fullfile(PARAMS.ltsa.indir, '*.flac')); % flac files
@@ -29,21 +29,18 @@ end
 PARAMS.ltsa.nch = [];
 PARAMS.ltsa.nave = [];
 PARAMS.ltsa.byteloc = [];
-
 PARAMS.ltsa.fname = char(d.name);      % file names in directory
-
-% % read data file headers
-% get_headers;
-
-get_headers; % check headers
-
-ck_ltsaparams; % check params
 
 info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)));
 PARAMS.ltsa.fs = info.SampleRate;
 PARAMS.ltsa.nfft = PARAMS.ltsa.fs / PARAMS.ltsa.dfreq;
 % compression factor (cfact = 1000 for tave=5sec,fs=200000Hz,dfreq=200)
 PARAMS.ltsa.cfact = PARAMS.ltsa.tave * PARAMS.ltsa.fs / PARAMS.ltsa.nfft;
+
+% % read data file headers
+get_headers; % check headers
+
+ck_ltsaparams; % check params
 
 % number of frequencies in each spectral average:
 if mod(PARAMS.ltsa.nfft,2) % odd
@@ -65,12 +62,14 @@ count = 0;                 % total number of averages counter for output display
 
 % if there is more than 1 channel, need new filenames for each of the
 % channels
-% check that num channels to process = num channels available
-if str2num(REMORA.batchLTSA.settings.numCh) ~= PARAMS.ltsa.nch(1)
-    nch = str2num(REMORA.batchLTSA.settings.numCh);
-else
-    nch = PARAMS.ltsa.nch(1);
+% check that num channels to process == num channels available
+if str2double(REMORA.batchLTSA.settings.numCh) > info.NumChannels
+    REMORA.batchLTSA.settings.numCh = info.NumChannels;
+    disp_msg('Incorrect number of channels. Using all. ');
+else 
+    REMORA.batchLTSA.settings.numCh = str2double(REMORA.batchLTSA.settings.numCh);
 end
+nch = REMORA.batchLTSA.settings.numCh;
 
 PARAMS.ltsa.fods = zeros(nch,1);
 curr_ofile = PARAMS.ltsa.outfile;
@@ -220,8 +219,9 @@ for k = 1:PARAMS.ltsa.nxwav
     end % all raw files within xwav
     
     fclose(PARAMS.ltsa.fid);
-    fprintf('Completed Processing sound file %d\n', k);
-end
+    fprintf('Completed processing sound file %d\n', k);
+end %loop through all sound files
 
 % close output ltsa file
 fclose all;
+end
