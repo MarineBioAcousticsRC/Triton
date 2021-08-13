@@ -63,11 +63,11 @@ count = 0;                 % total number of averages counter for output display
 % if there is more than 1 channel, need new filenames for each of the
 % channels
 % check that num channels to process == num channels available
-if str2double(REMORA.batchLTSA.settings.numCh) > info.NumChannels
+if REMORA.batchLTSA.settings.numCh > info.NumChannels
     REMORA.batchLTSA.settings.numCh = num2str(info.NumChannels);
     disp_msg('Incorrect number of channels. Using all. ');
 end
-nch = str2double(REMORA.batchLTSA.settings.numCh);
+nch = REMORA.batchLTSA.settings.numCh;
 
 PARAMS.ltsa.fods = zeros(nch,1);
 curr_ofile = PARAMS.ltsa.outfile;

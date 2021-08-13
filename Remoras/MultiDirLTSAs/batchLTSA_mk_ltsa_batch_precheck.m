@@ -50,7 +50,7 @@ dfreqs = PARAMS.ltsa.dfreqs;
 % % leave this empty if no rfs wanted to skip
 % %PARAMS.ltsa.rf_skip = [47957  47986  47989  48016  48019  48045  48048  48051  48081  48541];
 % %     PARAMS.ltsa.rf_skip = [11716  11715];
-% PARAMS.ltsa.rf_skip = [];
+PARAMS.ltsa.rf_skip = [];
 
 % loop through each of the sets of directories for PRE-CHECK
 prefixes = cell(1, length(indirs));

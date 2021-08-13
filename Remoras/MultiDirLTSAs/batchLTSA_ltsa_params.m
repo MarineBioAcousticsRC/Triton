@@ -84,8 +84,8 @@ global PARAMS
 PARAMS.ltsa.taves = zeros(length(fig_taves), 1);
 PARAMS.ltsa.dfreqs = zeros(length(fig_dfreqs), 1);
 for d = 1:length(fig_taves)
-    PARAMS.ltsa.taves(d) = str2num(get(fig_taves{d}, 'String'));
-    PARAMS.ltsa.dfreqs(d) = str2num(get(fig_dfreqs{d}, 'String'));
+    PARAMS.ltsa.taves(d) = str2double(get(fig_taves{d}, 'String'));
+    PARAMS.ltsa.dfreqs(d) = str2double(get(fig_dfreqs{d}, 'String'));
 end
 close(fig);
 end
