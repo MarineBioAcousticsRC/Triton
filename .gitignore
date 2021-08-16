@@ -41,4 +41,4 @@ Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM_test.m
 !Remoras/Airgun-Detector/air_template_df100.mat
 !Remoras/Explosion-Detector/template.mat
 
-Remoras/MultiDirLTSA/originalVersion/
+**/Remoras/MultiDirLTSA/originalVersion
