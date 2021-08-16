@@ -1,4 +1,4 @@
-function batchLTSA_mk_ltsa_dir()
+function batchLTSA_mk_ltsa_dir(lIdx, indirs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % mk_ltsa_dir.m
@@ -11,6 +11,12 @@ function batchLTSA_mk_ltsa_dir()
 % udpated to part of batchLTSA remora 2021 08 11
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS REMORA
+tic
+
+% initiate loadbar showing progress
+h = loadbar(['Creating LTSA ',num2str(lIdx),'/',num2str(length(indirs))]);
+pcntDone = 0;
+loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
 
 % wav data
 if PARAMS.ltsa.ftype == 1
@@ -218,8 +224,18 @@ for k = 1:PARAMS.ltsa.nxwav
     
     fclose(PARAMS.ltsa.fid);
     fprintf('Completed processing sound file %d\n', k);
+    % update loadbar
+    pcntDone = (k-1)/PARAMS.ltsa.nxwav;
+    loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
 end %loop through all sound files
 
 % close output ltsa file
 fclose all;
+
+t = toc;
+t = t/60/60;
+disp_msg(['Time to calculate ',num2str(count),' spectra is ', num2str(t),' h']);
+% turn off progress bar (loadbar)
+close(h)
+
 end

@@ -13,6 +13,7 @@ dfreqs =    precheck.dfreqs;
 
 % loop through each of the sets of directories for actual ltsa creation
 for k = 1:length(indirs)
+    lIdx = k; % which LTSA (For progress bar)
     
     % if we have different parameters for each of the dirs, adjust
     % accordingly
@@ -36,7 +37,7 @@ for k = 1:length(indirs)
     %     prefix = prefixes{k};
     
     % run from matlab command line 
-    if ~isfield(REMORA, 'hrp') % this *else* isn't tested...carry over from Ann Allen*
+    if ~isfield(REMORA, 'hrp') % the *else* below isn't tested...carry over from Ann Allen*
         d = dirdata{k};
         if ~isfield(d, 'dataID') % non xwav/typical dir
             fprintf('\nMaking LTSA for directory %s\n', PARAMS.ltsa.indir)
@@ -50,7 +51,7 @@ for k = 1:length(indirs)
     end
     
     % make the ltsa!
-    batchLTSA_mk_ltsa_dir;
+    batchLTSA_mk_ltsa_dir(lIdx, indirs);
     fprintf('Finished LTSA for directory %s\n', PARAMS.ltsa.indir)
     % fprintf('Press any key to continue...\n')
     %     pause
