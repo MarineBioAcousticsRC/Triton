@@ -60,7 +60,11 @@ for ridx = 1:PARAMS.ltsa.nrftot
             keep = ones(length(bytevec),1);
             % define how many time bins for disk write
             tbin = REMORA.sm.cmpt.remove/PARAMS.ltsa.dfreq;
-            keep(1:tbin) = 0;
+            if tbin<length(keep)
+                keep(1:tbin) = 0;
+            else
+                keep = zeros(length(bytevec),1);
+            end
         else %do this for wav files
             keep = ones(length(bytevec),1);
         end
