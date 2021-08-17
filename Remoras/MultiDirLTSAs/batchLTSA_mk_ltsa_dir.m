@@ -225,7 +225,7 @@ for k = 1:PARAMS.ltsa.nxwav
     fclose(PARAMS.ltsa.fid);
     fprintf('Completed processing sound file %d\n', k);
     % update loadbar
-    pcntDone = (k-1)/PARAMS.ltsa.nxwav;
+    pcntDone = k/PARAMS.ltsa.nxwav;
     loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
 end %loop through all sound files
 
