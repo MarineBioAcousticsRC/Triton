@@ -9,3 +9,8 @@ Remoras are developed by contributors at Scripps Institution of Oceanography and
 Current and past funders include:  
 - NOAA Protected Species Toolbox Initiative  
 - NAVFAC Living Marine Resources Program  
+
+
+## Batch/MultiDir LTSA Remora development TO DOs
+- add gui/step to check output filenames and change if wanted
+- test Remora folder alone with flac version
