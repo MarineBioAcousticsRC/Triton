@@ -42,7 +42,7 @@ if ~isempty(dataID) % yes, typical xwav header
     dirdat.df = df;
     
     % if non-traditional format, use directory name to create prefix and
-    % ltsa name
+    % ltsa name - at least try this! 
 else
     % get parent directory name
     prefix = strsplit(PARAMS.ltsa.indir, '\'); % TODO issue between running on windows and mac?

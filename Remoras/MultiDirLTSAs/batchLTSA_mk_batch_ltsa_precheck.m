@@ -37,13 +37,9 @@ outdirs = indirs;
 % LTSA parameters
 % default is same for all directories as set in initial window, but can
 % modify by directory if desired
-batchLTSA_ltsa_params(indirs); % set taves and dfreqs
+batchLTSA_chk_ltsa_params(indirs); % set taves and dfreqs
 taves = PARAMS.ltsa.taves;
 dfreqs = PARAMS.ltsa.dfreqs;
-
-% channels to process
-% PARAMS.ltsa.ch = REMORA.batchLTSA.settings.numChannels;
-% PARAMS.ltsa.ch = 1; % which channel do you want to process?
 
 % % raw files to skip.
 % % * this is specific to HRPs?
@@ -80,8 +76,8 @@ for k = 1:length(indirs)
     
     % make sure filenames will work
     success = ck_names(prefixes{k});
-    
-    % check to see if the ltsa file already exists
+       
+    % check to see if the ltsa file already exists 
     PARAMS.ltsa.indir = indirs{k};
     if exist(fullfile(PARAMS.ltsa.indir, outfiles{k}), 'file')
         choice = questdlg('LTSA file already found', 'LTSA creation', ...
@@ -113,6 +109,7 @@ for k = 1:length(indirs)
         dfreqs(k) = nan;
     end
 end
+   
 
 % remove any nans
 precheck.indirs = indirs(~cellfun(@isempty, indirs));
@@ -123,7 +120,8 @@ precheck.dirdata = dirdata(~cellfun(@isempty, dirdata));
 precheck.taves = taves(~isnan(taves));
 precheck.dfreqs = dfreqs(~isnan(dfreqs));
 
-
+% make sure the filenames are what you want them to be
+precheck = batchLTSA_chk_filenames(precheck);
 
 end
 

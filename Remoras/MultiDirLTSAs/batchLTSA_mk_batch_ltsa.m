@@ -1,4 +1,4 @@
-function batchLTSA_mk_ltsa_batch(precheck)
+function batchLTSA_mk_batch_ltsa(precheck)
 
 global PARAMS REMORA
 

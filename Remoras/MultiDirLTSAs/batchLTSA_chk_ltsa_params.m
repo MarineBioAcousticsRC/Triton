@@ -1,4 +1,4 @@
-function batchLTSA_ltsa_params(dirs) 
+function batchLTSA_chk_ltsa_params(dirs) 
 
 global REMORA
 % creates gui window to define ltsa settings
