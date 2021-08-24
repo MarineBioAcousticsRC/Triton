@@ -126,7 +126,6 @@ precheck = batchLTSA_chk_filenames(precheck);
 end
 
 %% find dirs function
-
 function dirs = find_dirs(d, ftype)
 
 cd(d);

@@ -7,7 +7,7 @@ global PARAMS REMORA
 % creates gui window check filenames
 mycolor = [.8,.8,.8];
 r = length(precheck.outfiles) + 2;
-c = 3;
+c = 4;
 h = 0.025*r;
 w = 0.09*c;
 
@@ -35,8 +35,8 @@ btnPos = [x(1), y(end), 2*bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
     'Position', btnPos, 'Style', 'text', 'String', labelStr);
 
-labelStr = 'filename';
-btnPos = [x(3), y(end), bw, bh];
+labelStr = 'Filename';
+btnPos = [x(3), y(end), 2*bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
     'Position', btnPos, 'Style', 'text', 'String', labelStr);
 
@@ -50,39 +50,31 @@ for d = 1:length(precheck.indirs)
         'Position', btnPos, 'Style', 'text', 'String', labelStr,...
         'HorizontalAlign', 'left');
     
-    % tave
+    % filenames
     labelStr = precheck.outfiles(d);
-    btnPos = [x(3), y(end-d), bw, bh];
+    btnPos = [x(3), y(end-d), 2*bw, bh];
     fig_filenames{end+1} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
         'Style', 'edit', 'String', labelStr);
     
-    % dfreq
-    labelStr = REMORA.batchLTSA.settings.dfreq;
-    btnPos = [x(3)+x(2)*0.5, y(end-d), 0.5*bw, bh];
-    fig_dfreqs{end+1} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
-        'Style', 'edit', 'String', labelStr);
 end
 
 % go button
 labelStr = 'Okay';
-btnPos = [x(3), y(1), bw, bh];
+btnPos = [x(4), y(1), bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
-    'Style', 'push', 'String', labelStr, 'Callback', {@okay, fig, fig_taves, fig_dfreqs});
+    'Style', 'push', 'String', labelStr, 'Callback', {@okay, fig, fig_filenames});
 uiwait;
 end
 
 
 %% okay button
-function okay(~, ~, fig, fig_taves, fig_dfreqs)
+function okay(~, ~, fig, fig_filenames)
 
 global PARAMS
 
 % close figure and assign values
-PARAMS.ltsa.taves = zeros(length(fig_taves), 1);
-PARAMS.ltsa.dfreqs = zeros(length(fig_dfreqs), 1);
-for d = 1:length(fig_taves)
-    PARAMS.ltsa.taves(d) = str2double(get(fig_taves{d}, 'String'));
-    PARAMS.ltsa.dfreqs(d) = str2double(get(fig_dfreqs{d}, 'String'));
+for d = 1:length(fig_filenames)
+    precheck.outfiles(d) = get(fig_filenames{d}, 'String');
 end
 close(fig);
 end
