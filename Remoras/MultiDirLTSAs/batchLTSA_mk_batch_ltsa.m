@@ -1,41 +1,26 @@
-function batchLTSA_mk_batch_ltsa(precheck)
+function batchLTSA_mk_batch_ltsa
 
 global PARAMS REMORA
 
-% load in data from precheck
-indirs =    precheck.indirs;
-outdirs =   precheck.outdirs;
-prefixes =  precheck.prefixes;
-outfiles =  precheck.outfiles;
-dirdata =   precheck.dirdata;
-taves =     precheck.taves;
-dfreqs =    precheck.dfreqs;
+% load in data from PARAMS
+indirs =    PARAMS.ltsa.indirs;
+outdirs =   PARAMS.ltsa.outdirs;
+prefixes =  PARAMS.ltsa.prefixes;
+outfiles =  PARAMS.ltsa.outfiles;
+dirdata =   PARAMS.ltsa.dirdata;
+taves =     PARAMS.ltsa.taves;
+dfreqs =    PARAMS.ltsa.dfreqs;
 
 % loop through each of the sets of directories for actual ltsa creation
 for k = 1:length(indirs)
     lIdx = k; % which LTSA (For progress bar)
-    
-    % if we have different parameters for each of the dirs, adjust
-    % accordingly
-    if length(taves) > 1
-        tave = taves(k);
-    else
-        tave = taves;
-    end
-    if length(dfreqs) > 1
-        dfreq = dfreqs(k);
-    else
-        dfreq = dfreqs;
-    end
-    
+        
     PARAMS.ltsa.indir = char(indirs{k});
     PARAMS.ltsa.outdir = char(outdirs{k});
     PARAMS.ltsa.outfile = char(outfiles{k});
-    PARAMS.ltsa.tave = tave;
-    PARAMS.ltsa.dfreq = dfreq;
-    
-    %     prefix = prefixes{k};
-    
+    PARAMS.ltsa.tave = taves(k);
+    PARAMS.ltsa.dfreq = dfreqs(k);
+        
     % run from matlab command line 
     if ~isfield(REMORA, 'hrp') % the *else* below isn't tested...carry over from Ann Allen*
         d = dirdata{k};
@@ -51,7 +36,7 @@ for k = 1:length(indirs)
     end
     
     % make the ltsa!
-    batchLTSA_mk_ltsa_dir(lIdx, indirs);
+    batchLTSA_mk_ltsa_dir(lIdx);
     fprintf('Finished LTSA for directory %s\n', PARAMS.ltsa.indir)
     % fprintf('Press any key to continue...\n')
     %     pause

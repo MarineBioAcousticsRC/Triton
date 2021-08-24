@@ -1,4 +1,4 @@
-function [prefix,ltsa_file,dirdat] = batchLTSA_gen_prefix()
+function [prefix,ltsa_file,dirdat] = batchLTSA_gen_prefix
 
 %create a prefix and an outfile name for ltsas generated
 % this was originally in batchLTSA_mk_ltsa_batch but extracted to run as

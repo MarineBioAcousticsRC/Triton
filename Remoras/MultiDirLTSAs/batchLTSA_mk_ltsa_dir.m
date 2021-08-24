@@ -1,4 +1,4 @@
-function batchLTSA_mk_ltsa_dir(lIdx, indirs)
+function batchLTSA_mk_ltsa_dir(lIdx)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % mk_ltsa_dir.m
@@ -14,7 +14,7 @@ global PARAMS REMORA
 tic
 
 % initiate loadbar showing progress
-h = loadbar(['Creating LTSA ',num2str(lIdx),'/',num2str(length(indirs))]);
+h = loadbar(['Creating LTSA ',num2str(lIdx),'/', num2str(length(PARAMS.ltsa.indirs))]);
 pcntDone = 0;
 loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
 
@@ -77,7 +77,7 @@ nch = REMORA.batchLTSA.settings.numCh;
 
 PARAMS.ltsa.fods = zeros(nch,1);
 curr_ofile = PARAMS.ltsa.outfile;
-PARAMS.ltsa.outfiles = [];
+PARAMS.ltsa.outfiles_ch = []; 
 
 for ch = 1:nch
     if nch ~= 1
@@ -86,7 +86,7 @@ for ch = 1:nch
         new_ofile = curr_ofile;
     end
     
-    PARAMS.ltsa.outfiles = [PARAMS.ltsa.outfiles; new_ofile];
+    PARAMS.ltsa.outfiles_ch = [PARAMS.ltsa.outfiles_ch; new_ofile];
     PARAMS.ltsa.fods(ch) = fopen(fullfile(PARAMS.ltsa.outdir, new_ofile),'w');
     
     % write header portion of ltsa for each ltsa
@@ -200,7 +200,7 @@ for k = 1:PARAMS.ltsa.nxwav
                     fseek(PARAMS.ltsa.fid,xi,'bof');
                     data = fread(PARAMS.ltsa.fid,[PARAMS.ltsa.nch,nsamp],PARAMS.ltsa.dbtype);
                 else
-                    [dall,~] = audioread( fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)), [yi yi-1+nsamp], 'native' );
+                    [dall,~] = audioread(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)), [yi yi-1+nsamp], 'native' );
                     dall = double(dall);
                     data = dall(:,PARAMS.ltsa.ch);
                 end

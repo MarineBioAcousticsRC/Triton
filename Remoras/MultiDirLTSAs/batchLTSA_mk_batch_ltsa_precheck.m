@@ -1,4 +1,4 @@
-function precheck = batchLTSA_mk_ltsa_batch_precheck()
+function batchLTSA_mk_batch_ltsa_precheck
 
 global PARAMS REMORA
 
@@ -26,13 +26,18 @@ else
     return
 end
 
-% if there is no files...abort. 
+% if there is no files...abort.
 if isempty(indirs)
     disp_msg('No files in directory. Exiting.');
     return
 end
+
 % save output files in same locations
 outdirs = indirs;
+
+% write to PARAMS
+PARAMS.ltsa.indirs = indirs;
+PARAMS.ltsa.outdirs = outdirs;
 
 % LTSA parameters
 % default is same for all directories as set in initial window, but can
@@ -48,7 +53,7 @@ dfreqs = PARAMS.ltsa.dfreqs;
 % %     PARAMS.ltsa.rf_skip = [11716  11715];
 PARAMS.ltsa.rf_skip = [];
 
-% loop through each of the sets of directories for PRE-CHECK
+% loop through each of the sets of directories  to set params and filenames
 prefixes = cell(1, length(indirs));
 outfiles = cell(1, length(indirs));
 dirdata = cell(1, length(indirs));
@@ -56,30 +61,40 @@ for k = 1:length(indirs)
     % if we have different parameters for each of the dirs, adjust
     % accordingly
     if length(dfreqs) > 1
-        dfreq = dfreqs(k);
+        PARAMS.ltsa.dfreq = dfreqs(k);
     else
-        dfreq = dfreqs;
+        PARAMS.ltsa.dfreq = dfreqs;
     end
     if length(taves) > 1
-        tave = taves(k);
+        PARAMS.ltsa.tave = taves(k);
     else
-        tave = taves;
+        PARAMS.ltsa.tave = taves;
     end
     
     PARAMS.ltsa.indir = char(indirs{k});
     PARAMS.ltsa.outdir = char(outdirs{k});
-    PARAMS.ltsa.tave = tave;
-    PARAMS.ltsa.dfreq = dfreq;
     
     % create the outfile and prefix
-    [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix();
+    [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix;  
+end
+
+% write to PARAMS
+PARAMS.ltsa.prefixes = prefixes;
+PARAMS.ltsa.outfiles = outfiles;
+PARAMS.ltsa.dirdata = dirdata;
+
+% make sure the filenames are what you want them to be
+batchLTSA_chk_filenames;
+outfiles = PARAMS.ltsa.outfiles; % write back to outfiles for below
+
+% loop through again to do filename checks 
+for k = 1:length(indirs)
     
     % make sure filenames will work
     success = ck_names(prefixes{k});
-       
-    % check to see if the ltsa file already exists 
-    PARAMS.ltsa.indir = indirs{k};
-    if exist(fullfile(PARAMS.ltsa.indir, outfiles{k}), 'file')
+    
+    % check to see if the ltsa file already exists
+    if exist(fullfile(indirs{k}, outfiles{k}), 'file')
         choice = questdlg('LTSA file already found', 'LTSA creation', ...
             'Overwrite', 'Continue, don''t overwrite', 'Skip', 'Skip');
         if strcmp(choice, 'Continue, don''t overwrite')
@@ -97,7 +112,6 @@ for k = 1:length(indirs)
         end
     end
     
-    %         if strcmp(ans, 'Skip') || ~success
     if ~success
         disp_msg(sprintf('Skipping LTSA creation for %s\n', prefixes{k}));
         indirs(k) = {[]};
@@ -108,20 +122,18 @@ for k = 1:length(indirs)
         taves(k) = nan;
         dfreqs(k) = nan;
     end
+    
 end
-   
 
-% remove any nans
-precheck.indirs = indirs(~cellfun(@isempty, indirs));
-precheck.outdirs = outdirs(~cellfun(@isempty, outdirs));
-precheck.prefixes = prefixes(~cellfun(@isempty, prefixes));
-precheck.outfiles = outfiles(~cellfun(@isempty, outfiles));
-precheck.dirdata = dirdata(~cellfun(@isempty, dirdata));
-precheck.taves = taves(~isnan(taves));
-precheck.dfreqs = dfreqs(~isnan(dfreqs));
+% remove any nans and write to PARAMS
+PARAMS.ltsa.indirs = indirs(~cellfun(@isempty, indirs));
+PARAMS.ltsa.outdirs = outdirs(~cellfun(@isempty, outdirs));
+PARAMS.ltsa.prefixes = prefixes(~cellfun(@isempty, prefixes));
+PARAMS.ltsa.outfiles = outfiles(~cellfun(@isempty, outfiles));
+PARAMS.ltsa.dirdata = dirdata(~cellfun(@isempty, dirdata));
+PARAMS.ltsa.taves = taves(~isnan(taves));
+PARAMS.ltsa.dfreqs = dfreqs(~isnan(dfreqs));
 
-% make sure the filenames are what you want them to be
-precheck = batchLTSA_chk_filenames(precheck);
 
 end
 
