@@ -301,8 +301,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
             if count >=3600
                 pnum = pnum + 1;
                 disp(['Time averages NOT computed since last print: ',num2str(seg),' segments; ',...
-                    datestr(thisend+dateoffset),'; ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa),'; duration ',...
-                            num2str(timehtoc(pnum)),' s; '])
+                    datestr(thisend+dateoffset),'; ',num2str(tidx),'/',num2str(REMORA.sm.cmpt.pre.thisltsa)])
                 count = 0;
             end
         end
