@@ -6,6 +6,8 @@ The Triton base package was developed by Dr. Sean M. Wiggins at Scripps Institut
 
 Remoras are developed by contributors at Scripps Institution of Oceanography and San Diego State University.
 
+If you do not have a Matlab installation, please check out out our [standalone version](https://github.com/MarineBioAcousticsRC/Triton-Compiled).
+
 Current and past funders include:  
 - NOAA Protected Species Toolbox Initiative  
 - NAVFAC Living Marine Resources Program  

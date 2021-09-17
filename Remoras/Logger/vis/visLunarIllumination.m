@@ -2,7 +2,7 @@ function [BarH, presence_d, presence_m] = visLunarIllumination(illu, varargin)
 % Parses an illumination query return and plots it on the given figure
 % plot.
 % Required arguments
-%   illu: n x 2 cell array of datetime values in the first column, and
+%   illu: n x 2 cell array of datenum values in the first column, and
 %   illumination percentages in the second column.
 % Optional arguments
 %   UTCOffset: integer of the offset from GMT
@@ -74,6 +74,7 @@ cGrad = [[1.0000, 0.6000, 0.2000]
  [1.0000, 0.4032, 0.0032]
  [1.0000, 0.4000, 0]];
 UTCOffset = 0;
+resolution_m = 30; %set default resolution to 30 minutes
 
 % Get varargin
 vidx = 1;
@@ -86,6 +87,8 @@ while vidx < length(varargin)
             end
         case 'cGrad'
             cGrad = varargin{vidx+1}; vidx=vidx+2;
+        case 'resolution_m'
+            resolution_m = varargin{vidx+1};vidx = vidx + 2;
         otherwise
             error('Bad argument %s', varargin{vidx+1});
     end
@@ -103,7 +106,6 @@ end
     end
     % shift to local time (if UTCOffset ~= 0)
     serdate = serdate + datenum(0, 0, 0, UTCOffset, 0, 0); 
-    resolution_m = 30;
 
     resolution_d = resolution_m / (24 * 60);
 
@@ -119,7 +121,7 @@ end
     crossDayP = find(m(:,2) > 1);
     
     presence_d = day;
-    presence_m = m;
+presence_m = m;
     
     lunarH = zeros(size(illu, 1) + sum(crossDayP), 1);
     
