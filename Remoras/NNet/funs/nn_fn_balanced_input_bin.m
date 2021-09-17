@@ -37,22 +37,31 @@ for iD = 1:size(typeList,1)
     thisTypeDir = fullfile(typeList(iD).folder,typeList(iD).name);
     
     [~,typeID] = fileparts(thisTypeDir);
+    
     typeNames{iD,1} = typeID;
     matList = dir(fullfile(thisTypeDir,REMORA.nn.train_test_set.binWild));
     if isempty(matList)
          disp('No files found for this type, skipping to next.')
     end 
+    matListIdx = ~contains({matList(:).name},'detLevel');
+    matList = matList(matListIdx);
     clusterSpectra = [];
     clusterICI = [];
     clusterTimes = [];
     clusterWave = [];
     for iM = 1:size(matList,1)
-        
+       
         inFile = load(fullfile(matList(iM).folder,matList(iM).name));
         for iRow = 1:size(inFile.thisType.Tfinal,1)
             clusterTimes = [clusterTimes;inFile.thisType.Tfinal{iRow,7}];
             clusterSpectra = [clusterSpectra;inFile.thisType.Tfinal{iRow,1}];
-            clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+            try 
+                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+            catch
+                nRows = size(inFile.thisType.Tfinal{iRow,2},1);
+                nCols = size(clusterICI,2)- size(inFile.thisType.Tfinal{iRow,2},2);
+                clusterICI = [clusterICI;[inFile.thisType.Tfinal{iRow,2},zeros(nRows,nCols)]];
+            end
             if size(inFile.thisType.Tfinal,2)>=10
                 clusterWave = [clusterWave;inFile.thisType.Tfinal{iRow,10}];
             end
@@ -112,8 +121,14 @@ for iD = 1:size(typeList,1)
     trainSetLabels{iD} = ones(size(binIndicesTrain,2),1)*iD;
     
     %% get validation set
-    if REMORA.nn.train_test_set.validationTF
-        validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent/100)))))';
+    if REMORA.nn.train_test_set.validationTF 
+        if (nBouts-length(trainBoutIdx))<2
+            validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent/100)))))';        
+        else
+            boutsLeft = setdiff(1:nBouts,trainBoutIdx);
+            boutsLeft = boutsLeft(randperm(length(boutsLeft)));% shuffle it
+            validBoutIdx = boutsLeft(1:max(1,floor(nBouts*(validPercent/100))))';
+        end
         fprintf('   %0.0f validation encounters selected\n',length(validBoutIdx))
         
         % pull out validation data
@@ -123,7 +138,8 @@ for iD = 1:size(typeList,1)
         
         % randomly select desired number of events across bouts
         nBinsValid  = sum(boutSizeValid);
-        binIndicesValid = sort(randi(nBinsValid,1,nExamples));
+        nValidExamples = round(nExamples*(round(100*(validPercent/trainPercent))/100));
+        binIndicesValid = sort(randi(nBinsValid,1,nValidExamples));
         
         % binIndicesValid  = sort(randperm(nBinsValid,min(nExamples,nBinsValid )));
         clusterIdxValidSet = vertcat(boutMembership{validBoutIdx});
@@ -163,7 +179,9 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTest = sum(boutSizeTest);
-    binIndicesTest = sort(randi(nBinsTest,1,nExamples));
+    nTestExamples = nExamples*round(100*(100-validPercent-trainPercent)/trainPercent)/100;
+
+    binIndicesTest = sort(randi(nBinsTest,1,nTestExamples));
     %binIndicesTest = sort(randperm(nBinsTest,min(nExamples,nBinsTest)));
     clusterIdxTestSet = vertcat(boutMembership{testBoutIdx});
     testSetMSP{iD} = clusterSpectra(clusterIdxTestSet(binIndicesTest),:);

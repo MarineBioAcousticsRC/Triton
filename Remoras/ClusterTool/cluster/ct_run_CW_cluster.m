@@ -48,7 +48,7 @@ while ~noChange && (cwItr<=p.maxCWiterations)
     cwItr = cwItr + 1;
   
 end
-if p.plotFlag
+if p.plotFlag && size(distClickEFull,1)<5000
     
     % G = graph(squareform(distClickE));
     G = graph(distClickEFull,'upper');
@@ -58,6 +58,8 @@ if p.plotFlag
     for iC=1:size(uID,1)
         highlight(h, clusterID==uID(iC),'nodeColor',cList(mod(uID(iC),64)+1,:))
     end
+else
+    disp('Too many nodes for network plotting')
 end
 fprintf('%0.0f iterations required\n',cwItr-1);
 colormap(jet)

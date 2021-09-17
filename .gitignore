@@ -28,7 +28,6 @@ $RECYCLE.BIN/
 Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM.m
 Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM.m
 Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM_test.m
-Settings/InstalledRemoras.cnf
 *.mat
 !Remoras/Fish detector/Bocaccio1_template.mat
 !Remoras/Fish detector/Bocaccio2_template.mat
@@ -38,8 +37,4 @@ Settings/InstalledRemoras.cnf
 !Remoras/Explosion-Detector/template.mat
 *.cnf
 Settings/InstalledRemoras.cnf
-Settings/InstalledRemoras.cnf
-*.cnf
-*.cnf
-*.cnf
 *.prj
