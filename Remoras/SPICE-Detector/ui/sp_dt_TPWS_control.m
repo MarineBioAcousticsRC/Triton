@@ -17,6 +17,10 @@ elseif strcmp(action, 'setTPWSFilterString')
     filterString = get(REMORA.spice_dt_mkTPWS.filterStringEdTxt,'String');
     REMORA.spice_dt.mkTPWS.filterString = filterString;
     
+elseif strcmp(action, 'setTPWSspName')
+    spName = get(REMORA.spice_dt_mkTPWS.spNameEdTxt,'String');
+    REMORA.spice_dt.mkTPWS.spName = spName;
+    
 elseif strcmp(action, 'setTPWSminRL')
     minDBpp = get(REMORA.spice_dt_mkTPWS.minRLEdTxt,'String');
     if ~isempty(minDBpp)

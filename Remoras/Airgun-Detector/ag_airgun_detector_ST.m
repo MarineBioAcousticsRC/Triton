@@ -340,7 +340,7 @@ for fidx = 1:size(FileList,1) % Make sure to change the start of the file list s
                 1;
         end
     end
-end
+
     
     if ~isempty(allExp)
         bt = [];
@@ -369,5 +369,5 @@ end
             'allRmsNBefore','allRmsNAfter','allRmsDet','allPpNBefore',...
             'allPpNAfter','allPpDet','rawStart','rawDur','parm','bt','-v7.3');
     end
-    
+end
 end

@@ -102,6 +102,9 @@ else
     [~,shortName,~] = fileparts(Filename);
     % determine timestamp
     [~,~,~,~,k] = regexp(shortName, DateRE);
+    if isempty(k)
+        error('Date expression does not match file name')
+    end
     catDate = cell2mat(k{1});
     if length(catDate)==12
         hdr.start.dvec = [str2double(catDate(1:2))+2000,str2double(catDate(3:4)),...
