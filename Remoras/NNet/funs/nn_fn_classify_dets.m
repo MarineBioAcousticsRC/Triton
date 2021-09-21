@@ -57,8 +57,8 @@ for iTPWS = 1:nFiles
         load(fullfile(TPWSList(iTPWS).folder,TPWSList(iTPWS).name),'MSN')
     end
     
-    % test4D = table(mat2cell([nn_fn_normalize_spectrum(MSP),nn_fn_normalize_timeseries(MSN)],ones(size(MSN,1),1)));
-    test4D = table(mat2cell([(MSP),(MSN)],ones(size(MSN,1),1)));
+    test4D = table(mat2cell([nn_fn_normalize_spectrum(MSP),nn_fn_normalize_timeseries(MSN)],ones(size(MSN,1),1)));
+    %test4D = table(mat2cell([(MSP),(MSN)],ones(size(MSN,1),1)));
 
     % classify
     [predLabels,predScores] = classify(trainedNet.net,test4D);

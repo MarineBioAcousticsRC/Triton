@@ -170,7 +170,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         % close input xwav file
         fclose(fid);
     end
-    disp(['Completed Processing file ',num2str(k)])
+    disp(['Completed Processing audio file ',num2str(k)])
     
     
 end     % end for k - loop over each file

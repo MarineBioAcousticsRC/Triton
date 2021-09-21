@@ -13,7 +13,11 @@ figName{2} = fullfile(figDir,sprintf('%s_allCatSpec',s.outputName));
 figName{3} = fullfile(figDir,sprintf('%ss_allICI',s.outputName));
 figName{4} = fullfile(figDir,sprintf('%s_allICIimage',s.outputName));
 figName{5} = fullfile(figDir,sprintf('%s_allWaveEnv',s.outputName));
-
+if isfield(s,'normalizeSpectra') && s.normalizeSpectra
+    normTF = 1;
+else
+    normTF = 0;
+end
 for iF = 1:length(nodeSet)
     hSet(1) = figure(41); % plot spectra means and percentiles
     subplot(n1,m1,iF)
@@ -36,10 +40,12 @@ for iF = 1:length(nodeSet)
     plot(fPlot,compositeData(iF).specPrctile,'--k','lineWidth',2)
     grid on
     hold off
-    %ylim([0,1])
-    
+    if normTF
+        ylim([0,1])
+    end
     hSet(2) = figure(42); % plot spectra as heatmap
     subplot(n1,m1,iF)
+
     if s.normalizeSpectra
         imagesc(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)')
     else
@@ -58,7 +64,9 @@ for iF = 1:length(nodeSet)
     hold on
     bar(p.barInt(1:s.maxICIidx) + s.barAdj,compositeData(iF).iciMean,1);
     xlim([0,p.barInt(s.maxICIidx)])
-    %ylim([0,1])
+    if normTF
+        ylim([0,1])
+    end
     hold off
     
     hSet(4) = figure(44); % plot click rate distributions
@@ -75,14 +83,22 @@ for iF = 1:length(nodeSet)
 end
 figure(41)
 mxlabel(41,'Frequency (kHz)','FontSize',16);
-mylabel(41,'Normalized Amplitude','FontSize',16);
+if normTF
+    mylabel(41,'Normalized Amplitude','FontSize',16);
+else
+    mylabel(41,'Amplitude','FontSize',16);
+end
 figure(42)
 mxlabel(42,'Click Number','FontSize',16);
 mylabel(42,'Frequency (kHz)','FontSize',16);
 colormap(jet)
 figure(43)
 mxlabel(43,'ICI (sec)','FontSize',16);
-mylabel(43,'Normalized Counts','FontSize',16);
+if normTF
+    mylabel(43,'Normalized Counts','FontSize',16);
+else
+    mylabel(43,'Counts','FontSize',16);
+end
 figure(44)
 mxlabel(44,'Bin Number','FontSize',16);
 mylabel(44,'ICI (sec)','FontSize',16);
