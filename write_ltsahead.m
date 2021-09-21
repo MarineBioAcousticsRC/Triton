@@ -12,25 +12,30 @@ global PARAMS
 % disp('set up ltsa file')
 
 % get file name
-filterSpec1 = '*.ltsa';
-boxTitle1 = 'Save LTSA File';
-% user interface retrieve file to open through a dialog box
-PARAMS.ltsa.outdir = PARAMS.ltsa.indir;
-PARAMS.ltsa.outfile = 'LTSAout.ltsa';
-DefaultName = [PARAMS.ltsa.outdir,'\',PARAMS.ltsa.outfile];
-[PARAMS.ltsa.outfile,PARAMS.ltsa.outdir]=uiputfile(filterSpec1,boxTitle1,DefaultName);
-% if the cancel button is pushed, then no file is loaded
-% so exit this script
-if strcmp(num2str(PARAMS.ltsa.outfile),'0')
-    PARAMS.ltsa.gen = 0;
-    disp_msg('Canceled file creation')
-    return
-else
-    PARAMS.ltsa.gen = 1;
-    disp_msg('Opened File: ')
-    disp_msg([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile])
-    %     disp(' ')
-    cd(PARAMS.ltsa.outdir)
+% if it has already been specified, don't have to do anything (this happens
+% when using mk_ltsa_multidir.m)
+% if making single LTSA through triton gui, prompt for filename
+if isempty(PARAMS.ltsa.outfile)
+    filterSpec1 = '*.ltsa';
+    boxTitle1 = 'Save LTSA File';
+    % user interface retrieve file to open through a dialog box
+    PARAMS.ltsa.outdir = PARAMS.ltsa.indir;
+    PARAMS.ltsa.outfile = 'LTSAout.ltsa';
+    DefaultName = [PARAMS.ltsa.outdir,'\',PARAMS.ltsa.outfile];
+    [PARAMS.ltsa.outfile,PARAMS.ltsa.outdir]=uiputfile(filterSpec1,boxTitle1,DefaultName);
+    % if the cancel button is pushed, then no file is loaded
+    % so exit this script
+    if strcmp(num2str(PARAMS.ltsa.outfile),'0')
+        PARAMS.ltsa.gen = 0;
+        disp_msg('Canceled file creation')
+        return
+    else
+        PARAMS.ltsa.gen = 1;
+        disp_msg('Opened File: ')
+        disp_msg([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile])
+        %     disp(' ')
+        cd(PARAMS.ltsa.outdir)
+    end
 end
 
 % calculate file header values, open file and fill up header
@@ -42,7 +47,7 @@ dirStartLoc = lhsz + 1;                               % directory start location
 dataStartLoc = rhsz * maxNrawfiles + lhsz;           % data start location in bytes
 
 % open output ltsa file
-fid = fopen([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile],'w');
+fid = fopen(fullfile(PARAMS.ltsa.outdir,PARAMS.ltsa.outfile),'w');
 
 % LTSA file Header - 64 bytes total
 fwrite(fid,'LTSA','char');                  % 4 bytes - file ID type

@@ -62,7 +62,7 @@ if PARAMS.ltsa.dtype == 1       % HARP data => 12 byte header
 elseif PARAMS.ltsa.dtype == 4   % wav or flac files 
     % don't worry about it for this type...
     % added for very long wav files with only one raw file
-
+    % no header bytes so don't have to speify blksz here? 
 else
     disp('Error - non-supported data type')
     disp(['PARAMS.ltsa.dtype = ',num2str(PARAMS.ltsa.dtype)])

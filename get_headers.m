@@ -54,7 +54,8 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         PARAMS.ltsahd.rfileid(m) = 1;                           % raw file id / number in this xwav file
         
         % timing stuff:
-        dnums = wavname2dnum(PARAMS.ltsa.fname(k,:),0);
+        dnums = wavname2dnum(PARAMS.ltsa.fname(k,:),0); % 0 toggles disp msg off
+
         if isempty(dnums)
             PARAMS.ltsahd.dnumStart(m) = datenum([0 1 1 0 0 0]);
         else
@@ -125,5 +126,6 @@ end
 PARAMS.ltsa.nrftot = m;     % total number of raw files
 PARAMS.ltsa.ver = 4;    % 32 bits (~ 4billon nave and nrftot allowed)
 
+disp(['Number of channels: ', num2str(PARAMS.ltsa.nch(1))])
 disp(['Total number of raw files: ',num2str(PARAMS.ltsa.nrftot)])
 disp(['LTSA version ',num2str(PARAMS.ltsa.ver)])

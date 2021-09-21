@@ -25,7 +25,8 @@ $RECYCLE.BIN/
 
 # Matlab
 *.asv
-*.mat
 *.cnf
 *.prj
+*.mat
+Remoras/MultiDirLTSAs/og/
 Settings/InstalledRemoras.cnf
