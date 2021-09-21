@@ -28,17 +28,5 @@ $RECYCLE.BIN/
 *.cnf
 *.prj
 *.mat
-
-Settings/InstalledRemoras.cnf
-
-Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM.m
-Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM.m
-Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM_test.m
-!Remoras/Fish detector/Bocaccio1_template.mat
-!Remoras/Fish detector/Bocaccio2_template.mat
-!Remoras/Fish detector/Bocaccio3_template.mat
-!Remoras/Fish detector/Bocaccio5_template.mat
-!Remoras/Airgun-Detector/air_template_df100.mat
-!Remoras/Explosion-Detector/template.mat
-
 Remoras/MultiDirLTSAs/og/
+Settings/InstalledRemoras.cnf

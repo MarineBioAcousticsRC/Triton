@@ -61,6 +61,17 @@ elseif strcmp(extFile,'.txt')
         % columns, with start times, end times, and labels
         Starts = table{:,1};
         Stops = table{:,2};
+        
+        %check if date range should be modified- if first column of datevec
+        %times is >2000, assume that should remove year to match triton
+        %dates
+        dvst = datevec(Starts);
+        yearcol = dvst(:,1);
+        if ~isempty(find(yearcol > 2000))
+            Starts = Starts - datenum(2000,0,0,0,0,0);
+            Stops = Stops - datenum(2000,0,0,0,0,0);
+        end
+        
         Labels = table{:,3};
         disp('.txt file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
 %     end

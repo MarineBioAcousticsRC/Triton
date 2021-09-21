@@ -89,3 +89,5 @@ spHelpStrings.energyPerc = ['Sets the threshold at which click start and end are
 spHelpStrings.energyThr = '';
 
 spHelpStrings.BPfilterOrder = 'Butterworth filter order used for bandpass.';
+
+spHelpStrings.Parpool = 'Number of parallel detection processes to run.';

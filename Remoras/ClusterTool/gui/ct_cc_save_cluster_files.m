@@ -93,7 +93,7 @@ if REMORA.ct.CC.output.saveDetLevelDataTF
             end
             trainMSN = MSN(I,:);
             trainMSP = MSP(I,:);
-            
+            trainTimes = trainTimes(I,:);
             [~,outputName,~] = fileparts(TPWSname);
             
             detLevelOutputFile = fullfile(newDir{iF},sprintf('%s_%s_file%0.0f_detLevel.mat',...
@@ -105,6 +105,7 @@ if REMORA.ct.CC.output.saveDetLevelDataTF
         fprintf('Done saving detection-level output for %s.\n',TPWSname)
         MSN = [];
         MSP = []; 
+        trainTimes = [];
     end
 end
 spinH.stop

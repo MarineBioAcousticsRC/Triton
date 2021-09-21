@@ -225,6 +225,10 @@ elseif strcmp(action,'SetEnergyThr')
     energyThr = str2num(get(REMORA.spice_dt_verify.energyThrEdTxt, 'string'));
     REMORA.spice_dt.detParams.energyPrctile = energyThr;
     
+elseif strcmp(action,'SetParpool')
+    parpoolSize = str2num(get(REMORA.spice_dt_verify.parpoolEdTxt, 'string'));
+    REMORA.spice_dt.detParams.parpool = parpoolSize;
+
 elseif strcmp(action,'SetFilterOrder')
     filterOrder = str2num(get(REMORA.spice_dt_verify.BPfilterEdTxt, 'string'));
     REMORA.spice_dt.detParams.filterOrder = filterOrder;
