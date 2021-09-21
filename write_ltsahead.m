@@ -90,9 +90,9 @@ for k = 1 : PARAMS.ltsa.nrftot
     %
     % calculate number of spectral averages for this raw file
     % number of samples in this raw file = # sectors in rawfile * # samples/sector:
-    if PARAMS.ltsa.ftype ~= 1   % for HARP and ARP data
+    if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3   % for HARP and ARP data
         Nsamp = (PARAMS.ltsahd.write_length(k) * PARAMS.ltsa.blksz) / PARAMS.ltsa.nch;
-    else        % for wav/Ishmael type data
+    elseif PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3   % for wav/Ishmael type data or flac files 
         Nsamp = PARAMS.ltsahd.nsamp(k);
     end
     %
