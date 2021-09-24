@@ -30,3 +30,4 @@ $RECYCLE.BIN/
 *.mat
 Remoras/MultiDirLTSAs/og/
 Settings/InstalledRemoras.cnf
+*.cp.txt
