@@ -69,8 +69,12 @@ if REMORA.ct.CC.output.saveDetLevelDataTF
     % uInputFiles = unique(thisType.fileNumExpand);
     thisTPWSList = REMORA.ct.CC.output.TPWSList;%(uInputFiles);
     for iTPWS = 1:length(thisTPWSList)
-        TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
-        load(TPWSname,'MTT');
+        if isempty(thisTPWSList{iTPWS}) % JMJ fix added to skip if empty dir entries are in the thisTPWSlist array
+            continue
+        end
+	TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
+        
+	load(TPWSname,'MTT');
         MSN = [];
         MSP = [];
         fprintf('Loading data from %s...\n',TPWSname)
@@ -93,7 +97,7 @@ if REMORA.ct.CC.output.saveDetLevelDataTF
             end
             trainMSN = MSN(I,:);
             trainMSP = MSP(I,:);
-            trainTimes = trainTimes(I,:);
+            trainTimes = MTT(I,:);
             [~,outputName,~] = fileparts(TPWSname);
             
             detLevelOutputFile = fullfile(newDir{iF},sprintf('%s_%s_file%0.0f_detLevel.mat',...
