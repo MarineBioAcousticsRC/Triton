@@ -48,7 +48,7 @@ while ~noChange && (cwItr<=p.maxCWiterations)
     cwItr = cwItr + 1;
   
 end
-if p.plotFlag && size(distClickEFull,1)<5000
+if p.plotFlag && size(distClickEFull,1)<3000
     
     % G = graph(squareform(distClickE));
     G = graph(distClickEFull,'upper');

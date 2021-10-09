@@ -112,8 +112,15 @@ for iDir = 1:length(inDirList)
     
     % Iterate over TPWS files, running clustering process on each time bin
     if p.parpoolSize>1    
-        
-        parpool(p.parpoolSize);
+        poolObj = gcp('nocreate');
+        if isempty(poolObj)
+            parpool(p.parpoolSize);
+        else poolObj.NumWorkers~=p.parpoolSize;
+            disp(sprintf('Found parpool of %0.0f workers, destroying to create new pool of %0.0f workers\n',...
+                poolObj.NumWorkers,p.parpoolSize))
+            delete(gcp('nocreate'))
+            parpool(p.parpoolSize);
+        end
         parfor itr = 1:length(tpwsNames) 
             thisFile = fullfile(tpwsNames(itr).folder,tpwsNames(itr).name);        
             fprintf('Beginning file %s\n',thisFile)
