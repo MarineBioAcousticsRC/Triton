@@ -168,6 +168,6 @@ end
 
 % change time in control window to data time in plot window
 set(HANDLES.ltsa.time.edtxt1,'String',timestr(PARAMS.ltsa.plot.dnum,6));
-set(HANDLES.ltsa.time.edtxt3,'String',PARAMS.ltsa.tseg.hr);
+% set(HANDLES.ltsa.time.edtxt3,'String',PARAMS.ltsa.tseg.hr);
 
 
