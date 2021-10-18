@@ -6,7 +6,10 @@ rfDur = PARAMS.ltsa.dur(1); %assumes same duration of all rfs in LTSA
 
 if strcmp(action,'starts')
     for iWin = 1:size(inWindowDet,1)
-        winDetWavIdx{iWin} = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,1)& inWindowDet(iWin,1)<=PARAMS.ltsa.dnumEnd);
+                %find all the raw files with start times before the detection
+        winDetWavIdxTemp = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,1));%& inWindowDet(iWin,1)<=PARAMS.ltsa.dnumEnd);
+       %choose the last of these to get the one it's in
+       winDetWavIdx{iWin} = max(winDetWavIdxTemp);
         if size(winDetWavIdx{iWin},2)>1
             winDetWavIdx{iWin} = winDetWavIdx{iWin}(1);
             disp('WARNING! Detection start time found in two raw files')
@@ -25,11 +28,14 @@ if strcmp(action,'starts')
 elseif strcmp(action,'stops')
     
     for iWin = 1:size(inWindowDet,1)
-        winDetWavIdx{iWin} = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,2)& inWindowDet(iWin,2)<=PARAMS.ltsa.dnumEnd);
-       if size(winDetWavIdx{iWin},2)>1
-            winDetWavIdx{iWin} = winDetWavIdx{iWin}(1);
-            disp('WARNING! Detection end time found in two raw files!')
-        end
+        %find all the raw files with start times before the detection
+        winDetWavIdxTemp = find(PARAMS.ltsa.dnumStart<=inWindowDet(iWin,2));%& inWindowDet(iWin,2)<=PARAMS.ltsa.dnumEnd);
+       %choose the last of these to get the one it's in
+       winDetWavIdx{iWin} = max(winDetWavIdxTemp);
+%         if size(winDetWavIdx{iWin},2)>1
+%             winDetWavIdx{iWin} = winDetWavIdx{iWin}(1);
+%             disp('WARNING! Detection end time found in two raw files!')
+%         end
     end
     
     wDWIdx = [winDetWavIdx{:}];
