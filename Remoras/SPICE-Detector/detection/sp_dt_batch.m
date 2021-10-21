@@ -25,7 +25,7 @@ else
     % deletes the current one and creates a new one with the specified
     % number of workers
     if poolobj.NumWorkers ~= p.parpool
-        disp('Shut down current pool to uptade number of workers specified')
+        disp('Shutting down current pool to update number of workers')
         delete(gcp('nocreate'))
         parpool(p.parpool)
     end
