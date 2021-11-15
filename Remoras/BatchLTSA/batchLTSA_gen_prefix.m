@@ -48,7 +48,7 @@ else
     prefix = strsplit(PARAMS.ltsa.indir, '\'); % TODO issue between running on windows and mac?
     prefix = prefix{end};
     prefix = strrep(prefix, ' ', '_');
-    exp = '[^\w.]+'; %any non (^) alphanumeric, numeric, underscore, or . character
+    exp = '[^\w.-]+'; %any non(^) alphanumeric, numeric, underscore, .m or - character
     prefix = regexprep(prefix, exp, ''); % remove it
     prefix = strrep(prefix, '__', '_');
 end
