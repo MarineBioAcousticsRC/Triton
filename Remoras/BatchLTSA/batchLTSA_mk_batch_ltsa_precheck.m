@@ -43,6 +43,7 @@ PARAMS.ltsa.outdirs = outdirs;
 % default is same for all directories as set in initial window, but can
 % modify by directory if desired
 batchLTSA_chk_ltsa_params(indirs); % set taves and dfreqs
+if REMORA.batchLTSA.cancelled == 1; return; end
 taves = PARAMS.ltsa.taves;
 dfreqs = PARAMS.ltsa.dfreqs;
 
@@ -85,6 +86,7 @@ PARAMS.ltsa.dirdata = dirdata;
 
 % make sure the filenames are what you want them to be
 batchLTSA_chk_filenames;
+if REMORA.batchLTSA.cancelled == 1; return; end
 outfiles = PARAMS.ltsa.outfiles; % write back to outfiles for below
 
 % loop through again to do filename checks 

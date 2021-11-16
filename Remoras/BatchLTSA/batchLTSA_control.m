@@ -41,6 +41,12 @@ elseif strcmp(action,'setnumch')
 elseif strcmp(action,'RunBatchLTSA')
     close(REMORA.fig.batchLTSA)
     batchLTSA_init_batch_ltsa;
+    
+elseif strcmp(action, 'cancelAll')
+    closereq();
+    REMORA.batchLTSA.cancelled = 1;
+    disp_msg('Process Cancelled');
+
 end
 
 
