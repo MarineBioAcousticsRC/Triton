@@ -2,6 +2,8 @@ function batchLTSA_mk_batch_ltsa
 
 global PARAMS REMORA
 
+if REMORA.batchLTSA.cancelled == 1; return; end
+
 % load in data from PARAMS
 indirs =    PARAMS.ltsa.indirs;
 outdirs =   PARAMS.ltsa.outdirs;
