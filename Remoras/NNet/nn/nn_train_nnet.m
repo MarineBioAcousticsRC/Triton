@@ -69,10 +69,10 @@ fprintf('\n\n Confusion matrix:\n')
 % May need a solution for older matlabs and no toolbox. In that case, keras
 % might be the thing.
 
-[YPred,scores] = classify(net,train4D);
-
-confusionmat(YPred,categorical(trainLabelsAll))
-fprintf('\n\n\n')
+% [YPred,scores] = classify(net,train4D);
+% 
+% confusionmat(YPred,categorical(trainLabelsAll))
+% fprintf('\n\n\n')
 
 load(REMORA.nn.train_net.testFile);
 testDataAll(isnan(testDataAll))=0;
@@ -82,6 +82,7 @@ test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(tes
 [YPredTrain,scoresTrain] = classify(net,train4D);
 
 [YPredEval,scoresEval] = classify(net,test4D);
+
 confusionMatrixEval = confusionmat(YPredEval,categorical(testLabelsAll));
 bestScores = max(scoresEval,[],2);
 
@@ -103,10 +104,10 @@ save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',.
 
 
 
-REMORA.fig.nn.training_plots{6} = nn_fn_plotconfusion(trainLabelsAll,YPredTrain,typeNames);
+REMORA.fig.nn.training_plots{6} = nn_fn_plotconfusionChart(trainLabelsAll,YPredTrain,typeNames);
 REMORA.fig.nn.training_plots{6};
 title('Confusion Matrix: Training Data')
-REMORA.fig.nn.training_plots{7} = nn_fn_plotconfusion(testLabelsAll,YPredEval,typeNames);
+REMORA.fig.nn.training_plots{7} = nn_fn_plotconfusionChart(testLabelsAll,YPredEval,typeNames);
 REMORA.fig.nn.training_plots{7};
 title('Confusion Matrix: Evaluation Data')
 
