@@ -93,6 +93,7 @@ outfiles = PARAMS.ltsa.outfiles; % write back to outfiles for below
 for k = 1:length(indirs)
     
     % make sure filenames will work
+    PARAMS.ltsa.indir = PARAMS.ltsa.indirs{k};
     success = ck_names(prefixes{k});
     
     % check to see if the ltsa file already exists
@@ -184,7 +185,7 @@ end
 %% check to see if the xwav/wav names are compatible with ltsa format
 function success = ck_names(prefix)
 
-global PARAMS
+global PARAMS REMORA
 
 success = 1;
 
@@ -218,7 +219,7 @@ if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3
 end
 
 % if we don't like the format, offer to change wav/xwav filenames
-if ~success; success = rename_wavs(prefix); end
+if ~success; success = batchLTSA_rename_wavs(prefix); end
 
 % either continue with ltsa creation or return
 if success; success = 1; return; end
