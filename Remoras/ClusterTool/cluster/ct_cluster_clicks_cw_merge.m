@@ -160,7 +160,7 @@ if ~isempty(uniqueLabelsNew)
         if p.normalizeTF
             spectraMean(i4,:) = (meanSpectra-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)))...
                 ./max(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)-min(meanSpectra(:,p.startFreqIdx:p.endFreqIdx)));
-            envMean(i4,:) = mean(envSet(thisClickSet,:)./max(envSet(thisClickSet,:),[],2));
+            envMean(i4,:) = mean(envSet(thisClickSet,:)./max(envSet(thisClickSet,:),[],2),1);
             
         else
             spectraMean(i4,:) = meanSpectra;
