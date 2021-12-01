@@ -16,7 +16,7 @@ else
     parpool(1);
 end
 
-parfor idx1 = 1:N % for each data file
+for idx1 = 1:N % for each data file
     f=[];
     
     outFileName = fullLabels{idx1};

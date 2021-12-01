@@ -99,6 +99,7 @@ MSN = MSN(ppKeep,:);
 fprintf('%0.0f clicks left after applying amplitude threshold.\n',length(MTT))
 if isempty(MTT)
     warning('All clicks pruned out by amplitude threshold, nothing left to cluster.')
+    return
 end
 
 % Remove clicks that are really close together if desired.

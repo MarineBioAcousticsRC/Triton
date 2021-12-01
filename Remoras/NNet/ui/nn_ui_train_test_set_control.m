@@ -38,10 +38,10 @@ elseif strcmp(myEvent, 'setTrainPerc')
     REMORA.nn.train_test_set.trainPerc = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set.trainPercEdTxt,'String'));
     
-    if REMORA.fig.nn.nn_train_test_set.trainPerc>1
+    if REMORA.nn.train_test_set.trainPerc>1
         % make it a fraction if needed.
-        REMORA.fig.nn.nn_train_test_set.trainPerc = ...
-            REMORA.fig.nn.nn_train_test_set.trainPerc/100;
+        REMORA.nn.train_test_set.trainPerc = ...
+            REMORA.nn.train_test_set.trainPerc/100;
     end
     
     elseif strcmp(myEvent,'setValidPerc')

@@ -8,14 +8,14 @@ nAll.inDir = inDir;
 nAll.validPercent = validPercent;
 nAll.trainPercent = trainPercent;
 nAll.boutGap = boutGap;
-nAll.normData = 1;
+nAll.normData = 0;
 nAll.myPerc = 98;
-if ~nAll.normData
-    disp('No pruning because data are not normalized.\n')
-    nAll.myPerc = 0;
-else
-    fprintf('Pruning at %0.2f\n',nAll.myPerc)
-end
+% if ~nAll.normData
+%     disp('No pruning because data are not normalized.\n')
+%     nAll.myPerc = 100;
+% else
+%     fprintf('Pruning at %0.2f\n',nAll.myPerc)
+% end
 nExamplesPad = ceil(nAll.nExamples/(nAll.myPerc/100));
 
 saveNameTrain = [saveName ,'_det_train.mat'];
@@ -54,7 +54,7 @@ for iT = 1:nTypes
     %wBar = waitbar(0,sprintf('Processing type %0.0f',subDirList(iT).name));
     fprintf('Beginning type %0.0f, name: %s\n',iT, subDirList(iT).name)
     folderPath = fullfile(subDirList(iT).folder,subDirList(iT).name);
-    n(iT).fList = dir(fullfile(folderPath,'*detLevel.mat'));
+    n(iT).fList = dir(fullfile(folderPath,REMORA.nn.train_test_set.detWild));
     if isempty(n(iT).fList)
         disp('No files found for this type, skipping to next.')
         continue
@@ -219,14 +219,17 @@ for iT = 1:nTypes
     testSpecAll = [testSpecAll;testSetSP(n(iT).keepersTest(1:nAll.nTest),:)];
     testAmpAll = [testAmpAll;testSetAmp(n(iT).keepersTest(1:nAll.nTest),:)];
     
-    testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN(n(iT).keepersTest(1:nAll.nTest),1)),1)];
-    
+    testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN(n(iT).keepersTest(1:nAll.nTest),:),1),1)];
+
     fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))
     fprintf('Done with type %0.0f of %0.0f\n',iT,nTypes)
     
 end
 
 trainTestSetInfo = REMORA.nn.train_test_set;
+trainTestSetInfo.setSpecHDim = size(trainSpecAll,2);
+trainTestSetInfo.setICIHDim = 0;
+trainTestSetInfo.setWaveHDim = size(trainTSAll,2);
 % Save training set
 trainDataAll = [trainSpecAll,trainTSAll];%trainAmpAll
 nAll.specSize = size(trainSpecAll,2);

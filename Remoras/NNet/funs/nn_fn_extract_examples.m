@@ -3,7 +3,6 @@ function [setSN,setSP,setAmp] = nn_fn_extract_examples(folderPath,fList,...
 
 global REMORA
 
-
 setSN = [];
 setSP = [];
 setAmp = [];
@@ -13,7 +12,7 @@ nBouts = length(fListIdx);
 for iBout = 1:nBouts
     
     thisFileIdx = fListIdx(iBout);
-    thisTypeFile = fullfile(folderPath,fList(thisFileIdx).name);
+    thisTypeFile = fullfile(fList(thisFileIdx).folder,fList(thisFileIdx).name);
     
     % do partial load of just clicks in bout
     fileObj = matfile(thisTypeFile);

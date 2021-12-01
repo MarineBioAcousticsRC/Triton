@@ -68,17 +68,18 @@ for iFile = 1:nFiles
 %             nInt+[0:1:numClusters(iRow,1)-1]']];
 %         nInt = nInt+1;
 %     end
+    tTSI = trainedNet.trainTestSetInfo;
     if trainedNet.trainTestSetInfo.useSpectra
         specSet = vertcat(binData(:).sumSpec);
         specSet(tooFew,:) = [];
-        specSetMin = specSet-min(specSet,[],2);
-        specSet = specSetMin./max(specSetMin,[],2);
+        specSet= (specSet-tTSI.minSpec)/(tTSI.maxSpec-tTSI.minSpec);
     end
     
     if trainedNet.trainTestSetInfo.useICI
         iciSet = vertcat(binData.dTT);
-        iciSet(tooFew,:) = [];
         iciSet = iciSet./max(iciSet,[],2);
+        iciSet(tooFew,:) = [];
+        iciSet = iciSet./(tTSI.maxICI);
     end
         
     if trainedNet.trainTestSetInfo.useWave
@@ -91,6 +92,7 @@ for iFile = 1:nFiles
         end
         waveSet = vertcat(binData.envMean);
         waveSet(tooFew,:) = [];
+        waveSet= waveSet./(tTSI.maxWave);
     end
     
     test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
@@ -126,6 +128,9 @@ for iFile = 1:nFiles
         nPlots = length(typeNames);
         nRows = 3;
         nCols = ceil(nPlots/nRows);
+        if ~isfield(REMORA.fig, 'nn')
+            REMORA.fig.nn = [];
+        end
         if ~isfield(REMORA.fig.nn,'binClass') || ~isvalid(REMORA.fig.nn.binClass)
             REMORA.fig.nn.binClass = figure;
         else

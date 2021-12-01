@@ -201,9 +201,15 @@ for iD = 1:size(typeList,1)
     else
         testSetWave{iD} = [];
     end
+    
     testSetLabels{iD} = ones(size(binIndicesTest,2),1)*iD;
     trainSetSize(iD) = nBinsTrain;
 end
+
+setSpecHDim = size(trainSetMSP{1},2);
+setICIHDim  = size(trainSetICI{1},2);
+setWaveHDim = size(trainSetWave{1},2);
+
 fprintf('Minimum available unique training set size is %0.0f\n', min(trainSetSize))
 fprintf('Maximum available unique training set size is %0.0f\n', max(trainSetSize))
 
@@ -219,6 +225,10 @@ savedTrainFile = fullfile(saveDir,saveNameTrain);
 savedTestFile = fullfile(saveDir,saveNameTest);
 savedValidFile = fullfile(saveDir,saveNameValid);
 trainTestSetInfo = REMORA.nn.train_test_set;
+trainTestSetInfo.setSpecHDim = setSpecHDim;
+trainTestSetInfo.setICIHDim  = setICIHDim;
+trainTestSetInfo.setWaveHDim = setWaveHDim;
+
 save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 save(fullfile(saveDir,saveNameValid),'validDataAll','validLabelsAll','typeNames','trainTestSetInfo','-v7.3')

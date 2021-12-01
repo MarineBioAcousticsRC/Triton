@@ -24,7 +24,26 @@ REMORA.fig.nn.training_plots = [];
 % In matlab 2018+ this should work, OR if you have a GPU, AND if you have
 % the deep learning toolbox.
 load(REMORA.nn.train_net.trainFile);
+tTSI = trainTestSetInfo;
+if 1
+    % normalize spectra
+    tTSI.specLims = [1,tTSI.setSpecHDim];
+    tTSI.minSpec = mean(min(trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2)),[],2));
+    tTSI.maxSpec = mean(max(trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2)),[],2));
+    trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2)) =...
+        (trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2))-tTSI.minSpec)./(tTSI.maxSpec-tTSI.minSpec);
+    
+    tTSI.iciLims = tTSI.setSpecHDim+[1,tTSI.setICIHDim];
+    tTSI.maxICI = mean(max(trainDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2)),[],2));
+    trainDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2)) =...
+        trainDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2))./(tTSI.maxICI);
 
+    tTSI.waveLims = tTSI.iciLims(2)+[1,tTSI.setWaveHDim];
+    tTSI.maxWave = mean(max(trainDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2)),[],2));
+    trainDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2)) =...
+        trainDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2))./(tTSI.maxWave);
+
+end
 if ~isdir(REMORA.nn.train_net.outDir)
     mkdir(REMORA.nn.train_net.outDir)
 end
@@ -47,7 +66,7 @@ uLabelWeights = round(max(labelOccurence)./labelOccurence);
 REMORA.nn.train_net.labelWeights = uLabelWeights;
 
 
-[myNetwork, trainPrefs] = nn_build_network
+[myNetwork, trainPrefs] = nn_build_network(tTSI)
 fprintf('\n\n\n')
 trainDataAll(isnan(trainDataAll))=0;
 
@@ -76,6 +95,19 @@ fprintf('\n\n\n')
 
 load(REMORA.nn.train_net.testFile);
 testDataAll(isnan(testDataAll))=0;
+
+if 1
+    % normalize spectra
+    testDataAll(:,tTSI.specLims(1):tTSI.specLims(2)) =...
+        (testDataAll(:,tTSI.specLims(1):tTSI.specLims(2))-tTSI.minSpec)./(tTSI.maxSpec-tTSI.minSpec);
+   
+    testDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2)) =...
+        testDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2))./(tTSI.maxICI);
+   
+    testDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2)) =...
+        testDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2))./(tTSI.maxWave);
+
+end
 % testDataAll(:,182:381)=abs(testDataAll(:,182:381)-.5)*2;
 test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
 
@@ -97,6 +129,7 @@ elseif contains(filenameStem,'_det_train')
     REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores_det.mat']);
 end
 netTrainingInfo =  REMORA.nn.train_net.trainFile;
+trainTestSetInfo = tTSI;
 save(REMORA.nn.train_net.networkFilename,'net','netTrainingInfo','trainTestSetInfo','typeNames','trainPrefs')
 save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',...
     'scoresEval','testLabelsAll','netTrainingInfo','trainTestSetInfo','typeNames')
