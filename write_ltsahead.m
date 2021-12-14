@@ -115,7 +115,12 @@ for k = 1 : PARAMS.ltsa.nrftot
     
     %
     % write ltsa parameters:
-    %
+    % test if the data exceeds 32 bit limit of byteloc  @JAH 12-2021
+    bytelmax = 2^32;
+    if PARAMS.ltsa.byteloc(k) > bytelmax
+       disp('Input data exceeds limit, use fewer files in LTSA');
+       return
+    end
     fwrite(fid,PARAMS.ltsa.byteloc(k) ,'uint32');     % 4 byte - Byte location in ltsa file of the spectral averages for this rawfile
     fwrite(fid,PARAMS.ltsa.nave(k) ,'uint32');          % 4 byte - number of spectral averages for this raw file
     % 16 bytes up to here
