@@ -70,8 +70,12 @@ for iD = 1:size(typeList,1)
     end
     [clusterTimes,I] = sort(clusterTimes);
     clusterSpectra = clusterSpectra(I,:);
-%     clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);
-%     clusterSpectra = clusterSpectraMin./max(clusterSpectraMin,[],2);
+    
+    % make sure spectra is normalized between 0 and 1
+    if min(min(clusterSpectra)) > 1
+        clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);
+        clusterSpectra = clusterSpectraMin./max(clusterSpectraMin,[],2);
+    end
     clusterICI = clusterICI(I,:);
     if ~isempty(clusterWave)
         clusterWave = clusterWave(I,:);
