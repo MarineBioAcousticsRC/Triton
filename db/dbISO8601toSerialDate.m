@@ -52,7 +52,7 @@ for row = 1:size(dates, 1)
                 else
                     if ischar(isodates{row, col})
                         e.message = sprintf('%s converting %s', ...
-                            isodates{row, col});
+                           isodates{row, col});
                     end
                     rethrow(e);
                 end

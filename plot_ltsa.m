@@ -71,7 +71,9 @@ end
 
 % Make sure color range is fixed.
 set(HANDLES.plt.ltsa,'CDataMapping','scaled');
-caxis([1,65]);
+minp = min(min(PARAMS.ltsa.pwr));
+maxp = max(max(PARAMS.ltsa.pwr));
+caxis([minp,maxp]);
 
 % shift and shrink plot by dv
 dv = 0.075;
