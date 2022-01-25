@@ -51,6 +51,7 @@ end
 if p.plotFlag && size(distClickEFull,1)<3000
     
     % G = graph(squareform(distClickE));
+    figure(110)
     G = graph(distClickEFull,'upper');
     h = plot(G,'layout','force');
     uID = unique(clusterID);
