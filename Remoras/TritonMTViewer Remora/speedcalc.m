@@ -26,11 +26,37 @@ minTime = REMORA.MT.settings.minTime;
 p = all.press(:,1);
 A = [all.iaccel(:,1), all.jaccel(:,1), all.kaccel(:,1)];
 
+%Calibrate accelerometer data based on tag slips.
+Ar = [];
+for t=1:(length(tagslipsA(:,1))-1)
+    st = tagslipsA(t,1)+1;
+    ed = tagslipsA(t+1,1);
+    a = A(st:ed,:);
+    orient = tagslipsA(t,2:4);
+    Q = euler2rotmat(orient);
+    ar = rotate_vecs(a,Q);
+    Ar = vertcat(Ar,ar);
+end
+
+
+%Calibrate pressure data based on temperature offset. Correct for
+%differences in sample rate between temperature and pressure sensors.
+Pc = fix_pressure(p,temp(:,1),5);
+Pd = decdc(p,2);
+Pc = fix_pressure(Pd,all.temp(:,1),5);
+Pc(:,2) = 1:2:length(p(:,1));
+p(:,2) = 1:1:length(p(:,1));
+k = Pc(:,2);
+p(k,3) = Pc(:,1);
+p(k,4) = p(k,1)-p(k,3);
+p(k+1,3) = p(k+1,1)-p(k,4);
+Pc10 = p(:,3);
+
 % Afs is the sample rate of the accelerometer data, fs is the (usually downsampled) sample rate of the tag data at which you will want the final speed values to match.
-JX = TagJiggle(all.iaccel(:,1),Afs,fs,filt,binSize); %[10 90] and 0.5 are default choices, can also input [].  If Afs<180, only a high pass filter at 10 Hz is used.
-JY = TagJiggle(all.jaccel(:,1),Afs,fs,filt,binSize);
-JZ = TagJiggle(all.kaccel(:,1),Afs,fs,filt,binSize);
-J = TagJiggle(A,Afs,fs,filt,binSize);
+JX = TagJiggle(Ar(:,1),Afs,fs,filt,binSize); %[10 90] and 0.5 are default choices, can also input [].  If Afs<180, only a high pass filter at 10 Hz is used.
+JY = TagJiggle(Ar(:,2),Afs,fs,filt,binSize);
+JZ = TagJiggle(Ar(:,3),Afs,fs,filt,binSize);
+J = TagJiggle(Ar,Afs,fs,filt,binSize);
 %end
 % if you've calculated flownoise RMS values, speedFromRMS can compare the speed from jiggle method to the speed from the flownoise method.
 if exist('flownoise','var') && sum(isnan(flownoise)) ~= length(flownoise) 
@@ -39,9 +65,20 @@ else
     RMS = [JX JY JZ J];
 end
 
+%G2018 tagslips
+tagslipsA = [1 0 2.7 0;...
+    (2.792*3600*800) 0 -2.7 0;...
+    (25.271*3600*800) -0.05 -1.6 0;...
+    length(A(:,1)) -0.05 -1.6 0];
+
 if exist('all.tagslip','var') 
-tagslips = [INFO.tagslip.Wchange; length(p)]; % creates a vector of indices indicating the end of periods when the tag was in different orientations
+if tag == 2018
+    tagslips = tagslipsA(2:end,1)/(Afs/10);
+   % tagslips = [INFO.tagslip.Wchange; length(p)]; % creates a vector of indices indicating the end of periods when the tag was in different orientations
 % see SpeedFromRMS for info on the following optional parameters.
+elseif tag == 2015
+    tagslips = tagslipsA(2:end,1);
+end
 else
     tagslips = [];
 end
@@ -58,13 +95,13 @@ tagon = logical(tagon);
 df=800/10;
 %y = decdc(A,df); %This leads to an array that is one shorter than the resampled accelerometer data...
 if tag == '2018'
-    [pitch, roll] = a2pr(A,Afs,fs); %for 2018 data
+    [pitch, roll] = a2pr(Ar); %for 2018 data
     pitchfilt = decdc(pitch,df);
     rollfilt = decdc(roll,df);
     pitchfilt = vertcat(pitchfilt,0);
     rollfilt = vertcat(rollfilt,0);
 else
-[pitch, roll] = a2pr(A); %for 2015 data
+[pitch, roll] = a2pr(Ar); %for 2015 data
 end
 %Filtering pitch and roll to match the other variables:
 
@@ -100,10 +137,10 @@ end
 
 % of the following output variables, the "speed" table is the most important one.  The rest of the outputs are for documenting the fit of the speed curve
 if tag == '2018'
-[~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels]=SpeedFromRMS(RMS,fs,p,pitchfilt,rollfilt,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime);
+[~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels]=SpeedFromRMS(RMS,fs,Pc10,pitchfilt,rollfilt,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime);
 %for 2018 data
 else
-[~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels] = SpeedFromRMS(RMS,fs,p,pitch,roll,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime); %for 2015 data
+[~,speed,sectionsendindex,fits,speedModels,modelsFit,speedThresh,multiModels] = SpeedFromRMS(RMS,fs,Pc,pitch,roll,[],tagslips,tagon,binSize,filterSize,minDepth,minPitch,minSpeed,minTime); %for 2015 data
 end
 %% The following section is optional, but it can help organize the data into a couple of simple structures:
 % 1) speed (a speed table with speed as well as prediction and confidence
@@ -142,12 +179,14 @@ JigRMS = table(X, Y, Z, Mag);
 figure; ax =  plotyy(1:length(p),p,1:length(p),speed.JJ); set(ax(1),'ydir','rev');
 
 if ~exist('SpeedPlots\','dir'); mkdir('SpeedPlots\'); end
-% for fig = [1 301:300+size(speedstats.r2used,1)]
-%     saveas(fig,['SpeedPlots\fig' num2str(fig) '.bmp']);
-% end
+for fig = [1 301:300+size(speedstats.r2used,1)]
+    saveas(fig,['SpeedPlots\fig' num2str(fig) '.bmp']);
+end
 all.speed = speed;
 all.speedstats = speedstats;
 all.JigRMS = JigRMS;
+all.Pc = Pc10;
+save('G2018_tagdata_updatedspeed_calibdepth.mat','-struct','all');
 %whaleID = INFO.whaleName;
 %save([whaleID 'speed.mat'],'speed','speedstats','JigRMS'); % or save the values within your prh file;
 

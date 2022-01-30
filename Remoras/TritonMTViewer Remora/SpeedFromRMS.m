@@ -370,7 +370,7 @@ for i = 1:length(speedper(:,1))
     I = [newIstot&tagon newIstot2&tagon];
     I([1:speedper(i,1)-1 speedper(i,2)+1:length(Is)],:) = false;
     sectI = speedper(i,1):speedper(i,2);
-    OsectI = Ospeedper(i,1):Ospeedper(i,2);
+    OsectI = floor(Ospeedper(i,1)):1:floor(Ospeedper(i,2));
     if model
         IsJ = I(:,1)&~isnan(JigRMS(:,1))&~isnan(speedSP);
         opts = statset('nlinfit');
