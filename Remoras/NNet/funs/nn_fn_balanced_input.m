@@ -219,7 +219,7 @@ for iT = 1:nTypes
     testSpecAll = [testSpecAll;testSetSP(n(iT).keepersTest(1:nAll.nTest),:)];
     testAmpAll = [testAmpAll;testSetAmp(n(iT).keepersTest(1:nAll.nTest),:)];
     
-    testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN(n(iT).keepersTest(1:nAll.nTest),1)),1)];
+    testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN(n(iT).keepersTest(1:nAll.nTest),:),1),1)];
     
     fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))
     fprintf('Done with type %0.0f of %0.0f\n',iT,nTypes)
