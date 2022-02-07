@@ -103,10 +103,10 @@ save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',.
 
 
 
-REMORA.fig.nn.training_plots{6} = nn_fn_plotconfusion(trainLabelsAll,YPredTrain,typeNames);
+REMORA.fig.nn.training_plots{6} = nn_fn_plotconfusionChart(trainLabelsAll,YPredTrain,typeNames);
 REMORA.fig.nn.training_plots{6};
 title('Confusion Matrix: Training Data')
-REMORA.fig.nn.training_plots{7} = nn_fn_plotconfusion(testLabelsAll,YPredEval,typeNames);
+REMORA.fig.nn.training_plots{7} = nn_fn_plotconfusionChart(testLabelsAll,YPredEval,typeNames);
 REMORA.fig.nn.training_plots{7};
 title('Confusion Matrix: Evaluation Data')
 
