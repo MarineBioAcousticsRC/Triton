@@ -13,7 +13,7 @@ HANDLES.filemenu = uimenu(HANDLES.fig.ctrl,'Label','&File');
 %
 uimenu(HANDLES.filemenu,'Label','&Open LTSA File','Callback','filepd(''openltsa'')');
 uimenu(HANDLES.filemenu,'Label','Open &XWAV File','Callback','filepd(''openxwav'')');
-uimenu(HANDLES.filemenu,'Label','Open &WAV File','Callback','filepd(''openwav'')');
+uimenu(HANDLES.filemenu,'Label','Open &WAV or FLAC File','Callback','filepd(''openwav'')');
 %
 HANDLES.exportdata = uimenu(HANDLES.filemenu, 'Separator','on','Label',...
     '&Export Plotted Data To','Enable','off');
