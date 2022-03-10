@@ -15,7 +15,7 @@ global PARAMS
 % if it has already been specified, don't have to do anything (this happens
 % when using mk_ltsa_multidir.m)
 % if making single LTSA through triton gui, prompt for filename
-if isempty(PARAMS.ltsa.outfile)
+if ~exist('PARAMS.ltsa.outfile','var')
     filterSpec1 = '*.ltsa';
     boxTitle1 = 'Save LTSA File';
     % user interface retrieve file to open through a dialog box
