@@ -146,7 +146,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
             if dsz < PARAMS.ltsa.nfft
                 %                 dz = zeros(PARAMS.ltsa.nfft-nsamp,1);
                 dz = zeros(PARAMS.ltsa.nfft-dsz,1);
-                               data = [data;dz'];
+                               data = [data,dz'];
                 %  data = [data,dz'];
                 disp(['File# Raw# Ave# DataSize: ',num2str(k),'  ',num2str(r),'  ',num2str(n),'  ',num2str(dsz)])
                 %                 disp('Paused ... press any key to continue')
