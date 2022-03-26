@@ -121,8 +121,11 @@ if isempty(MTT) % go to next file if no clicks left in this one.
 end
 
 % Build vector of bin starts/ends.
-dateInterval = floor(MTT(1)):datenum([0,0,0,0,p.timeStep,0]):ceil(MTT(end));
-
+if isinf(p.timeStep)
+    dateInterval = [floor(MTT(1)), ceil(MTT(end))];
+else
+    dateInterval = floor(MTT(1)):datenum([0,0,0,0,p.timeStep,0]):ceil(MTT(end));
+end
 % Figure out which clicks are in which time bin.
 [testN,testBin] = histc(MTT,dateInterval);
 
