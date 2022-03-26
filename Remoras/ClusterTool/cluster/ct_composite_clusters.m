@@ -540,7 +540,7 @@ end
 
 for iTF = 1:length(nodeSet)
     % compute mean of spectra in linear space
-    compositeData(iTF,1).spectraMeanSet = nanmean(specNorm,1);
+    compositeData(iTF,1).spectraMeanSet = nanmean(specNorm(nodeSet{iTF},:),1);
 
     %linearSpec = 10.^(specNorm(nodeSet{iTF},:)./20);
     compositeData(iTF,1).specPrctile = prctile(specNorm(nodeSet{iTF},:),[25,75]);
@@ -601,7 +601,7 @@ if s.saveOutput
         thisType.Tfinal = Tfinal(iType,:);
         % [~,~,bin2Nodes] = intersect(thisType.Tfinal{1,7},tIntMat,'stable');
         thisType.tIntMat = tIntMat(Tfinal{iType,8});
-        thisType.clickTimes = vertcat(clickTimes{Tfinal{iType,8}});
+        thisType.clickTimes = clickTimes(Tfinal{iType,8});
         thisType.fileNumExpand = fileNumExpand(Tfinal{iType,8});
         if ~exist('TPWSList','var')
             TPWSList = [];
