@@ -12,10 +12,7 @@ noChange = 0;
 cwItr = 1;
 
 % itrMax = 10;
-if p.plotFlag
-    figure(110);clf
-    cList = colormap(110,lines);
-end
+
 while ~noChange && (cwItr<=p.maxCWiterations)
     rOrder = randperm(length(list2cluster));% randomize order
     noChange = 1; % set no change flag to 1, it will be flipped to 0 as soon as a change is made    
@@ -49,7 +46,8 @@ while ~noChange && (cwItr<=p.maxCWiterations)
   
 end
 if p.plotFlag && size(distClickEFull,1)<3000
-    
+     figure(110);clf
+    cList = colormap(110,lines);
     % G = graph(squareform(distClickE));
     figure(110)
     G = graph(distClickEFull,'upper');
