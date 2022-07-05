@@ -126,8 +126,14 @@ nSpecMat = horzcat(binDataPruned.nSpec)';
 dTTmat = vertcat(binDataPruned.dTT);
 cRateMat = vertcat(binDataPruned.clickRate);
 clickTimes = horzcat(binDataPruned(:).clickTimes);
+if ~isfield(p,'maxDur')
+    p.maxDur = 1;
+end
 for iEM = 1:size(binDataPruned,1)
-    if size(binDataPruned(iEM).envMean,2) == 1
+    if ~isfield(binDataPruned,'envMean')
+       binDataPruned(iEM).envMean = [];
+    end
+    if size(binDataPruned(iEM).envMean,2) == 1 || size(binDataPruned(iEM).envMean,2) == 0
         binDataPruned(iEM).envMean = zeros(1,p.maxDur);
     end
     %     if size(binDataPruned(iEM).envMean,2) == 1
@@ -527,10 +533,16 @@ compositeData = struct(...
     'spectraMeanSet',[],'specPrctile',{},'iciMean',[],...
     'iciStd',[],'cRateMean',[],'cRateStd',[]);
 Tfinal = {};
+
+if s.linearTF
+    specNorm = (20*log10(specNorm))-1;
+end
+
 for iTF = 1:length(nodeSet)
     % compute mean of spectra in linear space
-    linearSpec = 10.^(specNorm(nodeSet{iTF},:)./20);
-    compositeData(iTF,1).spectraMeanSet = 20*log10(nanmean(linearSpec));
+    compositeData(iTF,1).spectraMeanSet = nanmean(specNorm(nodeSet{iTF},:),1);
+
+    %linearSpec = 10.^(specNorm(nodeSet{iTF},:)./20);
     compositeData(iTF,1).specPrctile = prctile(specNorm(nodeSet{iTF},:),[25,75]);
     compositeData(iTF,1).iciMean = nanmean(dTTmatNorm(nodeSet{iTF},:));
     compositeData(iTF,1).iciStd = nanstd(dTTmatNorm(nodeSet{iTF},:));
@@ -589,7 +601,7 @@ if s.saveOutput
         thisType.Tfinal = Tfinal(iType,:);
         % [~,~,bin2Nodes] = intersect(thisType.Tfinal{1,7},tIntMat,'stable');
         thisType.tIntMat = tIntMat(Tfinal{iType,8});
-        thisType.clickTimes = vertcat(clickTimes{Tfinal{iType,8}});
+        thisType.clickTimes = clickTimes(Tfinal{iType,8});
         thisType.fileNumExpand = fileNumExpand(Tfinal{iType,8});
         if ~exist('TPWSList','var')
             TPWSList = [];
