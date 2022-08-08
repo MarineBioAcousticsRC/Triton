@@ -14,7 +14,7 @@ global PARAMS
 % get file name
 % only if not already specified (in case of batchLTSA remora)
 % if making single LTSA through triton gui, prompt for filename
-if ~isfield(PARAMS.ltsa, 'outfile')
+if ~exist('PARAMS.ltsa.outfile','var')
     filterSpec1 = '*.ltsa';
     boxTitle1 = 'Save LTSA File';
     % user interface retrieve file to open through a dialog box

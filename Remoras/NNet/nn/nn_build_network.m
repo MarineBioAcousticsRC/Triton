@@ -1,4 +1,4 @@
-function [layerSet, trainPrefs] = nn_build_network
+function [layerSet, trainPrefs] = nn_build_network(trainTestSetInfo)
 
 global REMORA
 
@@ -37,6 +37,14 @@ if REMORA.nn.train_test_set.validationTF
         error(sprintf('Batch size (%0.0f) is too large relative to training set size (%0.0f). Reduce batch size',REMORA.nn.train_net.batchSize,trainDataSize(1)))
     end
     vD = load(REMORA.nn.train_net.validFile);
+    if trainTestSetInfo.standardizeAll
+        normSpec1 = vD.validDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
+        vD.validDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
+        ICIstart = trainTestSetInfo.setSpecHDim+1;
+        vD.validDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = vD.validDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
+        wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
+        vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))/trainTestSetInfo.waveStd(1);
+    end
     validation4D = table(mat2cell(vD.validDataAll,...
         ones(size(vD.validDataAll,1),1)),categorical(vD.validLabelsAll));
 

@@ -27,7 +27,7 @@ labels = {'', '2', '3', '4', '5', '6', '7', '8'};
 yPos = plotFreq;
 labelPos = yPos*1.05;
 
-for labidx = 1:length(labels);
+for labidx = 1:length(labels)
     detfld = sprintf('detection%s', labels{labidx});
     if REMORA.lt.lVis_det.(detfld).PlotLabels
         labl = REMORA.lt.lVis_det.(detfld).labels(1);
@@ -53,8 +53,8 @@ for labidx = 1:length(labels);
             
             %find which raw file each detection in winDet is in
             inWindowD = [ltsaS,ltsaE];
-            detXstart = lt_lVis_get_LTSA_Offset(inWindowD,'starts',ltsaS);
-            detXend = lt_lVis_get_LTSA_Offset(inWindowD,'stops',ltsaS);
+            detXstart = lt_lVis_get_LTSA_Offset(inWindowD,'starts');
+            detXend = lt_lVis_get_LTSA_Offset(inWindowD,'stops');
             
             
             hold(HANDLES.subplt.ltsa, 'on')
@@ -311,12 +311,33 @@ boutGap = datenum(0,0,0,0,0,15); %if spacing between start of detections...
 [startBouts,endBouts] = lt_lVis_defineBouts(chLab(:,1),chLab(:,2),boutGap);
 lablFull = [startBouts,endBouts];
 
-winDetsFull = lablFull(startBouts>= ltsaS & endBouts<=ltsaE,:);
+winDetsIdx = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
+%deal with floating-point issues. If first detection is on cusp of
+%ltsaS,include anyway
+if ~isempty(winDetsIdx)
+    firstdet = winDetsIdx(1);
+    if firstdet ~= 1 && abs(lablFull(firstdet-1,1) - ltsaS) <= 0.0001
+        %include this detection in the window
+        winDetsIdx = [firstdet-1;winDetsIdx];
+    end
+    %if last detection end is close to ltsaE, include detection
+    lastdet = winDetsIdx(end);
+    if lastdet ~= size(lablFull,1) && abs(lablFull(lastdet+1,2) - ltsaE) <= 0.0001
+        winDetsIdx = [winDetsIdx;lastdet+1];
+    end
+    %if windets is empty, check if ltsaS value very close to any of labl values
+elseif min(abs(lablFull(:,1) - ltsaS)) <= 0.0001
+    [~,winDetsIdx] = min(abs(lablFull(:,1) - ltsaS));
+else
+    winDetsIdx = [];
+end
+winDetsFull = lablFull(winDetsIdx,:);
+
 
 if ~isempty(winDetsFull)
     %find which raw file each detection in winDet is in
-    detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts',ltsaS);
-    detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops',ltsaS);
+    detXstart = lt_lVis_get_LTSA_Offset(winDetsFull,'starts');
+    detXend = lt_lVis_get_LTSA_Offset(winDetsFull,'stops');
     
     
     axes (HANDLES.subplt.ltsa)

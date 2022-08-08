@@ -1,4 +1,4 @@
-function nn_fn_classify_bins
+function nn_fn_classify_bins_standardize
 
 global REMORA
 minSize = 1;
@@ -71,14 +71,15 @@ for iFile = 1:nFiles
     if trainedNet.trainTestSetInfo.useSpectra
         specSet = vertcat(binData(:).sumSpec);
         specSet(tooFew,:) = [];
-        specSetMin = specSet-min(specSet,[],2);
-        specSet = specSetMin./max(specSetMin,[],2);
+        %specSetMin = specSet-min(specSet,[],2);
+        specSet = (specSet-trainedNet.trainTestSetInfo.specStd(1))/(trainedNet.trainTestSetInfo.specStd(2)-trainedNet.trainTestSetInfo.specStd(1));
+        % specSet = specSetMin./max(specSetMin,[],2);
     end
     
     if trainedNet.trainTestSetInfo.useICI
         iciSet = vertcat(binData.dTT);
         iciSet(tooFew,:) = [];
-        iciSet = iciSet./max(max(iciSet,[],2),1);
+        iciSet = iciSet./trainedNet.trainTestSetInfo.iciStd(1);
     end
         
     if trainedNet.trainTestSetInfo.useWave
@@ -90,7 +91,8 @@ for iFile = 1:nFiles
             binData(tooShort(iS)).envMean = ones(1,max(waveLen));
         end
         waveSet = vertcat(binData.envMean);
-        waveSet = waveSet./max(waveSet,[],2);
+        waveSet = waveSet/trainedNet.trainTestSetInfo.waveStd(1);
+        % waveSet = waveSet./max(waveSet,[],2);
         waveSet(tooFew,:) = [];
     end
     
