@@ -12,8 +12,7 @@ global PARAMS
 % disp('set up ltsa file')
 
 % get file name
-% if it has already been specified, don't have to do anything (this happens
-% when using mk_ltsa_multidir.m)
+% only if not already specified (in case of batchLTSA remora)
 % if making single LTSA through triton gui, prompt for filename
 if ~exist('PARAMS.ltsa.outfile','var')
     filterSpec1 = '*.ltsa';

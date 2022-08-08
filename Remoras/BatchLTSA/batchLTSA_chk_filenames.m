@@ -62,6 +62,12 @@ labelStr = 'Okay';
 btnPos = [x(3), y(1), 2*bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
     'Style', 'push', 'String', labelStr, 'Callback', {@okay, fig, fig_filenames});
+% cancel button
+labelStr = 'Cancel';
+btnPos = [x(1), y(1), bw, bh];
+uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
+    'Style', 'push', 'String', labelStr, 'Callback','batchLTSA_control(''cancelAll'')');
+
 uiwait;
 end
 

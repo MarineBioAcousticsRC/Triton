@@ -1,4 +1,4 @@
-function batchLTSA_chk_ltsa_params(dirs) 
+function batchLTSA_chk_ltsa_params(dirs)
 
 global REMORA
 % creates gui window to define ltsa settings
@@ -71,14 +71,25 @@ labelStr = 'Okay';
 btnPos = [x(3), y(1), bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
     'Style', 'push', 'String', labelStr, 'Callback', {@okay, fig, fig_taves, fig_dfreqs});
+
+% cancel button
+labelStr = 'Cancel';
+btnPos = [x(1), y(1), bw, bh];
+uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
+    'Style', 'push', 'String', labelStr, 'Callback','batchLTSA_control(''cancelAll'')');
+
 uiwait;
+
 end
 
 
 %% okay button
 function okay(~, ~, fig, fig_taves, fig_dfreqs)
 
-global PARAMS
+global PARAMS REMORA
+
+% double check - not cancelled
+REMORA.batchLTSA.cancelled = 0;
 
 % close figure and assign values
 PARAMS.ltsa.taves = zeros(length(fig_taves), 1);
@@ -89,3 +100,5 @@ for d = 1:length(fig_taves)
 end
 close(fig);
 end
+
+

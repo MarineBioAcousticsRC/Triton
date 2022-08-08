@@ -24,7 +24,7 @@ _init_gui.m
 
 _control.m
 - defines various actions that happen based on different interactions with the GUI. Most set variables or call basic MATLAB functions. 
-- Only RUN button at bottom calls another Remora function (batchLTSA_init_batch_LTSA.m
+- Only RUN button at bottom calls another Remora function (batchLTSA_init_batch_LTSA.m)
 
 _init_batch_ltsa.m
 - displays a message and runs the actual precheck and batch LTSA functions
@@ -32,8 +32,12 @@ _init_batch_ltsa.m
 
 _mk_batch_ltsa_precheck.m
 - check the input data is as is it should be and confirm ltsa settings
-- this calls another gui (batchLTSA_ltsa_params.m) where settings can be updated. 
+- this calls another gui (batchLTSA_chk_ltsa_params.m) where settings can be updated. 
+- may call batchLTSA_rename_wavs.m of filenames are not all same length or lack timing info
 - this was originally included in _mk_ltsa_batch but pulled it out to make a bit easier to modify for multi-channel/not have a 300+ line function
+
+_rename_wavs.m
+- option to rename sound files if the file names are not consistent within a folder. 
 
 _mk_batch_ltsa.m
 - actually make LTSAs, looping through multiple directories! 
