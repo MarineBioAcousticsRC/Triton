@@ -45,6 +45,8 @@ PARAMS.ltsa.outdirs = outdirs;
 batchLTSA_chk_ltsa_params(indirs); % set taves and dfreqs
 taves = PARAMS.ltsa.taves;
 dfreqs = PARAMS.ltsa.dfreqs;
+indirs = PARAMS.ltsa.indirs;
+outdirs = PARAMS.ltsa.outdirs;
 
 % % raw files to skip.
 % % * this is specific to HRPs?
