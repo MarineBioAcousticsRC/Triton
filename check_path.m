@@ -53,19 +53,6 @@ if ~isdeployed % standard in MATLAB mode
     
     %remove all Remoras before adding them in again later down in this code
     rem_dir = rmpath(genpath(PARAMS.path.Remoras));
-    %sets up the path as a long string
-    % p = path;
-    % % divide string to directories, don't
-    % % forget the first or the last...
-    % delim=[0 strfind(p, ';') length(p)+1];
-    % %remove the Remora folder and subfolder(s) from the path
-    % for i=2:length(delim)
-    %     direc = p(delim(i-1)+1:delim(i)-1);
-    %     if strncmpi(direc, rem_dir, length(rem_dir))
-    %         rmpath(direc);
-    %     end
-    % end
-    savepath;
     
     % check that remora dir and cnf file haven't been deleted
     if exist(PARAMS.path.Remoras) ~= 7
@@ -89,9 +76,6 @@ if ~isdeployed % standard in MATLAB mode
         remorapath = fgetl(fid);
     end
     fclose(fid);
-    
-    savepath;
-    
     
     % java folder - old logger?
     %     TritonJavaDir = fullfile(PARAMS.TritonPath, 'java');
