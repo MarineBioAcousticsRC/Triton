@@ -24,26 +24,7 @@ REMORA.fig.nn.training_plots = [];
 % In matlab 2018+ this should work, OR if you have a GPU, AND if you have
 % the deep learning toolbox.
 load(REMORA.nn.train_net.trainFile);
-tTSI = trainTestSetInfo;
-if 1
-    % normalize spectra
-    tTSI.specLims = [1,tTSI.setSpecHDim];
-    tTSI.minSpec = mean(min(trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2)),[],2));
-    tTSI.maxSpec = mean(max(trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2)),[],2));
-    trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2)) =...
-        (trainDataAll(:,tTSI.specLims(1):tTSI.specLims(2))-tTSI.minSpec)./(tTSI.maxSpec-tTSI.minSpec);
-    
-    tTSI.iciLims = tTSI.setSpecHDim+[1,tTSI.setICIHDim];
-    tTSI.maxICI = mean(max(trainDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2)),[],2));
-    trainDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2)) =...
-        trainDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2))./(tTSI.maxICI);
 
-    tTSI.waveLims = tTSI.iciLims(2)+[1,tTSI.setWaveHDim];
-    tTSI.maxWave = mean(max(trainDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2)),[],2));
-    trainDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2)) =...
-        trainDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2))./(tTSI.maxWave);
-
-end
 if ~isdir(REMORA.nn.train_net.outDir)
     mkdir(REMORA.nn.train_net.outDir)
 end
@@ -66,16 +47,35 @@ uLabelWeights = round(max(labelOccurence)./labelOccurence);
 REMORA.nn.train_net.labelWeights = uLabelWeights;
 
 
-[myNetwork, trainPrefs] = nn_build_network(tTSI)
 fprintf('\n\n\n')
 trainDataAll(isnan(trainDataAll))=0;
 
+trainTestSetInfo.standardizeAll = 1;
+if trainTestSetInfo.standardizeAll
+    trainTestSetInfo.specStd = [min(trainDataAll(:,1:trainTestSetInfo.setSpecHDim),[],'all'),mean(max(trainDataAll(:,1:trainTestSetInfo.setSpecHDim),[],2))];
+   
+    normSpec1 = trainDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
+    trainDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
+
+    ICIstart = trainTestSetInfo.setSpecHDim+1;
+    trainTestSetInfo.iciStd = mean(max(trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)),[],2));
+    trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
+    
+    wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
+    trainTestSetInfo.waveStd = std(max(trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2));
+    maxWave= max( trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
+
+    trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./maxWave;
+end
 
 %trainDataAll(:,182:381)=abs(trainDataAll(:,182:381)-.5)*2;
 train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
 %reshape(trainDataAll,[1,size(trainDataAll,2),1,...
 %    size(trainDataAll,1)]);
 %net = trainNetwork(train4D,categorical(trainLabelsAll),myNetwork,trainPrefs);
+[myNetwork, trainPrefs] = nn_build_network(trainTestSetInfo)
+
+
 net = trainNetwork(train4D,myNetwork,trainPrefs);
 
 if min(min(trainDataAll))<-1
@@ -93,22 +93,18 @@ fprintf('\n\n Confusion matrix:\n')
 confusionmat(YPred,categorical(trainLabelsAll))
 fprintf('\n\n\n')
 
-load(REMORA.nn.train_net.testFile);
+load(REMORA.nn.train_net.testFile,'testDataAll','testLabelsAll');
 testDataAll(isnan(testDataAll))=0;
-
-if 1
-    % normalize spectra
-    testDataAll(:,tTSI.specLims(1):tTSI.specLims(2)) =...
-        (testDataAll(:,tTSI.specLims(1):tTSI.specLims(2))-tTSI.minSpec)./(tTSI.maxSpec-tTSI.minSpec);
-   
-    testDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2)) =...
-        testDataAll(:,tTSI.iciLims(1):tTSI.iciLims(2))./(tTSI.maxICI);
-   
-    testDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2)) =...
-        testDataAll(:,tTSI.waveLims(1):tTSI.waveLims(2))./(tTSI.maxWave);
-
-end
 % testDataAll(:,182:381)=abs(testDataAll(:,182:381)-.5)*2;
+if trainTestSetInfo.standardizeAll
+    normSpec1 = testDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
+    testDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
+    
+    wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
+    testDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = testDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
+    maxWave= max( testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
+    testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./maxWave;
+end
 test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
 
 [YPredTrain,scoresTrain] = classify(net,train4D);
@@ -128,18 +124,18 @@ elseif contains(filenameStem,'_det_train')
     REMORA.nn.train_net.networkFilename = fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_trainedNetwork_det.mat']);
     REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores_det.mat']);
 end
+
 netTrainingInfo =  REMORA.nn.train_net.trainFile;
-trainTestSetInfo = tTSI;
 save(REMORA.nn.train_net.networkFilename,'net','netTrainingInfo','trainTestSetInfo','typeNames','trainPrefs')
 save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',...
     'scoresEval','testLabelsAll','netTrainingInfo','trainTestSetInfo','typeNames')
 
 
 
-REMORA.fig.nn.training_plots{6} = nn_fn_plotconfusion(trainLabelsAll,YPredTrain,typeNames);
+REMORA.fig.nn.training_plots{6} = nn_fn_plotconfusionChart(trainLabelsAll,YPredTrain,typeNames);
 REMORA.fig.nn.training_plots{6};
 title('Confusion Matrix: Training Data')
-REMORA.fig.nn.training_plots{7} = nn_fn_plotconfusion(testLabelsAll,YPredEval,typeNames);
+REMORA.fig.nn.training_plots{7} = nn_fn_plotconfusionChart(testLabelsAll,YPredEval,typeNames);
 REMORA.fig.nn.training_plots{7};
 title('Confusion Matrix: Evaluation Data')
 

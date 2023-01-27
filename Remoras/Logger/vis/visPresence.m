@@ -77,7 +77,7 @@ XLength_d = 1;
 Label = [];
 LabeledData = {};
 NoEffortColor = [];
-
+Counts = [];
 if ~isempty(presence)
     if ~ issorted(presence(:,1))
         error('Dates not sorted');
@@ -87,6 +87,8 @@ end
 vidx = 1;
 while vidx < length(varargin)
     switch varargin{vidx}
+        case 'Counts'
+            Counts = varargin{vidx+1}; vidx=vidx+2;
         case 'UTCOffset'
             UTCOffset = varargin{vidx+1}; vidx=vidx+2;
             if ~isscalar(UTCOffset)
@@ -214,7 +216,20 @@ if ~ isempty(presence)
 end
 
 axH = gca;  % get axis handle for current figure
-
+cmap = colormap(gca,brewermap([],'YlGnBu'));%'YlGnBu'
+%cmap= colormap(winter);
+cRange = [100,1000];
+if ~isempty(Counts)
+    %normCounts = round(length(cmap)*(log10(Counts)./max(log10(Counts))));
+    normCounts = Counts;
+    normCounts(normCounts<=cRange(1)) = floor(size(cmap,1)./length(cRange));
+    normCounts(normCounts>cRange(1)& normCounts<=cRange(2)) = ...
+        2*floor(size(cmap,1)./(length(cRange)+1));
+%     normCounts(normCounts>=cRange(2)& normCounts<=cRange(3)) = ...
+%         3*floor(size(cmap,1)./(length(cRange)+1));
+    normCounts(normCounts> cRange(2)) = ...
+        3*floor(size(cmap,1)./(length(cRange)+1));
+end
 if ~ isempty(presence)
     N = size(presence_d, 1);
     presenceH = zeros(N, 1);
@@ -224,6 +239,9 @@ if ~ isempty(presence)
         set(BarH(1), 'Parent', axH);
         
         for idx = 1:N
+            if ~isempty(Counts)
+            	Color = cmap(normCounts(idx),:);
+            end
             x = presence_dayfrac(idx, 1);
             y = presence_d(idx, 1) + BarOffset;
             % plot the rectangle on the axis
@@ -231,7 +249,7 @@ if ~ isempty(presence)
             %...
             presenceH(idx) = patch([x; x+width(idx); x+width(idx); x], ...
                 [y; y; y+BarHeight; y+BarHeight], Color, 'Parent', BarH(1), ...
-                'LineStyle', LineStyle, 'FaceAlpha', Transparency);
+                'LineStyle', LineStyle, 'FaceAlpha', Transparency,'EdgeColor',Color);
             % store serial dates as user data
             info.dates = [y+x, y+x+width(idx)];
             info.label = Label;
@@ -311,7 +329,7 @@ if ~ isempty(Effort)
             y = noeffort_d(idx, 1)+ BarOffset;
             NoEffortH(idx) = patch([x; x+width(idx); x+width(idx); x], ...
                 [y; y; y+BarHeight; y+BarHeight], NoEffortColor, ...
-                'Parent', BarH(2), 'LineStyle', LineStyle, ...
+                'Parent', BarH(2), 'LineStyle', 'none', ...
                 'FaceAlpha', NoEffortTransparency);
             % store serial dates as user data
             info.dates = [y+x, y+x+width(idx)];
@@ -333,9 +351,19 @@ set(axH, 'YTickMode', 'manual');
 % order is important here.
 % do not use datetick before setting YTick
 % datetick will not recalculate the dates
+datesTempVec = dates(1):1:dates(end);
+if max(dates)-min(dates)<700
+   datesTick = unique(datenum([year(datesTempVec'),month(datesTempVec'),ones(size(datesTempVec'))]));
+
+else
+    datesTick = unique(datenum([year(datesTempVec'),month(datesTempVec'),ones(size(datesTempVec'))]));
+    datesTick = datesTick(1:6:end);
+end
 set(axH, 'YGrid', 'on', ...
-    'YTick', dates(1):DateTickInterval:dates(2));
-datetick(axH, 'y', 1, 'keeplimits', 'keepticks');
+    'YTick', datesTick);
+myYLab = get(axH,'YTickLabel');
+%set(axH,'YTickLabel',myYLab(1:2:end))
+datetick(axH, 'y', 'mm/yy', 'keeplimits', 'keepticks');
 
 title(Title);
 xlabel(Xstring)

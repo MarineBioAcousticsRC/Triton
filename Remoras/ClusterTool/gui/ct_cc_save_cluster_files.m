@@ -18,13 +18,14 @@ thisName = [];
 thisTypeAll = [];
 
 for iF = 1:nTypes
-    
-    thisName{iF} = uNames{iF};
-    newDir{iF} = fullfile(REMORA.ct.CC.output.clustDir,thisName{iF});
-    if ~isdir(newDir{iF})
-        mkdir(fullfile(REMORA.ct.CC.output.clustDir,thisName{iF}))
-    end
+
+    thisName{iF} = uNames{iF};   
     cIdx = find(strcmp(thisName{iF},REMORA.ct.CC.output.labelStr));
+
+    newDir{iF} = fullfile(REMORA.ct.CC.output.clustDir,[REMORA.ct.CC_params.outputName,sprintf('_type%d_',cIdx),thisName{iF}]);
+    if ~isdir(newDir{iF})
+        mkdir(newDir{iF})
+    end
     thisTypeAll(iF).clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
     thisTypeAll(iF).fileNumExpand = REMORA.ct.CC.output.fileNumExpand(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
     thisTypeAll(iF).Tfinal = vertcat(REMORA.ct.CC.output.Tfinal(cIdx,:)); % This keeps cells apart.

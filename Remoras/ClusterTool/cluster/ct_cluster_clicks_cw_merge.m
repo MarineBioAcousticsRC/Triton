@@ -22,7 +22,9 @@ else
     else
         specClickTfNorm = specClickTf;
     end
-    if p.diff; specClickTfNormDiff = diff(specClickTfNorm,1,2); end
+    if p.diff
+        specClickTfNormDiff = diff(specClickTfNorm,1,2); 
+    end
 end
 tempN = size(specClickTf,1);
 

@@ -1,7 +1,14 @@
-function nn_fn_classify_bins
+function nn_fn_classify_bins(varargin)
 
 global REMORA
-minSize = 1;
+
+if ~isempty(varargin)
+    excludeList = varargin{1};
+else
+    excludeList = [];
+end
+
+minSize = 2;
 disp('Classifying bins from cluster bins output files')
 % load network
 trainedNet = load(REMORA.nn.classify.networkPath);
@@ -72,14 +79,16 @@ for iFile = 1:nFiles
     if trainedNet.trainTestSetInfo.useSpectra
         specSet = vertcat(binData(:).sumSpec);
         specSet(tooFew,:) = [];
-        specSet= (specSet-tTSI.minSpec)/(tTSI.maxSpec-tTSI.minSpec);
+        specSet= (specSet-tTSI.specStd(1))/(tTSI.specStd(2)-tTSI.specStd(1));
     end
     
     if trainedNet.trainTestSetInfo.useICI
         iciSet = vertcat(binData.dTT);
         iciSet = iciSet./max(iciSet,[],2);
+        max0 = find(max(iciSet,[],2)>0);
+        iciSet(max0,:) = iciSet(max0,:)./(tTSI.iciStd);
         iciSet(tooFew,:) = [];
-        iciSet = iciSet./(tTSI.maxICI);
+
     end
         
     if trainedNet.trainTestSetInfo.useWave
@@ -92,15 +101,24 @@ for iFile = 1:nFiles
         end
         waveSet = vertcat(binData.envMean);
         waveSet(tooFew,:) = [];
-        waveSet= waveSet./(tTSI.maxWave);
+        maxWave = max(waveSet,[],2);
+        waveSet= waveSet./maxWave;
     end
     
     test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
     
     % classify
     [predLabels,predScores] = classify(trainedNet.net,test4D);
-    predScoresMax = max(predScores,[],2);
-    predLabels = double(predLabels);
+    if ~isempty(excludeList)
+        [~,keepCols] = setdiff(trainedNet.typeNames,excludeList);
+        predScores = predScores(:,keepCols);
+        [predScoresMax,predLabels] = max(predScores,[],2);       
+
+    else
+        predLabels = double(predLabels);
+        predScoresMax = max(predScores,[],2);       
+
+    end
     % map bin labels back into binData
     predLabelsExpand = nan(size([binData(:).nSpec]',1),1);
     predLabelsExpand(goodSize) = predLabels;
@@ -118,11 +136,15 @@ for iFile = 1:nFiles
     netTrainingInfo = trainedNet.netTrainingInfo;
     trainTestSetInfo = trainedNet.trainTestSetInfo;
     typeNames = trainedNet.typeNames;
+    if ~isempty(excludeList)
+         typeNames = typeNames(keepCols);
+    end
     save(saveFullFile,'predScoresMax','trainTestSetInfo',...
         'netTrainingInfo','classificationInfo','typeNames','binData',...
         'f','p','TPWSfilename','-v7.3')
     fprintf('Done with file %0.0f of %0.0f: %s\n',iFile, nFiles,inFile)
     % should we plot here?
+
     if REMORA.nn.classify.intermedPlotCheck
         classifiedThings  = [specSet,iciSet,waveSet];
         nPlots = length(typeNames);
@@ -143,7 +165,7 @@ for iFile = 1:nFiles
             idxToPlot = find(predLabels==iR);
             [classScore,plotOrder] = sort(predScoresMax(idxToPlot),'descend');
             imagesc(classifiedThings(idxToPlot(plotOrder),:)')
-            set(gca,'ydir','normal')
+            set(gca,'ydir','normal','clim',[0,1.8])
             title(typeNames{iR})
             if size(classScore,1)>1
                 ax2 = axes('Position', get(ax1, 'Position'),'Color', 'none');
@@ -157,8 +179,10 @@ for iFile = 1:nFiles
                 set(ax2, 'XTick',confidenceLevelIdx(iA)+.5,...
                     'XTickLabel',confidenceLabels(iA),'TickDir','out','YTick',[],'FontSize',8);
             end
+           
         end
         disp('Paused: Press any key to continue.')
+        drawnow
         pause
     end
     % TODO: Have option to hold on to output and make plot of everything

@@ -68,6 +68,13 @@ for iD = 1:size(typeList,1)
             
         end
     end
+    
+    badRows = find(isnan(sum(clusterWave,2)));
+    clusterSpectra(badRows,:) = [];
+    clusterICI(badRows,:) = [];
+    clusterWave(badRows,:) = [];    
+    clusterTimes(badRows,:) = []; 
+    
     [clusterTimes,I] = sort(clusterTimes);
     clusterSpectra = clusterSpectra(I,:);
 %     clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);

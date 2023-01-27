@@ -494,7 +494,7 @@ for iNodeSet = 1:length(nodeSet)
     clusterIDreduced(setIntersect) = iNodeSet;
 end
 
-if tritonMode && (size(clusterIDreduced,1)<10000)
+if tritonMode && (size(clusterIDreduced,1)<5000)
 
     fprintf('Plotting network\n')
 

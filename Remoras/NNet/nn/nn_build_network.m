@@ -4,7 +4,7 @@ global REMORA
 
 trainFileObj = matfile(REMORA.nn.train_net.trainFile);
 testFileObj = matfile(REMORA.nn.train_net.testFile);
-if REMORA.nn.train_test_set.validationTF
+if REMORA.nn.train_test_set.validationTF 
     validFileObj = matfile(REMORA.nn.train_net.validFile);
 end
 % Sanity check that train and test data have same dimensions.
@@ -19,15 +19,15 @@ layerSet = imageInputLayer([1,trainDataSize(2),1],'normalization', 'none');
 
 for iD = 1:REMORA.nn.train_net.nHiddenLayers
     layerSet = [layerSet;...
-        fullyConnectedLayer(REMORA.nn.train_net.hLayerSize);...
-        leakyReluLayer;...
-        dropoutLayer(REMORA.nn.train_net.dropout/100)];
-    
+    fullyConnectedLayer(REMORA.nn.train_net.hLayerSize);...
+    leakyReluLayer;...
+    dropoutLayer(REMORA.nn.train_net.dropout/100)];
+
 end
 
 layerSet = [layerSet;...
-    fullyConnectedLayer(numClasses);...
-    softmaxLayer;...
+	fullyConnectedLayer(numClasses);...
+	softmaxLayer;...
     classificationLayer];
 % weightedClassificationLayer(REMORA.nn.train_net.labelWeights')];
 if REMORA.nn.train_test_set.validationTF
@@ -37,21 +37,18 @@ if REMORA.nn.train_test_set.validationTF
         error(sprintf('Batch size (%0.0f) is too large relative to training set size (%0.0f). Reduce batch size',REMORA.nn.train_net.batchSize,trainDataSize(1)))
     end
     vD = load(REMORA.nn.train_net.validFile);
-    if 1
-        % normalize spectra
-        vD.validDataAll(:,trainTestSetInfo.specLims(1):trainTestSetInfo.specLims(2)) =...
-            (vD.validDataAll(:,trainTestSetInfo.specLims(1):trainTestSetInfo.specLims(2))-trainTestSetInfo.minSpec)./(trainTestSetInfo.maxSpec-trainTestSetInfo.minSpec);
-        
-        vD.validDataAll(:,trainTestSetInfo.iciLims(1):trainTestSetInfo.iciLims(2)) =...
-            vD.validDataAll(:,trainTestSetInfo.iciLims(1):trainTestSetInfo.iciLims(2))./(trainTestSetInfo.maxICI);
-        
-        vD.validDataAll(:,trainTestSetInfo.waveLims(1):trainTestSetInfo.waveLims(2)) =...
-            vD.validDataAll(:,trainTestSetInfo.waveLims(1):trainTestSetInfo.waveLims(2))./(trainTestSetInfo.maxWave);
-        
+    if trainTestSetInfo.standardizeAll
+        normSpec1 = vD.validDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
+        vD.validDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
+        ICIstart = trainTestSetInfo.setSpecHDim+1;
+        vD.validDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = vD.validDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
+        wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
+        tsMax = max(vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
+        vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./tsMax;
     end
     validation4D = table(mat2cell(vD.validDataAll,...
         ones(size(vD.validDataAll,1),1)),categorical(vD.validLabelsAll));
-    
+
     trainPrefs = trainingOptions('rmsprop',...
         'MaxEpochs',REMORA.nn.train_net.nEpochs, ...
         'MiniBatchSize',REMORA.nn.train_net.batchSize, ...

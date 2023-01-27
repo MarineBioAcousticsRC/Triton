@@ -13,7 +13,7 @@ global PARAMS HANDLES
 if 0
     if isstruct(PARAMS)
         % open input ltsa file
-        fid = fopen([PARAMS.ltsa.inpath,PARAMS.ltsa.infile],'r');
+        fid = fopen(fullfile(PARAMS.ltsa.inpath,PARAMS.ltsa.infile),'r');
         blockHANDLES= 0;
     else
         [PARAMS.ltsa.infile, PARAMS.ltsa.inpath] = uigetfile('*.ltsa','Open LTSA File');
@@ -49,10 +49,10 @@ else
         return
     else % give user some feedback
         disp('Opened File: ')
-        disp([PARAMS.ltsa.inpath,PARAMS.ltsa.infile])
+        disp(fullfile(PARAMS.ltsa.inpath,PARAMS.ltsa.infile))
         cd(PARAMS.ltsa.inpath)
     end
-    fid = fopen([PARAMS.ltsa.inpath,PARAMS.ltsa.infile],'r');
+    fid = fopen(fullfile(PARAMS.ltsa.inpath,PARAMS.ltsa.infile),'r');
 end
 
 
