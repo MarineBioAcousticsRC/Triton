@@ -137,6 +137,8 @@ function [timestamps, info] = dbGetDetections(queryEngine, varargin)
 %   the deployment associated with the m'th set of detection effort (e.g.
 %   lat/long, deployment time)
 
+assert(dbVerifyQueryHandler(queryEngine), ...
+    "First argument must be a query handler");
 
 % Collecting benchmark statistics?
 b_idx = find(strcmp(varargin(1:2:end), 'Benchmark'));

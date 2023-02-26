@@ -25,6 +25,10 @@ while idx < length(varargin)
             idx = idx + 2;
         case 'QueryHandler'
             queries = varargin{idx+1};
+            if ~ dbVerifyQueryHandler(queries)
+                error("QueryHandler argument is not an instance " + ...
+                      "of dbxml.Queries (use dbInit to create")
+            end
             idx = idx + 2;
         case 'Debug'
             debug = varargin{idx+1};
@@ -106,6 +110,9 @@ switch example
         
     case 2
         % Humpbacks, Fin, and Blue whale calls
+        % We only look for binned detections with 60 min bins.
+        % On the demonstration database, there may not be effort for
+        % humpbacks.
         event(1).species = 'Mn';  % humpback
         event(2).species = 'Bp';  % fin
         event(3).species = 'Bm';  % blue
@@ -113,12 +120,16 @@ switch example
           % We won't use this in the query, but when we want to add
           % a legend the code will expect a string for the call
           event(k).call = '';
-          event(k).timestamps = dbGetDetections(queries, ...
+          [event(k).timestamps event(k).detections] = ...
+              dbGetDetections(queries, ...
+                'SpeciesId', event(k).species, 'Site', site, ...
+                'Project', project, ...
+                'Deployment/DeploymentId', deployment, ...
+                'Granularity', 'binned', '@BinSize_m', 60);
+          [event(k).effort event(k).effort_details] = dbGetEffort(queries, ...
             'SpeciesId', event(k).species, 'Site', site, 'Project', project, ...
-            'Deployment/DeploymentId', deployment);
-          event(k).effort = dbGetEffort(queries, ...
-            'SpeciesId', event(k).species, 'Site', site, 'Project', project, ...
-            'Deployment/DeploymentId', deployment);
+            'Deployment/DeploymentId', deployment, ...
+            '@BinSize_m', 60);
           event(k).resolution_m = 60;  % plot resolution
         end
 
@@ -131,7 +142,7 @@ switch example
         % who the report Id, who submitted the detection report and 
         % what algorithm they used to be returned
         [effort details] = dbGetEffort(queries, 'Project', project, ...
-            'DeploymentId', deployment, 'Site', site, 'return', ...
+            'Deployment/DeploymentId', deployment, 'Site', site, 'return', ...
             ["Id", "UserId", "Algorithm"]);
         fprintf('Effort summary %s %d site %s\n', project, deployment, site);
         ReportEffort(details.data);
@@ -195,7 +206,7 @@ switch example
         % Show all detections for a given project
         % Note that projects with duty cycling may have
         % striped patterns in their detection data.
-        project = 'CINMS';
+        project = 'SOCAL';
         species = 'Bm';
         granularity = 'call';
         fprintf('All detections project %s for SpeciesId %s\n', ...
@@ -248,14 +259,19 @@ switch example
         end
         
     case 8
-        % Demonstrate a weekly effort plot, KW Whistles
+        % Demonstrate weekly effort and diel plot for 
+        % killer whale whistles.  Also shows how to retrieve
+        % Latin names for species abbreviation.
         
         species = 'Oo';
         % Demonstration of finding the Latin species name to which
         % a coding corresponds.  The Integrated Taxonomic Information
-        % Sysstem refers to this as the completename. 
-        species_table = dbSpeciesAbbreviations(queries, 'SIO.SWAL.v1');
+        % System refers to this as the completename. 
+        abbr = 'SIO.SWAL.v1';
+        species_table = dbSpeciesAbbreviations(queries, abbr);
         latin = species_table.completename{strcmp(species_table.coding, species)};
+        fprintf("Abbreviation %s --> %s in abbreviation map %s\n", ...
+            species, latin, abbr);
             
         deploymentId = 'ALEUT02-BD';  % case sensitive
         visWeekly(queries, ...

@@ -1,20 +1,31 @@
 function night = dbYearly(query_eng, varargin)
 % dbYearly(query_eng, Arguments)
 % Produce a long-term plot containing all data for a given site
-% Arguments are keywords value pairs:
 %
-% Project, Site, Detector, Species, Call, Subtype
-% Each of these allows selections of detections.  See dbGetDetections
-% for details.
+% Arguments are keyword/value pairs that control display or data selection.
+% Display arguments:
 %
-% 'Diel', true|false|night
-% Add a diel plot with sunrise/sunset information.  Returns the time spans
-% of darkness hours over the queried time period.  If called again for
-% the same area, passing in the night time as the argument to Diel
-% will result in a faster plot and avoid taxing the ephemeris server.
+%   'Diel', true|false|night
+%    Add a diel plot with sunrise/sunset information.  Returns the time
+%    spans of darkness hours over the queried time period.  If called again
+%    for the same area, passing in the night time as the argument to Diel
+%    will result in a faster plot and avoid taxing the ephemeris server.
 %
-% 'TickSpacingDays, N 
-% Default:  Ticks every 30 days
+%   'TickSpacingDays, N 
+%    Default:  Ticks every 30 days
+%
+% Other arguments are keywords value pairs that are valid for selecting
+% sets of detection or effort.  See dbGetEffort and dbGetDetections for
+% more details, or dbGetDeployments for selecting detections with
+% deployment-specific information.  Example values:
+% 
+%    Example of using a specific detector
+%    "Algorithm/Software", ...
+%    "Silbido Profundo; Conant et al. (2022) DOI: 10.1121/10.0016631"
+%
+%    Only analyzie data from two sites in project SOCAL
+%    "Project", "SOCAL", "Site", {"M", "N"}
+
 
 error(nargchk(1, inf, nargin));
 

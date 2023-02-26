@@ -32,7 +32,7 @@ end
 
 %check for handler as first argument, shift varargin if so
 if ~isempty(varargin)
-    if isjava(varargin{1}) && strcmp('dbxml.Queries',class(varargin{1}))
+    if dbVerifyQueryHandler(varargin{1})
         queryH = varargin{1};
         varargin(1)=[];
     else
@@ -73,10 +73,6 @@ while idx < length(varargin) && ischar(varargin{idx})
             idx = idx+2;
     end
 end
-            
-global PARAMS;  % Triton parameters
-
-dbJavaPaths();
 
 if isempty(queryH)
     queryH = dbInit(varargin{:});
@@ -89,6 +85,7 @@ import dbxml.uploader.*;
 url = char(queryH.getURLString());
 
 if isempty(Files)
+    global PARAMS;  % Triton parameters
     % no arguments, pop up dialog with directory set appropriately
     if exist('PARAMS', 'var') & isfield('PARAMS', 'indir')  % Triton initialized?
         wdir = PARAMS.indir;  %  use Triton directory

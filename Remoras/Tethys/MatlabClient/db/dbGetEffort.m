@@ -29,6 +29,9 @@ function [timestamps, info] = dbGetEffort(queryEngine, varargin)
 %   
 % See also:  dbGetDetections
 
+assert(dbVerifyQueryHandler(queryEngine), ...
+    "First argument must be a query handler");
+
 % Collecting benchmark statistics?
 b_idx = find(strcmp(varargin(1:2:end), 'Benchmark'));
 if ~ isempty(b_idx)
@@ -220,7 +223,7 @@ else
                 end
                 if isfield(detections(idx).Kind(k), 'SpeciesId_attr') && ...
                         isfield(detections(idx).Kind(k).SpeciesId_attr, 'Group')
-                    group{count} = detections(idx).Kind(k).SpeciesId_attr.Group{1};
+                    group{count} = detections(idx).Kind(k).SpeciesId_attr.Group;
                 end
                 if strcmp(detections(idx).Kind(k).Granularity, 'binned')
                     binsize_m(count) = detections(idx).Kind(k).Granularity_attr.BinSize_m;

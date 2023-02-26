@@ -7,7 +7,7 @@ function deployments = dbGetDeployments(queryEngine, varargin)
 % 'return' which is rarely needed with dbGetDeployments as the default
 % behavior is to return the entire deployment record, the keywords specify
 % information used to filter/select deployments and the values are criteria
-% related to the selection criteria.
+% related to the selection criteria.  
 %
 % Keywords
 % A complete list of Deployments 
@@ -79,6 +79,9 @@ function deployments = dbGetDeployments(queryEngine, varargin)
 % to the list of default items that are returned.  As this function's
 % default is to return everything, it assumed that when return is used,
 % only the specified return fields are desired.
+
+assert(dbVerifyQueryHandler(queryEngine), ...
+    "First argument must be a query handler");
 
 % Collecting benchmark statistics?
 b_idx = find(strcmp(varargin(1:2:end), 'Benchmark'));
