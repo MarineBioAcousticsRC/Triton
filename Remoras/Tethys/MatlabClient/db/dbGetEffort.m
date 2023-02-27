@@ -211,7 +211,11 @@ else
             for k=1:length(detections(idx).Kind)
                 record_idx(count) = idx;  % track the effort group
                 if isfield(detections(idx).Kind(k), 'Call')
-                    calls{count} = detections(idx).Kind(k).Call{1};
+                    if isempty(detections(idx).Kind(k).Call)
+                        calls{count} = '';
+                    else
+                        calls{count} = detections(idx).Kind(k).Call{1};
+                    end
                 end
                 if isfield(detections(idx).Kind(k), 'Parameters')
                     if isfield(detections(idx).Kind(k).Parameters, 'Subtype')
