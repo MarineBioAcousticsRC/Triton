@@ -11,7 +11,7 @@ settings.rmsASmax = 10;
 settings.rmsBS = 1; % RMS noise before signal.
 settings.ppAS = 4; % PP noise after signal <ppAS (dB) difference will be eliminated.
 settings.ppBS = 3; % PP noise before signal.
-settings.durLong_s = 11; % Durations >= durAfter_s (s) will be eliminated.
+settings.durLong_s = 2; % Durations >= durAfter_s (s) will be eliminated.
 settings.durShort_s = .005; % Durations >= dur_s (s) will be eliminated.
 
 

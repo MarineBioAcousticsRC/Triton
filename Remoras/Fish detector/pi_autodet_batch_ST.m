@@ -36,9 +36,10 @@ SearchRecursiv = REMORA.pi.settings.recursSearch; % Setting to 1 searches throug
 
 currentPath = mfilename('fullpath');
 templateFilePath = fileparts(currentPath);
-template = fullfile(templateFilePath,'Bocaccio1_template.mat'); % Make sure that this line is correct for the input template folder!
+template = fullfile(templateFilePath,'BuBz_template_fromHYD11_S314_amp.mat'); % Make sure that this line is correct for the input template folder!
 load(template)
-template=boc1;
+%template=boc1;
+template=fishtemp;
 
 pre_env_temp=hilbert(template.');
 env_temp=sqrt((real(pre_env_temp)).^2+(imag(pre_env_temp)).^2); % Au 1993, S.178, equation 9-4.
@@ -77,8 +78,8 @@ for fidx = 1:size(FileList,1)
     % t = 0:rawDur(1)/(step-1):rawDur(1);
     
     % Bandpass filter y.
-    Fc1 = 100;   % First Cutoff Frequency.
-    Fc2 = 450;  % Second Cutoff Frequency.
+    Fc1 = 700;   % First Cutoff Frequency.
+    Fc2 = 2000;  % Second Cutoff Frequency.
     
     N = 10;     % Order.
     [B,A] = butter(N/2, [Fc1 Fc2]/(fs/2));
