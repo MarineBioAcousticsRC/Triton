@@ -75,25 +75,7 @@ if ~isdeployed % standard in MATLAB mode
         addpath(genpath(remorapath));
         remorapath = fgetl(fid);
     end
-    fclose(fid);
-    
-    % java folder - old logger?
-    %     TritonJavaDir = fullfile(PARAMS.TritonPath, 'java');
-    %  checks for java folder in search path
-    % if isempty(strfind(paths_array,TritonJavaDir))
-    %   file = which('triton.m'); %finds the triton1.9 folder
-    %   addpath(genpath(TritonJavaDir)); %add the triton 1.9 folder and all subfolders including
-    %   %java and Settings to the search path
-    % end
-    
-    % paths_array = path;
-    % %checks for Settings folder in search path
-    % if isempty(strfind(paths_array, TritonSettingsDir))
-    %   %same code as above adds all folders and subfolders from triton1.9 into
-    %   %search path
-    %   addpath(genpath(TritonSettingsDir));
-    % end
-    
+    fclose(fid);   
 end
 
 end
