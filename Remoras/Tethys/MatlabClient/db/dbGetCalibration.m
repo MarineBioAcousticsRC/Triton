@@ -69,6 +69,10 @@ classdef dbGetCalibration < handle
 
             result = tinyxml2_tethys('parse', char(xmlstr), typemap);
 
+            if ~isstruct(result)
+                error("No such calibration found");
+            end
+
             % Convert timestamps 
             for idx = 1:length(result.Return)
                 result.Return(idx).Calibration.TimeStamp{1} = ...
