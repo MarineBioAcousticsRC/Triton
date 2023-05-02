@@ -128,7 +128,7 @@ for fname = {'imagedir', 'audiodir'}
 end
 
 % fetch metadata that we expect to be static
-fields = {'User ID', 'Project', 'Deployment', 'Site'};
+fields = {'User ID',  'DeploymentId'};
 for fidx = 1:length(fields);
     tmp = strrep(fields{fidx}, ' ', '_');  % no spaces
     col = find(strcmp(handles.Meta.Headers, fields{fidx}));
@@ -140,13 +140,7 @@ end
 
 % This name is used as part of the image and audio filenames 
 % when the user takes a snapshot.
-if isnumeric(handles.Meta.Deployment)
-    handles.Meta.file_tag = sprintf('%s%d%s', handles.Meta.Project, ...
-        handles.Meta.Deployment, handles.Meta.Site);
-else
-    handles.Meta.file_tag = sprintf('%s%s%s', handles.Meta.Project, ...
-        handles.Meta.Deployment, handles.Meta.Site);
-end
+handles.Meta.file_tag = handles.Meta.DeploymentId;
 
 % Disable crosshair pointers when window loses focus
 % This relies on undocumented Matlab functionality.
