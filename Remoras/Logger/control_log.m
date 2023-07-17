@@ -189,7 +189,8 @@ switch action
     case 'set_metadata'
         
         % Retrieve the set of ids associated with deployments
-        deployment_id = log_getdeploymentids();
+        %deployment_id = log_getdeploymentids();
+       deployment_id = [];
         % Verify user has filled in requested fields before proceeding
         fields = {'deploy', 'user', 'effort_start'};
         WorksheetNames = { 'DeploymentId', 'User ID', 'Effort Start'};

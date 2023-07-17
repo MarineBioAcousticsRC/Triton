@@ -13,11 +13,11 @@ function initLogctrl(varargin)
 global PARAMS TREE handles HANDLES REMORA
 
 % Get a Tethys query handler instance from the Tethys REMORA
-if exist('get_tethys_server') ~= 2
-    error('Tethys Remora must be installed')
-else
-    query_h = get_tethys_server();
-end
+% if exist('get_tethys_server') ~= 2
+%     error('Tethys Remora must be installed')
+% else
+%     query_h = get_tethys_server();
+% end
 
 if length(varargin) > 2
     hObject = varargin{1};
@@ -522,6 +522,7 @@ handles.user.disp= uicontrol(handles.logcallgui,EditAttrib{:},...
     'Position', btnpos);
 
 % Retrieve valid deployment identifiers if we have a valid query handler
+query_h = '';
 if ~ isempty(query_h)
     try
         dep = dbGetDeployments(query_h, "return", "Id");

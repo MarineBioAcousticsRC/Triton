@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<contour_params>
+    <!-- Contour parameters designed for odontocete whistles -->
+    
+    <!-- SNR criteria -->
+    <whistle_dB> 10 </whistle_dB> <!-- SNR criterion for whistles -->
+    <click_dB> 10 </click_dB> <!-- SNR criterion for transients (frames are skipped) -->
+    
+    <!-- framing -->
+    <advance_ms> 2 </advance_ms> <!-- frame advance ms -->
+    <length_ms> 8 </length_ms> <!-- frame length ms -->
+    
+    <minlen_ms> 150 </minlen_ms>  <!-- Contours shorter than this will be discarded  -->
+    
+    <maxgap_ms> 50 </maxgap_ms>   <!-- Maximum gap in energy to bridge.  Graphs whose latest
+                                       peak is farther away than this from the current frame
+                                       will be removed from the active set.  -->
+    <maxgap_Hz> 500 </maxgap_Hz>  <!-- Maximum gap in frequency to bridge -->
+    
+    <activeset_s> .15 </activeset_s>  <!-- Minimum duration needed to join active set.
+                                           Otherwise is part of the fragment set.  -->
+    
+    <!-- Search across the following frequency bands -->
+    <low_cutoff_Hz> 5000 </low_cutoff_Hz>  <!-- lower bound of search -->
+    <high_cutoff_Hz> 50000 </high_cutoff_Hz>  <!-- high bound of search -->
+    
+    <!-- <advance_ms>/1000 * 12 -->
+    <prediction_lookback_s> 0.0960 </prediction_lookback_s>  <!-- fit polynomial to last n s -->
+    <broadband> .01 </broadband> <!-- Reject frame when increase in peak bins > x% over last frame -->
+    <disambiguate_s> .3 </disambiguate_s>  <!-- polynomial fit for previous N s -->
+    
+</contour_params>
