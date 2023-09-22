@@ -155,7 +155,7 @@ if iscell(result) && isempty(result{1})
     info = [];
 else
     % Start/End under Return.Detections as Effort cannot appear more than once
-    efforts = dbMergeStructures(result.Return, 'Detections');
+    efforts = dbMergeStructures(result.Record, 'Detections');
     %timestamps = cell2mat([[efforts.Start]', [efforts.End]']);
     tabular = table(...
         cell2mat([efforts.Start]'), cell2mat([efforts.End]'), ...
@@ -178,14 +178,14 @@ else
         % detection is associated with:
         % info.deployments(info.deploymentIdx(5)) tells us the identifier
         % for the fifth detection.
-        detections = [result.Return.Detections];
+        detections = [result.Record.Detections];
         % Convert start/end to datetime
         tabular.Start = datetime(tabular.Start, 'ConvertFrom', 'datenum');
         tabular.End = datetime(tabular.End, 'ConvertFrom', 'datenum');
         info.effort_table = tabular;
         info.deployments=[detections.DataSource];
-        info.Id = string(arrayfun(@(x) x.Detections.Id, result.Return));
-        info.data = result.Return;
+        info.Id = string(arrayfun(@(x) x.Detections.Id, result.Record));
+        info.data = result.Record;
         
         % Build a table showing effort for each kind
         % This code is a bit ugly as Matlab does not handle heterogeneous

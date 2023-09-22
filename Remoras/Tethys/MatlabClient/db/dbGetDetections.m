@@ -229,6 +229,7 @@ querygen_elapsed = querygen_timer.elapsed();
 
 % Execute XQuery
 query_timer = dbTimer();
+
 xmlstr = queryEngine.QueryJSON(json, 0);
 query_elapsed = query_timer.elapsed();
     

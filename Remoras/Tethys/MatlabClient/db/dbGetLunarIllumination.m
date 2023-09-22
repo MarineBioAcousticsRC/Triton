@@ -1,8 +1,9 @@
 function illu = dbGetLunarIllumination(query_eng, lat, long, start, stop, interval, varargin)
 % illu = dbGetLunarIllumination(query_eng, lat, long, start, stop, interval, varargin)
 % Return information from database about the lunar illumination percentage
-% between the start and ennd UTC serial timestamps (datenums) in the 
-% specified interval.  
+% between the start and end UTC serial timestamps (datenums).  The 
+% interval (min) indicates the number of minutes between measurements
+% and can be no more than 30 (default).  
 %
 % illu(:,1) contains serial dates (datenums)
 % illu(:,2) contains the percentage of lunar illumination 0-100
@@ -27,6 +28,10 @@ function illu = dbGetLunarIllumination(query_eng, lat, long, start, stop, interv
 % See also:  datenum for converting date/time to serial timestamps.
 
 
+narginchk(5, Inf);
+if nargin < 6
+    interval = 30;  % default time between measurements
+end
 
 
 % defaults
@@ -97,9 +102,10 @@ if (getDaylight)
     % Get lunar illumination during day and night
     UseIndicator = MoonIndicator;
 else
-    % Get lunar illumination during night only
+    % Get lunar illumination during night/twilight only
     [a, daylight] = dbXPathDomQuery(doc, 'ephemeris/entry/sun');
-    NightIndicator = ~strcmp(daylight, 'day');
+    NightIndicator = ~max(strcmp(daylight, "day"), ...
+        strcmp(daylight, "dawn/twilight"));
     UseIndicator = MoonIndicator & NightIndicator;
 end
 
