@@ -4,6 +4,9 @@ function dbLunarIlluminationCB(hObject, eventdata, handles)
 
 % retrieve dates
 info = get(hObject, 'UserData');
-fprintf('Lunar Illumination Percent: %f\n', info.illu);
+% Convert x/y to serial date
+start = hObject.XData(1) + hObject.YData(1);
+fprintf('Lunar Illumination Percent: %f at %s\n', ...
+    info.illu, datestr(start, 'yyyy-mm-dd hh:MM'));
 
 

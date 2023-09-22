@@ -18,7 +18,6 @@ xml_result = char(xml);  % Java string to Matlab char array
 % Each key represents an element name, and the value reps their return type.
 typemap={
     'idx','double';...
-    'DeploymentId','double';...
     'Start','datetime';...
     'End','datetime';...
     'BinSize_m','double';...
@@ -48,7 +47,7 @@ typemap={
     'dB', 'double'
     };
 if nargin > 1 && numeric_species
-    typemap(end+1,:) = {'SpeciesID', 'double'};
+    typemap(end+1,:) = {'SpeciesId', 'double'};
 end
 
 result=tinyxml2_tethys('parse',xml_result,typemap);
@@ -60,13 +59,13 @@ if iscell(result) && isempty(result{1})
     return;  % no results
 end
 
-if isstruct(result.Return)
+if isstruct(result.Record)
     % Remove any returned documents without detections
-    no_detections = arrayfun(@(x) ~ isfield(x.Detections, 'Detection'), result.Return);
-    result.Return(no_detections) = [];
+    no_detections = arrayfun(@(x) ~ isfield(x.Detections, 'Detection'), result.Record);
+    result.Record(no_detections) = [];
     
     % Assemble the Detections into an easier to use structure
-    detections = dbMergeStructures(result.Return, 'Detections');
+    detections = dbMergeStructures(result.Record, 'Detections');
 
     det_per_group = arrayfun(@(x) length(x.Detection), detections);
     detN = sum(det_per_group);  % total
@@ -135,7 +134,7 @@ if isstruct(result.Return)
     if nargout > 1
         % Return data from XML after processing to Matlab struct
         % contains everything
-        info.data = result.Return;
+        info.data = result.Record;
         % Retain table with datetimes instead of serial dates
         tabular.Start = datetime(tabular.Start, 'ConvertFrom', 'datenum');
         if ismember('End', tabular.Properties.VariableNames)

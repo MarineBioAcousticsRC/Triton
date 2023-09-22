@@ -1,6 +1,7 @@
 function [BarH, presence_d, presence_m] = visLunarIllumination(illu, varargin)
 % Parses an illumination query return and plots it on the given figure
-% plot.
+% plot.  Clicking on the illumination prints the illumination value
+% to the MATLAB console along with the timestamp.  
 % Required arguments
 %   illu: n x 2 cell array of datetime values in the first column, and
 %   illumination percentages in the second column.
@@ -9,7 +10,8 @@ function [BarH, presence_d, presence_m] = visLunarIllumination(illu, varargin)
 %   cGrad: color gradient of variable size
 
 % Defaults
-cGrad = [[1.0000, 0.6000, 0.2000]
+cGrad = [
+ [1.0000, 0.6000, 0.2000]
  [1.0000, 0.5968, 0.1968]
  [1.0000, 0.5937, 0.1937]
  [1.0000, 0.5905, 0.1905]
@@ -158,8 +160,26 @@ end
             set(lunarH(patch_idx), 'UserData', info, ...
                 'ButtonDownFcn', @dbLunarIlluminationCB);
         end
-        illu_idx = illu_idx + 1;
-            
-                
+        illu_idx = illu_idx + 1;   
     end
+
+
+    % If we call this after a vis function, the X axis should be between 0,1
+    % otherwise set it and set Y axis to be dates
+    if axH.XLim ~= [0, 1]
+        HourTickInterval = 3;  % N hours between hour ticks
+        XTicks = linspace(0, 1, round(24/HourTickInterval)+1);
+
+        set(axH, 'XLim', [0, 1], ...
+            'XTick', XTicks,'TickDir','out', 'XTickLabel', XTicks * 24, ...
+            'XGrid', 'on');
+        if UTCOffset
+            xlabel(sprintf('h (UTC %+1.1f h)', UTCOffset));
+        else
+            xlabel('h (UTC)');
+        end
+        datetick(gca, 'y', 'yyyy/mm/dd');
+        ylabel('Date')        
+    end
+
 end

@@ -127,6 +127,7 @@ end
 map = containers.Map();
 map('enclose') = 1;
 map('namespaces') = 0;
+map('enclose_join') = 'omit';
 err = dbParseOptions(queryEngine, "Deployment", ...
     map, "deployments", varargin{:});
 dbParseUnrecoverableErrorCheck(err);  % Make sure nothing ambiguous
@@ -175,9 +176,9 @@ if iscell(matstruct) && isempty(matstruct{1})
     deployments = [];  % nothing found
     return;
 end
-% Ideally, we would like to take matstruct.Return.Deployment, but
+% Ideally, we would like to take matstruct.Deployment, but
 % these structures may have different elements and cannot be concatenated.
-deployments = matstruct.Return;
+deployments = matstruct;
 % Remove the unused attribute field
 if isfield(deployments, 'Deployment_attr')
     deployments = arrayfun(@(x) rmfield(x, 'Deployment_attr'), deployments);

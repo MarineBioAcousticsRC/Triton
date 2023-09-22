@@ -199,7 +199,7 @@ if iscell(result) && isempty(result{1})
     localizations = [];  % empty
 else
     % Capture raw information
-    localizations.data = [result.Return.Localize];
+    localizations.data = [result.Record.Localize];
     % Processed
     if isfield(localizations.data, 'Localization')
         % Need to further process to make more usable

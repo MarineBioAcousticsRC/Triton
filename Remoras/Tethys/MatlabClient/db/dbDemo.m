@@ -175,13 +175,14 @@ switch example
             % Find periods of night time.  To get complete night periods,
             % we look one day prior to the start of effort and one day
             % after.
-            night = dbDiel(queries, ...
-                sensor.Deployment.DeploymentDetails.Latitude{1}, ...
-                sensor.Deployment.DeploymentDetails.Longitude{1}, ...
+            lat = sensor.Deployment.DeploymentDetails.Latitude{1};
+            long = sensor.Deployment.DeploymentDetails.Longitude{1};
+            night = dbDiel(queries, lat, long, ...
                 EffortSpan(1)-1, EffortSpan(2)+1);
 
-            % Set to zero for GMT, we'll plot in local time
-            UtcOffset = -7;  
+            % Let's plot this in local time using natical timezones
+            % (does not take into account daylight savings time)
+            UtcOffset = dbTimeZone(queries, lat, long, 'nautical');
             
             figure("Name", ...
                 sprintf("Detections of %s in localtime with day/night", species));
@@ -398,8 +399,8 @@ switch example
         %   for idx=1:length(lats)
         %       lats(idx) = deployment(idx).Deployment.DeploymentDetails.Latitude{1}
         %   end
-        lat = arrayfun(@(x) x.Deployment.DeploymentDetails.Latitude{1}, deployment);
-        long = arrayfun(@(x) x.Deployment.DeploymentDetails.Longitude{1}, deployment);
+        lat = arrayfun(@(x) x.DeploymentDetails.Latitude{1}, deployment.Deployment);
+        long = arrayfun(@(x) x.DeploymentDetails.Longitude{1}, deployment.Deployment);
         % Take average and round to resolutoin
         lat = round(mean(lat)/resolution_deg)*resolution_deg;
         long = round(mean(long)/resolution_deg)*resolution_deg;
