@@ -26,7 +26,7 @@ addtime = REMORA.sh.settings.buffer/tbin;
 minPassage = REMORA.sh.settings.minPassage/tbin;
 
 %identify disk writing noise
-if REMORA.sh.settings.diskWrite
+if REMORA.sh.settings.diskWrite == 1
     ipeak = (round(7.5/tbin):nave:size(pwr,2));
     ipeak(ipeak<0) = 0;
     exclude = sort([ipeak-2,ipeak-1, ipeak,ipeak+1, ipeak+2 ]);
