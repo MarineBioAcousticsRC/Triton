@@ -2,7 +2,8 @@ function log_closewindow(src,evnt)
 % src is the figure number
 global handles PARAMS
 
-if (src >= 1 && src <= 3) || src == 7 %from 5 (old logger) to 7 (remora version)
+if (src >= 1 && src <= 3) || src == 7 || src == 9 %from 5 (old logger) to 7 (remora version)
+    % sf added in 9 because bug wasn't able to close at all 2022 Aug 2
     % User attempted to close one of Triton's main windows
     % or the logger window
     

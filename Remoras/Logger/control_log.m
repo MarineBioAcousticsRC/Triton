@@ -254,6 +254,7 @@ switch action
                 oldcolor(b,:) = get(handles.(fields{b}).disp, 'BackgroundColor');
                 set(handles.(fields{b}).disp, 'BackgroundColor', red);
             end
+            error('Deployment must be numeric and Effort must be date/time format!')
             pause(.5);
             for b = find(bad)
                 set(handles.(fields{b}).disp, 'BackgroundColor', oldcolor(b,:));
