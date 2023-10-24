@@ -165,7 +165,7 @@ if iscell(result) && isempty(result{1})
     eff_info = [];  % empty
 else
     % Capture raw information
-    eff_info.data = [result.Return.Localize];
+    eff_info.data = [result.Record.Localize];
     
     % Processed
     effort = zeros(0,2);

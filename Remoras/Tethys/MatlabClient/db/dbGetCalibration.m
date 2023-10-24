@@ -74,13 +74,13 @@ classdef dbGetCalibration < handle
             end
 
             % Convert timestamps 
-            for idx = 1:length(result.Return)
-                result.Return(idx).Calibration.TimeStamp{1} = ...
-                    datetime(result.Return(idx).Calibration.TimeStamp{1}, ...
+            for idx = 1:length(result.Record)
+                result.Record(idx).Calibration.TimeStamp{1} = ...
+                    datetime(result.Record(idx).Calibration.TimeStamp{1}, ...
                     'ConvertFrom', 'datenum');
             end
 
-            obj.calibration = result.Return;
+            obj.calibration = result.Record;
 
             if length(obj.calibration) > 1
                 warning("Query matched multiple calibrations")

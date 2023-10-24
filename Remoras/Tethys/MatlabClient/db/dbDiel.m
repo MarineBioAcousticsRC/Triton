@@ -14,14 +14,16 @@ function night = dbDiel(query_eng, lat, long, start, stop, varargin)
 % specifying the sunset and sunrise time.
 %
 % Optional arguments:
-%  'type', SunsetType - default civil, not well tested with other
-%     types:  nautical, astronomical
+%  'type', SunsetType - 
+%     'setrise' (default)- When the sun sets/rises, uses the US Naval 
+%       Observatory default which is about -34 arc minutes below the 
+%       horizon to account for refraction.
+%     'civil' - sun is 6° below horizon
+%     'nautical' - sun is 12° below horizon
+%     'astronomical' - sun is 18° below horizon
 %  'UTCOffset', N - Return values are offset by N hours (e.g. -4.5
 %     four and a half hours before UTC).  The start and stop times
 %     are still assumed to be UTC.
-%  'CacheUpdate', N - By default, we use server cached entries if they
-%     are available.  When N > 0, we will update the cache with fresh
-%     results from the Internet.  This is not typically needed.
 %
 % Caveats:  
 %  When the interval begins after sunset, night(1, 1) is set to  start
@@ -52,13 +54,11 @@ end
 if isnumeric(stop)
     stop = datetime(stop, 'ConvertFrom', 'datenum');
 elseif ischar(stop) || isstring(stop)
-    stop = datetime(start, "TimeZone", "UTC", "Format", iso8601);
+    stop = datetime(stop, "TimeZone", "UTC", "Format", iso8601);
 end    
 
 % defaults
-type = 'civil';
-% store new server cache entries, but don't update old ones
-CacheUpdate = '';
+type = 'setrise';
 UTCOffset = 0;
 
 idx = 1;
@@ -82,22 +82,37 @@ while idx < length(varargin)
     end
 end
 
+switch type
+    case 'setrise'
+        horizon = dms2degrees([0, -34, 0]);
+    case 'civil'
+        horizon = -6;
+    case 'nautical'
+        horizon = -12;
+    case 'astronomical' 
+        horizon = -18;
+    otherwise
+        error('Unexpected diel type');
+end
+
 % shift the start date 1 day earlier and stop date 1 day later to ensure
 % that we get all night/day transitions
 prior_day = dateshift(start, 'start', 'day') - days(1);
 subsequent_day= dateshift(stop, 'end', 'day') + days(1);
 
 
-queryStr = sprintf(['collection("ext:horizons%s")/', ...
-    'target="sol"/latitude=%f/longitude=%f/', ...
-    'start="%s"/stop="%s"/interval="5m tvh"!'], ...
-    CacheUpdate, lat, long, ...
+queryStr = sprintf(['collection("ext:solar")/', ...
+    'latitude=%f/longitude=%f/', ...
+    'start="%s"/stop="%s"/horizon=%.4f!'], ...
+    lat, long, ...
     datestr(prior_day, 'yyyy-mm-ddTHH:MM:SS'), ...
-    datestr(subsequent_day, 'yyyy-mm-ddTHH:MM:SS'));
+    datestr(subsequent_day, 'yyyy-mm-ddTHH:MM:SS'), ...
+    horizon);
 
 % Run XML query to retrieve ephemeris information
 try
-    doc = query_eng.QueryReturnDoc(queryStr);
+    %doc = query_eng.QueryReturnDoc(queryStr);
+    xmlstr = query_eng.Query(queryStr);
 catch e
     if ~isempty(findstr(e.message, 'getaddrinfo failed'))
         warning('getaddrinfo failed, unable to obtain ephemeris')
@@ -109,113 +124,41 @@ catch e
 end
 
 
-% find day/night transitions
-% day and or night may be repeated due to events such
-% as moon rise/set/transit
-nodes = dbXPathDomQuery(doc, 'ephemeris/entry');
-[sunhandles, daynight] =  dbXPathDomQuery(doc, 'ephemeris/entry/sun');
-
-transitions = find(strcmp(daynight(1:end-1), daynight(2:end)) == 0) + 1;
-
-% count number of night periods
-nightsN = sum(strcmp(daynight([1; transitions]), 'night'));
-night = zeros(nightsN, 2);
-
-k = 0;
-if strcmp(daynight{1}, 'night')
-    % started at night, use first reported time
-    [x, tod] = dbXPathDomQuery(nodes.item(k), 'date');
-    k = k+1;
-    night(k, 1) = datenum(tod);
+typemap = {
+    'date','datetime'    
+};
+data = tinyxml2_tethys('parse', char(xmlstr), typemap);
+if iscell(data) && isempty(data{1})
+    night = [];  % nothing found
+    return;
 end
 
-for t=transitions'
-    switch daynight{t}
-        case 'day'
-            if k > 0
-                % Start of day, close off previous night entry
-                [x, tod] = dbXPathDomQuery(nodes.item(t-1), 'date');
-                night(k, 2) = datenum(tod);
-            end
-        case 'night'
-            [x, tod]= dbXPathDomQuery(nodes.item(t-1), 'date');
-            k=k+1;  % start new entry
-            night(k, 1) = datenum(tod);
-    end
-end
+timestamps = cell2mat([data.entry.date]');
+daynight = string([data.entry.sun]');
 
+N = round(length(daynight)/2);
+night = zeros(N, 2);
 
-debug = false;
-if debug
-    fprintf('Range %s - %s\n', datestr(start), datestr(stop));
-    fprintf('Nights prior to pruning or adjustments\n');
-    for idx=1:size(night, 1)
-        fprintf('night %s - %s\n', ...
-            datestr(night(idx,1)), datestr(night(idx,2)));
-    end
+nidx = 1;
+if strcmp(daynight(1), "day")
+    % Start of effort is during the night.  Set first night to start
+    night(nidx,1) = datenum(start);
 end
-
-if strcmp(daynight(end), 'night')
-    % ended during night, use end time
-    night(k, 2) = datenum(stop);
-end
-   
-% night is still a datenum, create datenums for comparision
-start_dn = datenum(start);
-stop_dn = datenum(stop);
-% check start time and end time, resize to fit offset_start and offset_stop
-while true
-    if night(1,2) < start_dn
-        % remove the first row and continue
-        night(1,:) = [];
+for idx=1:length(timestamps)
+    if strcmp(daynight(idx), "day")
+        night(nidx, 2) = timestamps(idx);
     else
-        % found the earliest full night transition
-        if night(1,1) < start_dn
-            night(1,1) = start_dn;
-        end
-        break;
+        % New night, next row
+        nidx = nidx + 1;
+        night(nidx, 1) = timestamps(idx);
     end
 end
-
-if debug
-    fprintf('Nights after pruning edges\n');
-    for idx=1:size(night, 1)
-        fprintf('night %s - %s\n', ...
-            datestr(night(idx,1)), datestr(night(idx,2)));
-    end
+if strcmp(daynight(end), "night")
+    % End of effort during night.  Set end of night to stop effort
+    night(nidx, 2) = datenum(stop);
 end
 
-% k is the index of the last row in night
-k = size(night, 1);
-if k == 0
-    return;  %no nights across query range
+if UTCOffset
+    night = night + datenum([0 0 0 UTCOffset 0 0]);
 end
-    
-while true
-    if night(k,1) > stop_dn
-        % remove the last row and continue
-        night(k,:) = [];
-        k = k - 1;
-        if k == 0
-            return;  % no nights left
-        end
-    else
-        % found the last full night transition
-        if night(k,2) > stop_dn
-            night(k,2) = stop_dn;
-        end
-        break;
-    end
-end
-
-if debug
-    fprintf('Nights after handling ending edge\n');
-    for idx=1:size(night, 1)
-        fprintf('night %s - %s\n', ...
-            datestr(night(idx,1)), datestr(night(idx,2)));
-    end
-end
-
-
-night = night + datenum([0 0 0 UTCOffset 0 0]);
 1;

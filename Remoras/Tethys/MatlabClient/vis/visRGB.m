@@ -1,7 +1,7 @@
-% rgb.m: translates a colour from multiple formats into matlab colour format
-% type 'rgb demo' to get started
+% visRGB.m: translates a colour from multiple formats into matlab colour format
+% type 'visRGB demo' to get started
 %
-% [matlabcolor]=rgb(col)
+% [matlabcolor] = visRGB(col)
 % matlab colors are in the format [R G B]
 %
 % if 'col' is a string, it is interpreted as
@@ -60,23 +60,45 @@
 % CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 % POSSIBILITY OF SUCH DAMAGE.
+%
+
+% 2023/07 - Modified to support string type (Marie A. Roch)
 
 
 function out=rgb(in)
 
-if isa(in,'char') & length(in)>2 & length(in)<5 & strcmpi('qb',in(1:2))
-	out=qbcolor(sscanf(in(3:end),'%i'));
-elseif isa(in,'char') & length(in)==1
-	out=translatecolorchar(in);
-elseif isa(in,'char')
-	if strcmp(in,'demo') rgb_demo; return; end
-	if strcmp(in,'list') rgb_list; return; end
-	out=translatecolorstring(in);
-elseif isa(in,'double') & size(in,1)==1 & size(in,2)==1 & abs(in)<16777216
-	out=translatecolorRGB(in);
-elseif isa(in,'double') & size(in,1)==1 & size(in,2)==3
-	out=in;
-else
+out = [];  % assume unable to assign
+if isnumeric(in)
+    if isscalar(in) & abs(in) < 16777216
+        out=translatecolorRGB(in);
+    elseif length(in) == 3
+        out = in(:)';  % ensure row vector
+    end
+elseif ischar(in) || isstring(in)
+    if ischar(in)
+        in = string(in);
+    end
+    sz = in.strlength;
+
+    if sz > 2 & sz <5 & in.startsWith('qb')
+        out=qbcolor(sscanf(in.extractAfter(2),'%i'));
+    elseif sz == 1
+        out=translatecolorchar(in);
+    else
+        switch(in)
+            case 'demo'
+                rgb_demo;
+                return
+            case 'list'
+                rgb_list;
+                return
+            otherwise
+                out=translatecolorstring(in);
+        end
+    end
+end
+
+if isempty(out)
 	warning('Unrecognised color format, black assumed');
 	out=[0 0 0];
 end
@@ -186,7 +208,7 @@ function tokens=rgb_parse(str)
 
 % parse string to obtain all tokens
 % quoted strings count as single tokens
-
+str = char(str);  % code designed for char array
 inquotes=0;
 intoken=0;
 pos=1;
@@ -285,7 +307,7 @@ if isempty(col) return; end
 r=rectangle('position',[x+0.1 y+0.1 1.8 0.8]);
 col_=col;
 if iscell(col) col=col{1}; end
-colrgb=rgb(col);
+colrgb=visRGB(col);
 if strcmp(col(1),'u') & length(col)==2
 	t=text(x+1,y+0.5,{'unnamed',['colour (' col(2) ')']});
 	set(r,'facecolor',colrgb);
