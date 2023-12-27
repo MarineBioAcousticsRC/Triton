@@ -8,7 +8,7 @@ function read_ltsadata
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS
 
-check_ltsa_time
+%check_ltsa_time
 
 ltsaFullFile = fullfile(PARAMS.ltsa.inpath, PARAMS.ltsa.infile);
 

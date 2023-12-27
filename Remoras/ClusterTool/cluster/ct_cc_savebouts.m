@@ -20,7 +20,7 @@ for iT = 1:size(REMORA.ct.CC.output.Tfinal)
         size(REMORA.ct.CC.output.Tfinal{iT,7},1),1));
     dataAll = [dataAll;dataMat];
     labelsAll = [labelsAll;labelMat];
-    binFileNamesAll = [binFileNamesAll;binFileNamesMat];
+    binFileNamesAll = [binFileNamesAll;binFileNamesMat'];
 end
 
 outputTable = table(datestr(dataAll(:,1)),datestr(dataAll(:,2)),dataAll(:,3),...

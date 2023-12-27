@@ -10,15 +10,17 @@ fOut = [];
 clickParamsOut = [];
 pTemp = p;
 
-if isfield(p,'parpool')
-    parpool(p.parpool)
-else
-    parpool(1);
+if isfield(p,'parpool')&& p.parpool>1
+    try
+        parpool(p.parpool)
+    end
+% else
+%     parpool(1);
 end
 
-for idx1 = 1:N % for each data file
+parfor idx1 = 1:N % for each data file
     f=[];
-    
+    pTemp = p;
     outFileName = fullLabels{idx1};
     if ~pTemp.overwrite && exist(outFileName, 'file') == 2
         fprintf('DetectionFile %s already exists.\n',outFileName)

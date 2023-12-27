@@ -58,8 +58,15 @@ if trainTestSetInfo.standardizeAll
     trainDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
 
     ICIstart = trainTestSetInfo.setSpecHDim+1;
-    trainTestSetInfo.iciStd = mean(max(trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)),[],2));
-    trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
+    if max(trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)),[],'all')>1
+        trainTestSetInfo.iciStd = mean(max(trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)),[],2));
+        trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = ...
+            trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/...
+            trainTestSetInfo.iciStd(1);
+    else
+       warning('ICI appears to be already normalized to [0,1] skipping standardization')
+       trainTestSetInfo.iciStd = 1;
+    end
     
     wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
     trainTestSetInfo.waveStd = std(max(trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2));

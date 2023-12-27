@@ -224,6 +224,9 @@ clickTimes = clickTimes(useBins);
 tIntMat = tIntMat(useBins);
 subOrder = subOrder(useBins);
 fileNumExpand = fileNumExpand(useBins);
+if size(envShape,1)<size(useBins,1)
+    envShape = zeros(size(useBins));
+end
 envShape = envShape(useBins,:);
 %% Cluster N times for evidence accumulation/robustness
 % CoMat = zeros(tempN,tempN);
@@ -494,12 +497,12 @@ for iNodeSet = 1:length(nodeSet)
     clusterIDreduced(setIntersect) = iNodeSet;
 end
 
-if tritonMode && (size(clusterIDreduced,1)<5000)
+if tritonMode && (size(clusterIDreduced,1)<1000)
 
     fprintf('Plotting network\n')
 
     figure(110);clf
-    G = graph(compDist);    
+    G = graph(compDist,'upper');    
     h = plot(G,'layout','force');
 
     set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)

@@ -52,7 +52,7 @@ end
 set_pointer(HANDLES.fig.main, oldptr);
 % Only process selection if we have a valid time or frequency
 if info_struct1.proc
-    if ~ isempty(PARAMS.log.pick)
+    if isfield(PARAMS,'log')&& ~isempty(PARAMS.log.pick)
         if ~ isempty(info_struct1.time_vec)
             log_pick(info_struct1.time_dnum, info_struct1.freq, fname); % inform logger of selection
         end

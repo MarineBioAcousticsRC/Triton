@@ -113,7 +113,6 @@ for iFile = 1:nFiles
         [~,keepCols] = setdiff(trainedNet.typeNames,excludeList);
         predScores = predScores(:,keepCols);
         [predScoresMax,predLabels] = max(predScores,[],2);       
-
     else
         predLabels = double(predLabels);
         predScoresMax = max(predScores,[],2);       
