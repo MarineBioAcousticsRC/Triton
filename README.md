@@ -15,3 +15,8 @@ Non-GitHub Users: You can obtain all of the source code by clicking the green "c
 Current and past funders include:  
 - NOAA Protected Species Toolbox Initiative  
 - NAVFAC Living Marine Resources Program  
+
+
+## Batch/MultiDir LTSA Remora development TO DOs
+- add gui/step to check output filenames and change if wanted
+- test Remora folder alone with flac version

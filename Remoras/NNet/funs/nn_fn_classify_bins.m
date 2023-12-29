@@ -17,7 +17,7 @@ fprintf('Loaded network %s\n', REMORA.nn.classify.networkPath)
 % identify files.
 fWild = [REMORA.nn.classify.wildcard,'*.mat'];
 if REMORA.nn.classify.searchSubDirsTF
-    fList = rdir(REMORA.nn.classify.inDir,fWild);
+    fList = nn_fn_rdir(REMORA.nn.classify.inDir,fWild);
 else
     fList = dir(fullfile(REMORA.nn.classify.inDir,fWild));
 end
@@ -84,11 +84,12 @@ for iFile = 1:nFiles
     
     if trainedNet.trainTestSetInfo.useICI
         iciSet = vertcat(binData.dTT);
-        iciSet = iciSet./max(iciSet,[],2);
-        max0 = find(max(iciSet,[],2)>0);
-        iciSet(max0,:) = iciSet(max0,:)./(tTSI.iciStd);
+        %iciSet = iciSet./max(iciSet,[],2);
+        %max0 = find(max(iciSet,[],2)>0);
+        %iciSet(max0,:) = iciSet(max0,:)./(tTSI.iciStd);
+        %iciSet(tooFew,:) = [];
         iciSet(tooFew,:) = [];
-
+        iciSet = iciSet./max(max(iciSet,[],2),1);
     end
         
     if trainedNet.trainTestSetInfo.useWave
@@ -100,6 +101,7 @@ for iFile = 1:nFiles
             binData(tooShort(iS)).envMean = ones(1,max(waveLen));
         end
         waveSet = vertcat(binData.envMean);
+        waveSet = waveSet./max(waveSet,[],2);
         waveSet(tooFew,:) = [];
         maxWave = max(waveSet,[],2);
         waveSet= waveSet./maxWave;
@@ -140,7 +142,7 @@ for iFile = 1:nFiles
     end
     save(saveFullFile,'predScoresMax','trainTestSetInfo',...
         'netTrainingInfo','classificationInfo','typeNames','binData',...
-        'f','p','TPWSfilename','-v7.3')
+        'f','p','TPWSfilename','predScores','-v7.3')
     fprintf('Done with file %0.0f of %0.0f: %s\n',iFile, nFiles,inFile)
     % should we plot here?
 
