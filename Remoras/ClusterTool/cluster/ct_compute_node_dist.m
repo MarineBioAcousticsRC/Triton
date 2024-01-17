@@ -7,9 +7,8 @@ if ~wcorTF
 %         verySmall = specClickTf_norm_short(iB,:)<=.2;
 %         specClickTf_norm_short(iB,verySmall) = 0;
 %     end
-    distClick = pdist(specClickTf,'euclidean');
-    distClickE = ((-distClick)/max(max(distClick)))+1;
-    %distClickE = (exp(-distClick));
+    distClick = pdist(specClickTf,'correlation');
+    distClickE = (exp(-distClick));
 else
     % weighted correlation
     % Wgts = 1:-1/(size(specClickTf,2)-1):0; % Vector from 1 to 0 ->

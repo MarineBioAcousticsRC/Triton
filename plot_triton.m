@@ -81,7 +81,7 @@ if multich_off
         set(HANDLES.time.edtxt1,'String',timestr(PARAMS.plot.dnum,6));
         %         end
         set(HANDLES.time.edtxt3,'String',timestr(PARAMS.plot.dnum,5));
-%         set(HANDLES.time.edtxt4,'String',num2str(PARAMS.tseg.sec));
+        set(HANDLES.time.edtxt4,'String',num2str(PARAMS.tseg.sec));
         %timestr doesn't do micro seconds with datenums so micro seconds are stored
         %in PARAMS.plot.uuu
         %   mmm = timestr(PARAMS.plot.dnum,5);

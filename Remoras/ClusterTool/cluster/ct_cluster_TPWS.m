@@ -122,11 +122,8 @@ if isempty(MTT) % go to next file if no clicks left in this one.
 end
 
 % Build vector of bin starts/ends.
-if isinf(p.timeStep)
-    dateInterval = [floor(MTT(1)), ceil(MTT(end))];
-else
-    dateInterval = floor(MTT(1)):datenum([0,0,0,0,p.timeStep,0]):ceil(MTT(end));
-end
+dateInterval = floor(MTT(1)):datenum([0,0,0,0,p.timeStep,0]):ceil(MTT(end));
+
 % Figure out which clicks are in which time bin.
 [testN,testBin] = histc(MTT,dateInterval);
 
@@ -246,9 +243,9 @@ for iC = 1:length(dateInterval)
         binData(cIdx,1).clusteredTF = 0;
         binData(cIdx,1).envDur = envDur;
         if size(envSet,1)>1
-            binData(cIdx,1).envMean = mean(envSet);%./max(envSet,[],2));
+            binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
         elseif size(envSet,1)==1
-            binData(cIdx,1).envMean = envSet;%./max(envSet,[],2);
+            binData(cIdx,1).envMean = envSet./max(envSet,[],2);
         end
         [binData(cIdx,1).dTT,binData(cIdx,1).clickRate] = ct_compute_rate_distributions(ttSet,p);
         

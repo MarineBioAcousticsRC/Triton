@@ -131,10 +131,6 @@ for iDir = 1:length(inDirList)
         for itr = 1:length(tpwsNames)
             thisFile = fullfile(tpwsNames(itr).folder,tpwsNames(itr).name);        
             fprintf('Beginning file %s\n',thisFile)
-            outFile = fullfile(p.outDir,strrep(tpwsNames(itr).name,'TPWS1.mat','clusters_PR95_PPmin125.mat'));
-            if exist(outFile,'file')
-                continue
-            end
             % Run clustering 
             ct_cluster_TPWS(thisFile,fdAll,p,outDir) 
         end
