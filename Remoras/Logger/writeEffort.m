@@ -102,6 +102,7 @@ if ischar(spreadsheet)
     % filename, try to open it
     if ismac
         Workbook = handles.logfile;
+    else
         try
             Excel = actxserver('Excel.Application');
         catch err
@@ -132,11 +133,14 @@ catch
 end
 
 % erase and rewrite headers with granularity and bintime as columns
-colsN = EffortSheet.UsedRange.Columns.Count;
-cellRange = sprintf('A1:%s1', excelColumn(colsN));%need proper range format
-headerRange = get(EffortSheet, 'Range', cellRange);%get the range of the headers
-headerRangeCell = headerRange.value;%convert from range object to cell array
-
+if ismac
+   
+else
+    colsN = EffortSheet.UsedRange.Columns.Count;
+    cellRange = sprintf('A1:%s1', excelColumn(colsN));%need proper range format
+    headerRange = get(EffortSheet, 'Range', cellRange);%get the range of the headers
+    headerRangeCell = headerRange.value;%convert from range object to cell array
+end
 
 
 

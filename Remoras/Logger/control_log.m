@@ -189,7 +189,7 @@ switch action
     case 'set_metadata'
         
         % Retrieve the set of ids associated with deployments
-        if REMORA.tethysinstalled = 1
+        if REMORA.tethysinstalled == 1
         deployment_id = log_getdeploymentids();
         else
             deployment_id = [];
