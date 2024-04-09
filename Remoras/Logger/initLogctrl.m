@@ -20,6 +20,7 @@ if exist('get_tethys_server') ~= 2
     error('Tethys Remora must be installed')
     elseif strcmp(txt,'n')
         REMORA.tethysinstalled = 0;
+        query_h = [];
     end
 else
     query_h = get_tethys_server();
