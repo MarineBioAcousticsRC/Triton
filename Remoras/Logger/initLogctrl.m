@@ -14,7 +14,7 @@ global PARAMS TREE handles HANDLES REMORA
 
 % Get a Tethys query handler instance from the Tethys REMORA
 if exist('get_tethys_server') ~= 2
-    prompt='Tethys Remora is not installed. Do you want to install it? Type y/n';
+    prompt='Tethys Remora is not installed. Do you want to install it? Type y/n: ';
     txt = input(prompt);
     if strcmp(txt,'y')
     error('Tethys Remora must be installed')
