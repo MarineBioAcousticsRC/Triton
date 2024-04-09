@@ -100,26 +100,33 @@ end
 
 if ischar(spreadsheet)
     % filename, try to open it
-    try
-        Excel = actxserver('Excel.Application');
-    catch err
-        errordlg('Unable to access spreadsheet interface')
-        return
-    end
-    %Excel.Visible = 1;  % for debugging
+    if ismac
+        Workbook = handles.logfile;
+        try
+            Excel = actxserver('Excel.Application');
+        catch err
+            errordlg('Unable to access spreadsheet interface')
+            return
+        end
+        %Excel.Visible = 1;  % for debugging
 
-    try
-        Workbook = Excel.workbooks.Open(spreadsheet);  % Open workbook
-    catch err
-        errordlg(sprintf('Unable to open spreadsheet %s', spreadsheet));
-        return
+        try
+            Workbook = Excel.workbooks.Open(spreadsheet);  % Open workbook
+        catch err
+            errordlg(sprintf('Unable to open spreadsheet %s', spreadsheet));
+            return
+        end
     end
 else
     Workbook = spreadsheet;  % Already open, copy handle
 end
 
 try
+    if ismac
+        EffortSheet = handles.Effort.Sheet;
+    else
     EffortSheet = Workbook.Sheets.Item('Effort'); % Access the Effort sheet
+    end
 catch
     errordlg('Master template missing Effort sheet');
 end

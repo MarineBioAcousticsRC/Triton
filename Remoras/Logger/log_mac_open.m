@@ -20,6 +20,7 @@ global handles HANDLES
 %[num,txt] = xlsread(handles.logfile);
 Detections = readtable(handles.logfile,'Sheet','Detections',"VariableUnitsRange" , 1);
 AdhocDetections = readtable(handles.logfile,'Sheet','AdhocDetections',"VariableUnitsRange" , 1);
+Effort = readtable(handles.logfile,'Sheet','Effort','VariableUnitsRange', 1);
 Metadata = readtable(handles.logfile,'Sheet','MetaData',"VariableUnitsRange" , 1);
 
 % Fill out Metadata
@@ -40,6 +41,8 @@ handles.Meta.Sheet = Metadata;
 %colsN = length(Metadata.Properties.VariableNames);
 %lastCol = excelColumn(colsN);
 handles.Meta.Headers = Metadata.Properties.VariableNames;
+
+handles.Effort.Sheet = Effort;
 
 handles.OnEffort.Sheet = Detections;
 handles.OnEffort.Sheet.InputFile = categorical(handles.OnEffort.Sheet.InputFile);
