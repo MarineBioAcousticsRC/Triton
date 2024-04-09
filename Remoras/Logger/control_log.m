@@ -271,19 +271,30 @@ switch action
         set(handles.log.effort, 'Visible', 'off');  % Hide metadata
         set(handles.done, 'Visible', 'off');
         set(handles.effortPane, 'Visible', 'on');
+        if ismac
+            log_mac_open(WorksheetNames, values);
+        else
         log_open(WorksheetNames, values);
+        end
         set(TREE.tree, 'Visible', 1); % overlay effort tree
 
         
         % New log, make sure that on/off effort detections are empty
         for f = {'OnEffort', 'OffEffort'}
             f = f{1};
-            RowsN = handles.(f).Sheet.UsedRange.Rows.Count;
-            % Clear all used rows after headers
-            if RowsN > 1
-                Range = handles.(f).Sheet.Range(sprintf('2:%d', RowsN));
-                Range.Clear();  % clear out any data
-                Range.EntireRow.Delete();  % remove rows
+            if ismac
+                [RowsN,~] = size(handles.(f).Sheet);
+                if RowsN > 1
+                    handles.(f).Sheet(:,:) = [];
+                end
+            else
+               RowsN = handles.(f).Sheet.UsedRange.Rows.Count;
+           % Clear all used rows after headers
+               if RowsN > 1
+                   Range = handles.(f).Sheet.Range(sprintf('2:%d', RowsN));
+                   Range.Clear();  % clear out any data
+                   Range.EntireRow.Delete();  % remove rows
+               end
             end
         end
         
@@ -318,7 +329,11 @@ switch action
                 end
             end
             %passed checks, proceed to write effort sheet
-            writeEffort(TREE.rootNode, handles.Workbook);
+            if ismac
+                writeEffort(TREE.rootNode,handles.logfile);
+            else
+                writeEffort(TREE.rootNode, handles.Workbook);
+            end
             % No need to open the log, we already did so.
         else
             read_effort(handles.logfile);

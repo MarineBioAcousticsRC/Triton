@@ -143,46 +143,88 @@ for callIdx = 1:length(entry.calls)
             continue  % parameters are a special case
         end
         column = excelColumn(hidx - 1);
-        Range = detection.Sheet.Range(sprintf('%s%d', column, currentRow));
+        if ismac
+            Range = [currentRow,hidx];
+        else
+            Range = detection.Sheet.Range(sprintf('%s%d', column, currentRow));
+        end
         
         % Some fields are only populated for the first call
         firstonly = false; 
         
-        switch lower(detection.Headers{hidx})
-            case 'input file'
-                set(Range, 'Value', entry.src_file);
-            case 'start time'
-                set(Range, 'Value', entry.pickstartdisplay - date_epoch('excel'));
-            case 'end time'
-                if isfield(entry, 'pickenddisplay')
-                    set(Range, 'Value', entry.pickenddisplay - date_epoch('excel'));
-                end
-            case 'event number'
-                set(Range, 'Value', entry.event);
-            case 'species code'
-                set(Range, 'Value', entry.species);
-            case 'call'
-                set(Range, 'Value', entry.calls{callIdx})
-            otherwise 
-                firstonly = true;
+        if ismac
+            switch lower(detection.Headers{hidx})
+                case 'inputfile'
+                    detection.Sheet.InputFile(currentRow) = entry.src_file;
+                case 'starttime'
+                    detection.Sheet.StartTime(currentRow) = entry.pickstartdisplay - date_epoch('excel');
+                case 'endtime'
+                    if isfield(entry, 'pickenddisplay')
+                        detection.Sheet.EndTime(currentRow) = entry.pickenddisplay - date_epoch('excel');
+                    end
+                case 'eventnumber'
+                    detection.Sheet.EventNumber(currentRow) = entry.event;
+                case 'speciescode'
+                    detection.Sheet.SpeciesCode(currentRow) = entry.species;
+                case 'call'
+                    detection.Sheet.Call(currentRow) = entry.calls{callIdx};
+                otherwise 
+                    firstonly = true;
+            end
+        else
+            switch lower(detection.Headers{hidx})
+                case 'input file'
+                    set(Range, 'Value', entry.src_file);
+                case 'start time'
+                    set(Range, 'Value', entry.pickstartdisplay - date_epoch('excel'));
+                case 'end time'
+                    if isfield(entry, 'pickenddisplay')
+                        set(Range, 'Value', entry.pickenddisplay - date_epoch('excel'));
+                    end
+                case 'event number'
+                    set(Range, 'Value', entry.event);
+                case 'species code'
+                    set(Range, 'Value', entry.species);
+                case 'call'
+                    set(Range, 'Value', entry.calls{callIdx})
+                otherwise 
+                    firstonly = true;
+            end
         end
         
         if callIdx == 1 && firstonly
-            switch lower(detection.Headers{hidx})
+            if ismac
+                switch lower(detection.Headers{hidx})
                 case 'audio'
                     if ~ isempty(entry.audio)
-                        set(Range, 'Value', entry.audio);
+                        detection.Sheet.Audio(currentRow) = entry.audio;
                     end
                 case 'image'
                     if ~ isempty(entry.image)
-                        set(Range, 'Value', entry.image);
+                        detection.Sheet.Image(currentRow) = entry.image;
                     end
                 case 'comments'
                     if ~ isempty(entry.comment)
-                        set(Range, 'Value', entry.comment);
+                        detection.Sheet.Comments(currentRow) = entry.comment;
                     end
+                end
+            else
+                switch lower(detection.Headers{hidx})
+                    case 'audio'
+                        if ~ isempty(entry.audio)
+                            set(Range, 'Value', entry.audio);
+                        end
+                    case 'image'
+                        if ~ isempty(entry.image)
+                            set(Range, 'Value', entry.image);
+                        end
+                    case 'comments'
+                        if ~ isempty(entry.comment)
+                            set(Range, 'Value', entry.comment);
+                        end
+                end
             end
-        end
+       end
         
         % Note that we do not process parameter headers here
     end
@@ -199,6 +241,10 @@ for callIdx = 1:length(entry.calls)
             set(Range, 'Value', entry.callAttrib(attrIdx).values(pidx));
         end
     end
+end
+
+if ismac
+handles.(PARAMS.log.mode).Sheet = detection.Sheet;
 end
 
 control_log('display_lastentry');  % Update last logged entry
@@ -231,7 +277,13 @@ end
 
 % Save every Nth log entry
 if mod(currentRow, 5) == 0
-    handles.Workbook.Save();
+    if ismac
+        writetable(handles.OnEffort.Sheet,handles.logfile,'Sheet','Detections')
+        writetable(handles.OffEffort.Sheet,handles.logfile,'Sheet','AdhocDetections')
+        writetable(handles.Meta.Sheet,handles.logfile,'Sheet','MetaData')
+    else
+        handles.Workbook.Save();
+    end
 end
 
 1;

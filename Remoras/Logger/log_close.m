@@ -8,15 +8,23 @@ global handles HANDLES PARAMS
 
 % Locate the end of effort
 effortEnd = 'Effort End';
-col = find(strcmp(handles.Meta.Headers, effortEnd), 1, 'first');
+if ismac
+    col = 4;
+else
+    col = find(strcmp(handles.Meta.Headers, effortEnd), 1, 'first');
+end
 if ~ isempty(end_effort_date)
     if isempty(col)
         errordlg(sprintf('Column %s missing from MetaData sheet', effortEnd));
         return
     else
+        if ismac
+            handles.Meta.Sheet.EffortEnd = datestr(end_effort_date,31);
+        else
         colStr = excelColumn(col - 1);
         set(handles.Meta.Sheet.Range(sprintf('%s2', colStr)), ...
             'Value', datestr(end_effort_date, 31))
+        end
 
     end
 end
@@ -25,11 +33,17 @@ PARAMS.log.pick = [];  % Turn off time X freq callback
 pickxyz(true);  % reset cursor
 
 % Save and close up
-handles.Workbook.Save();
-handles.Workbook.Close();
-handles.Workbook = [];
-handles.Server.Quit();
-handles.Server = [];
+if ismac
+    writetable(handles.OnEffort.Sheet,handles.logfile,'Sheet','Detections')
+    writetable(handles.OffEffort.Sheet,handles.logfile,'Sheet','AdhocDetections')
+    writetable(handles.Meta.Sheet,handles.logfile,'Sheet','MetaData')
+else
+    handles.Workbook.Save();
+    handles.Workbook.Close();
+    handles.Workbook = [];
+    handles.Server.Quit();
+    handles.Server = [];
+end
 
 % Restore original closing function
 for f = {'main', 'ctrl', 'msg'}
