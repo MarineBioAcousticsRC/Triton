@@ -15,7 +15,7 @@ if length(varargin) > 2
 end
 action = varargin{end};
 
-global handles PARAMS TREE HANDLES
+global handles PARAMS TREE HANDLES REMORA
 
 switch action
     case 'adhoc'
@@ -189,7 +189,11 @@ switch action
     case 'set_metadata'
         
         % Retrieve the set of ids associated with deployments
+        if REMORA.tethysinstalled = 1
         deployment_id = log_getdeploymentids();
+        else
+            deployment_id = [];
+        end
         % Verify user has filled in requested fields before proceeding
         fields = {'deploy', 'user', 'effort_start'};
         WorksheetNames = { 'DeploymentId', 'User ID', 'Effort Start'};
