@@ -134,7 +134,11 @@ end
 
 % erase and rewrite headers with granularity and bintime as columns
 if ismac
-   
+   sprw = find(strcmp(handles.Effort.Sheet.SpeciesCode,values{3}) & strcmp(handles.Effort.Sheet.Call,values{4}));
+   sp = handles.Effort.Sheet(sprw,:);
+   handles.Effort.Sheet(1,:) = sp;
+   handles.Effort.Sheet(2:end,:) = [];
+   handles.Effort.Sheet.Granularity(1) = granCell{1};
 else
     colsN = EffortSheet.UsedRange.Columns.Count;
     cellRange = sprintf('A1:%s1', excelColumn(colsN));%need proper range format
@@ -151,75 +155,80 @@ end
 % list was generated from the effort sheet, this should not be problematic.
 
 % Replace NaN with '' so regexp doesn't faile
-charI = cellfun(@ischar, headerRangeCell);
-for idx = find(~charI)
-    headerRangeCell{idx} = '';
-end
-speciesCol= find(strcmp(headerRangeCell, 'Species Code'));
-callCol = find(strcmp(headerRangeCell, 'Call'));
-granCol = excelColumn(find(strcmp(headerRangeCell, 'Granularity'))-1);
-groupCol = excelColumn(find(strcmp(headerRangeCell, 'Group'))-1);
-
-if length(granCell) > 1
-    % BinSize required
-    granLastCol = excelColumn(find(strcmp(headerRangeCell, 'BinSize_m'))-1);
+if ismac
 else
-    granLastCol = granCol;
-end
-
-selectedidx = size(list, 1);
-
-RowsN = EffortSheet.UsedRange.Rows.Count;  % #rows in sheet
-effortidx = RowsN;
-
-whitespace = false;  % for retaining spacing between entries 
-while effortidx > 1 && selectedidx >= 1
-    % Is the current row equivalent to the last row in list?
-    Range = EffortSheet.Range(sprintf('%d:%d', effortidx, effortidx));
-    values = Range.value;
-    
-    if ischar(values{callCol}) && ischar(values{speciesCol}) && ...
-            strcmp(values{callCol}, list{selectedidx, callCol}) && ...  
-            strcmp(values{speciesCol}, list{selectedidx, speciesCol})
-            % Matches, add granularity
-            GranRange = EffortSheet.Range(...
-                sprintf('%s%d:%s%d', granCol, effortidx, granLastCol, effortidx));
-            set(GranRange, 'Value', granCell);
-        
-            if ~isempty(list{selectedidx, 1})
-                % first item in group, set group name
-                GrpRange = EffortSheet.Range(...
-                    sprintf('%s%d:%s%d', groupCol, effortidx, groupCol, effortidx));
-                set(GrpRange, 'Value', list{selectedidx, 1});
-            end
-            selectedidx = selectedidx - 1;        
-            whitespace = false;
-    else
-        % The first empty row after retaining an entry is retained.
-        % All others are removed.
-        has_data = sum(cellfun(@ischar, values));        
-        if has_data || whitespace
-            Range.Delete();
-        end
-        if ~ has_data
-            whitespace = true;
-        end
+    charI = cellfun(@ischar, headerRangeCell);
+    for idx = find(~charI)
+        headerRangeCell{idx} = '';
     end
-    effortidx = effortidx - 1;
+    speciesCol= find(strcmp(headerRangeCell, 'Species Code'));
+    callCol = find(strcmp(headerRangeCell, 'Call'));
+    granCol = excelColumn(find(strcmp(headerRangeCell, 'Granularity'))-1);
+    groupCol = excelColumn(find(strcmp(headerRangeCell, 'Group'))-1);
+
+    if length(granCell) > 1
+        % BinSize required
+        granLastCol = excelColumn(find(strcmp(headerRangeCell, 'BinSize_m'))-1);
+    else
+        granLastCol = granCol;
+    end
+
+    selectedidx = size(list, 1);
+
+    RowsN = EffortSheet.UsedRange.Rows.Count;  % #rows in sheet
+    effortidx = RowsN;
+
+    whitespace = false;  % for retaining spacing between entries 
+    while effortidx > 1 && selectedidx >= 1
+        % Is the current row equivalent to the last row in list?
+        Range = EffortSheet.Range(sprintf('%d:%d', effortidx, effortidx));
+        values = Range.value;
+    
+        if ischar(values{callCol}) && ischar(values{speciesCol}) && ...
+                strcmp(values{callCol}, list{selectedidx, callCol}) && ...  
+                strcmp(values{speciesCol}, list{selectedidx, speciesCol})
+                % Matches, add granularity
+                GranRange = EffortSheet.Range(...
+                    sprintf('%s%d:%s%d', granCol, effortidx, granLastCol, effortidx));
+                set(GranRange, 'Value', granCell);
+        
+                if ~isempty(list{selectedidx, 1})
+                    % first item in group, set group name
+                    GrpRange = EffortSheet.Range(...
+                        sprintf('%s%d:%s%d', groupCol, effortidx, groupCol, effortidx));
+                    set(GrpRange, 'Value', list{selectedidx, 1});
+                end
+                selectedidx = selectedidx - 1;        
+                whitespace = false;
+        else
+            % The first empty row after retaining an entry is retained.
+            % All others are removed.
+            has_data = sum(cellfun(@ischar, values));        
+            if has_data || whitespace
+                Range.Delete();
+            end
+            if ~ has_data
+                whitespace = true;
+            end
+        end
+        effortidx = effortidx - 1;
+    end
 end
 
-% Remove any remaining rows
-while effortidx > 1
-    Range = EffortSheet.Range(sprintf('%d:%d', effortidx, effortidx));
-    Range.Delete();
-    effortidx = effortidx - 1;
-end
+if ~ismac
+    % Remove any remaining rows
+    while effortidx > 1
+        Range = EffortSheet.Range(sprintf('%d:%d', effortidx, effortidx));
+        Range.Delete();
+        effortidx = effortidx - 1;
+    end
 
-if ischar(spreadsheet)
-    % save and close, user wanted file operation
-    Workbook.Save();  % Save changes
-    Workbook.Close(false);  % Close program
-    Excel.Quit;  % Exit server
+    if ischar(spreadsheet)
+        % save and close, user wanted file operation
+        Workbook.Save();  % Save changes
+        Workbook.Close(false);  % Close program
+        Excel.Quit;  % Exit server
+    end
 end
 
 

@@ -18,10 +18,10 @@ function log_mac_open(MetadataNames,MetadataValues)
 global handles HANDLES
 
 %[num,txt] = xlsread(handles.logfile);
-Detections = readtable(handles.logfile,'Sheet','Detections',"VariableUnitsRange" , 1);
-AdhocDetections = readtable(handles.logfile,'Sheet','AdhocDetections',"VariableUnitsRange" , 1);
-Effort = readtable(handles.logfile,'Sheet','Effort','VariableUnitsRange', 1);
-Metadata = readtable(handles.logfile,'Sheet','MetaData',"VariableUnitsRange" , 1);
+Detections = readtable(handles.logfile,'Sheet','Detections',"VariableNamesRange" , 1);
+AdhocDetections = readtable(handles.logfile,'Sheet','AdhocDetections',"VariableNamesRange" , 1);
+Effort = readtable(handles.logfile,'Sheet','Effort','VariableNamesRange', 1);
+Metadata = readtable(handles.logfile,'Sheet','MetaData',"VariableNamesRange" , 1);
 
 % Fill out Metadata
 Metadata.UserID = MetadataValues{2};
@@ -43,6 +43,7 @@ handles.Meta.Sheet = Metadata;
 handles.Meta.Headers = Metadata.Properties.VariableNames;
 
 handles.Effort.Sheet = Effort;
+handles.Effort.Sheet.Granularity = categorical(handles.Effort.Sheet.Granularity);
 
 handles.OnEffort.Sheet = Detections;
 handles.OnEffort.Sheet.InputFile = categorical(handles.OnEffort.Sheet.InputFile);
