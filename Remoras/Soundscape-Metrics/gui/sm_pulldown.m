@@ -2,7 +2,8 @@ function sm_pulldown(action)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % sm_pulldown.m
-% initializes pulldowns for soundscape metrics calculation
+% initializes pulldowns for soundscape metrics calculation (when you click
+% on the soundscape remora what are your options?)
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -12,7 +13,7 @@ global PARAMS REMORA HANDLES
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if strcmp(action, 'make_ltsa')
+if strcmp(action, 'make_ltsa') % make LTSA
     sm_setpointers('watch');
     
     sm_ltsa_settings_init;
@@ -27,7 +28,7 @@ if strcmp(action, 'make_ltsa')
     
     sm_setpointers('arrow');
         
-elseif strcmp(action,'compute_metrics')
+elseif strcmp(action,'compute_metrics') % compute soundscape metrics
     % dialog box - compute metrics
     sm_setpointers('watch');
     
@@ -42,7 +43,7 @@ elseif strcmp(action,'compute_metrics')
     
     sm_setpointers('arrow');
     
-elseif strcmp(action,'load_ltsa')
+elseif strcmp(action,'load_ltsa') % load ltsa
     
     % reset default of standard LTSA plot length to SanctSound data length
     PARAMS.ltsa.tseg.hr = 0.5;
@@ -104,7 +105,7 @@ elseif strcmp(action,'load_ltsa')
     set(HANDLES.fig.ctrl, 'Pointer', 'arrow');
 
 
-elseif strcmp(action,'plot_metrics')
+elseif strcmp(action,'plot_metrics') % plot soundscape metrics (not implemented yet)
     % dialog box - compute metrics
     sm_setpointers('watch');
     
