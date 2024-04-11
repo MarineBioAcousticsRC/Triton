@@ -3,7 +3,8 @@ function sm_ltsa_settings_init
 %
 % sm_ltsa_settings_init.m
 %
-% initialize ltsa parameters
+% initialize ltsa parameters - holds the default soundscape metrics mkLTSA
+% window parameters which have been modified from the global PARAMS
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS
