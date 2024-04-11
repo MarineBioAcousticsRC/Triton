@@ -1,5 +1,7 @@
 function sm_ltsa_control(action)
-% Do something in response to GUI window update action:
+% Do something in response to GUI window update action: - all the gui code
+% coded in the pop up windows and selection options to appear. now this is
+% the code that will ask for the mkLTSA params
 
 global REMORA PARAMS
 

@@ -39,7 +39,7 @@ end
 if nfiles < 1
     disp_msg(['No data files in this directory: ',PARAMS.ltsa.indir])
     disp_msg('Pick another directory')
-    sm_ltsa_params_window;
+    sm_ltsa_params_window; % in gui folder, related to the pop up window with all of our inputted parameters
 end
 
 if PARAMS.ltsa.ftype == 1

@@ -7,6 +7,8 @@ function sm_write_ltsahead(lIdx)
 % file
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CMS NOTES: INSERT BREAKPOINT HERE TO STOP CODE AFTER FINISHING A SINGLE
+% LTSA!!
 global PARAMS
 
 % pull out start/end idx of files to be included in this LTSA
