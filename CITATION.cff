@@ -12,6 +12,7 @@ year: 2024
 doi: 10.5281/zenodo.10963175
 date-released: 2024-04-11
 repository-code: "https://github.com/MarineBioAcousticsRC/Triton"
+url: "https://github.com/MarineBioAcousticsRC/Triton"
 license: "This software is Copyright (c) 2019, The Regents of the University of California. All rights reserved."
 identifiers:
   - description: This is the collection of code archived of a snapshot of Triton and Remoras in 2021
