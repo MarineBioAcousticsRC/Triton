@@ -17,7 +17,56 @@ identifiers:
   - description: This is the collection of code archived of a snapshot of Triton and Remoras in 2021
     type: doi
     value: 10.5281/zenodo.1234
-  
+references:
+- type: software
+  title: "Ship-Detector Remora"
+  authors:
+      - family-names: Solsona-Berga
+        given-names: Alba
+  message: "Cite the following article to reference the concepts of this Remora described in the supplementary material"
+  doi: 10.1371/journal.pcbi.1007598
+- type: software
+  title: "SPICE-Detector Remora"
+  authors:
+      - family-names: Frasier
+        given-names: Kait
+      - family-names: Ziegenhorn
+        given-names: Morgan
+      - family-names: Solsona-Berga
+        given-names: Alba
+  message: "Cite the following article to reference the concepts of this Remora"
+  doi: 10.1371/journal.pcbi.1009613
+- type: software
+  title: "ClusterTool Remora"
+  authors:
+      - family-names: Frasier
+        given-names: Kait
+      - family-names: Ziegenhorn
+        given-names: Morgan
+      - family-names: Solsona-Berga
+        given-names: Alba
+  message: "Cite the following article to reference the concepts of this Remora"
+  doi: 10.1371/journal.pcbi.1009613
+- type: software
+  title: "NNet Remora"
+  authors:
+      - family-names: Frasier
+        given-names: Kait
+      - family-names: Rafter
+        given-names: Macey
+      - family-names: Solsona-Berga
+        given-names: Alba
+  message: "Cite the following article to reference the concepts of this Remora"
+  doi: 10.1371/journal.pcbi.1009613
+- type: software
+  title: "Soundscape-Metrics Remora"
+  authors:
+      - family-names: Baumann-Pickering
+        given-names: Simone
+      - family-names: Schoenbeck
+        given-names: Clara
+  message: "Cite the following link to reference the concepts of this Remora"
+  url: https://sanctuaries.noaa.gov/science/monitoring/sound
   
 
 
