@@ -65,8 +65,8 @@ if strcmp(action,'openltsa')
     
 elseif strcmp(action,'openwav')
     % user interface retrieve file to open through a dialog box
-    boxTitle1 = 'Open Wav File';
-    filterSpec1 = '*.wav';
+    boxTitle1 = 'Open Wav or Flac File';
+    filterSpec1 = {'*.wav;*.flac'};
     [infile,inpath]=uigetfile(filterSpec1,boxTitle1);
     % if the cancel button is pushed, then no file is loaded so exit this script
     if strcmp(num2str(infile),'0')
@@ -120,6 +120,7 @@ elseif strcmp(action,'openwav')
         set(HANDLES.mc.on,'Visible','on');
         %         set(HANDLES.mc.off,'Visible','on');
     end
+    
     % dialog box openxwav - open pseudo-wav file
 elseif strcmp(action,'openxwav')
     % user interface retrieve file to open through a dialog box

@@ -43,8 +43,11 @@ PARAMS.ltsa.outdirs = outdirs;
 % default is same for all directories as set in initial window, but can
 % modify by directory if desired
 batchLTSA_chk_ltsa_params(indirs); % set taves and dfreqs
+if REMORA.batchLTSA.cancelled == 1; return; end
 taves = PARAMS.ltsa.taves;
 dfreqs = PARAMS.ltsa.dfreqs;
+indirs = PARAMS.ltsa.indirs;
+outdirs = PARAMS.ltsa.outdirs;
 
 % % raw files to skip.
 % % * this is specific to HRPs?
@@ -85,12 +88,14 @@ PARAMS.ltsa.dirdata = dirdata;
 
 % make sure the filenames are what you want them to be
 batchLTSA_chk_filenames;
+if REMORA.batchLTSA.cancelled == 1; return; end
 outfiles = PARAMS.ltsa.outfiles; % write back to outfiles for below
 
 % loop through again to do filename checks 
 for k = 1:length(indirs)
     
     % make sure filenames will work
+    PARAMS.ltsa.indir = PARAMS.ltsa.indirs{k};
     success = ck_names(prefixes{k});
     
     % check to see if the ltsa file already exists
@@ -182,7 +187,7 @@ end
 %% check to see if the xwav/wav names are compatible with ltsa format
 function success = ck_names(prefix)
 
-global PARAMS
+global PARAMS REMORA
 
 success = 1;
 
@@ -216,7 +221,7 @@ if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3
 end
 
 % if we don't like the format, offer to change wav/xwav filenames
-if ~success; success = rename_wavs(prefix); end
+if ~success; success = batchLTSA_rename_wavs(prefix); end
 
 % either continue with ltsa creation or return
 if success; success = 1; return; end

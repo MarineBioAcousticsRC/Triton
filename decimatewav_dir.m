@@ -3,11 +3,12 @@ function decimatewav_dir(wavType)
 %
 % decimatexwav_dir.m
 %
-% Decimate a directory of wav or xwav files.
+% Decimate a directory of wav, flac, or xwav files.
 %
 % Parameters:
 %       wavType - a string that is either 'wav' or 'xwav' depending on the
 %                       type of file you are decimating.
+%               - works with flac files, treated similar to 'wav'
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -28,7 +29,17 @@ else
     %     disp(' ')
 end
 % get info on xwav/wav files in dir
-d = dir(fullfile(PARAMS.idir{ii},['*.' wavType]));    % directory info
+if strcmp(wavType,'wav')
+    d = dir(fullfile(PARAMS.idir{ii},['*.' wavType])); % directory info
+    if isempty(d)
+        d = dir(fullfile(PARAMS.idir{ii},'*.flac'));    % maybe flac files?
+        if ~isempty(d)
+            wavType = 'flac'; % if it is flac files, update waveType
+        end
+    end
+else
+    d = dir(fullfile(PARAMS.idir{ii},['*.' wavType]));    % directory info
+end
 
 PARAMS.fname{ii} = char(d.name);                % file names
 fnsz = size(PARAMS.fname{ii});
@@ -43,6 +54,12 @@ PARAMS.infile = deblank(PARAMS.fname{ii}(1,:));
 if strcmp(wavType,'wav')
     PARAMS.ftype = 1;   % files are xwavs
     rdwavhd        % get datafile info
+elseif strcmp(wavType, 'flac')
+    PARAMS.ftype = 3;
+    % pull relevent info that would come vrom rdwavhd
+    info = audioinfo([PARAMS.inpath PARAMS.infile]);
+    PARAMS.nch = info.NumChannels;         % Number of Channels
+    PARAMS.fs = info.SampleRate;          % Sampling Rate(samples/second)
 else
     PARAMS.ftype = 2;
     rdxwavhd
@@ -96,7 +113,9 @@ total = PARAMS.nfiles{ii};
 
 if strcmp(wavType,'wav')
     extension_size = 4;
-else
+elseif strcmp(wavType,'flac')
+    extension_size = 5;
+elseif strcmp(wavType, 'x.wav')
     extension_size = 6;
 end
 
@@ -110,15 +129,24 @@ for jj = 1:PARAMS.nfiles{ii}
     PARAMS.outfile = [PARAMS.infile(1:length(PARAMS.infile)-extension_size),'.d',...
         num2str(PARAMS.df),'.' wavType];
     PARAMS.xhd.dSubchunkSize = [];
-    if strcmp(wavType, 'wav')
-        rdwavhd
+    if strcmp(wavType, 'wav') || strcmp(wavType, 'flac')
+%         rdwavhd % this used to check df but now that is checked above
         %Decimating wav files is easy
         %         [data,fs,nbits]=wavread([PARAMS.inpath,PARAMS.infile],'native');
         [data,fs] = audioread([PARAMS.inpath,PARAMS.infile], 'native');
         data = double(data);
         info = audioinfo([PARAMS.inpath,PARAMS.infile]);
         nbits = info.BitsPerSample;
-        odata = decimate(double(data),PARAMS.df);
+        nch = info.NumChannels;
+        %     odata = decimate(double(data),PARAMS.df);
+        if nch == 1
+            odata = decimate(double(data),PARAMS.df);
+        else
+            for m = 1:nch
+                odata(:,m) = decimate(double(data(:,m)),PARAMS.df);
+            end
+        end
+        
         new_fs = fs/PARAMS.df;
         if nbits == 16
             %             wavwrite(int16(odata), new_fs, nbits, [PARAMS.outpath,PARAMS.outfile]);
@@ -134,6 +162,10 @@ for jj = 1:PARAMS.nfiles{ii}
             disp_msg(['Nbits = ', num2str(nbits)])
             return
         end
+        clear odata
+        pcntDone = (jj-1)/total;
+        loadbar(['Calculating, ', num2str(int8(pcntDone*100)),...
+            '% complete'], h, pcntDone)
         continue
     else
         rdxwavhd
@@ -196,6 +228,9 @@ for jj = 1:PARAMS.nfiles{ii}
                 loadbar(['Calculating, ',num2str(int8(pcntDone*100)),...
                     '% complete'],h, pcntDone)
             end
+        case 'flac'
+            % this never gets called because of continue after simple
+            % decimation for wav and flac above. 
         case 'x.wav'
             for di = 1:dn
                 %                 if di == dn
@@ -229,9 +264,9 @@ for jj = 1:PARAMS.nfiles{ii}
     
     fclose(fid);
     fclose(fod);
-%     count = count+1;
-%     pcntDone = count/total;
-%     loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
+    %     count = count+1;
+    %     pcntDone = count/total;
+    %     loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
 end
 toc
 close(h)
