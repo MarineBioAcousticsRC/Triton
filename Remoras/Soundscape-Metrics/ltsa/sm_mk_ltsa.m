@@ -38,7 +38,7 @@ for lIdx = PARAMS.ltsa.nstart:size(PARAMS.ltsa.ltsaIdx,1)
         return
     end
     % calculated averaged spectra
-    sm_calc_ltsa(lIdx)
+    sm_calc_ltsa(lIdx) % SET BREAKPOINT HERE IF NEED TO JUST MAKE ONE LTSA!!!
 end
 
 % initial parameter for LTSA
