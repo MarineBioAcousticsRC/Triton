@@ -53,6 +53,10 @@ switch mode
     case 'append'
         if ismac
             fname = uigetfile_with_preview({'*.xls'; '*.xlsx'}, 'Open existing annotation log');
+            fsplit = split(fname,'/');
+            fdirs = split(fname,fsplit{end});
+            fdir = fdirs{1};
+            fname = fsplit{end};
         else
         [fname, fdir] = ...
             uigetfile({'*.xls'; '*.xlsx'}, 'Open existing annotation log');
@@ -65,11 +69,11 @@ if isnumeric(fname)
     return  % User did not select a filename
 end
 
-if ismac
-    handles.logfile = fullfile(fname);
-else
+%if ismac
+ %   handles.logfile = fullfile(fname);
+%else
     handles.logfile = fullfile(fdir, fname);
-end
+%end
 
 
 PARAMS.numfreq = 6;
