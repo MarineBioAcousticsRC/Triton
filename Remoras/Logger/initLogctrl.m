@@ -51,8 +51,12 @@ switch mode
     case 'create'
         [fname, fdir] = uiputfile('.xlsx', 'New annotation log', 'unique_logname');
     case 'append'
+        if ismac
+            fname = uigetfile_with_preview({'*.xls'; '*.xlsx'}, 'Open existing annotation log');
+        else
         [fname, fdir] = ...
             uigetfile({'*.xls'; '*.xlsx'}, 'Open existing annotation log');
+        end
     otherwise
         error('triton:logger', 'Bad log mode')
 end
@@ -61,7 +65,11 @@ if isnumeric(fname)
     return  % User did not select a filename
 end
 
-handles.logfile = fullfile(fdir, fname);
+if ismac
+    handles.logfile = fullfile(fname);
+else
+    handles.logfile = fullfile(fdir, fname);
+end
 
 
 PARAMS.numfreq = 6;
