@@ -23,7 +23,11 @@ javaImage_checked = im2java(I,map);
 javaImage_partChecked = im2java(I,map);
 
 currNode = TREE.rootNode;
-[xlnum, xltext, xlcell]=xlsread(filename,'effort');
+if ismac
+    [xlnum, xltext, xlcell] = xlsread(filename,3);
+else
+    [xlnum, xltext, xlcell]=xlsread(filename,'effort');
+end
 
 % Find columns of interest
 CommonNameI = strcmp(xltext(1,:), 'Common Name');
