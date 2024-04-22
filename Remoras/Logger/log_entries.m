@@ -62,8 +62,13 @@ for gidx = 1:size(row_groups, 1)
 end
 
 if commonnames
-    namecol = find(~cellfun(@isempty, ...
+    if ismac
+        namecol = find(~cellfun(@isempty, ...
+        strfind(effort.Headers, 'SpeciesCode')));
+    else    
+        namecol = find(~cellfun(@isempty, ...
         strfind(effort.Headers, 'Species Code')));
+    end
     for idx=1:size(entries, 1)
        codeidx = ~cellfun(@isempty, ...
            strfind(TREE.textW(:,2), entries{idx, namecol}));
