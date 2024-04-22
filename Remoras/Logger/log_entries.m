@@ -80,7 +80,7 @@ end
 
            
 if format
-    if
+    if ismac
         UseCols = {
             'SpeciesCode', '%s'
             'Call', '%s'
