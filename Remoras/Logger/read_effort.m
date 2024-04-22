@@ -30,7 +30,11 @@ else
 end
 
 % Find columns of interest
-CommonNameI = strcmp(xltext(1,:), 'Common Name');
+if ismac
+    CommonNameI = strcmp(xltext(1,:), 'CommonName');
+else
+    CommonNameI = strcmp(xltext(1,:), 'Common Name');
+end
 CallI = strcmp(xltext(1,:), 'Call');
 
 % Calls that are numbers will not be read properly.  Fix them
