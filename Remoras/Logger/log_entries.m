@@ -80,12 +80,21 @@ end
 
            
 if format
-    UseCols = {
-        'Species Code', '%s'
-        'Call', '%s'
-        'Start time', 'date'
-        'End time', 'date'
-        };
+    if
+        UseCols = {
+            'SpeciesCode', '%s'
+            'Call', '%s'
+            'StartTime', 'date'
+            'EndTime', 'date'
+            };
+    else
+        UseCols = {
+            'Species Code', '%s'
+            'Call', '%s'
+            'Start time', 'date'
+            'End time', 'date'
+            };
+    end
     formatted = cell(size(entries, 1), 1);
     for lidx=1:size(entries, 1)
         str = '';
