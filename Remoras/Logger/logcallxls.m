@@ -82,6 +82,9 @@ time = clock;
 entry.event = datestr(time, 'yyyy/mm/dd HH:MM:SS');
 
 % Generate the basename for image and audio files
+if ismac
+    handles.Meta.file_tag = string(handles.Meta.file_tag{1});
+end
 entry.fname_time = sprintf('%s-%s-%s', ...
     TREE.speciesR{Svalue}, handles.Meta.file_tag, ...
     datestr(entry.pickstartdisplay, 'yyyymmddTHHMMSS'));
