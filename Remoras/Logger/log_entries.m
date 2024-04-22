@@ -52,8 +52,7 @@ for gidx = 1:size(row_groups, 1)
         effort.Sheet.Image = string(effort.Sheet.Image);
         effort.Sheet.Audio = string(effort.Sheet.Audio);
         
-        entries(groups(1,1):groups(1,2),:) = table2cell(effort.Sheet(end,:));
-        entries(groups(gidx,1):groups(gidx,2),:) = effort.Sheet(end,:);
+        entries(groups(gidx,1):groups(gidx,2),:) = table2cell(effort.Sheet(end,:));
  
     else
         range = effort.Sheet.Range(sprintf(...
