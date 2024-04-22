@@ -24,10 +24,11 @@ Effort = readtable(handles.logfile,'Sheet','Effort','VariableNamesRange', 1);
 Metadata = readtable(handles.logfile,'Sheet','MetaData',"VariableNamesRange" , 1);
 
 % Fill out Metadata
+if nargin == 2
 Metadata.UserID = MetadataValues{2};
 Metadata.DeploymentId = MetadataValues{1};
 Metadata.EffortStart = MetadataValues{3};
-
+end
 
 set(handles.logcallgui, 'CloseRequestFcn', @log_closewindow)
 

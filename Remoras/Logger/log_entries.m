@@ -42,6 +42,19 @@ entries = cell(length(rows), length(effort.Headers));
 
 for gidx = 1:size(row_groups, 1)
     if ismac
+        effort.Sheet.StartTime = datestr(effort.Sheet.StartTime);
+        effort.Sheet.EndTime = datestr(effort.Sheet.EndTime);
+        effort.Sheet.InputFile = string(effort.Sheet.InputFile);
+        effort.Sheet.EventNumber = string(effort.Sheet.EventNumber);
+        effort.Sheet.SpeciesCode = string(effort.Sheet.SpeciesCode);
+        effort.Sheet.Call = string(effort.Sheet.Call);
+        effort.Sheet.Comments = string(effort.Sheet.Comments);
+        effort.Sheet.Image = string(effort.Sheet.Image);
+        effort.Sheet.Audio = string(effort.Sheet.Audio);
+        
+        entries(groups(1,1):groups(1,2),:) = table2cell(effort.Sheet(end,:));
+        entries(groups(gidx,1):groups(gidx,2),:) = effort.Sheet(end,:);
+ 
     else
         range = effort.Sheet.Range(sprintf(...
             'A%d:%s%d', row_groups(gidx, 1), lastCol, row_groups(gidx, 2)));

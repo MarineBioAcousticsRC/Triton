@@ -37,7 +37,7 @@ if ismac
     writetable(handles.OnEffort.Sheet,handles.logfile,'Sheet','Detections')
     writetable(handles.OffEffort.Sheet,handles.logfile,'Sheet','AdhocDetections')
     writetable(handles.Meta.Sheet,handles.logfile,'Sheet','MetaData')
-    writetable(handles.Effort.Sheet,handles.logfile,'Sheet','Effort')
+    writetable(handles.Effort.Sheet,handles.logfile,'Sheet','Effort2')
 else
     handles.Workbook.Save();
     handles.Workbook.Close();
