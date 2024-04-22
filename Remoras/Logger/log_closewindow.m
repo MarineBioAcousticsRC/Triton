@@ -79,23 +79,42 @@ if (src >= 1 && src <= 3) || src == 7 %from 5 (old logger) to 7 (remora version)
         endDate = get(handles.Meta.Sheet.Range(...
                     sprintf('%s2', excelColumn(endCol-1))), 'Value');
     end
-    if ~ isnan(endDate)
-        if ischar(endDate)
-            endDate = datenum(endDate);
-        else
-            endDate = endDate + date_epoch('excel');
+    if ismac
+        endDate = char(endDate);
+        if ~ isnan(endDate)
+            if ischar(endDate)
+                endDate = datetime(endDate);
+            else
+                endDate = datetime(endDate + date_epoch('excel'));
+            end
+            % Make the last recorded end of effort be an option if we have not
+            % detected anything past the end.
+            if isempty(last) || endDate >= handles.log.lastDate
+                endDateStr = datestr(endDate, 'yyyy/mm/dd HH:MM:SS');
+                set(handles.end_previous.disp, 'String', endDateStr);
+                previousEnd = sprintf('Existing:  %s', endDateStr);
+                handles.log.endDate = endDate;
+                options{end+1} = previousEnd;
+            end
         end
-        
-        % Make the last recorded end of effort be an option if we have not
-        % detected anything past the end.
-        if isempty(last) || endDate >= handles.log.lastDate
-            endDateStr = datestr(endDate, 'yyyy/mm/dd HH:MM:SS');
-            set(handles.end_previous.disp, 'String', endDateStr);
-            previousEnd = sprintf('Existing:  %s', endDateStr);
-            handles.log.endDate = endDate;
-            options{end+1} = previousEnd;
+    else
+        if ~ isnan(endDate)
+            if ischar(endDate)
+                endDate = datenum(endDate);
+            else
+                endDate = endDate + date_epoch('excel');
+            end
+            % Make the last recorded end of effort be an option if we have not
+            % detected anything past the end.
+            if isempty(last) || endDate >= handles.log.lastDate
+                endDateStr = datestr(endDate, 'yyyy/mm/dd HH:MM:SS');
+                set(handles.end_previous.disp, 'String', endDateStr);
+                previousEnd = sprintf('Existing:  %s', endDateStr);
+                handles.log.endDate = endDate;
+                options{end+1} = previousEnd;
+            end
         end
-    end    
+    end
     
     terminate = questdlg(...
         'End logging session.  Close to cancel or denote end of effort by:', ...
