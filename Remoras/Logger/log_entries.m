@@ -41,9 +41,12 @@ row_groups = rows(groups);
 entries = cell(length(rows), length(effort.Headers));
 
 for gidx = 1:size(row_groups, 1)
-    range = effort.Sheet.Range(sprintf(...
-        'A%d:%s%d', row_groups(gidx, 1), lastCol, row_groups(gidx, 2)));
-    entries(groups(gidx,1):groups(gidx,2), :) = range.Value();
+    if ismac
+    else
+        range = effort.Sheet.Range(sprintf(...
+            'A%d:%s%d', row_groups(gidx, 1), lastCol, row_groups(gidx, 2)));
+        entries(groups(gidx,1):groups(gidx,2), :) = range.Value();
+    end
 end
 
 if commonnames
