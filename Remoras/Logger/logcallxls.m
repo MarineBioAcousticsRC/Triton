@@ -82,9 +82,9 @@ time = clock;
 entry.event = datestr(time, 'yyyy/mm/dd HH:MM:SS');
 
 % Generate the basename for image and audio files
-if ismac
-    handles.Meta.file_tag = string(handles.Meta.file_tag{1});
-end
+% if ismac
+%     handles.Meta.file_tag = string(handles.Meta.file_tag{1});
+% end
 entry.fname_time = sprintf('%s-%s-%s', ...
     TREE.speciesR{Svalue}, handles.Meta.file_tag, ...
     datestr(entry.pickstartdisplay, 'yyyymmddTHHMMSS'));
@@ -160,10 +160,10 @@ for callIdx = 1:length(entry.calls)
                 case 'inputfile'
                     detection.Sheet.InputFile(currentRow) = entry.src_file;
                 case 'starttime'
-                    detection.Sheet.StartTime(currentRow) = datetime(entry.pickstartdisplay - date_epoch('excel'),'ConvertFrom','datenum');
+                    detection.Sheet.StartTime(currentRow) = entry.pickstartdisplay - date_epoch('excel'); %datetime(entry.pickstartdisplay - date_epoch('excel'),'ConvertFrom','datenum');
                 case 'endtime'
                     if isfield(entry, 'pickenddisplay')
-                        detection.Sheet.EndTime(currentRow) = datetime(entry.pickenddisplay - date_epoch('excel'),'ConvertFrom','datenum');
+                        detection.Sheet.EndTime(currentRow) = entry.pickenddisplay - date_epoch('excel'); %datetime(entry.pickenddisplay - date_epoch('excel'),'ConvertFrom','datenum');
                     end
                 case 'eventnumber'
                     detection.Sheet.EventNumber(currentRow) = entry.event;

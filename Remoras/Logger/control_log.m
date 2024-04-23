@@ -341,7 +341,11 @@ switch action
             % No need to open the log, we already did so.
         else
             read_effort(handles.logfile);
-            log_open();
+            if ismac
+                log_mac_open();
+            else
+                log_open();
+            end
         end
         
         % Hide the effortPane, bin controls and tree

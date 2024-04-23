@@ -80,7 +80,7 @@ if (src >= 1 && src <= 3) || src == 7 %from 5 (old logger) to 7 (remora version)
                     sprintf('%s2', excelColumn(endCol-1))), 'Value');
     end
     if ismac
-        endDate = char(endDate);
+        %endDate = char(endDate);
         if ~ isnan(endDate)
             if ischar(endDate)
                 endDate = datetime(endDate);

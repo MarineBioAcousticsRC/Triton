@@ -50,6 +50,8 @@ handles.OnEffort.Sheet = Detections;
 handles.OnEffort.Sheet.InputFile = categorical(handles.OnEffort.Sheet.InputFile);
 handles.OnEffort.Sheet.EventNumber = categorical(handles.OnEffort.Sheet.EventNumber);
 handles.OnEffort.Sheet.SpeciesCode = categorical(handles.OnEffort.Sheet.SpeciesCode);
+handles.OnEffort.Sheet.StartTime = datenum(handles.OnEffort.Sheet.StartTime) - date_epoch('excel');
+handles.OnEffort.Sheet.EndTime = datenum(handles.OnEffort.Sheet.EndTime) - date_epoch('excel');
 handles.OnEffort.Sheet.Call = categorical(handles.OnEffort.Sheet.Call);
 handles.OnEffort.Sheet.Comments = categorical(handles.OnEffort.Sheet.Comments);
 handles.OnEffort.Sheet.Image = categorical(handles.OnEffort.Sheet.Image);
@@ -65,6 +67,8 @@ handles.OffEffort.Sheet.InputFile = categorical(handles.OffEffort.Sheet.InputFil
 handles.OffEffort.Sheet.EventNumber = categorical(handles.OffEffort.Sheet.EventNumber);
 handles.OffEffort.Sheet.SpeciesCode = categorical(handles.OffEffort.Sheet.SpeciesCode);
 handles.OffEffort.Sheet.Call = categorical(handles.OffEffort.Sheet.Call);
+handles.OffEffort.Sheet.StartTime = datenum(handles.OffEffort.Sheet.StartTime) - date_epoch('excel');
+handles.OffEffort.Sheet.EndTime = datenum(handles.OffEffort.Sheet.EndTime) - date_epoch('excel');
 handles.OffEffort.Sheet.Comments = categorical(handles.OffEffort.Sheet.Comments);
 handles.OffEffort.Sheet.Image = categorical(handles.OffEffort.Sheet.Image);
 handles.OffEffort.Sheet.Audio = categorical(handles.OffEffort.Sheet.Audio);
@@ -84,4 +88,4 @@ for fname = {'imagedir', 'audiodir'}
     end
 end
 
-handles.Meta.file_tag = handles.Meta.Sheet.DeploymentId;
+handles.Meta.file_tag = string(handles.Meta.Sheet.DeploymentId);

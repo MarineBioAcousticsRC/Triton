@@ -69,11 +69,7 @@ if isnumeric(fname)
     return  % User did not select a filename
 end
 
-%if ismac
- %   handles.logfile = fullfile(fname);
-%else
-    handles.logfile = fullfile(fdir, fname);
-%end
+handles.logfile = fullfile(fdir, fname);
 
 
 PARAMS.numfreq = 6;
