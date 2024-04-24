@@ -74,13 +74,12 @@ if (src >= 1 && src <= 3) || src == 7 %from 5 (old logger) to 7 (remora version)
     previousEnd = [];  % Assume not until we learn otherwise
     endCol = find(strcmp(handles.Meta.Headers, 'Effort End'), 1, 'first');
     if ismac
-        endDate = char(handles.Meta.Sheet.EffortEnd);
+        endDate = datenum(handles.Meta.Sheet.EffortEnd);
     else
         endDate = get(handles.Meta.Sheet.Range(...
                     sprintf('%s2', excelColumn(endCol-1))), 'Value');
     end
     if ismac
-        %endDate = char(endDate);
         if ~ isnan(endDate)
             if ischar(endDate)
                 endDate = datenum(endDate);
