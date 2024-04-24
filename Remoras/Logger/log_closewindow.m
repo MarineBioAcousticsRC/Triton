@@ -83,9 +83,9 @@ if (src >= 1 && src <= 3) || src == 7 %from 5 (old logger) to 7 (remora version)
         %endDate = char(endDate);
         if ~ isnan(endDate)
             if ischar(endDate)
-                endDate = datetime(endDate);
+                endDate = datenum(endDate);
             else
-                endDate = datetime(endDate + date_epoch('excel'));
+                endDate = datenum(endDate + date_epoch('excel'));
             end
             % Make the last recorded end of effort be an option if we have not
             % detected anything past the end.
