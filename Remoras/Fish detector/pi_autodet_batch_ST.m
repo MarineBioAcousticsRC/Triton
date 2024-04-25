@@ -36,9 +36,9 @@ SearchRecursiv = REMORA.pi.settings.recursSearch; % Setting to 1 searches throug
 
 currentPath = mfilename('fullpath');
 templateFilePath = fileparts(currentPath);
-template = fullfile(templateFilePath,'Bocaccio1_template.mat'); % Make sure that this line is correct for the input template folder!
+template = fullfile(templateFilePath,'Stickleback_mean_template.mat'); % Make sure that this line is correct for the input template folder!
 load(template)
-template=boc1;
+template=meansound;
 
 pre_env_temp=hilbert(template.');
 env_temp=sqrt((real(pre_env_temp)).^2+(imag(pre_env_temp)).^2); % Au 1993, S.178, equation 9-4.

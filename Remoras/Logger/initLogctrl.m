@@ -14,9 +14,17 @@ global PARAMS TREE handles HANDLES REMORA
 
 % Get a Tethys query handler instance from the Tethys REMORA
 if exist('get_tethys_server') ~= 2
+    prompt='Tethys Remora is not installed. Do you want to install it? Type y/n: ';
+    txt = input(prompt,"s");
+    if strcmp(txt,'y')
     error('Tethys Remora must be installed')
+    elseif strcmp(txt,'n')
+        REMORA.tethysinstalled = 0;
+        query_h = [];
+    end
 else
     query_h = get_tethys_server();
+    REMORA.tethysinstalled = 1;
 end
 
 if length(varargin) > 2
@@ -43,8 +51,16 @@ switch mode
     case 'create'
         [fname, fdir] = uiputfile('.xlsx', 'New annotation log', 'unique_logname');
     case 'append'
+        if ismac
+            fname = uigetfile_with_preview({'*.xls'; '*.xlsx'}, 'Open existing annotation log');
+            fsplit = split(fname,'/');
+            fdirs = split(fname,fsplit{end});
+            fdir = fdirs{1};
+            fname = fsplit{end};
+        else
         [fname, fdir] = ...
             uigetfile({'*.xls'; '*.xlsx'}, 'Open existing annotation log');
+        end
     otherwise
         error('triton:logger', 'Bad log mode')
 end

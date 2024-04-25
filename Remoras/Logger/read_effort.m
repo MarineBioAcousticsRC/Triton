@@ -23,10 +23,18 @@ javaImage_checked = im2java(I,map);
 javaImage_partChecked = im2java(I,map);
 
 currNode = TREE.rootNode;
-[xlnum, xltext, xlcell]=xlsread(filename,'effort');
+if ismac
+    [xlnum, xltext, xlcell] = xlsread(filename,3);
+else
+    [xlnum, xltext, xlcell]=xlsread(filename,'effort');
+end
 
 % Find columns of interest
-CommonNameI = strcmp(xltext(1,:), 'Common Name');
+if ismac
+    CommonNameI = strcmp(xltext(1,:), 'CommonName');
+else
+    CommonNameI = strcmp(xltext(1,:), 'Common Name');
+end
 CallI = strcmp(xltext(1,:), 'Call');
 
 % Calls that are numbers will not be read properly.  Fix them
