@@ -26,53 +26,94 @@ if (src >= 1 && src <= 3) || src == 7 %from 5 (old logger) to 7 (remora version)
     options = {};
     
     %  Find last detection
-    colStart = excelColumn(find(~cellfun(@isempty, ...
-        strfind(handles.OnEffort.Headers, 'Start time'))) -1);
-    colEnd =  excelColumn(find(~cellfun(@isempty, ...
-        strfind(handles.OnEffort.Headers, 'End time')))-1);
-    lastRow = log_lastRow(handles.OnEffort.Sheet);
-    if lastRow < 2
-        handles.log.lastDate = [];  % no detections recorded
-        lastDateStr = 'none';
-        last = [];
+    if ismac
+        lastRow = log_lastRow(handles.OnEffort.Sheet);
+        if lastRow<1
+            handles.log.lastDate = [];
+            lastDateStr = 'none';
+            last = [];
+        else
+            handles.log.lastDate = max(handles.OnEffort.Sheet.EndTime) + ...
+                date_epoch('excel');
+            lastDateStr = datestr(handles.log.lastDate, ...
+                'yyyy/mm/dd HH:MM:SS');
+           set(handles.end_pick.disp, 'String', lastDateStr);
+            last = sprintf('Latest pick: %s', lastDateStr);
+            options{end+1} = last;
+        end
+
     else
-        lastDateRange = handles.OnEffort.Sheet.Range(...
-            sprintf('%s2:%s%d,%s2:%s%d', ...
-            colStart, colStart, lastRow, ...
-            colEnd, colEnd, lastRow));
-        handles.log.lastDate = ...
-            handles.Server.WorksheetFunction.Max(lastDateRange) + ...
-            date_epoch('excel');
+        colStart = excelColumn(find(~cellfun(@isempty, ...
+            strfind(handles.OnEffort.Headers, 'Start time'))) -1);
+        colEnd =  excelColumn(find(~cellfun(@isempty, ...
+            strfind(handles.OnEffort.Headers, 'End time')))-1);
+        lastRow = log_lastRow(handles.OnEffort.Sheet);
+        if lastRow < 2
+            handles.log.lastDate = [];  % no detections recorded
+            lastDateStr = 'none';
+            last = [];
+        else
+            %lastDateRange = handles.OnEffort.Sheet();
+            lastDateRange = handles.OnEffort.Sheet.Range(...
+                sprintf('%s2:%s%d,%s2:%s%d', ...
+                colStart, colStart, lastRow, ...
+                colEnd, colEnd, lastRow));
+            handles.log.lastDate = ...
+                handles.Server.WorksheetFunction.Max(lastDateRange) + ...
+                date_epoch('excel');
         
-        lastDateStr = datestr(handles.log.lastDate, ...
-            'yyyy/mm/dd HH:MM:SS');
-        set(handles.end_pick.disp, 'String', lastDateStr);
-        last = sprintf('Latest pick: %s', lastDateStr);
-        options{end+1} = last;
+            lastDateStr = datestr(handles.log.lastDate, ...
+                'yyyy/mm/dd HH:MM:SS');
+            set(handles.end_pick.disp, 'String', lastDateStr);
+            last = sprintf('Latest pick: %s', lastDateStr);
+            options{end+1} = last;
+        end
     end
 
     % Is there a current end date from a previous session?
     previousEnd = [];  % Assume not until we learn otherwise
     endCol = find(strcmp(handles.Meta.Headers, 'Effort End'), 1, 'first');
-    endDate = get(handles.Meta.Sheet.Range(...
+    if ismac
+        endDate = datenum(handles.Meta.Sheet.EffortEnd);
+    else
+        endDate = get(handles.Meta.Sheet.Range(...
                     sprintf('%s2', excelColumn(endCol-1))), 'Value');
-    if ~ isnan(endDate)
-        if ischar(endDate)
-            endDate = datenum(endDate);
-        else
-            endDate = endDate + date_epoch('excel');
+    end
+    if ismac
+        if ~ isnan(endDate)
+            if ischar(endDate)
+                endDate = datenum(endDate);
+            else
+                endDate = datenum(endDate + date_epoch('excel'));
+            end
+            % Make the last recorded end of effort be an option if we have not
+            % detected anything past the end.
+            if isempty(last) || endDate >= handles.log.lastDate
+                endDateStr = datestr(endDate, 'yyyy/mm/dd HH:MM:SS');
+                set(handles.end_previous.disp, 'String', endDateStr);
+                previousEnd = sprintf('Existing:  %s', endDateStr);
+                handles.log.endDate = endDate;
+                options{end+1} = previousEnd;
+            end
         end
-        
-        % Make the last recorded end of effort be an option if we have not
-        % detected anything past the end.
-        if isempty(last) || endDate >= handles.log.lastDate
-            endDateStr = datestr(endDate, 'yyyy/mm/dd HH:MM:SS');
-            set(handles.end_previous.disp, 'String', endDateStr);
-            previousEnd = sprintf('Existing:  %s', endDateStr);
-            handles.log.endDate = endDate;
-            options{end+1} = previousEnd;
+    else
+        if ~ isnan(endDate)
+            if ischar(endDate)
+                endDate = datenum(endDate);
+            else
+                endDate = endDate + date_epoch('excel');
+            end
+            % Make the last recorded end of effort be an option if we have not
+            % detected anything past the end.
+            if isempty(last) || endDate >= handles.log.lastDate
+                endDateStr = datestr(endDate, 'yyyy/mm/dd HH:MM:SS');
+                set(handles.end_previous.disp, 'String', endDateStr);
+                previousEnd = sprintf('Existing:  %s', endDateStr);
+                handles.log.endDate = endDate;
+                options{end+1} = previousEnd;
+            end
         end
-    end    
+    end
     
     terminate = questdlg(...
         'End logging session.  Close to cancel or denote end of effort by:', ...
