@@ -152,8 +152,8 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all x.w
                         data = fread(fid,[PARAMS.ltsa.nch,nsamp],PARAMS.ltsa.dbtype);   %
                     else            % add pad with zeros if not full data for spectra average
                         data = fread(fid,[PARAMS.ltsa.nch,nsamp],PARAMS.ltsa.dbtype);
-                        %                 padsize = sampPerAve - nsamp;
-                        %                 data = padarray(data,padsize);
+                                        padsize = sampPerAve - nsamp; % uncommented CMS
+                                        data = padarray(data,padsize);
                     end
                     if ~isempty(data)
                         data = data(PARAMS.ltsa.ch,:);

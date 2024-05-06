@@ -55,15 +55,15 @@ function deployments = dbGetDeployments(queryEngine, varargin)
 % Values
 % Each selection criteria is followed by a value.  It may be a simple
 % value such as a number of string:
-%   "Deployment/Project", "SOCAL"
-%   "Deployment/DeploymentId, 45
+%   'Deployment/Project', 'SOCAL'
+%   'Deployment/DeploymentId, 45
 %
 % Some paths are optional.  To only select documents where an optional path
 % is present, use [] (or any value v where isempty(v) is true) as the
 % value).  For example QualityAssurance records are optional and not
 % all deployments will have them.  Here, we only look for deployments
 % that have assessments of their quality:
-%  "Deployment/QualityAssurance/Quality/Category", []
+%  'Deployment/QualityAssurance/Quality/Category', []
 % It is possible to specify relative comparisons, a cell array can be 
 % provided consisting of the value and the comparision operator:
 %
@@ -75,13 +75,13 @@ function deployments = dbGetDeployments(queryEngine, varargin)
 % Example:  Retrieve all deployments north of 70 degrees
 % dep = dbGetDeployments(q, 'DeploymentDetails/Latitude', {'>', 70})
 %
-% Note about "return":  Other dbGet... functions will add return values
+% Note about 'return':  Other dbGet... functions will add return values
 % to the list of default items that are returned.  As this function's
 % default is to return everything, it assumed that when return is used,
 % only the specified return fields are desired.
 
 assert(dbVerifyQueryHandler(queryEngine), ...
-    "First argument must be a query handler");
+    'First argument must be a query handler');
 
 % Collecting benchmark statistics?
 b_idx = find(strcmp(varargin(1:2:end), 'Benchmark'));
@@ -97,7 +97,7 @@ end
 querygen_timer = dbTimer();
 
 % Values to be returned (complete paths)
-default_returns = ["Deployment"];
+default_returns = ['Deployment'];
 
 r_idx = find(strcmp(varargin(1:2:end), 'return'));
 if isempty(r_idx)
@@ -120,25 +120,25 @@ else
     % and see if we need to add in the default ones.
     tmpmap = containers.Map();
     var_indices = [(r_idx-1)*2+1; r_idx*2];
-    err = dbParseOptions(queryEngine, "Deployment", ...
-        tmpmap, "deployments", varargin{var_indices});
+    err = dbParseOptions(queryEngine, 'Deployment', ...
+        tmpmap, 'deployments', varargin{var_indices});
 end
      
 map = containers.Map();
 map('enclose') = 1;
 map('namespaces') = 0;
 map('enclose_join') = 'omit';
-err = dbParseOptions(queryEngine, "Deployment", ...
-    map, "deployments", varargin{:});
+err = dbParseOptions(queryEngine, 'Deployment', ...
+    map, 'deployments', varargin{:});
 dbParseUnrecoverableErrorCheck(err);  % Make sure nothing ambiguous
 if ~ isempty(err)
     % User might have Deployments selection criteria.
-    err = dbParseOptions(queryEngine, "Calibration", map, ...
-        "calibrations", err.unmatched{:});
+    err = dbParseOptions(queryEngine, 'Calibration', map, ...
+        'calibrations', err.unmatched{:});
     dbParseUnrecoverableErrorCheck(err);
     if ~ isempty(err)
-        error(sprintf("Unable to parse the following paths\n%s", ...
-            strjoin(err.unmatched(1:2:end), "\n")));
+        error(sprintf('Unable to parse the following paths\n%s', ...
+            strjoin(err.unmatched(1:2:end), '\n')));
     end
 end
 
