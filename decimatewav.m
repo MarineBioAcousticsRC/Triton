@@ -3,18 +3,24 @@ function decimatewav(wavType)
 %
 % decimatexwav.m
 %
-% Decimate a wav or xwav file.
+% Decimate a wav, flac, or xwav file.
 %
 % Parameters:
 %       wavType - a string that is either 'wav' or 'xwav' depending on the
 %                       type of file you are decimating.
+%               - works with flac files, treated similar to 'wav' 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS
 
 % get file name
-filterSpec1 = ['*.',wavType];
-boxTitle1 = ['Open ',wavType, ' file to Decimate'];
+if strcmp(wavType, 'wav')
+    filterSpec1 = ['*.wav;*.flac'];
+    boxTitle1 = ['Open wav or flac file to Decimate'];
+else
+    filterSpec1 = ['*.',wavType];
+    boxTitle1 = ['Open ', wavType, ' file to Decimate'];
+end
 % user interface retrieve file to open through a dialog box
 %[PARAMS.infile,PARAMS.inpath]=uigetfile(filterSpec1,boxTitle1);
 [infile,inpath]=uigetfile(filterSpec1,boxTitle1);
@@ -29,13 +35,26 @@ else
     disp_msg('Opened File: ')
     disp_msg([PARAMS.inpath,PARAMS.infile])
     cd(PARAMS.inpath)
+    [~,~,ext] = fileparts(PARAMS.infile);
 end
+
+if strcmp(ext,'.flac')
+    wavType = 'flac'; % update wavType if flac file. 
+end
+
 if strcmp(wavType,'wav')
     PARAMS.ftype = 1;   % file is wav
     rdwavhd        % get datafile info
     if PARAMS.df == -1 % bad wav file
         return;
     end
+elseif strcmp(wavType, 'flac')
+    PARAMS.ftype = 3;
+    % pull relevent info that would come vrom rdwavhd
+    info = audioinfo([PARAMS.inpath PARAMS.infile]);
+    PARAMS.nch = info.NumChannels;         % Number of Channels
+    PARAMS.fs = info.SampleRate;          % Sampling Rate(samples/second)
+    
 else
     PARAMS.ftype = 2;   % file is xwav
     rdxwavhd        % get datafile info
@@ -69,7 +88,9 @@ disp_msg(['Decimation Factor: ',num2str(PARAMS.df)])
 
 if strcmp(wavType,'wav')
     extension_size = 4;
-else
+elseif strcmp(wavType,'flac')
+    extension_size = 5;
+elseif strcmp(wavType, 'xwav')
     extension_size = 6;
 end
 
@@ -91,11 +112,11 @@ end
 
 disp_msg('This takes a while, please wait ...')
 
-if ~strcmp(wavType, 'wav')
+if ~strcmp(wavType, 'wav') && ~strcmp(wavType, 'flac')
     wrxwavhd(2)
 end
 
-if strcmp(wavType, 'wav')
+if strcmp(wavType, 'wav') || strcmp(wavType, 'flac')
     %Decimating wav files is easy
     %     [data,fs,nbits]=wavread([PARAMS.inpath,PARAMS.infile],'native');
     try 
@@ -110,7 +131,17 @@ if strcmp(wavType, 'wav')
     data = double(data);
     info = audioinfo([PARAMS.inpath,PARAMS.infile]);
     nbits = info.BitsPerSample;
-    odata = decimate(double(data),PARAMS.df);
+    nch = info.NumChannels;
+    
+%     odata = decimate(double(data),PARAMS.df);
+    if nch == 1
+        odata = decimate(double(data),PARAMS.df);
+    else
+        for m = 1:nch
+            odata(:,m) = decimate(double(data(:,m)),PARAMS.df);
+        end
+    end
+    
     new_fs = fs/PARAMS.df;
     if nbits == 16
         %         wavwrite(int16(odata), new_fs, nbits, [PARAMS.outpath,PARAMS.outfile]);
@@ -126,6 +157,7 @@ if strcmp(wavType, 'wav')
         disp_msg(['Nbits = ', num2str(nbits)])
         return
     end
+    disp_msg('Done');
     return
 end
 
@@ -184,6 +216,9 @@ switch wavType % maybe change this in the future to one for loop with one switch
             decimatedData = decimate(data,PARAMS.df); % decimated to a double which equals 32 bits
             fwrite(fod,decimatedData,precision);
         end
+    case 'flac'
+        % this never gets called because of continue after simple
+        % decimation for wav and flac above.
     case 'x.wav'
         for di = 1:dn
             %             if di == dn
