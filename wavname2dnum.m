@@ -13,7 +13,7 @@ function [dnums] = wavname2dnum(filenames, dispOn)
 % regexp(fname,'\d{4}[-_]\d{4}','match','split')
 
 if nargin <2
-    dispOn = 1; % added to limit printing of dnum format during LTSA creation
+    dispOn = true; % added to limit printing of dnum format during LTSA creation
 end
 
 % start with the default date format
@@ -25,7 +25,7 @@ date_fmt = 'yymmdd-HHMMSS';
 if isempty(date_strs{1})
     date_fmt = 'yymmddTHHMMSSZ';
     date_strs = regexp(filenamesc,'\d{6}[T]\d{6}[Z]','match' );
-    if ~isempty(date_strs{1}) && dispOn == 1
+    if ~isempty(date_strs{1}) && dispOn
         disp('Using ISO8601 date format yymmddTHHMMSSZ in filename');
     end
 end
@@ -33,7 +33,7 @@ end
 if isempty(date_strs{1}) % not a PAMguard file, try avisoft or Soundtrap filename
     date_fmt = 'yymmddHHMMSS';
     date_strs = regexp(filenamesc,'\d{12}','match' );
-    if ~isempty(date_strs{1}) && dispOn == 1
+    if ~isempty(date_strs{1}) && dispOn
         disp('Using avisoft and SoundTrap filename format yymmddHHMMSS');
     end
 end
@@ -41,7 +41,7 @@ end
 if isempty(date_strs{1}) % not just an underscore problem, try PAMGuard filename
     date_fmt = 'yyyymmdd_HHMMSS'; % PAMGuard default file format 
     date_strs = regexp(filenamesc,'\d{8}[_]\d{6}','match');
-    if ~isempty(date_strs{1}) && dispOn == 1
+    if ~isempty(date_strs{1}) && dispOn
         disp('Using PAMGuard filename format yyyymmdd_HHMMSS');
     end
 end

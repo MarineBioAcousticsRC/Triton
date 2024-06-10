@@ -32,7 +32,7 @@ PARAMS.xhd.Longitude = -17912345;
 PARAMS.xhd.Latitude = 8912345;
 PARAMS.xhd.Depth = 6666;
 
-if PARAMS.ftype == 1
+if PARAMS.ftype == 1 || PARAMS.ftype == 3 % wav or flac
     % initialize data format
 %     m = [];
 %     [m d] = wavfinfo([PARAMS.inpath PARAMS.infile]);
