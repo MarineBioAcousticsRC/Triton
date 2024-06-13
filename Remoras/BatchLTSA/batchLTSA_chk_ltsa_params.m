@@ -1,6 +1,8 @@
-function batchLTSA_chk_ltsa_params(dirs) 
+function batchLTSA_chk_ltsa_params(dirs)
 
 global REMORA
+
+disp_msg('Check LTSA settings for each directory. To skip, set tave and dfreq blank.');
 % creates gui window to define ltsa settings
 mycolor = [.8,.8,.8];
 r = length(dirs) + 2;
@@ -71,21 +73,43 @@ labelStr = 'Okay';
 btnPos = [x(3), y(1), bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
     'Style', 'push', 'String', labelStr, 'Callback', {@okay, fig, fig_taves, fig_dfreqs});
+
+% cancel button
+labelStr = 'Cancel';
+btnPos = [x(1), y(1), bw, bh];
+uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
+    'Style', 'push', 'String', labelStr, 'Callback','batchLTSA_control(''cancelAll'')');
+
 uiwait;
+
 end
 
 
 %% okay button
 function okay(~, ~, fig, fig_taves, fig_dfreqs)
 
-global PARAMS
+global PARAMS REMORA
+
+% double check - not cancelled
+REMORA.batchLTSA.cancelled = 0;
 
 % close figure and assign values
 PARAMS.ltsa.taves = zeros(length(fig_taves), 1);
 PARAMS.ltsa.dfreqs = zeros(length(fig_dfreqs), 1);
-for d = 1:length(fig_taves)
+for d = 1:length(fig_taves)      
     PARAMS.ltsa.taves(d) = str2double(get(fig_taves{d}, 'String'));
     PARAMS.ltsa.dfreqs(d) = str2double(get(fig_dfreqs{d}, 'String'));
 end
+
+%id any blank/dirs to skip
+dirToSkip = isnan(PARAMS.ltsa.taves) & isnan(PARAMS.ltsa.dfreqs);
+if any(dirToSkip)
+    PARAMS.ltsa.indirs = PARAMS.ltsa.indirs(~dirToSkip);
+    PARAMS.ltsa.outdirs = PARAMS.ltsa.outdirs(~dirToSkip);
+    PARAMS.ltsa.taves = PARAMS.ltsa.taves(~dirToSkip);
+    PARAMS.ltsa.dfreqs = PARAMS.ltsa.dfreqs(~dirToSkip);
+end
 close(fig);
 end
+
+

@@ -3,12 +3,13 @@ function batchLTSA_mk_ltsa_dir(lIdx)
 %
 % mk_ltsa_dir.m
 %
-% make long-term spectral averages from XWAV or WAV files in multiple
+% make long-term spectral averages from XWAV or WAV or FLAC files in multiple
 % nested directories
 %
 % edits made 2021 05 10 S. Fregosi to work for DASBRs/Soundtraps and latest
 % version of Triton on Github
 % udpated to part of batchLTSA remora 2021 08 11
+% fixed FLAC bug 2022 06 16
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS REMORA
 tic
@@ -55,7 +56,7 @@ else        % even
     PARAMS.ltsa.nfreq = PARAMS.ltsa.nfft/2 + 1;
 end
 
-% loop over xwavs and raw files or wavs
+% loop over xwavs and raw files or wavs/flacs
 PARAMS.ltsa.window = hanning(PARAMS.ltsa.nfft);
 PARAMS.ltsa.overlap = 0;
 PARAMS.ltsa.noverlap = round((PARAMS.ltsa.overlap/100)*PARAMS.ltsa.nfft);
@@ -121,10 +122,10 @@ for k = 1:PARAMS.ltsa.nxwav
             continue;
         end
         
-        if PARAMS.ltsa.ftype ~= 1       % xwavs
+        if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3     % xwavs
             nave1 = (PARAMS.ltsahd.write_length(PARAMS.ltsa.rfNum) * ...
                 PARAMS.ltsa.blksz / PARAMS.ltsa.nch)/(PARAMS.ltsa.nfft * PARAMS.ltsa.cfact);
-        else                            % wavs or flacs
+        else                                                    % wavs or flacs
             nave1 = PARAMS.ltsahd.nsamp(PARAMS.ltsa.rfNum)/...
                 (PARAMS.ltsa.nfft * PARAMS.ltsa.cfact);
         end
@@ -156,14 +157,14 @@ for k = 1:PARAMS.ltsa.nxwav
                 else
                     if n == PARAMS.ltsa.nave(PARAMS.ltsa.rfNum)     % last average, data not full number of samples
                         %                     nsamp = (PARAMS.ltsahd.nsectPerRawFile(r) * 250) - ((PARAMS.ltsa.nave(r) - 1) * PARAMS.ltsa.sampPerAve);
-                        if PARAMS.ltsa.ftype ~= 1       % xwavs
+                        if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3 % xwavs
                             nsamp = (PARAMS.ltsahd.write_length(PARAMS.ltsa.rfNum)...
                                 * PARAMS.ltsa.blksz / PARAMS.ltsa.nch) - ...
                                 ((PARAMS.ltsa.nave(PARAMS.ltsa.rfNum) - 1) * PARAMS.ltsa.sampPerAve);
-                        else
+                        else                                                % wavs or flacs
                             nsamp = PARAMS.ltsahd.nsamp(PARAMS.ltsa.rfNum)  - ...
                                 ((PARAMS.ltsa.nave(PARAMS.ltsa.rfNum) - 1) * PARAMS.ltsa.sampPerAve);
-                        end                             % wav
+                        end                            
                         PARAMS.ltsa.dur = nsamp / PARAMS.ltsa.fs;
                     else
                         nsamp = PARAMS.ltsa.sampPerAve;
@@ -172,7 +173,7 @@ for k = 1:PARAMS.ltsa.nxwav
                 
                 % disp([num2str(k),'  ',num2str(r),'  ',num2str(n),'  ',num2str(nsamp)])      % for debugging
                 
-                if PARAMS.ltsa.ftype ~= 1       % xwavs (count bytes)
+                if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3            % xwavs (count bytes)
                     % start Byte location in xwav file of spectral average
                     if n == 1
                         xi = PARAMS.ltsahd.byte_loc(PARAMS.ltsa.rfNum);
@@ -180,7 +181,7 @@ for k = 1:PARAMS.ltsa.nxwav
                         %                     xi = xi + (bytesPerAve * PARAMS.ltsa.nch);
                         xi = xi + (nsamp * (PARAMS.ltsa.nBits/8) * PARAMS.ltsa.nch);
                     end
-                else                    % wav files (count samples)
+                else                    % wav or flac files (count samples)
                     if n == 1
                         yi = 1;
                     else
@@ -196,7 +197,7 @@ for k = 1:PARAMS.ltsa.nxwav
                 data = [];
                 
                 % jump to correct location in xwav file
-                if PARAMS.ltsa.ftype == 2
+                if PARAMS.ltsa.ftype == 2 
                     fseek(PARAMS.ltsa.fid,xi,'bof');
                     data = fread(PARAMS.ltsa.fid,[PARAMS.ltsa.nch,nsamp],PARAMS.ltsa.dbtype);
                 else
