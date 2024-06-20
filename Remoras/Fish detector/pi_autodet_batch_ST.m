@@ -77,10 +77,10 @@ for fidx = 1:size(FileList,1)
     % t = 0:rawDur(1)/(step-1):rawDur(1);
     
     % Bandpass filter y.
-    Fc1 = 100;   % First Cutoff Frequency.
-    Fc2 = 450;  % Second Cutoff Frequency.
+    Fc1 = 20;   % First Cutoff Frequency. Originally 200 Hz
+    Fc2 = 500;  % Second Cutoff Frequency. Originally 2000 Hz
     
-    N = 10;     % Order.
+    N = 8;     % Order. Changed it from N = 10 because that gave issues with lower frequency bandpass filters (below 2000 Hz).
     [B,A] = butter(N/2, [Fc1 Fc2]/(fs/2));
     
     allSmpPts = [];
