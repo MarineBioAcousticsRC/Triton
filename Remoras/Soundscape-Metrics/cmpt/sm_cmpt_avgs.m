@@ -200,7 +200,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
     %!!!!!!!!!!!!!!!!!!!!!!!!!!! TO TEST FOR LTSA        
             % if frequency average for psd is not 1 Hz bin, change freq binning
             if REMORA.sm.cmpt.avgf ~= 1
-                vec = 0:REMORA.sm.cmpt.avgf:size(REMORA.sm.cmpt.pre.pwr,2);
+                vec = 0:(REMORA.sm.cmpt.avgf/PARAMS.ltsa.dfreq):size(REMORA.sm.cmpt.pre.pwr,2);
                 pwr = ones(size(REMORA.sm.cmpt.pre.pwr,1),length(vec)-1)*NaN;
                 for a = 1:length(vec)-1
                     pwr(:,a) = mean(REMORA.sm.cmpt.pre.pwr(:,...
@@ -211,7 +211,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
                 % replace psd
                 REMORA.sm.cmpt.pre.psd = 10*log10(REMORA.sm.cmpt.pre.pwr);
                 % adjust for bin width
-                %!!!!!!!!!!!!!!!!!! TO DO
+                
             end
     %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -270,16 +270,18 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
                     % compute percentiles
                     if REMORA.sm.cmpt.avgt>1
                         REMORA.sm.cmpt.pre.prcpsd = 10*log10(prctile(REMORA.sm.cmpt.pre.pwr,p));
-                        if REMORA.sm.cmpt.avgf == 1
+                        if REMORA.sm.cmpt.avgf == PARAMS.ltsa.dfreq
                             % crop to lower band edge
                             REMORA.sm.cmpt.pre.prcpsd = REMORA.sm.cmpt.pre.prcpsd(:,poslow:end);
                         end
                     else
                         REMORA.sm.cmpt.pre.prcpsd = ones(length(p),size(REMORA.sm.cmpt.pre.pwr,2))*NaN;
                         REMORA.sm.cmpt.pre.prcpsd(5,:) = 10*log10(REMORA.sm.cmpt.pre.pwr);
-                        if REMORA.sm.cmpt.avgf == 1
+                        if REMORA.sm.cmpt.avgf == PARAMS.ltsa.dfreq
                             % crop to lower band edge
                             REMORA.sm.cmpt.pre.prcpsd = REMORA.sm.cmpt.pre.prcpsd(:,poslow:end);
+                        %else
+                            %binwidth=REMORA.sm.cmpt.avgf;
                         end
                     end
                 end
