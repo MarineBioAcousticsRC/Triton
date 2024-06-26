@@ -15,6 +15,18 @@ elseif strcmp(action,'setOutDir')
     outDir = get(REMORA.pi_verify.outDirEdTxt, 'string');
     REMORA.pi.settings.outDir = outDir;
     
+elseif strcmp(action,'setTemplate')
+    Template = get(REMORA.pi_verify.tempEdTxt, 'string');
+    REMORA.pi.settings.templateFile = Template;
+
+elseif strcmp(action,'setFc1')
+    Fc1 = str2double(REMORA.pi_verify.Fc1EdTxt, 'string');
+    REMORA.pi.settings.Fc1 = Fc1;
+
+elseif strcmp(action,'setFc2')
+    Fc2 = str2double(REMORA.pi_verify.Fc2EdTxt, 'string');
+    REMORA.pi.settings.Fc2 = Fc2;
+
 elseif strcmp(action,'setThresh')
     ThreshEdText = str2double(get(REMORA.pi_verify.ThreshEdText, 'string'));
     REMORA.pi.settings.thresh = ThreshEdText;

@@ -36,7 +36,8 @@ SearchRecursiv = REMORA.pi.settings.recursSearch; % Setting to 1 searches throug
 
 currentPath = mfilename('fullpath');
 templateFilePath = fileparts(currentPath);
-template = fullfile(templateFilePath,'Stickleback_mean_template.mat'); % Make sure that this line is correct for the input template folder!
+%template = fullfile(templateFilePath,'Stickleback_mean_template.mat'); % Make sure that this line is correct for the input template folder!
+template = fullfile(templateFilePath,settings.templateFile);
 load(template)
 template=meansound;
 
@@ -77,8 +78,8 @@ for fidx = 1:size(FileList,1)
     % t = 0:rawDur(1)/(step-1):rawDur(1);
     
     % Bandpass filter y.
-    Fc1 = 20;   % First Cutoff Frequency. Originally 200 Hz
-    Fc2 = 500;  % Second Cutoff Frequency. Originally 2000 Hz
+    Fc1 = settings.Fc1;   % First Cutoff Frequency. Originally 200 Hz
+    Fc2 = settings.Fc2;  % Second Cutoff Frequency. Originally 2000 Hz
     
     N = 8;     % Order. Changed it from N = 10 because that gave issues with lower frequency bandpass filters (below 2000 Hz).
     [B,A] = butter(N/2, [Fc1 Fc2]/(fs/2));
