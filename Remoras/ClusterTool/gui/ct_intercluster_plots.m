@@ -47,9 +47,16 @@ for iF = 1:length(nodeSet)
     subplot(n1,m1,iF)
 
     if s.normalizeSpectra
-        imagesc(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)')
+        hs = pcolor(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)');
+        hs.LineStyle = 'none';
+        set(gca, 'YScale', 'log');
+
     else
-       imagesc(1:length(nodeSet{iF}),f,Tfinal{iF,1}')
+       hs = pcolor(1:length(nodeSet{iF}),f,Tfinal{iF,1}');
+       hs.LineStyle = 'none';
+       %set(gca,'clim',[-1,1])
+       set(gca, 'YScale', 'log','ylim',[min(f),max(f)]);
+
     end
     set(gca,'ydir','normal')
     title(labelStr{iF})
@@ -79,6 +86,7 @@ for iF = 1:length(nodeSet)
         subplot(n1,m1,iF)
         imagesc(1:length(nodeSet{iF}),1:p.maxDur,[Tfinal{iF,10}./max(Tfinal{iF,10},[],2)]')
         set(gca,'ydir','normal')
+
     end
 end
 figure(41)

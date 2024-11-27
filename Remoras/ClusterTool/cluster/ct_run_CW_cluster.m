@@ -11,6 +11,9 @@ distClickEIdx = 1:size(distClickEFull,1);
 noChange = 0;
 cwItr = 1;
 
+if length(clusterID)==1
+    return
+end
 % itrMax = 10;
 if p.plotFlag
     figure(110);clf

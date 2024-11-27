@@ -9,7 +9,7 @@ offaxN = ((tempN.^2)-tempN)./2;
 rows1 = zeros(offaxN, 1);
 cols1 = zeros(offaxN, 1);
 n = 1;
-
+specClickTf = specClickTf(:,~isnan(sum(specClickTf,1)));
 for itrA = 1:size(specClickTf,1)-1  
     for itrB = itrA+1:size(specClickTf,1)
         rows1(n) = itrA;
@@ -18,8 +18,8 @@ for itrA = 1:size(specClickTf,1)-1
     end
 end
 if ~wcorTF
-    % distClick = pdist(specClickTf_norm,'seuclidean');
-    distClick = pdist(specClickTf,'correlation');
+    %distClick = pdist(specClickTf,'seuclidean');
+    distClick = pdist(10.^specClickTf,'correlation');
     distClickE = (exp(-distClick));
 else
     % weighted correlation

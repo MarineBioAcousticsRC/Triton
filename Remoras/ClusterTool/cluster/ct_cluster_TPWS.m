@@ -259,5 +259,5 @@ for iC = 1:length(dateInterval)
 end
 TPWSfilename = fNameExt;
 % save output
-save(fullfile(outDir,outName),'TPWSfilename','binData','p','f')
+save(fullfile(outDir,outName),'TPWSfilename','binData','p','f','-v7.3')
 

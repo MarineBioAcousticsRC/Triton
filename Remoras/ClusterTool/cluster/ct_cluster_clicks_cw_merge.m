@@ -33,7 +33,11 @@ if p.useSpectra && p.diff
     distClickE = ct_compute_node_dist(specClickTfNormDiff(:,...
         p.startFreqIdx:p.endFreqIdx-1),p.wcorTF);
 elseif p.useSpectra 
-    distClickE = ct_compute_node_dist(specClickTfNorm(:,p.startFreqIdx:p.endFreqIdx),p.wcorTF);
+    if tempN==1
+        distClickE = 1;
+    else
+        distClickE = ct_compute_node_dist(specClickTfNorm(:,p.startFreqIdx:p.endFreqIdx),p.wcorTF);
+    end
 end
 
 if p.mergeTF && tempN>p.mergeThresh  % determine whether to merge or not.
@@ -141,11 +145,11 @@ if ~isempty(uniqueLabelsNew)
     for i4 = 1:length(uniqueLabelsNew)
         
         thisClickSet = find(clusterIDNew==uniqueLabelsNew(i4));
-        if 1
-            thisNConnectionsSet = sum(distClickEFull>0);
-            gt1Idx = thisNConnectionsSet(thisClickSet)>1;
-            thisClickSet = thisClickSet(gt1Idx);
-        end
+        % if 1
+        %     thisNConnectionsSet = sum(distClickEFull>0);
+        %     gt1Idx = thisNConnectionsSet(thisClickSet)>0;
+        %     thisClickSet = thisClickSet(gt1Idx);
+        % end
         thisSpectralSet = specClickTf(thisClickSet,:);
         thisEnvDurSet = envDur(thisClickSet,:);
 

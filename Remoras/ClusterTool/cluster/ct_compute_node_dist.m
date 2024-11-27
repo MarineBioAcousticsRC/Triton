@@ -1,5 +1,6 @@
 function distClickE = ct_compute_node_dist(specClickTf,wcorTF)
 % find distance between them
+specClickTf = rmmissing(specClickTf,2);
 if ~wcorTF
     % Can use euclidean distance, but it doesn't capture shape very well
     % distClick = pdist(specClickTf_norm,'seuclidean');
@@ -13,7 +14,8 @@ else
     % weighted correlation
     % Wgts = 1:-1/(size(specClickTf,2)-1):0; % Vector from 1 to 0 ->
     % decreasing weight as frequency increases
-    Wgts = ones(1,size(specClickTf,2));  %all ones -> no weighting 
+    Wgts = log10(size(specClickTf,2)+1)./log10((1:size(specClickTf,2))+1);
+    %Wgts = ones(1,size(specClickTf,2));  %all ones -> no weighting 
     
     X = specClickTf;
     X = bsxfun(@minus,X,mean(X,2));
@@ -23,7 +25,7 @@ else
     Xnorm(Xmax==0) = 0;
     Xnorm = Xnorm .* Xmax;
     X = bsxfun(@rdivide,X,Xnorm);
-    
+    % 
     % euclidean option:
     % weuc = @(XI,XJ,W)(sqrt(bsxfun(@minus,XI,XJ).^2 * W'));
     

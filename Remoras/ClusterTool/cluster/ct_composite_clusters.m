@@ -134,7 +134,12 @@ for iEM = 1:size(binDataPruned,1)
     %         binDataPruned(iEM).envDur = zeros(1,p.envDur);
     %     end
 end
-envShape = vertcat(binDataPruned(:).envMean);
+try
+    envShape = vertcat(binDataPruned(:).envMean);
+catch
+    envShape = ones(size(sumSpecMat,1),1);
+end
+
 %envDistrib = vertcat(binDataPruned(:).envDur);
 
 clustersInBin = nan(size(dTTmat,1),1);
@@ -177,8 +182,11 @@ end
 [~,s.stIdx] = min(abs(f-s.startFreq));
 [~,s.edIdx] = min(abs(f-s.endFreq));
 
-if ~isfield(s,'normalizeSpectra') 
+s.normalizeSpectraAcross = 0;
+if ~isfield(s,'normalizeSpectra')
     s.normalizeSpectra = 1;
+    s.normalizeSpectraAcross = 0;
+
 end
 
 if s.useEnvShapeTF
@@ -502,14 +510,16 @@ if tritonMode && (size(clusterIDreduced,1)<1000)
     fprintf('Plotting network\n')
 
     figure(110);clf
-    G = graph(compDist,'upper');    
+    G = graph(compDist(clusterIDreduced>0,clusterIDreduced>0),'upper');    
     h = plot(G,'layout','force');
 
-    set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)
-    
-%     for iClustPlot=1:size(nodeSet,2)
-%         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
-%     end    
+    set(h,'MarkerSize',5)%'NodeLabel',clusterIDreduced)
+    cList = colormap(110,lines);
+    for iClustPlot=1:size(nodeSet,2)
+       
+         highlight(h, clusterIDreduced(clusterIDreduced>0)==iClustPlot,'NodeColor',(rand(1,3)));%cList(mod(iClustPlot,64)+1,:))
+    end    
+    h.EdgeColor = [.9,.9,.9];
 
 else
     disp('Too many nodes to plot as network.')
