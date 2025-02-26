@@ -160,10 +160,12 @@ for callIdx = 1:length(entry.calls)
                 case 'inputfile'
                     detection.Sheet.InputFile(currentRow) = entry.src_file;
                 case 'starttime'
-                    detection.Sheet.StartTime(currentRow) = entry.pickstartdisplay - date_epoch('excel'); %datetime(entry.pickstartdisplay - date_epoch('excel'),'ConvertFrom','datenum');
+                    %detection.Sheet.StartTime(currentRow) = entry.pickstartdisplay - date_epoch('excel'); %datetime(entry.pickstartdisplay - date_epoch('excel'),'ConvertFrom','datenum');
+                    detection.Sheet.StartTime(currentRow) = entry.pickstartdisplay;
                 case 'endtime'
                     if isfield(entry, 'pickenddisplay')
-                        detection.Sheet.EndTime(currentRow) = entry.pickenddisplay - date_epoch('excel'); %datetime(entry.pickenddisplay - date_epoch('excel'),'ConvertFrom','datenum');
+                        %detection.Sheet.EndTime(currentRow) = entry.pickenddisplay - date_epoch('excel'); %datetime(entry.pickenddisplay - date_epoch('excel'),'ConvertFrom','datenum');
+                        detection.Sheet.EndTime(currentRow) = entry.pickenddisplay;
                     end
                 case 'eventnumber'
                     detection.Sheet.EventNumber(currentRow) = entry.event;
