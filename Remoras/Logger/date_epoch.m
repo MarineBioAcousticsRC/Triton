@@ -6,7 +6,7 @@ switch name
     case 'excel'
         if ismac
             % Mac Excel uses different date (not tested)
-            epoch = datenum('01-Jan-1900');
+            epoch = datenum('30-Dec-1899');
         else
             epoch = datenum('30-Dec-1899');
         end
