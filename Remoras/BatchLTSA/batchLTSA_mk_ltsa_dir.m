@@ -76,6 +76,7 @@ if REMORA.batchLTSA.settings.numCh > info.NumChannels
 end
 nch = REMORA.batchLTSA.settings.numCh;
 
+
 PARAMS.ltsa.fods = zeros(nch,1);
 curr_ofile = PARAMS.ltsa.outfile;
 PARAMS.ltsa.outfiles_ch = []; 

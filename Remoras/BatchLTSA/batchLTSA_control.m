@@ -34,9 +34,14 @@ elseif strcmp(action,'setdfreq')
     REMORA.batchLTSA.settings.dfreq = dfreq;
     
 elseif strcmp(action,'setnumch')
-    numch = get(REMORA.batchLTSA_verify.numchEdTxt, 'string');
-    numch = str2double(numch);
-    REMORA.batchLTSA.settings.numCh = numch;
+    numCh = get(REMORA.batchLTSA_verify.numChEdTxt, 'string');
+    numCh = str2double(numCh);
+    REMORA.batchLTSA.settings.numCh = numCh;
+
+elseif strcmp(action,'setwhch')
+    whCh = get(REMORA.batchLTSA_verify.whChEdTxt, 'string');
+    whCh = str2double(whCh);
+    REMORA.batchLTSA.settings.whCh = whCh;
 
 elseif strcmp(action,'RunBatchLTSA')
     close(REMORA.fig.batchLTSA)

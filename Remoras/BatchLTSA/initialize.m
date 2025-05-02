@@ -3,7 +3,7 @@
 % Initialize the BatchLTSA pulldown
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global HANDLES REMORA PARAMS
+global HANDLES REMORA
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 REMORA.batchLTSA.menu = uimenu(HANDLES.remmenu,'Label','&Batch LTSAs',...
