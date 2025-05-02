@@ -20,7 +20,7 @@ elseif strcmp(a, 'FLAC')
 elseif strcmp(a, 'XWAV')
     PARAMS.ltsa.ftype = 2;
     indirs = find_dirs(dir_name, '*.x.wav');
-    PARAMS.ltsa.dtype =  1; % 1 for HRP data
+    PARAMS.ltsa.dtype =  1; % 1 for HRP data/xwavs
 else
     disp_msg('Window closed. Exiting.');
     return
@@ -35,19 +35,23 @@ end
 % save output files in same locations
 outdirs = indirs;
 
-% write to PARAMS
-PARAMS.ltsa.indirs = indirs;
-PARAMS.ltsa.outdirs = outdirs;
+% write to REMORA
+REMORA.batchLTSA.ltsa.indirs = indirs;
+REMORA.batchLTSA.ltsa.outdirs = outdirs;
 
-% LTSA parameters
+
+% Individual LTSA parameters
 % default is same for all directories as set in initial window, but can
 % modify by directory if desired
+% these are saved in REMORA.batchLTSA.params and will be pulled into PARAMS
 batchLTSA_chk_ltsa_params(indirs); % set taves and dfreqs
 if REMORA.batchLTSA.cancelled == 1; return; end
-taves = PARAMS.ltsa.taves;
-dfreqs = PARAMS.ltsa.dfreqs;
-indirs = PARAMS.ltsa.indirs;
-outdirs = PARAMS.ltsa.outdirs;
+% update if any were changed in check
+taves = REMORA.batchLTSA.ltsa.taves;
+dfreqs = REMORA.batchLTSA.ltsa.dfreqs;
+chs = REMORA.batchLTSA.ltsa.chs;
+indirs =REMORA.batchLTSA.ltsa.indirs;
+outdirs = REMORA.batchLTSA.ltsa.outdirs;
 
 % % raw files to skip.
 % % * this is specific to HRPs?
@@ -56,7 +60,7 @@ outdirs = PARAMS.ltsa.outdirs;
 % %     PARAMS.ltsa.rf_skip = [11716  11715];
 PARAMS.ltsa.rf_skip = [];
 
-% loop through each of the sets of directories  to set params and filenames
+% loop through each of the sets of directories to set params and filenames
 prefixes = cell(1, length(indirs));
 outfiles = cell(1, length(indirs));
 dirdata = cell(1, length(indirs));
@@ -64,27 +68,32 @@ for k = 1:length(indirs)
     % if we have different parameters for each of the dirs, adjust
     % accordingly
     if length(dfreqs) > 1
-        PARAMS.ltsa.dfreq = dfreqs(k);
+        REMORA.batchLTSA.tmp.dfreq = dfreqs(k);
     else
-        PARAMS.ltsa.dfreq = dfreqs;
+        REMORA.batchLTSA.tmp.dfreq = dfreqs;
     end
     if length(taves) > 1
-        PARAMS.ltsa.tave = taves(k);
+        REMORA.batchLTSA.tmp.tave = taves(k);
     else
-        PARAMS.ltsa.tave = taves;
+        REMORA.batchLTSA.tmp.tave = taves;
+    end
+    if length(chs) > 1
+        REMORA.batchLTSA.tmp.ch = chs(k);
+    else
+        REMORA.batchLTSA.tmp.ch = chs;
     end
     
-    PARAMS.ltsa.indir = char(indirs{k});
-    PARAMS.ltsa.outdir = char(outdirs{k});
+    REMORA.batchLTSA.tmp.indir = char(indirs{k});
+    REMORA.batchLTSA.tmp.outdir = char(outdirs{k});
     
     % create the outfile and prefix
     [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix;  
 end
 
-% write to PARAMS
-PARAMS.ltsa.prefixes = prefixes;
-PARAMS.ltsa.outfiles = outfiles;
-PARAMS.ltsa.dirdata = dirdata;
+% write to REMORA
+REMORA.batchLTSA.ltsa.prefixes = prefixes;
+REMORA.batchLTSA.ltsa.outfiles = outfiles;
+REMORA.batchLTSA.ltsa.dirdata = dirdata;
 
 % make sure the filenames are what you want them to be
 batchLTSA_chk_filenames;
@@ -152,18 +161,20 @@ dirs = {};
 files = dir;
 inds = find(vertcat(files.isdir));
 subdirs = {};
-subdirs_xwav = {};
 for k = 1:length(inds)
     ind = inds(k);
-    if ~strcmp(files(ind).name, '.') && ~strcmp(files(ind).name, '..')
-        subdirs{end+1} = fullfile(d, files(ind).name);
+    % skip hidden folders or system folders
+    if strcmp(files(ind).name(1), '.') || ...
+            any(strcmp(files(ind).name, {'$RECYCLE.BIN', 'System Volume Information'}))
+        continue
     end
+    subdirs{end+1} = fullfile(d, files(ind).name); %#ok<AGROW>
 end
 
-% for each subdirectory, check for xwavs and append to list of indirs
+% for each subdirectory, check for audio files and append to list of indirs
 for k = 1:size(subdirs, 2)
-    subdirs_xwav = find_dirs(subdirs{k}, ftype);
-    dirs = cat_cell(dirs, subdirs_xwav);
+    subdirs_audio = find_dirs(subdirs{k}, ftype);
+    dirs = cat_cell(dirs, subdirs_audio);
 end
 cd(d);
 if ~isempty(dir(ftype))

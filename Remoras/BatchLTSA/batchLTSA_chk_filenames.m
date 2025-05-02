@@ -2,11 +2,11 @@ function batchLTSA_chk_filenames
 
 % check filenames that they are what you want/expected
 
-global PARAMS
+global REMORA
 
 % creates gui window check filenames
 mycolor = [.8,.8,.8];
-r = length(PARAMS.ltsa.outfiles) + 2;
+r = length(REMORA.batchLTSA.ltsa.outfiles) + 2;
 c = 4;
 h = 0.025*r;
 w = 0.09*c;
@@ -40,20 +40,20 @@ btnPos = [x(3), y(end), 2*bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
     'Position', btnPos, 'Style', 'text', 'String', labelStr);
 
-fig_filenames = {};
+fig_filenames = cell(length((REMORA.batchLTSA.ltsa.indirs), 1));
 
 % directory names and ed txt
-for d = 1:length(PARAMS.ltsa.indirs)
-    labelStr = PARAMS.ltsa.indirs(d);
+for d = 1:length(REMORA.batchLTSA.ltsa.indirs)
+    labelStr = REMORA.batchLTSA.ltsa.indirs(d);
     btnPos = [x(1), y(end-d), 2*bw, bh];
     uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
         'Position', btnPos, 'Style', 'text', 'String', labelStr,...
         'HorizontalAlign', 'left');
     
     % filenames
-    labelStr = PARAMS.ltsa.outfiles(d);
+    labelStr = REMORA.batchLTSA.ltsa.outfiles(d);
     btnPos = [x(3), y(end-d), 2*bw, bh];
-    fig_filenames{end+1} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
+    fig_filenames{d} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
         'Style', 'edit', 'String', labelStr); 
 end
 
@@ -75,11 +75,11 @@ end
 %% okay button
 function okay(~, ~, fig, fig_filenames)
 
-global PARAMS
+global REMORA
 
 % close figure and assign values
 for d = 1:length(fig_filenames)
-    PARAMS.ltsa.outfiles(d) = get(fig_filenames{d}, 'String');
+    REMORA.batchLTSA.ltsa.outfiles(d) = get(fig_filenames{d}, 'String');
 end
 close(fig);
 end
