@@ -1,6 +1,6 @@
 function batchLTSA_control(action, mySource)
 
-global REMORA 
+global REMORA
 
 if ~exist('mySource','var')
     mySource = 'null';
@@ -9,22 +9,23 @@ end
 if strcmp(action, '')
     % Note: could make this have an option to just refresh everything by making
     % these all into if rather than elseif
-    
+
 elseif strcmp(action,'setInDir')
     inDir = get(REMORA.batchLTSA_verify.inDirEdTxt, 'string');
     REMORA.batchLTSA.settings.inDir = inDir;
-    
+
 elseif strcmp(action, 'browseInDir')
     dir = uigetdir();
     if ~ isnumeric(dir)
         % user selected something
-         set(REMORA.batchLTSA_verify.inDirEdTxt, 'string', dir);
+        set(REMORA.batchLTSA_verify.inDirEdTxt, 'string', dir);
         REMORA.batchLTSA.settings.inDir = dir;
     end
-    elseif strcmp(action, 'setDataType')
+
+elseif strcmp(action, 'setDataType')
     dataType = get(REMORA.fig.dataType_buttongroup.SelectedObject, 'Tag');
     REMORA.batchLTSA.settings.dataType = dataType;
-  
+
 elseif strcmp(action,'settave')
     tave = get(REMORA.batchLTSA_verify.taveEdTxt, 'string');
     REMORA.batchLTSA.settings.tave = tave;
@@ -32,13 +33,12 @@ elseif strcmp(action,'settave')
 elseif strcmp(action,'setdfreq')
     dfreq = get(REMORA.batchLTSA_verify.dfreqEdTxt, 'string');
     REMORA.batchLTSA.settings.dfreq = dfreq;
-    
-elseif strcmp(action,'setnumch')
-    numCh = get(REMORA.batchLTSA_verify.numChEdTxt, 'string');
-    numCh = str2double(numCh);
+
+elseif strcmp(action,'setNumCh')
+    numCh = get(REMORA.fig.numCh_buttongroup.SelectedObject, 'Tag');
     REMORA.batchLTSA.settings.numCh = numCh;
 
-elseif strcmp(action,'setwhch')
+elseif strcmp(action,'setWhCh')
     whCh = get(REMORA.batchLTSA_verify.whChEdTxt, 'string');
     whCh = str2double(whCh);
     REMORA.batchLTSA.settings.whCh = whCh;
@@ -46,7 +46,7 @@ elseif strcmp(action,'setwhch')
 elseif strcmp(action,'RunBatchLTSA')
     close(REMORA.fig.batchLTSA)
     batchLTSA_init_batch_ltsa;
-    
+
 elseif strcmp(action, 'cancelAll')
     closereq();
     REMORA.batchLTSA.cancelled = 1;

@@ -63,18 +63,23 @@ if length(prefix) > lim
     prefix = prefix(1:lim);
 end
 
-% create the outfile name
-if ~strcmp(prefix(end), '_')
-    prefix = [prefix, '_'];
-end
+% % create the outfile name
+% if ~strcmp(prefix(end), '_')
+%     prefix = [prefix, '_'];
+% end
 
-if numCh == 1 && whCh == 1
-    ltsa_file = sprintf('%s%ds_%dHz.ltsa', prefix, ...
+% assemble a name differently depending on num of channels to process
+if REMORA.batchLTSA.settings.numCh == 1 && REMORA.batchLTSA.tmp.ch == 1
+    % processing single channel and its channel 1
+    ltsa_file = sprintf('%s_%ds_%dHz.ltsa', prefix, ...
         REMORA.batchLTSA.tmp.tave, REMORA.batchLTSA.tmp.dfreq);
-elseif numCh == 1 && whCh > 1
-    ltsa_file = sprintf('%s_ch%i_%ds_%dHz.ltsa', prefix, whCh, ...
+elseif REMORA.batchLTSA.settings.numCh == 1 && REMORA.batchLTSA.tmp.ch > 1
+    % processing single channel but it's not channel 1, add to name
+    ltsa_file = sprintf('%s_ch%i_%ds_%dHz.ltsa', prefix, REMORA.batchLTSA.tmp.ch, ...
         REMORA.batchLTSA.tmp.tave, REMORA.batchLTSA.tmp.dfreq);
-elseif numCh > 1
-    ltsa_file = sprintf('%s_ch%i_%ds_%dHz.ltsa', prefix, numCh, ...
+elseif REMORA.batchLTSA.settings.numCh > 1
+    % processing multiple channels, all of them, set to 0 as example
+    ltsa_file = sprintf('%s_ch%i_%ds_%dHz.ltsa', prefix, 0, ...
         REMORA.batchLTSA.tmp.tave, REMORA.batchLTSA.tmp.dfreq);
+    disp_msg('Multiple channels being processed, each file will be named with channel number.')
 end
