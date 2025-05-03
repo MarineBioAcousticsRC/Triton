@@ -15,11 +15,12 @@ global PARAMS REMORA
 tic
 
 % initiate loadbar showing progress
-h = loadbar(['Creating LTSA ',num2str(lIdx),'/', num2str(length(PARAMS.ltsa.indirs))]);
+h = loadbar(['Creating LTSA ',num2str(lIdx),'/', ...
+    num2str(length(REMORA.batchLTSA.ltsa.indirs))]);
 pcntDone = 0;
 loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
 
-% wav data
+% data type
 if PARAMS.ltsa.ftype == 1
     d = dir(fullfile(PARAMS.ltsa.indir, '*.wav')); % wav files
 elseif PARAMS.ltsa.ftype == 3
@@ -32,13 +33,13 @@ end
 if isfield(PARAMS,'ltsahd')
     PARAMS = rmfield(PARAMS,'ltsahd');
 end
-% also clean up some items in PARAMS.ltsa
+% also clean up some items in PARAMS.ltsa (in case left over from before)
 PARAMS.ltsa.nch = [];
 PARAMS.ltsa.nave = [];
 PARAMS.ltsa.byteloc = [];
 PARAMS.ltsa.fname = char(d.name);      % file names in directory
 
-info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)));
+info = audioinfo(fullfile(PARAMS.ltsa.indir, PARAMS.ltsa.fname(1,:)));
 PARAMS.ltsa.fs = info.SampleRate;
 PARAMS.ltsa.nfft = PARAMS.ltsa.fs / PARAMS.ltsa.dfreq;
 % compression factor (cfact = 1000 for tave=5sec,fs=200000Hz,dfreq=200)
@@ -56,7 +57,7 @@ else        % even
     PARAMS.ltsa.nfreq = PARAMS.ltsa.nfft/2 + 1;
 end
 
-% loop over xwavs and raw files or wavs/flacs
+% set spec settings
 PARAMS.ltsa.window = hanning(PARAMS.ltsa.nfft);
 PARAMS.ltsa.overlap = 0;
 PARAMS.ltsa.noverlap = round((PARAMS.ltsa.overlap/100)*PARAMS.ltsa.nfft);
@@ -67,42 +68,61 @@ total = PARAMS.ltsa.nxwav;
 PARAMS.ltsa.rfNum = 0;     % total number of raw file counter
 count = 0;                 % total number of averages counter for output display
 
-% if there is more than 1 channel, need new filenames for each of the
-% channels
-% check that num channels to process == num channels available
-if REMORA.batchLTSA.settings.numCh > info.NumChannels
-    REMORA.batchLTSA.settings.numCh = num2str(info.NumChannels);
-    disp_msg('Incorrect number of channels. Using all. ');
+% if audioinfo says 1 channel, confirm numCh is 'single'
+if info.NumChannels == 1 && strcmp(REMORA.batchLTSA.settings.numCh, 'multi')
+    REMORA.batchLTSA.settings.numCh = 'single';
+    REMORA.batchLTSA.ltsa.chs = ones(length(REMORA.batchLTSA.ltsa.chs), 1);
+    PARAMS.ltsa.ch = 1;
+
+    disp_msg('Incorrect number of channels for single channel data.');
+    disp_msg('Setting to channel 1 - output filename may still contain incorrect channel label.')
 end
-nch = REMORA.batchLTSA.settings.numCh;
 
+% if multichannel AND making LTSAs for all channels, need modified filenames
+% and to loop through to write LTSA headers
+if strcmp(REMORA.batchLTSA.settings.numCh, 'multi') && PARAMS.ltsa.ch == 0
+    % confirm its multichannel data
+    if info.NumChannels > 1  && PARAMS.ltsa.ch == 0
+        nch = info.NumChannels;
+        % set up output of all by-channel file names and fods
+        PARAMS.ltsa.outfiles_ch = {};
+        PARAMS.ltsa.fods = zeros(nch, 1);
+        curr_ofile = PARAMS.ltsa.outfile;
+        % generate file names and write ltsa headers
+        for ich = 1:nch
+            new_ofile = sprintf('%s_ch%d.ltsa', strrep(curr_ofile,'.ltsa',''), ...
+                LTSAch);
 
-PARAMS.ltsa.fods = zeros(nch,1);
-curr_ofile = PARAMS.ltsa.outfile;
-PARAMS.ltsa.outfiles_ch = []; 
+            PARAMS.ltsa.outfiles_ch{ich} = new_ofile;
+            PARAMS.ltsa.fods(ich) = fopen(fullfile(PARAMS.ltsa.outdir, new_ofile), 'w');
 
-for ch = 1:nch
-    if nch ~= 1
-        new_ofile = sprintf('%s_ch%d.ltsa',strrep(curr_ofile,'.ltsa',''),ch);
+            % write header portion of ltsa for each ltsa
+            PARAMS.ltsa.outfile = new_ofile;
+            PARAMS.ltsa.ch = ich;
+            write_ltsahead;
+        end
     else
-        new_ofile = curr_ofile;
+        disp_msg('Issue with multichannel data. Exiting.');
+        disp_msg('See batchLTSA_mk_ltsa_dir L75 and contact Selene Fregosi.')
     end
-    
-    PARAMS.ltsa.outfiles_ch = [PARAMS.ltsa.outfiles_ch; new_ofile];
-    PARAMS.ltsa.fods(ch) = fopen(fullfile(PARAMS.ltsa.outdir, new_ofile),'w');
-    
-    % write header portion of ltsa for each ltsa
-    PARAMS.ltsa.outfile = new_ofile;
-    PARAMS.ltsa.ch = ch;
-    write_ltsahead
+
+    % if single channel or only processing one channel, write that header
+elseif strcmp(REMORA.batchLTSA.settings.numCh, 'single ') || ...
+        info.NumChannels == 1 || PARAMS.ltsa.ch > 0
+    nch = 1;
+    PARAMS.ltsa.fods = zeros(nch, 1);
+    PARAMS.ltsa.fods(nch) = fopen(fullfile(PARAMS.ltsa.outdir, ...
+        PARAMS.ltsa.outfile), 'w');
+    write_ltsahead;
 end
 
-% loop over all xwavs
+% loop over xwavs and raw files or wavs/flacs
+% multichannel LTSAs will be created simultaneously
 for k = 1:PARAMS.ltsa.nxwav
-    
+
     % globalize xwav # we're on so can access in calc_ltsa
     PARAMS.ltsa.currxwav = k;
-    
+
     % HARP and ARP & OBS data
     if PARAMS.ltsa.ftype == 2
         % open xwav file
@@ -111,18 +131,18 @@ for k = 1:PARAMS.ltsa.nxwav
         nrf = fread(PARAMS.ltsa.fid,1,'uint16');         % Number of RawFiles in XWAV file (80 bytes from bof)
     else % wav or flac data
         nrf = 1;
-        PARAMS.ltsa.fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)), 'r');
+        PARAMS.ltsa.fid = fopen(fullfile(PARAMS.ltsa.indir, PARAMS.ltsa.fname(k,:)), 'r');
     end
-    
+
     % loop over each raw file in xwav (nrf = 1 for wavs)
     for r = 1:nrf
         PARAMS.ltsa.rfNum = PARAMS.ltsa.rfNum + 1; % total # of raw files processed
-        
+
         % skip rfs we want to skip
         if ismember(PARAMS.ltsa.rfNum, PARAMS.ltsa.rf_skip)
             continue;
         end
-        
+
         if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3     % xwavs
             nave1 = (PARAMS.ltsahd.write_length(PARAMS.ltsa.rfNum) * ...
                 PARAMS.ltsa.blksz / PARAMS.ltsa.nch)/(PARAMS.ltsa.nfft * PARAMS.ltsa.cfact);
@@ -130,28 +150,30 @@ for k = 1:PARAMS.ltsa.nxwav
             nave1 = PARAMS.ltsahd.nsamp(PARAMS.ltsa.rfNum)/...
                 (PARAMS.ltsa.nfft * PARAMS.ltsa.cfact);
         end
-        
+
         % difference the number of averages and size of raw file
         dnave = PARAMS.ltsa.nave(PARAMS.ltsa.rfNum) - nave1;
-        
+
         % loop over channels
-        for ch = 1:nch
-            PARAMS.ltsa.fod = PARAMS.ltsa.fods(ch);
-            PARAMS.ltsa.ch = ch;
-            
+        for ich = 1:nch
+            PARAMS.ltsa.fod = PARAMS.ltsa.fods(ich);
+            if nch > 1
+                PARAMS.ltsa.ch = ich;
+            end
+
             % jump to correct place in output file to put spectral averages
-            fseek(PARAMS.ltsa.fod,PARAMS.ltsa.byteloc(PARAMS.ltsa.rfNum),'bof');
+            fseek(PARAMS.ltsa.fod, PARAMS.ltsa.byteloc(PARAMS.ltsa.rfNum), 'bof');
             xi = 0;
-            
+
             % loop over averages
             for n = 1:PARAMS.ltsa.nave(PARAMS.ltsa.rfNum)
-                
+
                 % globalize for use in calc_ltsa
                 PARAMS.ltsa.currNave = n;
-                
+
                 % increment ltsa count from mk_ltsa
                 count = count + 1;
-                
+
                 % number of samples to grab
                 if dnave == 0       % number of averages divide evenly into size of raw file
                     nsamp = PARAMS.ltsa.sampPerAve;
@@ -165,15 +187,15 @@ for k = 1:PARAMS.ltsa.nxwav
                         else                                                % wavs or flacs
                             nsamp = PARAMS.ltsahd.nsamp(PARAMS.ltsa.rfNum)  - ...
                                 ((PARAMS.ltsa.nave(PARAMS.ltsa.rfNum) - 1) * PARAMS.ltsa.sampPerAve);
-                        end                            
+                        end
                         PARAMS.ltsa.dur = nsamp / PARAMS.ltsa.fs;
                     else
                         nsamp = PARAMS.ltsa.sampPerAve;
                     end
                 end
-                
+
                 % disp([num2str(k),'  ',num2str(r),'  ',num2str(n),'  ',num2str(nsamp)])      % for debugging
-                
+
                 if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3            % xwavs (count bytes)
                     % start Byte location in xwav file of spectral average
                     if n == 1
@@ -190,23 +212,24 @@ for k = 1:PARAMS.ltsa.nxwav
                         yi = yi + nsamp;
                     end
                 end
-                
+
                 % hold on to number of samples to calculate next byte location
                 prev_nsamp = nsamp;
-                
+
                 % clear data vector
                 data = [];
-                
+
                 % jump to correct location in xwav file
-                if PARAMS.ltsa.ftype == 2 
+                if PARAMS.ltsa.ftype == 2
                     fseek(PARAMS.ltsa.fid,xi,'bof');
                     data = fread(PARAMS.ltsa.fid,[PARAMS.ltsa.nch,nsamp],PARAMS.ltsa.dbtype);
                 else
-                    [dall,~] = audioread(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)), [yi yi-1+nsamp], 'native' );
+                    [dall, ~] = audioread(fullfile(PARAMS.ltsa.indir, ...
+                        PARAMS.ltsa.fname(k,:)), [yi yi-1+nsamp], 'native' );
                     dall = double(dall);
-                    data = dall(:,PARAMS.ltsa.ch);
+                    data = dall(:, PARAMS.ltsa.ch);
                 end
-                
+
                 % no data - error message
                 if ~isempty(data)
                     %                 data = data(PARAMS.ltsa.ch,:);
@@ -217,13 +240,13 @@ for k = 1:PARAMS.ltsa.nxwav
                     disp_msg(['k,r,n = ',num2str(k),' ',num2str(r),' ',num2str(n)])
                     data = zeros(1,nsamp);
                 end
-                
+
                 % write ltsa values
                 batchLTSA_calc_ltsa_dir(data);
             end
         end % all channels
     end % all raw files within xwav
-    
+
     fclose(PARAMS.ltsa.fid);
     fprintf('Completed processing sound file %d\n', k);
     % update loadbar

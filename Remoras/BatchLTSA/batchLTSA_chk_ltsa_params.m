@@ -3,6 +3,7 @@ function batchLTSA_chk_ltsa_params(dirs)
 global REMORA
 
 disp_msg('Check LTSA settings for each directory. To skip a directory, set tave, dfreq, ch blank.');
+disp_msg('If multichannel data, set ch to 0 to process ALL channels or select single channel by number.')
 % creates gui window to define ltsa settings
 mycolor = [.8,.8,.8];
 r = length(dirs) + 2;

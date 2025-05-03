@@ -39,10 +39,10 @@ end
 % disp_msg(['File# Raw# Ave# DataSize: ',num2str(k),'  ',num2str(r),'  ',num2str(n),'  ',num2str(dsz)])
 
 % calculate spectra
-[ltsa,freq] = pwelch(data,window,noverlap,PARAMS.ltsa.nfft,PARAMS.ltsa.fs);   % pwelch is supported psd'er
+[ltsa, freq] = pwelch(data, window, noverlap, PARAMS.ltsa.nfft, PARAMS.ltsa.fs);   % pwelch is supported psd'er
 ltsa = 10*log10(ltsa); % counts^2/Hz
 1;
 % write data
-fwrite(PARAMS.ltsa.fod,ltsa,'int8');
+fwrite(PARAMS.ltsa.fod, ltsa, 'int8');
 end
 

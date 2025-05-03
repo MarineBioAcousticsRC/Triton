@@ -50,8 +50,17 @@ if REMORA.batchLTSA.cancelled == 1; return; end
 taves = REMORA.batchLTSA.ltsa.taves;
 dfreqs = REMORA.batchLTSA.ltsa.dfreqs;
 chs = REMORA.batchLTSA.ltsa.chs;
-indirs =REMORA.batchLTSA.ltsa.indirs;
+indirs = REMORA.batchLTSA.ltsa.indirs;
 outdirs = REMORA.batchLTSA.ltsa.outdirs;
+
+% check that all chs are 1 if single channel data
+if strcmp(REMORA.batchLTSA.settings.numCh, 'single') && ...
+        any(REMORA.batchLTSA.ltsa.chs ~= 1)
+    REMORA.batchLTSA.ltsa.chs = ones(length(REMORA.batchLTSA.ltsa.chs), 1);
+    chs = REMORA.batchLTSA.ltsa.chs;
+    disp_msg('Incorrect channel specified for single channel data.')
+    disp_msg('Setting to channel 1.')
+end
 
 % % raw files to skip.
 % % * this is specific to HRPs?
@@ -82,12 +91,12 @@ for k = 1:length(indirs)
     else
         REMORA.batchLTSA.tmp.ch = chs;
     end
-    
+
     REMORA.batchLTSA.tmp.indir = char(indirs{k});
     REMORA.batchLTSA.tmp.outdir = char(outdirs{k});
-    
+
     % create the outfile and prefix
-    [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix;  
+    [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix;
 end
 
 % write to REMORA
@@ -100,13 +109,13 @@ batchLTSA_chk_filenames;
 if REMORA.batchLTSA.cancelled == 1; return; end
 outfiles = REMORA.batchLTSA.ltsa.outfiles; % write back to outfiles for below
 
-% loop through again to do filename checks 
+% loop through again to do filename checks
 for k = 1:length(indirs)
-    
+
     % make sure filenames will work
     PARAMS.ltsa.indir = REMORA.batchLTSA.ltsa.indirs{k};
     success = ck_names(prefixes{k});
-    
+
     % check to see if the ltsa file already exists
     if exist(fullfile(indirs{k}, outfiles{k}), 'file')
         choice = questdlg('LTSA file already found', 'LTSA creation', ...
@@ -125,7 +134,7 @@ for k = 1:length(indirs)
             dfreqs(k) = nan;
         end
     end
-    
+
     if ~success
         disp_msg(sprintf('Skipping LTSA creation for %s\n', prefixes{k}));
         indirs(k) = {[]};
@@ -136,7 +145,7 @@ for k = 1:length(indirs)
         taves(k) = nan;
         dfreqs(k) = nan;
     end
-    
+
 end
 
 % remove any nans and write to PARAMS
@@ -147,7 +156,7 @@ REMORA.batchLTSA.ltsa.outfiles = outfiles(~cellfun(@isempty, outfiles));
 REMORA.batchLTSA.ltsa.dirdata = dirdata(~cellfun(@isempty, dirdata));
 REMORA.batchLTSA.ltsa.taves = taves(~isnan(taves));
 REMORA.batchLTSA.ltsa.dfreqs = dfreqs(~isnan(dfreqs));
-REMORA.batchLTSA.ltsa.chs = dfreqs(~isnan(chs));
+REMORA.batchLTSA.ltsa.chs = chs(~isnan(chs));
 
 
 end
@@ -227,7 +236,7 @@ end
 if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3
     fname = files(1).name;
     dnum = wavname2dnum(fname);
-    
+
     % datenumber isn't in filenames
     if isempty(dnum); success = 0; end
 end
