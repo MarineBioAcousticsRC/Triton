@@ -98,13 +98,13 @@ REMORA.batchLTSA.ltsa.dirdata = dirdata;
 % make sure the filenames are what you want them to be
 batchLTSA_chk_filenames;
 if REMORA.batchLTSA.cancelled == 1; return; end
-outfiles = PARAMS.ltsa.outfiles; % write back to outfiles for below
+outfiles = REMORA.batchLTSA.ltsa.outfiles; % write back to outfiles for below
 
 % loop through again to do filename checks 
 for k = 1:length(indirs)
     
     % make sure filenames will work
-    PARAMS.ltsa.indir = PARAMS.ltsa.indirs{k};
+    PARAMS.ltsa.indir = REMORA.batchLTSA.ltsa.indirs{k};
     success = ck_names(prefixes{k});
     
     % check to see if the ltsa file already exists
@@ -140,13 +140,14 @@ for k = 1:length(indirs)
 end
 
 % remove any nans and write to PARAMS
-PARAMS.ltsa.indirs = indirs(~cellfun(@isempty, indirs));
-PARAMS.ltsa.outdirs = outdirs(~cellfun(@isempty, outdirs));
-PARAMS.ltsa.prefixes = prefixes(~cellfun(@isempty, prefixes));
-PARAMS.ltsa.outfiles = outfiles(~cellfun(@isempty, outfiles));
-PARAMS.ltsa.dirdata = dirdata(~cellfun(@isempty, dirdata));
-PARAMS.ltsa.taves = taves(~isnan(taves));
-PARAMS.ltsa.dfreqs = dfreqs(~isnan(dfreqs));
+REMORA.batchLTSA.ltsa.indirs = indirs(~cellfun(@isempty, indirs));
+REMORA.batchLTSA.ltsa.outdirs = outdirs(~cellfun(@isempty, outdirs));
+REMORA.batchLTSA.ltsa.prefixes = prefixes(~cellfun(@isempty, prefixes));
+REMORA.batchLTSA.ltsa.outfiles = outfiles(~cellfun(@isempty, outfiles));
+REMORA.batchLTSA.ltsa.dirdata = dirdata(~cellfun(@isempty, dirdata));
+REMORA.batchLTSA.ltsa.taves = taves(~isnan(taves));
+REMORA.batchLTSA.ltsa.dfreqs = dfreqs(~isnan(dfreqs));
+REMORA.batchLTSA.ltsa.chs = dfreqs(~isnan(chs));
 
 
 end
@@ -198,7 +199,7 @@ end
 %% check to see if the xwav/wav names are compatible with ltsa format
 function success = ck_names(prefix)
 
-global PARAMS REMORA
+global PARAMS
 
 success = 1;
 

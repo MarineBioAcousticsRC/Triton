@@ -26,19 +26,19 @@ elseif strcmp(action, 'setDataType')
     dataType = get(REMORA.fig.dataType_buttongroup.SelectedObject, 'Tag');
     REMORA.batchLTSA.settings.dataType = dataType;
 
-elseif strcmp(action,'settave')
+elseif strcmp(action, 'settave')
     tave = get(REMORA.batchLTSA_verify.taveEdTxt, 'string');
     REMORA.batchLTSA.settings.tave = tave;
 
-elseif strcmp(action,'setdfreq')
+elseif strcmp(action,' setdfreq')
     dfreq = get(REMORA.batchLTSA_verify.dfreqEdTxt, 'string');
     REMORA.batchLTSA.settings.dfreq = dfreq;
 
-elseif strcmp(action,'setNumCh')
+elseif strcmp(action, 'setNumCh')
     numCh = get(REMORA.fig.numCh_buttongroup.SelectedObject, 'Tag');
     REMORA.batchLTSA.settings.numCh = numCh;
 
-elseif strcmp(action,'setWhCh')
+elseif strcmp(action, 'setWhCh')
     whCh = get(REMORA.batchLTSA_verify.whChEdTxt, 'string');
     whCh = str2double(whCh);
     REMORA.batchLTSA.settings.whCh = whCh;

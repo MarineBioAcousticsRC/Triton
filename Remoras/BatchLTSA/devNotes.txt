@@ -33,6 +33,7 @@ _init_batch_ltsa.m
 _mk_batch_ltsa_precheck.m
 - check the input data is as is it should be and confirm ltsa settings
 - this calls another gui (batchLTSA_chk_ltsa_params.m) where settings can be updated. 
+- also calls another gui (batchLTSA_chk_filenames.m) where output file names can be modified
 - may call batchLTSA_rename_wavs.m of filenames are not all same length or lack timing info
 - this was originally included in _mk_ltsa_batch but pulled it out to make a bit easier to modify for multi-channel/not have a 300+ line function
 

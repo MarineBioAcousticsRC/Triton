@@ -40,7 +40,7 @@ btnPos = [x(3), y(end), 2*bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
     'Position', btnPos, 'Style', 'text', 'String', labelStr);
 
-fig_filenames = cell(length((REMORA.batchLTSA.ltsa.indirs), 1));
+fig_filenames = cell(length(REMORA.batchLTSA.ltsa.indirs), 1);
 
 % directory names and ed txt
 for d = 1:length(REMORA.batchLTSA.ltsa.indirs)
@@ -49,12 +49,12 @@ for d = 1:length(REMORA.batchLTSA.ltsa.indirs)
     uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
         'Position', btnPos, 'Style', 'text', 'String', labelStr,...
         'HorizontalAlign', 'left');
-    
+
     % filenames
     labelStr = REMORA.batchLTSA.ltsa.outfiles(d);
     btnPos = [x(3), y(end-d), 2*bw, bh];
     fig_filenames{d} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
-        'Style', 'edit', 'String', labelStr); 
+        'Style', 'edit', 'String', labelStr);
 end
 
 % go button
