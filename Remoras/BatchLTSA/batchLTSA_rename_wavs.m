@@ -1,13 +1,43 @@
 function ctn = batchLTSA_rename_wavs(prefix)
+% BATCHLTSA_RENAME_WAVS   Rename sound files if the filenames are not valid
+%
+%   Syntax:
+%       CTN = BATCHLTSA_RENAME_WAVS(PREFIX)
+%
+%   Description:
+%       If the BATCHLTSA_MK_BATCH_LTSA_PRECHECK flags the input wav or flac
+%       filenames as incompatible with LTSA creation (missing timestamps,
+%       timestamp is not properly formatted, or filenames are not all the 
+%       same length), this function will rename all the files using a 
+%       provided prefix and appending the correctly formatted timestamp.
+%       This only works if the files are in sequential order and have no
+%       gaps. 
+%
+%       Note: This code is not super well tested (have not had example
+%       where this was an issue) so may be buggy.
+%
+%       Originally from A.Allen/triton1.93.20190212_testWithHARPimage
+%
+%   Inputs:
+%       prefix   [string] prefix created with BATCHLTSA_GEN_PREFIX based on
+%                the input subdirectory to start each filename
+%
+%	Outputs:
+%       ctn      flag to continue or not continue through the code
+%
+%   Examples:
+%
+%   See also
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% if sound file names are not all the same length or missing timing info,
-% option to rename automatically. 
-% this only works if sound files are in consecutive order (no time gaps)
-
-% modified by S. Fregosi 2021 11 19, 
-% originally from A.Allen/triton1.93.20190212_testWithHARPimage
-
-global PARAMS REMORA
+global PARAMS % REMORA
 
 % TODO
 % PARAMS.ltsa.indir = 'G:\data\180501_ltsa_multidir_filenames';
