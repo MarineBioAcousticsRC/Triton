@@ -1,11 +1,42 @@
 function batchLTSA_init_gui
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BATCHLTSA_INIT_GUI    Creates set up GUI windo for batchLTSA remora
 %
-% batchLTSA_init_gui.m
+%   Syntax:
+%       BATCHLTSA_INIT_GUI
 %
-% Verify settings in GUI before running on entire drive.
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Description:
+%       Populates the set up GUI window with push buttons, editable text
+%       boxes, radio buttons, and informational text where a user defines
+%       the desired settings. Each interaction with the GUI calles an
+%       action in BATCHLTSA_CONTROL.
+%
+%       The GUI window includes an option to set the directory that
+%       contains sound files (either manually or using a Browse button),
+%       the raw sound file type (XWAV, WAV, or FLAC), initial broad LTSA
+%       settings (time average and frequency average; these can be modified
+%       by individual directory later), whether the data is single or
+%       multichannel, and if it is multichannel how many or which channel
+%       to create LTSAs for (can do all channels by setting to 0 or select
+%       a single channel)
+%
+%   Inputs:
+%       calls global REMORA
+%
+%	Outputs:
+%       updates global REMORA
+%
+%   Examples:
+%
+%   See also BATCHLTSA_CONTROL
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 global REMORA
 
 % button grid layouts

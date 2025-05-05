@@ -1,6 +1,32 @@
 function batchLTSA_chk_filenames
-
-% check filenames that they are what you want/expected
+% BATCHLTSA_CHK_FILENAMES   Check and/or modify output LTSA filenames
+%
+%   Syntax:
+%       BATCHLTSA_CHK_FILENAMES
+%
+%   Description:
+%       GUI window that displays the assembled LTSA output filenames (using
+%       a prefix from the directory plus the time average, frequency
+%       average, and channel (if multichannel data). The user has the
+%       option to manually modify the filenames individually. 
+%
+%   Inputs:
+%       calls global REMORA
+%
+%	Outputs:
+%       updates global REMORA
+%
+%   Examples:
+%
+%   See also
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global REMORA
 
@@ -74,7 +100,7 @@ end
 
 %% okay button
 function okay(~, ~, fig, fig_filenames)
-
+% local function to assign updated LTSA filenames after OKAY is pressed
 global REMORA
 
 % close figure and assign values

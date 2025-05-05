@@ -1,4 +1,37 @@
 function batchLTSA_mk_batch_ltsa
+% BATCHLTSA_MK_BATCH_LTSA   Create multiple LTSAs for many directories
+%
+%   Syntax:
+%       BATCHLTSA_MK_BATCH_LTSA
+%
+%   Description:
+%       Loop through multiple directories/subdirectories of audio files to
+%       create LTSAs for each directory. This calls BATCHLTSA_MK_LTSA_DIR
+%       which operates on each individual directory and provides messages
+%       to track progress. 
+%
+%       This was modified from Ann Allen 1.93.20190212. There is some
+%       lingering code/catches for trying to use the procFun/create LTSAs
+%       directly from HRPs. This is not fleshed out/tested but could be
+%       expanded on in the future. 
+%
+%   Inputs:
+%       calls global PARAMS and REMORA
+%
+%	Outputs:
+%       updates global PARAMS and REMORA
+%
+%   Examples:
+%
+%   See also BATCHLTSA_MK_LTSA_DIR
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global PARAMS REMORA
 
@@ -34,10 +67,12 @@ for k = 1:length(indirs)
         else
             fprintf('\nMaking LTSA for %s disk %s df %i\n', d.dataID, d.disk, d.df);
         end
+
         % run from procFun
     else
         % untested...
-        fprintf('\nMaking LTSA for %s disk %s df %i\n', REMORA.hrp.dataID, REMORA.hrp.disk, REMORA.hrp.dfs(k));
+        fprintf('\nMaking LTSA for %s disk %s df %i\n', REMORA.hrp.dataID, ...
+            REMORA.hrp.disk, REMORA.hrp.dfs(k));
     end
     
     % make the ltsa!

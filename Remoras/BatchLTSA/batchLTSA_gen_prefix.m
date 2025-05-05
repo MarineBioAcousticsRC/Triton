@@ -1,8 +1,36 @@
 function [prefix, ltsa_file, dirdat] = batchLTSA_gen_prefix
-
-%create a prefix and an outfile name for ltsas generated
-% this was originally in batchLTSA_mk_ltsa_batch but extracted to run as
-% own function because it used there and in precheck
+% BATCHLTSA_GEN_PREFIX  Create a prefix and filename for LTSAs to be creagted
+%
+%   Syntax:
+%       [PREFIX, LTSA_FILE, DIRDAT] = BATCHLTSA_GEN_PREFIX
+%
+%   Description:
+%       Generate a prefix to create output filenames for the LTSAs to be
+%       created. If this is XWAV data it follows a deployment/drift format
+%
+%   Inputs:
+%       calls global REMORA and PARAMS
+%
+%	Outputs:
+%       prefix     [string] or [cell array] of prefixes to start each file
+%                  name, based on input subdirectory
+%       ltsa_file  [string] or [cell array] of full LTSA filenames for each
+%                  LTSA to be made by the batch process
+%       dirdata    [string] or [cell array] of directory/disk info
+%                  following the standard HARP/xwav format. Will be empty
+%                  for wav and flac files
+%
+%   Examples:
+%
+%   See also
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global PARAMS REMORA
 

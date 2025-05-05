@@ -1,4 +1,38 @@
 function batchLTSA_chk_ltsa_params(dirs)
+% BATCHLTSA_CHK_LTSA_PARAMS   Check and/or modify settings for each LTSA
+%
+%   Syntax:
+%       BATCHLTSA_CHK_LTSA_PARAMS(DIRS)
+%
+%   Description:
+%       GUI window that displays all LTSA settings (time average, frequency
+%       average, and channel) for each of the subdirectories of audio
+%       files. They will be pre-populated with the general settings defined
+%       in the inital GUI control window but can be modified for each
+%       individual subdirectory. Instructions are printed to the Triton
+%       Message Window.
+%
+%       To skip a given directory, set any of the values to empty/blank. To
+%       process all channels of multichannel data, set the channel to 0.
+%
+%   Inputs:
+%       calls global REMORA
+%       dirs   [cell array] of input directories containing audio files
+%
+%	Outputs:
+%       updates global REMORA
+%
+%   Examples:
+%
+%   See also BATCHLTSA_MK_BATCH_LTSA_PRECHECK
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global REMORA
 
@@ -102,6 +136,8 @@ end
 
 %% okay button
 function okay(~, ~, fig, fig_taves, fig_dfreqs, fig_chs)
+% local function to assign updated LTSA settings after the OKAY button is
+% pressed
 
 global REMORA
 

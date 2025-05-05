@@ -1,10 +1,36 @@
-function batchLTSA_control(action, mySource)
+function batchLTSA_control(action)
+% BATCHLTSA_CONTROL Defines actions for batchLTSA Remora GUI
+%
+%   Syntax:
+%       BATCHLTSA_CONTROL(action)
+%
+%   Description:
+%       Triggers actions in response to changes in the GUI window setting
+%       up the batchLTSA process (batchLTSA_init_gui.m)
+%
+%   Inputs:
+%       action   output of a uicontrol call from batchLTSA_init_gui that
+%                triggers defining some setting
+%
+%   Inputs:
+%       calls global REMORA
+%
+%	Outputs:
+%       updates global REMORA
+%
+%   Examples:
+%
+%   See also BATCHLTSA_INIT_GUI
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global REMORA
-
-if ~exist('mySource','var')
-    mySource = 'null';
-end
 
 if strcmp(action, '')
     % Note: could make this have an option to just refresh everything by making

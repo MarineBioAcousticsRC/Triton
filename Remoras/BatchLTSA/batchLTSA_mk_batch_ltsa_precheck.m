@@ -1,4 +1,46 @@
 function batchLTSA_mk_batch_ltsa_precheck
+% BATCHLTSA_MK_BATCH_LTSA_PRECHECK  Run checks on batch LTSA settings
+%
+%   Syntax:
+%       BATCHLTSA_MK_BATCH_LTSA_PRECHECK
+%
+%   Description:
+%       Run a series of checks on the settings for the batch LTSA process
+%       and provide the user with options to modify or confirm these
+%       settings. 
+% 
+%       This calls two additional GUIs (BATCHLTSA_CHK_LTSA_PARAMS and 
+%       BATCHLTSA_CHK_FILENAMES) where the user can modify or confirm the 
+%       LTSA settings and output filenames. Each of these will be 
+%       predefined but the initial settings but provides flexibility if
+%       some of the directories need different settings (for example if
+%       some of the directories are decimated data) or if a directory
+%       should be skipped (by changing settings to empty).
+% 
+%       It also checks the format of the input audio files to confirm they 
+%       have valid timestamp info - if not, there is an option to batch 
+%       rename the audio files with BATCHLTSA_RENAME_WAVS. These checks are
+%       based of similar checks in the main Triton code copied here as
+%       local functions. 
+%
+%   Inputs:
+%       calls global REMORA and PARAMS
+%
+%	Outputs:
+%       updates global REMORA and PARAMS
+%
+%   Examples:
+%
+%   See also BATCHLTSA_CHK_LTSA_PARAMS BATCHLTSA_CHK_FILENAMES
+%   BATCHLTSA_RENAME_WAVS
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global PARAMS REMORA
 
@@ -43,8 +85,8 @@ REMORA.batchLTSA.ltsa.outdirs = outdirs;
 % Individual LTSA parameters
 % default is same for all directories as set in initial window, but can
 % modify by directory if desired
-% these are saved in REMORA.batchLTSA.params and will be pulled into PARAMS
-batchLTSA_chk_ltsa_params(indirs); % set taves and dfreqs
+% these are saved in REMORA.batchLTSA.ltsa and will be pulled into PARAMS
+batchLTSA_chk_ltsa_params(indirs); % set taves, dfreqs, chs
 if REMORA.batchLTSA.cancelled == 1; return; end
 % update if any were changed in check
 taves = REMORA.batchLTSA.ltsa.taves;
@@ -195,7 +237,7 @@ end
 
 
 
-%% concatenate two cell arrays cause APPARENTLY THIS ISN'T EASY IN MATLAB
+%% concatenate two cell arrays 'cause APPARENTLY THIS ISN'T EASY IN MATLAB
 function c1 = cat_cell(c1, c2)
 
 for k = 1:size(c2, 2)

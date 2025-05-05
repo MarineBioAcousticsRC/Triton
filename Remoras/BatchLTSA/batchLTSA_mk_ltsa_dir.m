@@ -1,16 +1,40 @@
 function batchLTSA_mk_ltsa_dir(lIdx)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BATCHLTSA_MK_LTSA_DIR   Create LTSA from audio files
 %
-% mk_ltsa_dir.m
+%   Syntax:
+%       BATCHLTSA_MK_LTSA_DIR(LIDX)
 %
-% make long-term spectral averages from XWAV or WAV or FLAC files in multiple
-% nested directories
+%   Description:
+%       Create an LTSA for a single directory (lIdx) of the many
+%       directories selected in the batchLTSA set up process. 
 %
-% edits made 2021 05 10 S. Fregosi to work for DASBRs/Soundtraps and latest
-% version of Triton on Github
-% udpated to part of batchLTSA remora 2021 08 11
-% fixed FLAC bug 2022 06 16
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%       This creates a single progress bar for this LTSA and will create a
+%       single LTSA output file if single channel data or only one channel
+%       being processed, but will simultaneously make LTSAs for all
+%       channels if multichannel data and all channels was specified. 
+%
+%       This was modified from Ann Allen 1.93.20190212. 
+%
+%   Inputs:
+%       calls global PARAMS and REMORA
+%       lIdx    [double] index of which LTSA (of the set to be batch
+%               processed) to make
+%
+%	Outputs:
+%       updates global PARAMS and REMORA, write to .ltsa file
+%
+%   Examples:
+%
+%   See also BATCHLTSA_CALC_LTSA_DIR
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 global PARAMS REMORA
 tic
 
