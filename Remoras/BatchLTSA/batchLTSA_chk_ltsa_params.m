@@ -36,8 +36,11 @@ function batchLTSA_chk_ltsa_params(dirs)
 
 global REMORA
 
-disp_msg('Check LTSA settings for each directory. To skip a directory, set tave, dfreq, ch blank.');
-disp_msg('If multichannel data, set ch to 0 to process ALL channels or select single channel by number.')
+disp_msg(['Check LTSA settings for each directory. To skip a directory, ', ...
+    'set tave, dfreq, ch blank.']);
+disp_msg(['If multichannel data, set ch to 0 to process ALL channels or ', ...
+    'select single channel by number.'])
+
 % creates gui window to define ltsa settings
 mycolor = [.8,.8,.8];
 r = length(dirs) + 2;
@@ -60,7 +63,8 @@ end
 
 btnPos = [0,0,w,h];
 fig = figure('Name', 'Check taves, dfreqs, chs', 'Units', 'normalized', ...
-    'Position', btnPos, 'MenuBar', 'none', 'NumberTitle', 'off');
+    'Position', btnPos, 'MenuBar', 'none', 'NumberTitle', 'off', ...
+    'CloseRequestFcn', @onClose);
 movegui(gcf, 'center');
 
 % entry labels
@@ -84,7 +88,6 @@ btnPos = [x(10), y(end), bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
     'Position', btnPos, 'Style', 'text', 'String', labelStr);
 
-
 fig_taves = cell(length(dirs), 1);
 fig_dfreqs = cell(length(dirs), 1);
 fig_chs = cell(length(dirs), 1);
@@ -96,13 +99,13 @@ for d = 1:length(dirs)
     uicontrol(fig, 'Units', 'normalized', 'BackgroundColor', mycolor,...
         'Position', btnPos, 'Style', 'text', 'String', labelStr,...
         'HorizontalAlign', 'left');
-    
+
     % tave
     labelStr = REMORA.batchLTSA.settings.tave;
     btnPos = [x(8), y(end-d), bw, bh];
     fig_taves{d} = uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
         'Style', 'edit', 'String', labelStr);
-    
+
     % dfreq
     labelStr = REMORA.batchLTSA.settings.dfreq;
     btnPos = [x(9), y(end-d), bw, bh];
@@ -116,12 +119,12 @@ for d = 1:length(dirs)
         'Style', 'edit', 'String', labelStr);
 end
 
-% go button
+% okay button
 labelStr = 'Okay';
 btnPos = [x(8), y(1), bw*3, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
     'Style', 'push', 'String', labelStr, 'Callback', ...
-    {@okay, fig, fig_taves, fig_dfreqs, fig_chs});
+    @(src, event) okay(src, event, fig, fig_taves, fig_dfreqs, fig_chs));
 
 % cancel button
 labelStr = 'Cancel';
@@ -129,7 +132,17 @@ btnPos = [x(1), y(1), bw*3, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
     'Style', 'push', 'String', labelStr, 'Callback', 'batchLTSA_control(''cancelAll'')');
 
-uiwait;
+% set flag for window close
+setappdata(fig, 'closed', false);
+
+% wait for user input
+uiwait(fig);
+
+% delete if closed by X or okay
+if ishandle(fig) && getappdata(fig, 'closed')
+    delete(fig);
+    % return;
+end
 
 end
 
@@ -138,6 +151,7 @@ end
 function okay(~, ~, fig, fig_taves, fig_dfreqs, fig_chs)
 % local function to assign updated LTSA settings after the OKAY button is
 % pressed
+% ~, ~ are src, event that aren't needed
 
 global REMORA
 
@@ -148,7 +162,7 @@ REMORA.batchLTSA.cancelled = 0;
 REMORA.batchLTSA.ltsa.taves = zeros(length(fig_taves), 1);
 REMORA.batchLTSA.ltsa.dfreqs = zeros(length(fig_dfreqs), 1);
 REMORA.batchLTSA.ltsa.chs = zeros(length(fig_chs), 1);
-for d = 1:length(fig_taves)      
+for d = 1:length(fig_taves)
     REMORA.batchLTSA.ltsa.taves(d) = str2double(get(fig_taves{d}, 'String'));
     REMORA.batchLTSA.ltsa.dfreqs(d) = str2double(get(fig_dfreqs{d}, 'String'));
     REMORA.batchLTSA.ltsa.chs(d) = str2double(get(fig_chs{d}, 'String'));
@@ -164,7 +178,20 @@ if any(dirToSkip)
     REMORA.batchLTSA.ltsa.dfreqs = REMORA.batchLTSA.ltsa.dfreqs(~dirToSkip);
     REMORA.batchLTSA.ltsa.chs = REMORA.batchLTSA.ltsa.chs(~dirToSkip);
 end
-close(fig);
+
+setappdata(fig, 'closed', true);
+uiresume(fig);
 end
 
+%% window closed
+function onClose(src, ~)
 
+global REMORA
+% treat as if cancelled
+REMORA.batchLTSA.cancelled = 1;
+
+% trigger closing figurea
+setappdata(src, 'closed', true);
+uiresume(src);  % resume execution
+
+end

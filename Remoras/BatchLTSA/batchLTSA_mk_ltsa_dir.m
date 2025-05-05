@@ -114,8 +114,11 @@ if strcmp(REMORA.batchLTSA.settings.numCh, 'multi') && PARAMS.ltsa.ch == 0
         curr_ofile = PARAMS.ltsa.outfile;
         % generate file names and write ltsa headers
         for ich = 1:nch
-            new_ofile = sprintf('%s_ch%d.ltsa', strrep(curr_ofile,'.ltsa',''), ...
-                LTSAch);
+            % clean up curr_ofile
+            curr_ofile =  strrep(curr_ofile,'.ltsa',''); 
+            curr_ofile = strrep(curr_ofile, '_ch0','');
+            % append ch# on end
+            new_ofile = sprintf('%s_ch%d.ltsa',curr_ofile, ich);
 
             PARAMS.ltsa.outfiles_ch{ich} = new_ofile;
             PARAMS.ltsa.fods(ich) = fopen(fullfile(PARAMS.ltsa.outdir, new_ofile), 'w');

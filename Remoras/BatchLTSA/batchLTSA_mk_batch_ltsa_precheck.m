@@ -7,21 +7,21 @@ function batchLTSA_mk_batch_ltsa_precheck
 %   Description:
 %       Run a series of checks on the settings for the batch LTSA process
 %       and provide the user with options to modify or confirm these
-%       settings. 
-% 
-%       This calls two additional GUIs (BATCHLTSA_CHK_LTSA_PARAMS and 
-%       BATCHLTSA_CHK_FILENAMES) where the user can modify or confirm the 
-%       LTSA settings and output filenames. Each of these will be 
+%       settings.
+%
+%       This calls two additional GUIs (BATCHLTSA_CHK_LTSA_PARAMS and
+%       BATCHLTSA_CHK_FILENAMES) where the user can modify or confirm the
+%       LTSA settings and output filenames. Each of these will be
 %       predefined but the initial settings but provides flexibility if
 %       some of the directories need different settings (for example if
 %       some of the directories are decimated data) or if a directory
 %       should be skipped (by changing settings to empty).
-% 
-%       It also checks the format of the input audio files to confirm they 
-%       have valid timestamp info - if not, there is an option to batch 
+%
+%       It also checks the format of the input audio files to confirm they
+%       have valid timestamp info - if not, there is an option to batch
 %       rename the audio files with BATCHLTSA_RENAME_WAVS. These checks are
 %       based of similar checks in the main Triton code copied here as
-%       local functions. 
+%       local functions.
 %
 %   Inputs:
 %       calls global REMORA and PARAMS
@@ -50,16 +50,15 @@ dir_name = REMORA.batchLTSA.settings.inDir;
 if dir_name == 0; disp_msg('Window closed. Exiting.'); return; end
 
 % find sound files and set dtype based on file type
-a = REMORA.batchLTSA.settings.dataType;
-if strcmp(a, 'WAV')
+if strcmp(REMORA.batchLTSA.settings.dataType, 'WAV')
     PARAMS.ltsa.ftype = 1;
     indirs = find_dirs(dir_name, '*.wav');
     PARAMS.ltsa.dtype = 4; % standard wav
-elseif strcmp(a, 'FLAC')
+elseif strcmp(REMORA.batchLTSA.settings.dataType, 'FLAC')
     PARAMS.ltsa.ftype = 3;
     indirs = find_dirs(dir_name, '*.flac');
     PARAMS.ltsa.dtype = 4; % standard wav
-elseif strcmp(a, 'XWAV')
+elseif strcmp(REMORA.batchLTSA.settings.dataType, 'XWAV')
     PARAMS.ltsa.ftype = 2;
     indirs = find_dirs(dir_name, '*.x.wav');
     PARAMS.ltsa.dtype =  1; % 1 for HRP data/xwavs
@@ -70,8 +69,12 @@ end
 
 % if there is no files...abort.
 if isempty(indirs)
-    disp_msg('No files in directory. Exiting.');
-    return
+    disp_msg(sprintf('No %s files in directory. Exiting.', ...
+        REMORA.batchLTSA.settings.dataType));
+    disp_msg('Please check your input directory or file type selection.')
+    if REMORA.batchLTSA.cancelled == 1; return; end
+    error(['No %s files in directory. Please check your input directory ', ...
+        'or file type selection. Exiting.'], REMORA.batchLTSA.settings.dataType)
 end
 
 % save output files in same locations

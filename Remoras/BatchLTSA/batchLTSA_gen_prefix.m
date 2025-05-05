@@ -96,7 +96,7 @@ if strcmp(REMORA.batchLTSA.settings.numCh, 'single')
     % processing single channel data
     ltsa_file = sprintf('%s_%ds_%dHz.ltsa', prefix, ...
         REMORA.batchLTSA.tmp.tave, REMORA.batchLTSA.tmp.dfreq);
-elseif strcmp(REMORA.batchLTSA.settings.numCh, 'multi') && REMORA.batchLTSA.tmp.ch > 0
+elseif strcmp(REMORA.batchLTSA.settings.numCh, 'multi') % && REMORA.batchLTSA.tmp.ch > 0
     % processing multichannel data - either give example with chosen single
     % channel to process or use 0 as placeholder/example
     ltsa_file = sprintf('%s_%ds_%dHz_ch%i.ltsa', prefix, ...

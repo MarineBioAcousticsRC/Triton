@@ -8,7 +8,7 @@ function batchLTSA_chk_filenames
 %       GUI window that displays the assembled LTSA output filenames (using
 %       a prefix from the directory plus the time average, frequency
 %       average, and channel (if multichannel data). The user has the
-%       option to manually modify the filenames individually. 
+%       option to manually modify the filenames individually.
 %
 %   Inputs:
 %       calls global REMORA
@@ -29,6 +29,13 @@ function batchLTSA_chk_filenames
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global REMORA
+
+disp_msg('Check output filenames. Edit as needed.');
+if strcmp(REMORA.batchLTSA.settings.numCh, 'multi') && ...
+        REMORA.batchLTSA.settings.whCh == 0
+    disp_msg(['Multichannel files with ''ch0'' will have ''0'' replaced ', ...
+        'by actual channel number.']);
+end
 
 % creates gui window check filenames
 mycolor = [.8,.8,.8];
@@ -52,7 +59,8 @@ end
 
 btnPos = [0,0,w,h];
 fig = figure('Name', 'Check LTSA filenames', 'Units', 'normalized', ...
-    'Position', btnPos, 'MenuBar', 'none', 'NumberTitle', 'off');
+    'Position', btnPos, 'MenuBar', 'none', 'NumberTitle', 'off', ...
+    'CloseRequestFcn', @onClose);
 movegui(gcf, 'center');
 
 % entry labels
@@ -83,29 +91,58 @@ for d = 1:length(REMORA.batchLTSA.ltsa.indirs)
         'Style', 'edit', 'String', labelStr);
 end
 
-% go button
+% okay button
 labelStr = 'Okay';
 btnPos = [x(3), y(1), 2*bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
-    'Style', 'push', 'String', labelStr, 'Callback', {@okay, fig, fig_filenames});
+    'Style', 'push', 'String', labelStr, 'Callback', ...
+    @(src, event) okay(src, event, fig, fig_filenames));
+
 % cancel button
 labelStr = 'Cancel';
 btnPos = [x(1), y(1), bw, bh];
 uicontrol(fig, 'Units', 'normalized', 'Position', btnPos,...
     'Style', 'push', 'String', labelStr, 'Callback','batchLTSA_control(''cancelAll'')');
 
-uiwait;
+% set flag for window close
+setappdata(fig, 'closed', false);
+
+% wait for user input
+uiwait(fig);
+
+% delete if closed by X or okay
+if ishandle(fig) && getappdata(fig, 'closed')
+    delete(fig);
 end
 
+end
 
 %% okay button
 function okay(~, ~, fig, fig_filenames)
 % local function to assign updated LTSA filenames after OKAY is pressed
+% ~, ~ are src, event that aren't needed
+
 global REMORA
 
 % close figure and assign values
 for d = 1:length(fig_filenames)
     REMORA.batchLTSA.ltsa.outfiles(d) = get(fig_filenames{d}, 'String');
 end
-close(fig);
+
+setappdata(fig, 'closed', true);
+uiresume(fig);
+
+end
+
+%% window closed
+function onClose(src, ~)
+
+global REMORA
+% treat as if cancelled
+REMORA.batchLTSA.cancelled = 1;
+
+% trigger closing figurea
+setappdata(src, 'closed', true);
+uiresume(src);  % resume execution
+
 end

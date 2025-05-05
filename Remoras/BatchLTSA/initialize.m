@@ -10,7 +10,7 @@
 %   Authors:
 %       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
 %
-%   Updated:   2025 May 04
+%   Updated:   05 May 2025
 %
 %   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,7 +18,7 @@
 global HANDLES REMORA
 
 
-REMORA.batchLTSA.menu = uimenu(HANDLES.remmenu,'Label','&Batch LTSAs',...
+REMORA.batchLTSA.menu = uimenu(HANDLES.remmenu,'Label','&Batch LTSA',...
     'Enable','on','Visible','on');
 
 % Batch create LTSAs over multiple directories

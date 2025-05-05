@@ -56,7 +56,7 @@ elseif strcmp(action, 'settave')
     tave = get(REMORA.batchLTSA_verify.taveEdTxt, 'string');
     REMORA.batchLTSA.settings.tave = tave;
 
-elseif strcmp(action,' setdfreq')
+elseif strcmp(action, 'setdfreq')
     dfreq = get(REMORA.batchLTSA_verify.dfreqEdTxt, 'string');
     REMORA.batchLTSA.settings.dfreq = dfreq;
 
@@ -71,12 +71,14 @@ elseif strcmp(action, 'setWhCh')
 
 elseif strcmp(action,'RunBatchLTSA')
     close(REMORA.fig.batchLTSA)
+    % double check - not cancelled
+    % REMORA.batchLTSA.cancelled = 0;
     batchLTSA_init_batch_ltsa;
 
 elseif strcmp(action, 'cancelAll')
     closereq();
     REMORA.batchLTSA.cancelled = 1;
-    disp_msg('Process Cancelled');
+    disp_msg('Process cancelled');
 
 end
 
