@@ -1,4 +1,46 @@
 function batchLTSA_mk_batch_ltsa_precheck
+% BATCHLTSA_MK_BATCH_LTSA_PRECHECK  Run checks on batch LTSA settings
+%
+%   Syntax:
+%       BATCHLTSA_MK_BATCH_LTSA_PRECHECK
+%
+%   Description:
+%       Run a series of checks on the settings for the batch LTSA process
+%       and provide the user with options to modify or confirm these
+%       settings.
+%
+%       This calls two additional GUIs (BATCHLTSA_CHK_LTSA_PARAMS and
+%       BATCHLTSA_CHK_FILENAMES) where the user can modify or confirm the
+%       LTSA settings and output filenames. Each of these will be
+%       predefined but the initial settings but provides flexibility if
+%       some of the directories need different settings (for example if
+%       some of the directories are decimated data) or if a directory
+%       should be skipped (by changing settings to empty).
+%
+%       It also checks the format of the input audio files to confirm they
+%       have valid timestamp info - if not, there is an option to batch
+%       rename the audio files with BATCHLTSA_RENAME_WAVS. These checks are
+%       based of similar checks in the main Triton code copied here as
+%       local functions.
+%
+%   Inputs:
+%       calls global REMORA and PARAMS
+%
+%	Outputs:
+%       updates global REMORA and PARAMS
+%
+%   Examples:
+%
+%   See also BATCHLTSA_CHK_LTSA_PARAMS BATCHLTSA_CHK_FILENAMES
+%   BATCHLTSA_RENAME_WAVS
+%
+%   Authors:
+%       S. Fregosi <selene.fregosi@gmail.com> <https://github.com/sfregosi>
+%
+%   Updated:   04 May 2025
+%
+%   Created with MATLAB ver.: 24.2.0.2740171 (R2024b) Update 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global PARAMS REMORA
 
@@ -8,19 +50,18 @@ dir_name = REMORA.batchLTSA.settings.inDir;
 if dir_name == 0; disp_msg('Window closed. Exiting.'); return; end
 
 % find sound files and set dtype based on file type
-a = REMORA.batchLTSA.settings.dataType;
-if strcmp(a, 'WAV')
+if strcmp(REMORA.batchLTSA.settings.dataType, 'WAV')
     PARAMS.ltsa.ftype = 1;
     indirs = find_dirs(dir_name, '*.wav');
     PARAMS.ltsa.dtype = 4; % standard wav
-elseif strcmp(a, 'FLAC')
+elseif strcmp(REMORA.batchLTSA.settings.dataType, 'FLAC')
     PARAMS.ltsa.ftype = 3;
     indirs = find_dirs(dir_name, '*.flac');
     PARAMS.ltsa.dtype = 4; % standard wav
-elseif strcmp(a, 'XWAV')
+elseif strcmp(REMORA.batchLTSA.settings.dataType, 'XWAV')
     PARAMS.ltsa.ftype = 2;
     indirs = find_dirs(dir_name, '*.x.wav');
-    PARAMS.ltsa.dtype =  1; % 1 for HRP data
+    PARAMS.ltsa.dtype =  1; % 1 for HRP data/xwavs
 else
     disp_msg('Window closed. Exiting.');
     return
@@ -28,26 +69,43 @@ end
 
 % if there is no files...abort.
 if isempty(indirs)
-    disp_msg('No files in directory. Exiting.');
-    return
+    disp_msg(sprintf('No %s files in directory. Exiting.', ...
+        REMORA.batchLTSA.settings.dataType));
+    disp_msg('Please check your input directory or file type selection.')
+    if REMORA.batchLTSA.cancelled == 1; return; end
+    error(['No %s files in directory. Please check your input directory ', ...
+        'or file type selection. Exiting.'], REMORA.batchLTSA.settings.dataType)
 end
 
 % save output files in same locations
 outdirs = indirs;
 
-% write to PARAMS
-PARAMS.ltsa.indirs = indirs;
-PARAMS.ltsa.outdirs = outdirs;
+% write to REMORA
+REMORA.batchLTSA.ltsa.indirs = indirs;
+REMORA.batchLTSA.ltsa.outdirs = outdirs;
 
-% LTSA parameters
+
+% Individual LTSA parameters
 % default is same for all directories as set in initial window, but can
 % modify by directory if desired
-batchLTSA_chk_ltsa_params(indirs); % set taves and dfreqs
+% these are saved in REMORA.batchLTSA.ltsa and will be pulled into PARAMS
+batchLTSA_chk_ltsa_params(indirs); % set taves, dfreqs, chs
 if REMORA.batchLTSA.cancelled == 1; return; end
-taves = PARAMS.ltsa.taves;
-dfreqs = PARAMS.ltsa.dfreqs;
-indirs = PARAMS.ltsa.indirs;
-outdirs = PARAMS.ltsa.outdirs;
+% update if any were changed in check
+taves = REMORA.batchLTSA.ltsa.taves;
+dfreqs = REMORA.batchLTSA.ltsa.dfreqs;
+chs = REMORA.batchLTSA.ltsa.chs;
+indirs = REMORA.batchLTSA.ltsa.indirs;
+outdirs = REMORA.batchLTSA.ltsa.outdirs;
+
+% check that all chs are 1 if single channel data
+if strcmp(REMORA.batchLTSA.settings.numCh, 'single') && ...
+        any(REMORA.batchLTSA.ltsa.chs ~= 1)
+    REMORA.batchLTSA.ltsa.chs = ones(length(REMORA.batchLTSA.ltsa.chs), 1);
+    chs = REMORA.batchLTSA.ltsa.chs;
+    disp_msg('Incorrect channel specified for single channel data.')
+    disp_msg('Setting to channel 1.')
+end
 
 % % raw files to skip.
 % % * this is specific to HRPs?
@@ -56,7 +114,7 @@ outdirs = PARAMS.ltsa.outdirs;
 % %     PARAMS.ltsa.rf_skip = [11716  11715];
 PARAMS.ltsa.rf_skip = [];
 
-% loop through each of the sets of directories  to set params and filenames
+% loop through each of the sets of directories to set params and filenames
 prefixes = cell(1, length(indirs));
 outfiles = cell(1, length(indirs));
 dirdata = cell(1, length(indirs));
@@ -64,40 +122,45 @@ for k = 1:length(indirs)
     % if we have different parameters for each of the dirs, adjust
     % accordingly
     if length(dfreqs) > 1
-        PARAMS.ltsa.dfreq = dfreqs(k);
+        REMORA.batchLTSA.tmp.dfreq = dfreqs(k);
     else
-        PARAMS.ltsa.dfreq = dfreqs;
+        REMORA.batchLTSA.tmp.dfreq = dfreqs;
     end
     if length(taves) > 1
-        PARAMS.ltsa.tave = taves(k);
+        REMORA.batchLTSA.tmp.tave = taves(k);
     else
-        PARAMS.ltsa.tave = taves;
+        REMORA.batchLTSA.tmp.tave = taves;
     end
-    
-    PARAMS.ltsa.indir = char(indirs{k});
-    PARAMS.ltsa.outdir = char(outdirs{k});
-    
+    if length(chs) > 1
+        REMORA.batchLTSA.tmp.ch = chs(k);
+    else
+        REMORA.batchLTSA.tmp.ch = chs;
+    end
+
+    REMORA.batchLTSA.tmp.indir = char(indirs{k});
+    REMORA.batchLTSA.tmp.outdir = char(outdirs{k});
+
     % create the outfile and prefix
-    [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix;  
+    [prefixes{k}, outfiles{k}, dirdata{k}] = batchLTSA_gen_prefix;
 end
 
-% write to PARAMS
-PARAMS.ltsa.prefixes = prefixes;
-PARAMS.ltsa.outfiles = outfiles;
-PARAMS.ltsa.dirdata = dirdata;
+% write to REMORA
+REMORA.batchLTSA.ltsa.prefixes = prefixes;
+REMORA.batchLTSA.ltsa.outfiles = outfiles;
+REMORA.batchLTSA.ltsa.dirdata = dirdata;
 
 % make sure the filenames are what you want them to be
 batchLTSA_chk_filenames;
 if REMORA.batchLTSA.cancelled == 1; return; end
-outfiles = PARAMS.ltsa.outfiles; % write back to outfiles for below
+outfiles = REMORA.batchLTSA.ltsa.outfiles; % write back to outfiles for below
 
-% loop through again to do filename checks 
+% loop through again to do filename checks
 for k = 1:length(indirs)
-    
+
     % make sure filenames will work
-    PARAMS.ltsa.indir = PARAMS.ltsa.indirs{k};
+    PARAMS.ltsa.indir = REMORA.batchLTSA.ltsa.indirs{k};
     success = ck_names(prefixes{k});
-    
+
     % check to see if the ltsa file already exists
     if exist(fullfile(indirs{k}, outfiles{k}), 'file')
         choice = questdlg('LTSA file already found', 'LTSA creation', ...
@@ -116,7 +179,7 @@ for k = 1:length(indirs)
             dfreqs(k) = nan;
         end
     end
-    
+
     if ~success
         disp_msg(sprintf('Skipping LTSA creation for %s\n', prefixes{k}));
         indirs(k) = {[]};
@@ -127,17 +190,18 @@ for k = 1:length(indirs)
         taves(k) = nan;
         dfreqs(k) = nan;
     end
-    
+
 end
 
 % remove any nans and write to PARAMS
-PARAMS.ltsa.indirs = indirs(~cellfun(@isempty, indirs));
-PARAMS.ltsa.outdirs = outdirs(~cellfun(@isempty, outdirs));
-PARAMS.ltsa.prefixes = prefixes(~cellfun(@isempty, prefixes));
-PARAMS.ltsa.outfiles = outfiles(~cellfun(@isempty, outfiles));
-PARAMS.ltsa.dirdata = dirdata(~cellfun(@isempty, dirdata));
-PARAMS.ltsa.taves = taves(~isnan(taves));
-PARAMS.ltsa.dfreqs = dfreqs(~isnan(dfreqs));
+REMORA.batchLTSA.ltsa.indirs = indirs(~cellfun(@isempty, indirs));
+REMORA.batchLTSA.ltsa.outdirs = outdirs(~cellfun(@isempty, outdirs));
+REMORA.batchLTSA.ltsa.prefixes = prefixes(~cellfun(@isempty, prefixes));
+REMORA.batchLTSA.ltsa.outfiles = outfiles(~cellfun(@isempty, outfiles));
+REMORA.batchLTSA.ltsa.dirdata = dirdata(~cellfun(@isempty, dirdata));
+REMORA.batchLTSA.ltsa.taves = taves(~isnan(taves));
+REMORA.batchLTSA.ltsa.dfreqs = dfreqs(~isnan(dfreqs));
+REMORA.batchLTSA.ltsa.chs = chs(~isnan(chs));
 
 
 end
@@ -152,18 +216,20 @@ dirs = {};
 files = dir;
 inds = find(vertcat(files.isdir));
 subdirs = {};
-subdirs_xwav = {};
 for k = 1:length(inds)
     ind = inds(k);
-    if ~strcmp(files(ind).name, '.') && ~strcmp(files(ind).name, '..')
-        subdirs{end+1} = fullfile(d, files(ind).name);
+    % skip hidden folders or system folders
+    if strcmp(files(ind).name(1), '.') || ...
+            any(strcmp(files(ind).name, {'$RECYCLE.BIN', 'System Volume Information'}))
+        continue
     end
+    subdirs{end+1} = fullfile(d, files(ind).name); %#ok<AGROW>
 end
 
-% for each subdirectory, check for xwavs and append to list of indirs
+% for each subdirectory, check for audio files and append to list of indirs
 for k = 1:size(subdirs, 2)
-    subdirs_xwav = find_dirs(subdirs{k}, ftype);
-    dirs = cat_cell(dirs, subdirs_xwav);
+    subdirs_audio = find_dirs(subdirs{k}, ftype);
+    dirs = cat_cell(dirs, subdirs_audio);
 end
 cd(d);
 if ~isempty(dir(ftype))
@@ -174,7 +240,7 @@ end
 
 
 
-%% concatenate two cell arrays cause APPARENTLY THIS ISN'T EASY IN MATLAB
+%% concatenate two cell arrays 'cause APPARENTLY THIS ISN'T EASY IN MATLAB
 function c1 = cat_cell(c1, c2)
 
 for k = 1:size(c2, 2)
@@ -187,7 +253,7 @@ end
 %% check to see if the xwav/wav names are compatible with ltsa format
 function success = ck_names(prefix)
 
-global PARAMS REMORA
+global PARAMS
 
 success = 1;
 
@@ -215,7 +281,7 @@ end
 if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3
     fname = files(1).name;
     dnum = wavname2dnum(fname);
-    
+
     % datenumber isn't in filenames
     if isempty(dnum); success = 0; end
 end

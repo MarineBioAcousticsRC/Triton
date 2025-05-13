@@ -53,7 +53,7 @@ elseif strcmp(wavType, 'flac')
     % pull relevent info that would come from rdwavhd
     info = audioinfo([PARAMS.inpath PARAMS.infile]);
     PARAMS.nch = info.NumChannels;         % Number of Channels
-    PARAMS.fs = info.SampleRate;          % Sampling Rate(samples/second)
+    PARAMS.fs = info.SampleRate;          % Sampling Rate(samples/second)    
 else
     PARAMS.ftype = 2;   % file is xwav
     rdxwavhd        % get datafile info
