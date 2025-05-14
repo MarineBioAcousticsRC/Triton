@@ -115,7 +115,7 @@ if strcmp(wavType,'wav')
     extension_size = 4;
 elseif strcmp(wavType,'flac')
     extension_size = 5;
-elseif strcmp(wavType, 'xwav')
+elseif strcmp(wavType, 'x.wav')
     extension_size = 6;
 end
 
