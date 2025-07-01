@@ -159,8 +159,6 @@ for i = 1:length(allDays)
     end
 
 
-
-
     % transfer function in dB re 1uPa
     Ptf = interp1(freq,uppc,F,'linear','extrap');
 
@@ -281,6 +279,12 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'nfft', PARAMS.ltsa.nfft);
     netcdf.putAtt(ncid, globalID, 'freq_bin_size', PARAMS.ltsa.dfreq);
     netcdf.putAtt(ncid, globalID, 'deployment', PARAMS.ltsa.deployment);
+    netcdf.putAtt(ncid, globalID, 'time_coverage_duration', 'P1D');
+    netcdf.putAtt(ncid, globalID, 'time_coverage_resolution', 'P60S');
+    netcdf.putAtt(ncid, globalID, 'date_created', datetime("today"));
+    netcdf.putAtt(ncid, globalID, 'calibration_file', datetime("today"));
+
+
 
 
 
@@ -334,16 +338,16 @@ end
 
 end
 % % 
-
-test2 = ncinfo('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc');
- PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'effort');
-  PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'xwavFile');
-  PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'time');
-%  t = datetime(PSTnc2, 'ConvertFrom', 'posixtime');
+% 
+% test2 = ncinfo('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc');
+% PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'effort');
+% PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'xwavFile');
+% PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'time');
+% t = datetime(PSTnc2, 'ConvertFrom', 'posixtime');
+% % % % 
+% % % % % % 
 % % % 
-% % % % % 
-% % 
 % test = ncinfo('D:\HMD\mbari_products_sound_level_metrics_mbari-mars_20210101-20211231_hmd_data_MARS_20210125.nc');
 % PSTnc = ncread('D:\HMD\mbari_products_sound_level_metrics_mbari-mars_20210101-20211231_hmd_data_MARS_20210125.nc', 'psd');
-
+% 
 % test3 = ncinfo('D:\HMD\onms_products_sound_level_metrics_sb03_onms_sb03_20230731-20231208_hmd_data_ONMS_SB03_20230731_7852.1.48000_20230731_DAILY_MILLIDEC_MinRes.nc');

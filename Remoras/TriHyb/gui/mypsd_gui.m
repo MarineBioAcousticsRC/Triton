@@ -238,15 +238,10 @@ uicontrol(tab2, 'Style', 'text', ...
     'ForegroundColor', textColor, ...
     'HorizontalAlignment', 'center');
 
-% Helper to create label/edit controls with browse buttons if needed
-function createField(tab, labelStr, defaultVal, ypos, hasBrowse, editWidthPx)
-    if nargin < 6
-        editWidthPx = 500;
-    end
-    if nargin < 5
-        hasBrowse = false;
-    end
-    % Normalized positions
+function createField(tab, labelStr, defaultVal, ypos, browseCallback, editWidthPx)
+    if nargin < 6, editWidthPx = 500; end
+    if nargin < 5, browseCallback = []; end
+
     labelPos = [60 / figWidthPx, ypos, 150 / figWidthPx, 28 / figHeightPx];
     editPos = [(140 + 85) / figWidthPx, ypos, editWidthPx / figWidthPx, 28 / figHeightPx];
     btnPos = [(670 + 85) / figWidthPx, ypos, 90 / figWidthPx, 28 / figHeightPx];
@@ -263,25 +258,27 @@ function createField(tab, labelStr, defaultVal, ypos, hasBrowse, editWidthPx)
         'Position', editPos, 'HorizontalAlignment', 'left', ...
         'String', defaultVal);
 
-    if hasBrowse
+    if ~isempty(browseCallback)
         uicontrol(tab, 'Style', 'pushbutton', 'String', 'Browse', ...
             'Units', 'normalized', ...
             'Position', btnPos, ...
             'BackgroundColor', buttonColor, 'ForegroundColor', buttonFontColor, ...
             'FontWeight', 'bold', ...
-            'Callback', @(~,~) browse_callback(hEdit));
+            'Callback', @(~,~) browseCallback(hEdit));
     end
 
     REMORA.mypsd.gui.(matlab.lang.makeValidName(labelStr)) = hEdit;
 end
 
-% Browse callback
-function browse_callback(editHandle)
-    dirName = uigetdir;
-    if dirName ~= 0
-        set(editHandle, 'String', dirName);
+
+function browse_tf_file(editHandle)
+    [file, path] = uigetfile('*.tf', 'Select Transfer Function File');
+    if isequal(file, 0)
+        return;
     end
+    set(editHandle, 'String', fullfile(path, file));
 end
+
 
 % Create all fields with labels, default values, and browse buttons where needed
 yCurrent = yBase;
@@ -291,7 +288,9 @@ yCurrent = yCurrent - yStep;
 createField(tab2, 'Output Directory:', 'D:\HMD', yCurrent, true);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Transfer Function File:', 'G:\Shared drives\MBARC_TF\800-899\856\856_170215_B_HARP.tf', yCurrent, true, 500);
+createField(tab2, 'Transfer Function File:', ...
+    'G:\Shared drives\MBARC_TF\800-899\856\856_170215_B_HARP.tf', ...
+    yCurrent, @browse_tf_file, 500);
 
 yCurrent = yCurrent - yStep;
 createField(tab2, 'Organization:', 'MBARC', yCurrent);
