@@ -89,7 +89,7 @@ for i = 1:length(allDays)
     minPrct_vec = nan(length(thisDayMins), 1);
     xwav_file = cell(length(thisDayMins), 1);
     tic
-    for m = 1:length(thisDayMins)
+    for m = 1:3%length(thisDayMins)
         PARAMS.minTime = thisDayMins(m);                % start of first minute to process
         PARAMS.endt = PARAMS.minTime + seconds(60);     % end time is 60 seconds later
 
@@ -279,8 +279,7 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'geospatial_bounds', pointStr);    netcdf.putAtt(ncid, globalID, 'id', char(PARAMS.ltsa.id));
     netcdf.putAtt(ncid, globalID, 'sample_rate', PARAMS.ltsa.fs);
     netcdf.putAtt(ncid, globalID, 'nfft', PARAMS.ltsa.nfft);
-        idxTF = find(PARAMS.tfFilePath == '\', 1, 'last');
-
+    idxTF = find(PARAMS.tfFilePath == '\', 1, 'last');
     netcdf.putAtt(ncid, globalID, 'transferFunction_file', PARAMS.tfFilePath(idxTF+1:end));
     netcdf.putAtt(ncid, globalID, 'freq_bin_size', PARAMS.ltsa.dfreq);
     netcdf.putAtt(ncid, globalID, 'cmd_data_type', 'TimeSeries');
@@ -338,3 +337,14 @@ end
 
 
 end
+
+
+info = ncinfo('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc')
+
+data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'psd')
+data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'time')
+data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'effort')
+data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'xwavFile')
+
+
+
