@@ -270,6 +270,13 @@ function createField(tab, labelStr, defaultVal, ypos, browseCallback, editWidthP
     REMORA.mypsd.gui.(matlab.lang.makeValidName(labelStr)) = hEdit;
 end
 
+function browse_dir(editHandle)
+    path = uigetdir('', 'Select Directory');
+    if isequal(path, 0)
+        return;
+    end
+    set(editHandle, 'String', path);
+end
 
 function browse_tf_file(editHandle)
     [file, path] = uigetfile('*.tf', 'Select Transfer Function File');
@@ -282,10 +289,10 @@ end
 
 % Create all fields with labels, default values, and browse buttons where needed
 yCurrent = yBase;
-createField(tab2, 'Input Directory:', 'Y:\CINMS\CINMS_B_49\CINMS_B_49_disk01_df100', yCurrent, true);
+createField(tab2, 'Input Directory:', 'Y:\CINMS\CINMS_B_49\CINMS_B_49_disk01_df100', yCurrent, @browse_dir);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Output Directory:', 'D:\HMD', yCurrent, true);
+createField(tab2, 'Output Directory:', 'D:\HMD', yCurrent, @browse_dir);
 
 yCurrent = yCurrent - yStep;
 createField(tab2, 'Transfer Function File:', ...
@@ -391,7 +398,7 @@ REMORA.mypsd.gui.endFreq = uicontrol(tab2, 'Style', 'edit', ...
 
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Minimum effort for minute bin (%):', '50', yCurrent, false, 90);
+createField(tab2, 'Minimum effort for minute bin (%):', '50', yCurrent, [], 90);
 
 
 %disp(fieldnames(REMORA.mypsd.gui))
