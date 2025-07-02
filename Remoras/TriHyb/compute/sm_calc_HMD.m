@@ -151,13 +151,11 @@ for i = 1:length(allDays)
 
     % if there aren't the maximum amount of minutes in this day
 
-    idxEnd = find(isnan(psd_matrix(1, :)));
-    if ~isempty(idxEnd)
-        psd_matrix = psd_matrix(:, 1:idxEnd(1) - 1);
-        time_matrix = time_matrix(1:idxEnd(1) - 1);
-        minPrct_vec = minPrct_vec(1:idxEnd(1) - 1);
-        xwav_file = xwav_file(1:idxEnd(1) - 1);
-    end
+    idxNaN = any(isnan(psd_matrix), 1);
+    psd_matrix(:, idxNaN) = [];
+    time_matrix(idxNaN) = [];
+    minPrct_vec(idxNaN) = [];
+    xwav_file(idxNaN) = [];
 
 
     % transfer function in dB re 1uPa
@@ -187,7 +185,7 @@ for i = 1:length(allDays)
     view(ax1, [0 90])
     set(ax1, 'yscale', 'log')
     colormap(ax1, cmocean('thermal'));
-    clim(ax1, [cm1 cm2])  % clim is caxis in axes
+    caxis(ax1, [cm1 cm2])  % clim is caxis in axes
     ylabel(ax1, 'Frequency (Hz)')
     xlabel(ax1, 'UTC Time (HH:MM)')
     title(ax1, [PARAMS.ltsa.organization ' ' PARAMS.ltsa.project ' ' PARAMS.ltsa.site ' ' PARAMS.ltsa.deployment ' Hybrid Millidecade ' datestr(dayStart)])
@@ -232,7 +230,6 @@ for i = 1:length(allDays)
 
 
     fclose('all');
-
 
     % Delete file if it exists (and not already open)
     if isfile(outFile)
@@ -339,12 +336,10 @@ end
 end
 
 
-info = ncinfo('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc')
-
-data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'psd')
-data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'time')
-data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'effort')
-data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'xwavFile')
-
-
+% info = ncinfo('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc')
+% 
+% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'psd')
+% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'time')
+% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'effort')
+% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'xwavFile')
 
