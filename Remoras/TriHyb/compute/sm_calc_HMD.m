@@ -279,13 +279,14 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'geospatial_bounds', pointStr);    netcdf.putAtt(ncid, globalID, 'id', char(PARAMS.ltsa.id));
     netcdf.putAtt(ncid, globalID, 'sample_rate', PARAMS.ltsa.fs);
     netcdf.putAtt(ncid, globalID, 'nfft', PARAMS.ltsa.nfft);
+        idxTF = find(PARAMS.tfFilePath == '\', 1, 'last');
+
     netcdf.putAtt(ncid, globalID, 'transferFunction_file', PARAMS.tfFilePath(idxTF+1:end));
     netcdf.putAtt(ncid, globalID, 'freq_bin_size', PARAMS.ltsa.dfreq);
     netcdf.putAtt(ncid, globalID, 'cmd_data_type', 'TimeSeries');
     netcdf.putAtt(ncid, globalID, 'time_coverage_duration', 'P1D');
     netcdf.putAtt(ncid, globalID, 'time_coverage_resolution', 'P60S');
     netcdf.putAtt(ncid, globalID, 'date_created', char(datetime("today", 'Format', 'yyyy-MM-dd')));
-    idxTF = find(PARAMS.tfFilePath == '\', 1, 'last');
 
 
     xwav_file = string(xwav_file);
