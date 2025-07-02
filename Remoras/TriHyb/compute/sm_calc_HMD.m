@@ -8,6 +8,7 @@ function sm_calc_HMD
 % TO DO:
 % - Stitch minutes with 2 xwavs together, for now, it just uses
 % beginning xwav and keeps if it has 50% of data in minute
+% - batch run all disks in deployment...
 
 
 global PARAMS
@@ -88,7 +89,7 @@ for i = 1:length(allDays)
     minPrct_vec = nan(length(thisDayMins), 1);
     xwav_file = cell(length(thisDayMins), 1);
     tic
-    for m = 1:3%length(thisDayMins)
+    for m = 1:length(thisDayMins)
         PARAMS.minTime = thisDayMins(m);                % start of first minute to process
         PARAMS.endt = PARAMS.minTime + seconds(60);     % end time is 60 seconds later
 
@@ -281,11 +282,9 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'deployment', PARAMS.ltsa.deployment);
     netcdf.putAtt(ncid, globalID, 'time_coverage_duration', 'P1D');
     netcdf.putAtt(ncid, globalID, 'time_coverage_resolution', 'P60S');
-    netcdf.putAtt(ncid, globalID, 'date_created', datetime("today"));
-    netcdf.putAtt(ncid, globalID, 'calibration_file', datetime("today"));
-
-
-
+    netcdf.putAtt(ncid, globalID, 'date_created', char(datetime("today", 'Format', 'yyyy-MM-dd')));
+    idxTF = find(PARAMS.tfFilePath == '\', 1, 'last');
+    netcdf.putAtt(ncid, globalID, 'transferFunction_file', PARAMS.tfFilePath(idxTF+1:end));
 
 
     xwav_file = string(xwav_file);
@@ -337,17 +336,12 @@ end
 
 
 end
-% % 
-% 
+
 % test2 = ncinfo('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc');
 % PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'effort');
 % PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'xwavFile');
 % PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'time');
 % t = datetime(PSTnc2, 'ConvertFrom', 'posixtime');
-% % % % 
-% % % % % % 
-% % % 
 % test = ncinfo('D:\HMD\mbari_products_sound_level_metrics_mbari-mars_20210101-20211231_hmd_data_MARS_20210125.nc');
 % PSTnc = ncread('D:\HMD\mbari_products_sound_level_metrics_mbari-mars_20210101-20211231_hmd_data_MARS_20210125.nc', 'psd');
-% 
 % test3 = ncinfo('D:\HMD\onms_products_sound_level_metrics_sb03_onms_sb03_20230731-20231208_hmd_data_ONMS_SB03_20230731_7852.1.48000_20230731_DAILY_MILLIDEC_MinRes.nc');
