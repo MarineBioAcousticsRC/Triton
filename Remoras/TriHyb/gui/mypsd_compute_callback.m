@@ -53,8 +53,9 @@ PARAMS.ltsa.comment = get(REMORA.mypsd.gui.Comment, 'String');
 PARAMS.ltsa.conventions = get(REMORA.mypsd.gui.Conventions, 'String');
 PARAMS.ltsa.creator_name = get(REMORA.mypsd.gui.Creator_Name, 'String');
 PARAMS.ltsa.creator_role = get(REMORA.mypsd.gui.Creator_Role, 'String');
+PARAMS.ltsa.creator_url = get(REMORA.mypsd.gui.Creator_URL, 'String');
+
 PARAMS.ltsa.id = get(REMORA.mypsd.gui.ID, 'String');
-PARAMS.ltsa.infoUrl = get(REMORA.mypsd.gui.Info_URL, 'String');
 PARAMS.ltsa.institution = get(REMORA.mypsd.gui.Institution, 'String');
 PARAMS.ltsa.instrument = get(REMORA.mypsd.gui.Instrument, 'String');
 PARAMS.ltsa.keywords = get(REMORA.mypsd.gui.Keywords, 'String');
@@ -63,9 +64,8 @@ PARAMS.ltsa.license = get(REMORA.mypsd.gui.License, 'String');
 PARAMS.ltsa.naming_authority = get(REMORA.mypsd.gui.Naming_Authority, 'String');
 PARAMS.ltsa.product_version = get(REMORA.mypsd.gui.Product_Version, 'String');
 PARAMS.ltsa.publisher_name = get(REMORA.mypsd.gui.Publisher_Name, 'String');
-%PARAMS.ltsa.publisher_type = get(REMORA.mypsd.gui.Publisher_Type, 'String');
+PARAMS.ltsa.publisher_url = get(REMORA.mypsd.gui.Publisher_URL, 'String');
 PARAMS.ltsa.reference = get(REMORA.mypsd.gui.Reference, 'String');
-PARAMS.ltsa.standard_name_vocabulary = get(REMORA.mypsd.gui.Standard_Name_Vocabulary, 'String');
 
 
 

@@ -259,9 +259,8 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'conventions', char(PARAMS.ltsa.conventions));
     netcdf.putAtt(ncid, globalID, 'creator_name', char(PARAMS.ltsa.creator_name));
     netcdf.putAtt(ncid, globalID, 'creator_role', char(PARAMS.ltsa.creator_role));
-    pointStr = sprintf('POINT(%0.6f %0.6f)', PARAMS.ltsa.longitude, PARAMS.ltsa.latitude);
-    netcdf.putAtt(ncid, globalID, 'geospatial_bounds', pointStr);    netcdf.putAtt(ncid, globalID, 'id', char(PARAMS.ltsa.id));
-    netcdf.putAtt(ncid, globalID, 'infoUrl', char(PARAMS.ltsa.infoUrl));
+    netcdf.putAtt(ncid, globalID, 'creator_url', char(PARAMS.ltsa.creator_url));
+    netcdf.putAtt(ncid, globalID, 'publisher_url', char(PARAMS.ltsa.publisher_url));
     netcdf.putAtt(ncid, globalID, 'institution', char(PARAMS.ltsa.institution));
     netcdf.putAtt(ncid, globalID, 'instrument', char(PARAMS.ltsa.instrument));
     netcdf.putAtt(ncid, globalID, 'keywords', char(PARAMS.ltsa.keywords));
@@ -269,22 +268,24 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'license',char( PARAMS.ltsa.license));
     netcdf.putAtt(ncid, globalID, 'naming_authority', char(PARAMS.ltsa.naming_authority));
     netcdf.putAtt(ncid, globalID, 'product_version', char(PARAMS.ltsa.product_version));
-    netcdf.putAtt(ncid, globalID, 'project', char(PARAMS.ltsa.project));
     netcdf.putAtt(ncid, globalID, 'publisher_name', char(PARAMS.ltsa.publisher_name));
-    %    netcdf.putAtt(ncid, globalID, 'publisher_type', char(PARAMS.ltsa.publisher_type));
     netcdf.putAtt(ncid, globalID, 'reference', char(PARAMS.ltsa.reference));
-    netcdf.putAtt(ncid, globalID, 'standard_name_vocabulary', char(PARAMS.ltsa.standard_name_vocabulary));
+
     netcdf.putAtt(ncid, globalID, 'organization', char(PARAMS.ltsa.organization));
+    netcdf.putAtt(ncid, globalID, 'project', char(PARAMS.ltsa.project));
     netcdf.putAtt(ncid, globalID, 'site', char(PARAMS.ltsa.site));
+    netcdf.putAtt(ncid, globalID, 'deployment', PARAMS.ltsa.deployment);
+    pointStr = sprintf('POINT(%0.6f %0.6f)', PARAMS.ltsa.longitude, PARAMS.ltsa.latitude);
+    netcdf.putAtt(ncid, globalID, 'geospatial_bounds', pointStr);    netcdf.putAtt(ncid, globalID, 'id', char(PARAMS.ltsa.id));
     netcdf.putAtt(ncid, globalID, 'sample_rate', PARAMS.ltsa.fs);
     netcdf.putAtt(ncid, globalID, 'nfft', PARAMS.ltsa.nfft);
+    netcdf.putAtt(ncid, globalID, 'transferFunction_file', PARAMS.tfFilePath(idxTF+1:end));
     netcdf.putAtt(ncid, globalID, 'freq_bin_size', PARAMS.ltsa.dfreq);
-    netcdf.putAtt(ncid, globalID, 'deployment', PARAMS.ltsa.deployment);
+    netcdf.putAtt(ncid, globalID, 'cmd_data_type', 'TimeSeries');
     netcdf.putAtt(ncid, globalID, 'time_coverage_duration', 'P1D');
     netcdf.putAtt(ncid, globalID, 'time_coverage_resolution', 'P60S');
     netcdf.putAtt(ncid, globalID, 'date_created', char(datetime("today", 'Format', 'yyyy-MM-dd')));
     idxTF = find(PARAMS.tfFilePath == '\', 1, 'last');
-    netcdf.putAtt(ncid, globalID, 'transferFunction_file', PARAMS.tfFilePath(idxTF+1:end));
 
 
     xwav_file = string(xwav_file);
@@ -336,12 +337,3 @@ end
 
 
 end
-
-% test2 = ncinfo('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc');
-% PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'effort');
-% PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'xwavFile');
-% PSTnc2 = ncread('D:\HMD\MBARC_CINMS_B_47_2kHz_YYMMDD-YYMMDD_HMD_230920.nc', 'time');
-% t = datetime(PSTnc2, 'ConvertFrom', 'posixtime');
-% test = ncinfo('D:\HMD\mbari_products_sound_level_metrics_mbari-mars_20210101-20211231_hmd_data_MARS_20210125.nc');
-% PSTnc = ncread('D:\HMD\mbari_products_sound_level_metrics_mbari-mars_20210101-20211231_hmd_data_MARS_20210125.nc', 'psd');
-% test3 = ncinfo('D:\HMD\onms_products_sound_level_metrics_sb03_onms_sb03_20230731-20231208_hmd_data_ONMS_SB03_20230731_7852.1.48000_20230731_DAILY_MILLIDEC_MinRes.nc');

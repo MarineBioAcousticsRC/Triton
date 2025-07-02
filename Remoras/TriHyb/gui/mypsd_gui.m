@@ -65,11 +65,10 @@ fontSize = 10;
 longFields = {'Title', 'Summary', 'History', 'Source', 'Acknowledgements'};
 shortFields = {
     'Citation', 'Comment', 'Conventions', 'Creator_Name', 'Creator_Role', ...
-    'Creator_URL', 'ID', 'Info_URL', 'Institution', ...
+    'Creator_URL', 'ID', 'Publisher_URL', 'Institution', ...
     'Instrument', 'Keywords', 'Keywords_Vocabulary', 'License', ...
     'Naming_Authority', 'Product_Version', ...
-    'Publisher_Name', 'Reference', ...
-    'Standard_Name_Vocabulary'
+    'Publisher_Name', 'Reference'
     };
 
 % Layout parameters (normalized relative to 900x800 px base)
@@ -171,6 +170,12 @@ for i = 1:length(shortFields)
             defaultStr = {'COARDS, CF-1.6, ACDD-1.3'};
         case 'creator_url'
             defaultStr = {'https://mbarc.ucsd.edu/'};
+        case 'naming_authority'
+            defaultStr = {'NOAA National Centers for Environmental Information'};
+        case 'publisher_url'
+            defaultStr = {'https://www.ncei.noaa.gov/products/passive-acoustic-data'};
+        case 'publisher_name'
+            defaultStr = {'NOAA National Centers for Environmental Information'};
         otherwise
             defaultStr = '';
     end
@@ -309,7 +314,7 @@ yCurrent = yCurrent - yStep;
 createField(tab2, 'Site Name:', 'B', yCurrent);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Site Location:', '[32.000, -120.000]', yCurrent);
+createField(tab2, 'Site Location:', '[dd.dddd, dd.ddd]', yCurrent);
 
 yCurrent = yCurrent - yStep;
 createField(tab2, 'Deployment #:', '47', yCurrent);
@@ -319,7 +324,7 @@ labelWidthPx = 165;
 editWidthPx = 100;
 fieldHeightPx = 28;
 xStart1Px = 60;
-xStart2Px = xStart1Px + labelWidthPx + editWidthPx + 60;  % spacing to second column
+xStart2Px = xStart1Px + labelWidthPx + editWidthPx + 60;  % 
 
 % Normalize positions
 labelWidth = labelWidthPx / figWidthPx;
@@ -402,8 +407,6 @@ createField(tab2, 'Minimum effort for minute bin (%):', '50', yCurrent, [], 90);
 
 
 %disp(fieldnames(REMORA.mypsd.gui))
-
-
 
 % Compute Button centered at bottom
 uicontrol(tab2, 'Style', 'pushbutton', ...
