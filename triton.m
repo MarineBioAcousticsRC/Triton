@@ -31,9 +31,9 @@ warning off % this is turned off for plotting messages
 global PARAMS
 
 % PARAMS.ver = '1.93.20160524';
-PARAMS.ver = '1.0 2022 06 16 github.com/sfregosi/Triton/tree/flac';
+PARAMS.ver = '1.0 2025 05 04 https://github.com/MarineBioAcousticsRC/Triton';
 disp(' ')
-disp(['         Triton version ',PARAMS.ver])
+disp(['         Triton version ', PARAMS.ver])
 
 check_path
 
