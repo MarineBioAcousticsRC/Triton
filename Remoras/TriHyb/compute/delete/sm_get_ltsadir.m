@@ -18,11 +18,13 @@ else
     PARAMS.ltsa.gen = 1;
 end
 
-if PARAMS.ltsa.ftype == 1
-    d = dir(fullfile(PARAMS.ltsa.inputDir,'*.wav'));    % wav files
-elseif PARAMS.ltsa.ftype == 2
-    d = dir(fullfile(PARAMS.ltsa.inputDir,'*.x.wav'));    % xwav files
+
+if PARAMS.ltsa.recursiveSearch == 1
+    d = dir(fullfile(PARAMS.ltsa.inputDir, '\*\', [PARAMS.ltsa.FilenamePattern_ '.x.wav']));    % xwav files
+elseif PARAMS.ltsa.recursiveSearch == 0
+    d = dir(fullfile(PARAMS.ltsa.inputDir, '*.x.wav'));    % xwav files
 end
+
 
 fn = char(d.name);      % file names in directory
 fnsz = size(fn);        % number of data files in directory

@@ -58,7 +58,7 @@ if dnum0 < ( PARAMS.start.dnum + Y2K )
     fprintf('Setting start time to BOF\n');
     dnum0 = PARAMS.start.dnum + Y2K;
     if ((abs(dnumN - (dnum0 )))*mnum2secs)/60 < 50
-        fprintf(['Less than ' num2str(PARAMS.ltsa.minPrct) '%% of minute, skipping.\n'])
+        fprintf(['Less than ' num2str(PARAMS.metadata.minPrct) '%% of minute, skipping.\n'])
         DATA = [];
         return
     end
@@ -70,7 +70,7 @@ if dnumN > ( PARAMS.end.dnum + Y2K )
     fprintf('Setting end time to EOF\n');
     dnumN = PARAMS.end.dnum + Y2K;
     if ((abs(dnumN - ( dnum0 )))*mnum2secs)/60 < 50
-        fprintf(['Less than ' num2str(PARAMS.ltsa.minPrct) '%% of minute, skipping.\n'])
+        fprintf(['Less than ' num2str(PARAMS.metadata.minPrct) '%% of minute, skipping.\n'])
         DATA = [];
         return
     end

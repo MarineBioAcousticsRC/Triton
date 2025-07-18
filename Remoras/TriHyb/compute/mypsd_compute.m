@@ -6,23 +6,25 @@ function mypsd_compute
 global PARAMS
 
 % Create output directory if needed
-if ~exist(PARAMS.ltsa.outputDir, 'dir')
-    mkdir(PARAMS.ltsa.outputDir);
+if ~exist(PARAMS.metadata.outputDir, 'dir')
+    mkdir(PARAMS.metadata.outputDir);
 end
 
-sm_get_ltsadir;
+disp('Compiling xwav files...')
+%getXWAVTimes_recur
+
+% get xwav directory to compute HMD
+%sm_get_xwav_dir_recur;
 
 % read data file headers
-sm_get_headers;
-
-if PARAMS.ltsa.gen == 0 % could not read wav file metadata
-    return
-end
+sm_get_headers_recur;
 
 % check some ltsa parameters and other stuff
-sm_ck_ltsaparams;
+%sm_ck_ltsaparams;
 
 % calculated averaged spectra
+profile on
 sm_calc_HMD
+profile viewer
 
 end

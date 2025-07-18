@@ -68,7 +68,7 @@ shortFields = {
     'Creator_URL', 'ID', 'Publisher_URL', 'Institution', ...
     'Instrument', 'Keywords', 'Keywords_Vocabulary', 'License', ...
     'Naming_Authority', 'Product_Version', ...
-    'Publisher_Name', 'Reference'
+    'Publisher_Name', 'References'
     };
 
 % Layout parameters (normalized relative to 900x800 px base)
@@ -199,7 +199,21 @@ for i = 1:length(shortFields)
         'Position', [x + label_width + 5/figWidthPx, y + 5/figHeightPx, edit_width, edit_height], ...
         'FontSize', fontSize, ...
         'HorizontalAlignment', 'left', 'String', defaultStr);
+
+
+
 end
+
+% Add "Import from CSV" button
+uicontrol(tab1, 'Style', 'pushbutton', ...
+    'String', 'Import from .csv file', ...
+    'Units', 'normalized', ...
+    'Position', [(figWidthPx/2 - 110) / figWidthPx, 10 / figHeightPx, 220 / figWidthPx, 35 / figHeightPx], ...
+    'BackgroundColor', [0.40, 0.75, 0.40], ...
+    'ForegroundColor', buttonFontColor, ...
+    'FontWeight', 'bold', ...
+    'FontSize', fontSize, ...
+    'Callback', @import_csv_callback);
 
 %% === TAB 2: HMD Controls ===
 tab2 = uitab(tabGroup, 'Title', 'Compute HMD', 'BackgroundColor', bgColor, 'Units', 'normalized');
@@ -292,9 +306,27 @@ function browse_tf_file(editHandle)
 end
 
 
+
 % Create all fields with labels, default values, and browse buttons where needed
 yCurrent = yBase;
 createField(tab2, 'Input Directory:', 'Y:\CINMS\CINMS_B_49\CINMS_B_49_disk01_df100', yCurrent, @browse_dir);
+
+% Checkbox directly above Input Directory browse button
+REMORA.mypsd.gui.recursiveSearch = uicontrol(tab2, 'Style', 'checkbox', ...
+    'String', 'Search subfolders', ...
+    'Value', 0, ...  % unchecked by default
+    'Units', 'normalized', ...
+    'Position', [(670 + 85) / figWidthPx, yBase + 28/figHeightPx + 5/figHeightPx, 160 / figWidthPx, 28 / figHeightPx], ...
+    'BackgroundColor', bgColor, ...
+    'ForegroundColor', textColor, ...
+    'FontWeight', 'bold', ...
+    'FontSize', fontSize, ...
+    'Callback', @recursiveSearchCallback);
+REMORA.mypsd.recursiveSearch = get(REMORA.mypsd.gui.recursiveSearch, 'Value');
+
+yCurrent = yCurrent - yStep;
+
+createField(tab2, 'Filename pattern:', '*df20*', yCurrent);
 
 yCurrent = yCurrent - yStep;
 createField(tab2, 'Output Directory:', 'D:\HMD', yCurrent, @browse_dir);
@@ -418,4 +450,39 @@ uicontrol(tab2, 'Style', 'pushbutton', ...
     'FontWeight', 'bold', 'FontSize', 11, ...
     'Callback', @mypsd_compute_callback);
 
+end
+
+
+function import_csv_callback(~, ~)
+    global REMORA
+
+    [file, path] = uigetfile('*.csv', 'Select Metadata CSV File');
+    if isequal(file, 0)
+        return; % User canceled
+    end
+
+    fullFile = fullfile(path, file);
+    try
+        data = readtable(fullFile, 'TextType', 'string');
+    catch ME
+        errordlg(['Failed to read file: ', ME.message], 'Import Error');
+        return;
+    end
+
+    % Loop through table variables and update GUI fields if they match
+    fieldNames = data.Properties.VariableNames;
+
+    for i = 1:length(fieldNames)
+        fieldName = matlab.lang.makeValidName(fieldNames{i});
+        if isfield(REMORA.mypsd.gui, fieldName)
+            val = data{1, i};  % Only use the first row
+            if iscell(val), val = val{1}; end
+            set(REMORA.mypsd.gui.(fieldName), 'String', val);
+        end
+    end
+
+end
+function recursiveSearchCallback(src, ~)
+    global REMORA
+    REMORA.mypsd.gui.recursiveSearchValue = get(src, 'Value');
 end
