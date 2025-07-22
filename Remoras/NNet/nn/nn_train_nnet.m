@@ -24,7 +24,7 @@ REMORA.fig.nn.training_plots = [];
 % In matlab 2018+ this should work, OR if you have a GPU, AND if you have
 % the deep learning toolbox.
 load(REMORA.nn.train_net.trainFile);
-
+%trainDataAll(:,191+200+1:(191+200+96+100)) = [];
 if ~isdir(REMORA.nn.train_net.outDir)
     mkdir(REMORA.nn.train_net.outDir)
 end
@@ -52,38 +52,19 @@ trainDataAll(isnan(trainDataAll))=0;
 
 trainTestSetInfo.standardizeAll = 1;
 if trainTestSetInfo.standardizeAll
-    trainTestSetInfo.specStd = [min(trainDataAll(:,1:trainTestSetInfo.setSpecHDim),[],'all'),mean(max(trainDataAll(:,1:trainTestSetInfo.setSpecHDim),[],2))];
-   
-    normSpec1 = trainDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
-    trainDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
-
-    ICIstart = trainTestSetInfo.setSpecHDim+1;
-    if max(trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)),[],'all')>1
-        trainTestSetInfo.iciStd = mean(max(trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)),[],2));
-        trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = ...
-            trainDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/...
-            trainTestSetInfo.iciStd(1);
-    else
-       warning('ICI appears to be already normalized to [0,1] skipping standardization')
-       trainTestSetInfo.iciStd = 1;
-    end
-    
-    wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
-    trainTestSetInfo.waveStd = std(max(trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2));
-    maxWave= max( trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
-
-    trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = trainDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./maxWave;
+    trainDataAll = nn_fn_standardize_data(trainTestSetInfo,trainDataAll);
 end
 
+trainDataAll = min(abs(trainDataAll),1);
 %trainDataAll(:,182:381)=abs(trainDataAll(:,182:381)-.5)*2;
-train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
+%train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
 %reshape(trainDataAll,[1,size(trainDataAll,2),1,...
 %    size(trainDataAll,1)]);
 %net = trainNetwork(train4D,categorical(trainLabelsAll),myNetwork,trainPrefs);
 [myNetwork, trainPrefs] = nn_build_network(trainTestSetInfo)
 
 
-net = trainNetwork(train4D,myNetwork,trainPrefs);
+net = trainnet(trainDataAll,categorical(trainLabelsAll),myNetwork,"crossentropy",trainPrefs);
 
 if min(min(trainDataAll))<-1
     normMin = -1;
@@ -95,28 +76,39 @@ fprintf('\n\n Confusion matrix:\n')
 % May need a solution for older matlabs and no toolbox. In that case, keras
 % might be the thing.
 
-[YPred,scores] = classify(net,train4D);
+scores = predict(net,trainDataAll);
+[YPred,score] = scores2label(scores,categorical(uLabels));
 
 confusionmat(YPred,categorical(trainLabelsAll))
 fprintf('\n\n\n')
 
 load(REMORA.nn.train_net.testFile,'testDataAll','testLabelsAll');
+%testDataAll(:,191+200+1:(191+200+96+100)) = [];
+
 testDataAll(isnan(testDataAll))=0;
 % testDataAll(:,182:381)=abs(testDataAll(:,182:381)-.5)*2;
 if trainTestSetInfo.standardizeAll
     normSpec1 = testDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
     testDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
     
-    wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
+    %wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
     testDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = testDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
-    maxWave= max( testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
-    testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./maxWave;
+    %maxWave= max( testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
+    testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./trainTestSetInfo.maxWave;
+
+
+    testDataAll(:,(end-neighborWidth):end) = testDataAll(:,(end-neighborWidth):end)/20;
+
 end
-test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
+%test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
+testDataAll = min(abs(testDataAll),1);
 
-[YPredTrain,scoresTrain] = classify(net,train4D);
+scoresAllTrain = predict(net,trainDataAll);
+[YPredTrain,scoresTrain] = scores2label(scoresAllTrain,categorical(uLabels));
 
-[YPredEval,scoresEval] = classify(net,test4D);
+scoresAllEval = predict(net,testDataAll);
+[YPredEval,scoresEval] = scores2label(scoresAllEval,categorical(uLabels));
+
 confusionMatrixEval = confusionmat(YPredEval,categorical(testLabelsAll));
 bestScores = max(scoresEval,[],2);
 
@@ -198,7 +190,7 @@ end
 
 REMORA.fig.nn.training_plots{4} = figure;
 clf;colormap(jet)
-set(REMORA.fig.nn.training_plots{4} ,'name', 'Misclassified Events in on Test Set')
+set(REMORA.fig.nn.training_plots{4} ,'name', 'Misclassified Events in Test Set')
 misclassSet = double(YPredEval)~=testLabelsAll;
 for iR = 1:nPlots
     thisType = double(YPredEval)==iR;
@@ -213,6 +205,25 @@ for iR = 1:nPlots
 
 end
 
+
+REMORA.fig.nn.training_plots{5} = figure;
+clf;colormap(jet)
+set(REMORA.fig.nn.training_plots{5} ,'name', 'Misclassified Events in Training Set')
+misclassSetTrain = double(YPredTrain)~=trainLabelsAll;
+bestScoresTrain = max(scoresTrain,[],2);
+
+for iR = 1:nPlots
+    thisType = double(YPredTrain)==iR;
+    misclassIdxTrain = find(thisType & misclassSetTrain);
+    [~,plotOrder] = sort(bestScoresTrain(misclassIdxTrain),'descend');
+
+    subplot(nRows,nCols,iR)
+    imagesc(trainDataAll(misclassIdxTrain(plotOrder),:)')
+    set(gca,'ydir','normal')
+    title(typeNames{iR})   
+    set(gca,'clim',[normMin,1])
+
+end
 diary off
 
 if REMORA.nn.train_net.saveFigs

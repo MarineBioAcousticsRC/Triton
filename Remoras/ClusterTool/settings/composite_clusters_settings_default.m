@@ -17,14 +17,14 @@ s.saveOutput = 1; %set to 1 to save output file and figs, else 0
 s.useSpectraTF = 1; % compare on spectra?
 s.useTimesTF = 1;
 % choose if you want to include ICI **OR** click rate in similarity calculation
-s.iciModeTF = 1; % 1 if you want to use modal ICI (time between clicks)
+s.iciModeTF = 0; % 1 if you want to use modal ICI (time between clicks)
 %OR
-s.iciDistTF = 0;% 1 if you want to compare ici distributions
+s.iciDistTF = 1;% 1 if you want to compare ici distributions
 %OR
 s.cRateTF = 0; % 1 if you want to use click rate (# of clicks per second)
 
 %%%
-s.correctForSaturation = 1; % 1 if you want to look for minor ICI peaks in 
+s.correctForSaturation = 0; % 1 if you want to look for minor ICI peaks in 
 % cases where clicking is so dense that individual ICIs are obscured. This
 % helps with dolphins, but may hurt if you are trying to pull out ships and
 % rain too. Only for modal ICI
@@ -33,8 +33,8 @@ s.linearTF = 0; % Compare spectra in linear space = 1, compare spectra in dB spa
 s.singleClusterOnly = 0; % Only use single cluster bins to train
 %%%% Distribution Pruning %%%%
 s.startFreq = 5;
-s.endFreq = 80;
-s.maxICI = .5;
+s.endFreq = 100;
+s.maxICI = 1;
 s.minICI = 0;
 
 %%%% Clustering %%%%
@@ -62,8 +62,9 @@ s.minClicks = 50; % minimum number of clicks per bin that you want to consider
 s.clusterPrune = 0;
 s.maxCWIterations = 30; % Maximum number of CW iterations
 % Number of clusterings to use for evidence accumulation
-s.N = 5; % bigger is theoretically more robust, but takes longer
-s.mergeTF = 0 ;
+s.N = 1; % bigger is theoretically more robust, but takes longer
+s.mergeTF = 0;
+
 %%%% Plotting %%%%
 s.subPlotSet = 1; % Set to 1 if you want plots with each click type as a subplot
 s.indivPlots = 0; % Set to 1 if you want separate plots for each click type

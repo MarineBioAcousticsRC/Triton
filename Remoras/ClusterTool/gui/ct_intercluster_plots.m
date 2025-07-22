@@ -49,13 +49,14 @@ for iF = 1:length(nodeSet)
     if s.normalizeSpectra
         hs = pcolor(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)');
         hs.LineStyle = 'none';
-        set(gca, 'YScale', 'log');
+        %set(gca, 'YScale', 'log');
 
     else
        hs = pcolor(1:length(nodeSet{iF}),f,Tfinal{iF,1}');
        hs.LineStyle = 'none';
        %set(gca,'clim',[-1,1])
-       set(gca, 'YScale', 'log','ylim',[min(f),max(f)]);
+       %set(gca, 'YScale', 'log','ylim',[min(f),max(f)]);
+       set(gca, 'ylim',[min(f),max(f)]);
 
     end
     set(gca,'ydir','normal')

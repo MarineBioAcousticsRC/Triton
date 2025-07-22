@@ -56,7 +56,7 @@ for iD = 1:size(typeList,1)
             clusterTimes = [clusterTimes;inFile.thisType.Tfinal{iRow,7}];
             clusterSpectra = [clusterSpectra;inFile.thisType.Tfinal{iRow,1}];
             try 
-                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}(:,1:51)];
             catch
                 nRows = size(inFile.thisType.Tfinal{iRow,2},1);
                 nCols = size(clusterICI,2)- size(inFile.thisType.Tfinal{iRow,2},2);
@@ -90,7 +90,7 @@ for iD = 1:size(typeList,1)
     fprintf('   %0.0f encounters found\n',nBouts)
 
     %% Get training set
-    trainBoutIdx = sort(randperm(nBouts,round(nBouts*(trainPercent/100))))';
+    trainBoutIdx = sort(randperm(nBouts,round(nBouts*(trainPercent))))';
     fprintf('   %0.0f train encounters selected\n',length(trainBoutIdx))
     
     % pull out training data
@@ -130,11 +130,11 @@ for iD = 1:size(typeList,1)
     %% get validation set
     if REMORA.nn.train_test_set.validationTF 
         if (nBouts-length(trainBoutIdx))<2
-            validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent/100)))))';        
+            validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent)))))';        
         else
             boutsLeft = setdiff(1:nBouts,trainBoutIdx);
             boutsLeft = boutsLeft(randperm(length(boutsLeft)));% shuffle it
-            validBoutIdx = boutsLeft(1:max(1,floor(nBouts*(validPercent/100))))';
+            validBoutIdx = boutsLeft(1:max(1,floor(nBouts*(validPercent))))';
         end
         fprintf('   %0.0f validation encounters selected\n',length(validBoutIdx))
         
@@ -145,7 +145,7 @@ for iD = 1:size(typeList,1)
         
         % randomly select desired number of events across bouts
         nBinsValid  = sum(boutSizeValid);
-        nValidExamples = round(nExamples*(round(100*(validPercent/trainPercent))/100));
+        nValidExamples = round(nExamples*validPercent);
         binIndicesValid = sort(randi(nBinsValid,1,nValidExamples));
         
         % binIndicesValid  = sort(randperm(nBinsValid,min(nExamples,nBinsValid )));
@@ -186,7 +186,7 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTest = sum(boutSizeTest);
-    nTestExamples = nExamples*round(100*(100-validPercent-trainPercent)/trainPercent)/100;
+    nTestExamples = round(nExamples*(1-validPercent-trainPercent));
 
     binIndicesTest = sort(randi(nBinsTest,1,nTestExamples));
     %binIndicesTest = sort(randperm(nBinsTest,min(nExamples,nBinsTest)));

@@ -53,12 +53,7 @@ for iBout = 1:nBouts
         else
             thisBout.MSP = [];
         end
-        % add handling for neighbor data
-        if contains([details.name],'neighborMetrics')
-            thisBout.setMaxAmpNeighbor = neighborMetrics.trainMaxAmpNeighbor(boutIdxRange,:);
-            thisBout.setPeakFrNeighbor = neighborMetrics.trainPeakFrnNeighbor(boutIdxRange,:);
-            thisBout.setICINeighbor = neighborMetrics.trainICINeighbor(boutIdxRange,:);
-        end
+
 
         % Figure out which of the randomly selected training events are in this bout
         if REMORA.nn.train_test_set.useWave

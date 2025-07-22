@@ -561,6 +561,8 @@ for iTF = 1:length(nodeSet)
     Tfinal{iTF,8} = nodeSet{iTF};% primary index of bin in
     Tfinal{iTF,9} = subOrder(nodeSet{iTF}); % subIndex of bin
     Tfinal{iTF,10} = envShape(nodeSet{iTF},:); % all mean envelope shape
+    TfinalFields = {'specNorm','dTTmatNorm','diffNormSpec','iciModes','compositeData',...
+        'fileNum','tIntMat','nodeSet','subOrder','envShape'};
 end
 bestWNodeDeg = wNodeDeg{bokIdx};
 s.barAdj = .5*mode(diff(p.barInt));%p.stIdx = 2;
@@ -591,7 +593,7 @@ if s.saveOutput
     outputDataFile = fullfile(s.outDir,[s.outputName,'_types_all']);
     fprintf('Saving data file to %s\n',outputDataFile)
     save(outputDataFile,'inputSet','nodeSet','NMIList','bokVal','bokIdx','f',...
-        'p','s','nList','ka','naiItr','isolatedSet','compositeData','Tfinal',...
+        'p','s','nList','ka','naiItr','isolatedSet','compositeData','Tfinal','TfinalFields',...
         'specNorm','dTTmatNorm','iciModes','diffNormSpec','cRateNorm','fileNumExpand',...
         'bestWNodeDeg','prunedNodeSet','tIntMat','subOrder','binIdx','inFileList',...
         'clickTimes','labelStr','TPWSList')
@@ -607,7 +609,7 @@ if s.saveOutput
         if ~exist('TPWSList','var')
             TPWSList = [];
         end
-        save(outputTypeFile,'thisType','inFileList','TPWSList')
+        save(outputTypeFile,'thisType','inFileList','TPWSList','f','p','s')
     end
 end
 

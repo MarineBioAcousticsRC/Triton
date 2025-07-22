@@ -63,6 +63,7 @@ for iFile = 1:nFiles
     if strcmp(inFile, saveFullFile)
         error('Something went wrong: Input and output names match, might overwrite. Aborting.')
     end
+
     tooFew = find([binData(:).nSpec]'< minSize);
     goodSize = find([binData(:).nSpec]'>= minSize);
     nRows = size(goodSize,1);
@@ -76,48 +77,63 @@ for iFile = 1:nFiles
 %         nInt = nInt+1;
 %     end
     tTSI = trainedNet.trainTestSetInfo;
-    if trainedNet.trainTestSetInfo.useSpectra
-        specSet = vertcat(binData(:).sumSpec);
-        specSet(tooFew,:) = [];
-        specSet= (specSet-tTSI.specStd(1))/(tTSI.specStd(2)-tTSI.specStd(1));
-    end
-    
-    if trainedNet.trainTestSetInfo.useICI
-        iciSet = vertcat(binData.dTT);
-        iciSet = iciSet./max(iciSet,[],2);
-        max0 = find(max(iciSet,[],2)>0);
-        iciSet(max0,:) = iciSet(max0,:)./(tTSI.iciStd);
-        iciSet(tooFew,:) = [];
+    specSet = vertcat(binData(:).sumSpec);
+    iciSet = vertcat(binData.dTT);
+    waveSet = vertcat(binData.envMean);
+    dataInput = [specSet,iciSet,waveSet];
 
-    end
-        
-    if trainedNet.trainTestSetInfo.useWave
-        % check for old bug where envs were averaged to a single value
-        % along wrong dimension.
-        waveLen = arrayfun(@(x) size(binData(x).envMean,2),1:numel(binData));
-        tooShort = find(waveLen ==1);
-        for iS = 1:length(tooShort)
-            binData(tooShort(iS)).envMean = ones(1,max(waveLen));
-        end
-        waveSet = vertcat(binData.envMean);
-        waveSet(tooFew,:) = [];
-        maxWave = max(waveSet,[],2);
-        waveSet= waveSet./maxWave;
-    end
-    
-    test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
-    
+    dataInputStd = nn_fn_standardize_data(trainedNet.trainTestSetInfo,dataInput);
+    % if trainedNet.trainTestSetInfo.useSpectra
+    %     specSet = vertcat(binData(:).sumSpec);
+    %     specSet(tooFew,:) = [];
+    %     %specSet = (specSet*60)+60; %TEMP!!!
+    %     specSet= (specSet-tTSI.specStd(1))/(tTSI.specStd(2)-tTSI.specStd(1));
+    % end
+    % 
+    % if trainedNet.trainTestSetInfo.useICI
+    %     iciSet = vertcat(binData.dTT);
+    %     iciSet = iciSet./max(iciSet,[],2);
+    %     max0 = find(max(iciSet,[],2)>0);
+    %     iciSet(max0,:) = iciSet(max0,:)./(tTSI.iciStd);
+    %     iciSet(tooFew,:) = [];
+    % 
+    % end
+    % 
+    % if trainedNet.trainTestSetInfo.useWave
+    %     % check for old bug where envs were averaged to a single value
+    %     % along wrong dimension.
+    %     waveLen = arrayfun(@(x) size(binData(x).envMean,2),1:numel(binData));
+    %     tooShort = find(waveLen ==1);
+    %     for iS = 1:length(tooShort)
+    %         binData(tooShort(iS)).envMean = ones(1,max(waveLen));
+    %     end
+    %     waveSet = vertcat(binData.envMean);
+    %     waveSet(tooFew,:) = [];
+    %     maxWave = max(waveSet,[],2);
+    %     waveSet= waveSet./maxWave;
+    % end
+    % 
+
+    %test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
+
     % classify
-    [predLabels,predScores] = classify(trainedNet.net,test4D);
+    dataInputStdR = reshape(dataInputStd,[1,size(dataInputStd,2),1,...
+    size(dataInputStd,1)]);
+    predScoresAll = predict(trainedNet.net,dataInputStdR);
+%    if ~isempty(excludeList)
+    [~,keepCols] = setdiff(trainedNet.typeNames,excludeList);
+    typeNames = trainedNet.typeNames;
     if ~isempty(excludeList)
-        [~,keepCols] = setdiff(trainedNet.typeNames,excludeList);
-        predScores = predScores(:,keepCols);
-        [predScoresMax,predLabels] = max(predScores,[],2);       
-    else
-        predLabels = double(predLabels);
-        predScoresMax = max(predScores,[],2);       
-
+         typeNames = typeNames(keepCols);
     end
+    predScoresAll = predScoresAll(:,keepCols);
+    [predLabels,predScoresMax] = scores2label(predScoresAll,categorical(1:length(typeNames)));
+
+    % else
+    %     predLabels = double(predLabels);
+    %     predScoresMax = max(predScores,[],2);       
+    % 
+    % end
     % map bin labels back into binData
     predLabelsExpand = nan(size([binData(:).nSpec]',1),1);
     predLabelsExpand(goodSize) = predLabels;
@@ -134,10 +150,7 @@ for iFile = 1:nFiles
     % save all the things
     netTrainingInfo = trainedNet.netTrainingInfo;
     trainTestSetInfo = trainedNet.trainTestSetInfo;
-    typeNames = trainedNet.typeNames;
-    if ~isempty(excludeList)
-         typeNames = typeNames(keepCols);
-    end
+
     save(saveFullFile,'predScoresMax','trainTestSetInfo',...
         'netTrainingInfo','classificationInfo','typeNames','binData',...
         'f','p','TPWSfilename','-v7.3')
@@ -161,7 +174,7 @@ for iFile = 1:nFiles
         set(gcf,'name', 'Bin Classifications (Intermediate)')
         for iR = 1:nPlots
             ax1 = subplot(nRows,nCols,iR);
-            idxToPlot = find(predLabels==iR);
+            idxToPlot = find(double(predLabels)==iR);
             [classScore,plotOrder] = sort(predScoresMax(idxToPlot),'descend');
             imagesc(classifiedThings(idxToPlot(plotOrder),:)')
             set(gca,'ydir','normal','clim',[0,1.8])

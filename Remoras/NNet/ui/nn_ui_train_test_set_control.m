@@ -48,11 +48,11 @@ elseif strcmp(myEvent, 'setTrainPerc')
     REMORA.nn.train_test_set.validPerc = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set.validPercEdTxt,'String'));
     
-%     if REMORA.nn.train_test_set.validPerc>1
-%         % make it a fraction if needed.
-%         REMORA.nn.train_test_set.validPerc = ...
-%             REMORA.nn.train_test_set.validPerc/100;
-%     end
+    if REMORA.nn.train_test_set.validPerc>1
+        % make it a fraction if needed.
+        REMORA.nn.train_test_set.validPerc = ...
+            REMORA.nn.train_test_set.validPerc/100;
+    end
     if REMORA.nn.train_test_set.validPerc <=0
         REMORA.nn.train_test_set.validationTF = 0;
     else
@@ -63,20 +63,20 @@ elseif strcmp(myEvent, 'setTrainSize')
     REMORA.nn.train_test_set.trainSize = ...
         str2num(get(REMORA.fig.nn.nn_train_test_set.trainSizeEdTxt,'String'));
     
-elseif strcmp(myEvent, 'setValidPerc')
-    REMORA.nn.train_test_set.validPerc = ...
-        str2num(get(REMORA.fig.nn.nn_train_test_set.validPercEdTxt,'String'));
-    
-    if REMORA.nn.train_test_set.validPerc>1
-        % make it a fraction if needed.
-        RREMORA.nn.train_test_set.validPerc = ...
-            REMORA.nn.train_test_set.validPerc/100;
-    end
-    if REMORA.nn.train_test_set.validPerc<=0
-        REMORA.nn.train_test_set.validationTF = 0;
-    else
-        REMORA.nn.train_test_set.validationTF = 1;
-    end
+% elseif strcmp(myEvent, 'setValidPerc')
+%     REMORA.nn.train_test_set.validPerc = ...
+%         str2num(get(REMORA.fig.nn.nn_train_test_set.validPercEdTxt,'String'));
+% 
+%     if REMORA.nn.train_test_set.validPerc>1
+%         % make it a fraction if needed.
+%         RREMORA.nn.train_test_set.validPerc = ...
+%             REMORA.nn.train_test_set.validPerc/100;
+%     end
+%     if REMORA.nn.train_test_set.validPerc<=0
+%         REMORA.nn.train_test_set.validationTF = 0;
+%     else
+%         REMORA.nn.train_test_set.validationTF = 1;
+%     end
     
        
 elseif strcmp(myEvent, 'setAddNoise')

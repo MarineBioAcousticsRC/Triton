@@ -58,6 +58,7 @@ if p.plotFlag && size(distClickEFull,1)<3000
     h = plot(G,'layout','force');
     uID = unique(clusterID);
     h.EdgeColor = [.9,.9,.9];
+    h.NodeLabel = {};
     for iC=1:size(uID,1)
         highlight(h, clusterID==uID(iC),'nodeColor',cList(mod(uID(iC),64)+1,:))
     end
