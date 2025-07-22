@@ -105,6 +105,11 @@ for i = 1:length(allDays)
 
         % xwav(s) associated with this day
         [~, idxRw] = find(fileStartTimes < endMin & fileEndTimes > startMin);
+        if isempty(idxRw)
+            disp(['No data for: ' char(startMin)])
+            continue
+        end
+
         overlapFileName =  PARAMS.ltsahd.fname(idxRw(1), :);
         overlapFiles = dir(fullfile(PARAMS.metadata.inputDir, '**', overlapFileName));
 
