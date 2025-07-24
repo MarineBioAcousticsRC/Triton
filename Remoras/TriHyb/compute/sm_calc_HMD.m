@@ -83,7 +83,7 @@ disp(['Creating HMD Products for ', PARAMS.metadata.project, ' ', PARAMS.metadat
 %% Processing minutely average SPL for each day
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for i = 1:length(allDays)
+for i = 34%1:length(allDays)
 
     % start and end time for day being processed
     dayStart = allDays(i);
@@ -114,7 +114,7 @@ for i = 1:length(allDays)
         overlapFiles = dir(fullfile(PARAMS.metadata.inputDir, '**', overlapFileName));
 
         thisxwavIdx = all(PARAMS.ltsahd.fname == overlapFileName, 2);
-
+        
         % compiling start and end times of this xwav
         PARAMS.raw.dnumStart = PARAMS.ltsahd.dnumStart(thisxwavIdx);
         PARAMS.raw.dvecStart = [PARAMS.ltsahd.year(thisxwavIdx); ...
@@ -142,10 +142,12 @@ for i = 1:length(allDays)
         PARAMS.end.dnum = PARAMS.raw.dnumEnd(end);
 
 
-           DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin));
 
+       % Read 1-minute chunk of data from file
+        DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin));
 
-            % Read 1-minute chunk of data from file
+        PARAMS.minPrctVecTemp = (length(DATA)/PARAMS.ltsa.fs / 60);
+
 
 
         if isempty(DATA)

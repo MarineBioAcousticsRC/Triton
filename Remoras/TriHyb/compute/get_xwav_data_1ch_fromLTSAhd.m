@@ -138,24 +138,56 @@ bin_samps = bin_B/floor(PARAMS.ltsa.nBits/8);
 
 DATA = nan(bin_samps,1);
 fid = fopen(xwav,'r');
+% 
+% if rfIdx0 == rfIdxN
+%  
+%  % skip past data we don't want in first raw file
+%         b1 = skip_samp*floor(PARAMS.ltsa.nBits/8);
+%         fseek(fid,b1,'cof');
+% 
+%         % want to read remainder of raw file
+%         nb = end_samp*floor(PARAMS.ltsa.nBits/8);
+%         s1 = 1; % start samp idx
+% elseif rfIdx0 < rfIdxN
+
+
 for rf=rfIdx0:rfIdxN
     % jump to raw file start
     fseek(fid, PARAMS.xhd.byte_loc(rf),'bof');
 
-    if rf==rfIdx0
+    % all data in 1 rawfile
+    if rfIdx0 == rfIdxN
         % skip past data we don't want in first raw file
         b1 = skip_samp*floor(PARAMS.ltsa.nBits/8);
         fseek(fid,b1,'cof');
 
-        % want to read remainder of raw file
-        nb = PARAMS.xhd.byte_length(rf)-b1;
+        % read from start loc to end loc in 1 raw file
+        nb = (end_samp - skip_samp) * floor(PARAMS.ltsa.nBits/8);
         s1 = 1; % start samp idx
-    elseif rf==rfIdxN
-        % only read the part we care about in last raw file
-        nb = end_samp*floor(PARAMS.ltsa.nBits/8);
-    else
-        % read all data
-        nb = PARAMS.xhd.byte_length(rf);
+
+    % if data times are over multiple raw files
+    elseif rfIdx0~=rfIdxN
+        if rf==rfIdx0
+            % skip past data we don't want in first raw file
+            b1 = skip_samp*floor(PARAMS.ltsa.nBits/8);
+            fseek(fid,b1,'cof');
+
+            % want to read remainder of raw file
+            nb = PARAMS.xhd.byte_length(rf)-b1;
+            s1 = 1; % start samp idx
+        elseif rf==rfIdxN
+            % only read the part we care about in last raw file
+            nb = end_samp*floor(PARAMS.ltsa.nBits/8);
+        else
+            % read all data
+            nb = PARAMS.xhd.byte_length(rf);
+        end
+    end
+
+
+    if nb < 0
+        disp('Buffer wrap around or sync loss is causing missing data in this rawfile, skipping to the next rawfile.')
+        continue
     end
 
     nr = nb/floor(PARAMS.ltsa.nBits/8);
@@ -168,8 +200,6 @@ fclose(fid);
 naIdx = find(isnan(DATA),1,'first');
 DATA(naIdx:end) = [];
 
-
-PARAMS.minPrctVecTemp = ((abs(dnumN - ( dnum0 )))*mnum2secs)/60;
 
 
 if ~isempty(naIdx)
