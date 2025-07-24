@@ -12,6 +12,7 @@ if isfield(REMORA.fig.nn, 'training_plots') && ~isempty(REMORA.fig.nn.training_p
         end
     end
 end
+
 % having trouble closing confusion matrices, so do this instead.
 figList = get(groot, 'Children');
 confusionFigs = find(~cellfun(@isempty,strfind({figList(:).Name},'plotconfusion')));
@@ -24,7 +25,7 @@ REMORA.fig.nn.training_plots = [];
 % In matlab 2018+ this should work, OR if you have a GPU, AND if you have
 % the deep learning toolbox.
 load(REMORA.nn.train_net.trainFile);
-%trainDataAll(:,191+200+1:(191+200+96+100)) = [];
+
 if ~isdir(REMORA.nn.train_net.outDir)
     mkdir(REMORA.nn.train_net.outDir)
 end
@@ -46,23 +47,23 @@ uLabelWeights = round(max(labelOccurence)./labelOccurence);
 
 REMORA.nn.train_net.labelWeights = uLabelWeights;
 
-
 fprintf('\n\n\n')
 trainDataAll(isnan(trainDataAll))=0;
 
 trainTestSetInfo.standardizeAll = 1;
 if trainTestSetInfo.standardizeAll
-    trainDataAll = nn_fn_standardize_data(trainTestSetInfo,trainDataAll);
-end
+    % update trainTestSetInfo with training set-derived values for
+    % standardization.
+     [trainDataAll,trainTestSetInfo] = nn_fn_standardize_data(trainTestSetInfo,trainDataAll, 1);
+end 
+%trainDataAll = min(abs(trainDataAll),1);
 
-trainDataAll = min(abs(trainDataAll),1);
 %trainDataAll(:,182:381)=abs(trainDataAll(:,182:381)-.5)*2;
-%train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
+% train4D = table(mat2cell(trainDataAll,ones(size(trainDataAll,1),1)),categorical(trainLabelsAll));
 %reshape(trainDataAll,[1,size(trainDataAll,2),1,...
 %    size(trainDataAll,1)]);
 %net = trainNetwork(train4D,categorical(trainLabelsAll),myNetwork,trainPrefs);
-[myNetwork, trainPrefs] = nn_build_network(trainTestSetInfo)
-
+[myNetwork, trainPrefs] = nn_build_network(trainTestSetInfo);
 
 net = trainnet(trainDataAll,categorical(trainLabelsAll),myNetwork,"crossentropy",trainPrefs);
 
@@ -83,31 +84,21 @@ confusionmat(YPred,categorical(trainLabelsAll))
 fprintf('\n\n\n')
 
 load(REMORA.nn.train_net.testFile,'testDataAll','testLabelsAll');
-%testDataAll(:,191+200+1:(191+200+96+100)) = [];
-
 testDataAll(isnan(testDataAll))=0;
 % testDataAll(:,182:381)=abs(testDataAll(:,182:381)-.5)*2;
 if trainTestSetInfo.standardizeAll
-    normSpec1 = testDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
-    testDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
-    
-    %wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
-    testDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = testDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
-    %maxWave= max( testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
-    testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = testDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./trainTestSetInfo.maxWave;
-
-
-    testDataAll(:,(end-neighborWidth):end) = testDataAll(:,(end-neighborWidth):end)/20;
-
+    [testDataAll,~] = nn_fn_standardize_data(trainTestSetInfo,testDataAll,0);
 end
-%test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
-testDataAll = min(abs(testDataAll),1);
+% test4D = table(mat2cell(testDataAll,ones(size(testDataAll,1),1)),categorical(testLabelsAll));
+% testDataAll = min(abs(testDataAll),1);
 
 scoresAllTrain = predict(net,trainDataAll);
 [YPredTrain,scoresTrain] = scores2label(scoresAllTrain,categorical(uLabels));
 
 scoresAllEval = predict(net,testDataAll);
 [YPredEval,scoresEval] = scores2label(scoresAllEval,categorical(uLabels));
+%[YPredTrain,scoresTrain] = classify(net,train4D);
+%[YPredEval,scoresEval] = classify(net,test4D);
 
 confusionMatrixEval = confusionmat(YPredEval,categorical(testLabelsAll));
 bestScores = max(scoresEval,[],2);
@@ -123,7 +114,6 @@ elseif contains(filenameStem,'_det_train')
     REMORA.nn.train_net.networkFilename = fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_trainedNetwork_det.mat']);
     REMORA.nn.train_net.evalResultsFilename =  fullfile(REMORA.nn.train_net.outDir,[filenameStem,'_evalScores_det.mat']);
 end
-
 netTrainingInfo =  REMORA.nn.train_net.trainFile;
 save(REMORA.nn.train_net.networkFilename,'net','netTrainingInfo','trainTestSetInfo','typeNames','trainPrefs')
 save(REMORA.nn.train_net.evalResultsFilename,'confusionMatrixEval','YPredEval',...
@@ -204,7 +194,6 @@ for iR = 1:nPlots
     set(gca,'clim',[normMin,1])
 
 end
-
 
 REMORA.fig.nn.training_plots{5} = figure;
 clf;colormap(jet)

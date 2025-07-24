@@ -79,10 +79,11 @@ for iFile = 1:nFiles
     tTSI = trainedNet.trainTestSetInfo;
     specSet = vertcat(binData(:).sumSpec);
     iciSet = vertcat(binData.dTT);
+    iciSet = iciSet(:,1:51);
     waveSet = vertcat(binData.envMean);
     dataInput = [specSet,iciSet,waveSet];
 
-    dataInputStd = nn_fn_standardize_data(trainedNet.trainTestSetInfo,dataInput);
+    [dataInputStd,~ ] = nn_fn_standardize_data(trainedNet.trainTestSetInfo,dataInput(goodSize,:),0);
     % if trainedNet.trainTestSetInfo.useSpectra
     %     specSet = vertcat(binData(:).sumSpec);
     %     specSet(tooFew,:) = [];
@@ -117,9 +118,9 @@ for iFile = 1:nFiles
     %test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
 
     % classify
-    dataInputStdR = reshape(dataInputStd,[1,size(dataInputStd,2),1,...
-    size(dataInputStd,1)]);
-    predScoresAll = predict(trainedNet.net,dataInputStdR);
+    % dataInputStdR = reshape(dataInputStd,[1,size(dataInputStd,2),1,...
+    % size(dataInputStd,1)]);
+    predScoresAll = predict(trainedNet.net,dataInputStd);
 %    if ~isempty(excludeList)
     [~,keepCols] = setdiff(trainedNet.typeNames,excludeList);
     typeNames = trainedNet.typeNames;
@@ -152,13 +153,13 @@ for iFile = 1:nFiles
     trainTestSetInfo = trainedNet.trainTestSetInfo;
 
     save(saveFullFile,'predScoresMax','trainTestSetInfo',...
-        'netTrainingInfo','classificationInfo','typeNames','binData',...
+        'netTrainingInfo','classificationInfo','typeNames','binData','predScoresAll',...
         'f','p','TPWSfilename','-v7.3')
     fprintf('Done with file %0.0f of %0.0f: %s\n',iFile, nFiles,inFile)
     % should we plot here?
 
     if REMORA.nn.classify.intermedPlotCheck
-        classifiedThings  = [specSet,iciSet,waveSet];
+        classifiedThings  = dataInputStd;
         nPlots = length(typeNames);
         nRows = 3;
         nCols = ceil(nPlots/nRows);

@@ -90,6 +90,9 @@ for iD = 1:size(typeList,1)
     fprintf('   %0.0f encounters found\n',nBouts)
 
     %% Get training set
+    if trainPercent>1
+        trainPercent = trainPercent/100;
+    end
     trainBoutIdx = sort(randperm(nBouts,round(nBouts*(trainPercent))))';
     fprintf('   %0.0f train encounters selected\n',length(trainBoutIdx))
     
@@ -100,6 +103,9 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTrain = sum(boutSizeTrain);
+    if nBinsTrain ==0
+        error('Problem finding data. Check input base folder and wildcard. Use \**\ to search subfolders')
+    end
     binIndicesTrain = sort(randi(nBinsTrain,1,nExamples));
     
     
@@ -129,6 +135,9 @@ for iD = 1:size(typeList,1)
     
     %% get validation set
     if REMORA.nn.train_test_set.validationTF 
+        if validPercent>1
+            validPercent = validPercent/100;
+        end
         if (nBouts-length(trainBoutIdx))<2
             validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent)))))';        
         else

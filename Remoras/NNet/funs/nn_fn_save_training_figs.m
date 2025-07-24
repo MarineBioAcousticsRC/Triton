@@ -24,9 +24,7 @@ REMORA.fig.nn.training_plots{8} = h(trainFig);
 try
     saveas(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.png']))
 catch
-    disp('couldn''t save progress png')
-    
+    disp('error saving figure')%exportgraphics(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.jpg']),'ContentType','auto')    
 end
-saveas(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.fig']))
 
 disp('Done saving figs')

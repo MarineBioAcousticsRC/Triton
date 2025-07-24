@@ -37,21 +37,11 @@ if REMORA.nn.train_test_set.validationTF
     end
     vD = load(REMORA.nn.train_net.validFile);
     %vD.validDataAll(:,191+200+1:(191+200+96+100)) = [];
-
+    validData = vD.validDataAll;
     if trainTestSetInfo.standardizeAll
-        normSpec1 = vD.validDataAll(:,1:trainTestSetInfo.setSpecHDim)-trainTestSetInfo.specStd(1);
-        vD.validDataAll(:,1:trainTestSetInfo.setSpecHDim) = normSpec1./(trainTestSetInfo.specStd(2)-trainTestSetInfo.specStd(1));
-        ICIstart = trainTestSetInfo.setSpecHDim+1;
-        vD.validDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1)) = vD.validDataAll(:,ICIstart:(ICIstart+trainTestSetInfo.setICIHDim-1))/trainTestSetInfo.iciStd(1);
-        wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
-        %tsMax = max(vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
-        vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)) = vD.validDataAll(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1))./trainTestSetInfo.maxWave;
-        neighborWidth = size(vD.validDataAll,2)-trainTestSetInfo.setWaveHDim-...
-            trainTestSetInfo.setICIHDim-trainTestSetInfo.setSpecHDim;
-        vD.validDataAll(:,(end-neighborWidth):end) = vD.validDataAll(:,(end-neighborWidth):end)/20;
-
+        [validData,~] = nn_fn_standardize_data(trainTestSetInfo,validData, 0);
     end
-    vD.validDataAll = min(abs(vD.validDataAll),1);
+    % vD.validDataAll = min(abs(validData),1);
 
     % validation4D = table(mat2cell(vD.validDataAll,...
     %     ones(size(vD.validDataAll,1),1)),categorical(vD.validLabelsAll));
