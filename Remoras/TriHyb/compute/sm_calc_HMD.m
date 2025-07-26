@@ -83,7 +83,7 @@ disp(['Creating HMD Products for ', PARAMS.metadata.project, ' ', PARAMS.metadat
 %% Processing minutely average SPL for each day
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for i = 34%1:length(allDays)
+for i = 1:length(allDays)
 
     % start and end time for day being processed
     dayStart = allDays(i);
@@ -143,9 +143,10 @@ for i = 34%1:length(allDays)
 
 
 
-       % Read 1-minute chunk of data from file
+        % Read 1-minute chunk of data from file
         DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin));
 
+        % Calculating percent effort in this minute
         PARAMS.minPrctVecTemp = (length(DATA)/PARAMS.ltsa.fs / 60);
 
 
