@@ -132,8 +132,10 @@ for i = 1:length(allDays)
             PARAMS.ltsahd.hour(thisxwavIdx), ...
             PARAMS.ltsahd.minute(thisxwavIdx), ...
             PARAMS.ltsahd.secs(thisxwavIdx) ...
-            ) + seconds(75.9995) ...
+            ) + seconds(PARAMS.ltsahd.byte_length(thisxwavIdx) / ((PARAMS.ltsa.nBits/8) * PARAMS.ltsahd.sample_rate(thisxwavIdx))) ...
             );
+
+
 
         PARAMS.raw.dnumEnd = datenum(PARAMS.raw.dvecEnd)';
         PARAMS.xhd.byte_loc = PARAMS.ltsahd.byte_loc(thisxwavIdx);
@@ -147,7 +149,7 @@ for i = 1:length(allDays)
         DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin));
 
         % Calculating percent effort in this minute
-        PARAMS.minPrctVecTemp = (length(DATA)/PARAMS.ltsa.fs / 60);
+        PARAMS.minPrctVecTemp = round((length(DATA)/PARAMS.ltsa.fs / 60));
 
 
 

@@ -51,7 +51,6 @@ else
 end
 
 
-1;
 % a lil sanity check doesn't hurt anybody
 if dnum0 < ( PARAMS.start.dnum + Y2K )
     fprintf('Start time is before XWAV start!\n')
@@ -117,15 +116,12 @@ if rfIdxN < rfIdx0
     DATA = [];
     return;
 end
-% skip_samp = ceil(skip_s * PARAMS.fs)-1;
+
+
 skip_samp = round(skip_s * PARAMS.ltsa.fs);
 % bytes to skip from start of file
 start_B = PARAMS.xhd.byte_loc(rfIdx0) + skip_samp * floor(PARAMS.ltsa.nBits/8);
-% fprintf('skip_s = %f,\tskip_samp = %d,\tskip_B = %d\n', ...
-%     skip_s, skip_samp, skip_B);
 
-
-% end_samp = ceil(end_s*PARAMS.fs)-1;
 end_samp = round(end_s*PARAMS.ltsa.fs);
 end_B = PARAMS.xhd.byte_loc(rfIdxN) + end_samp*floor(PARAMS.ltsa.nBits/8);
 
@@ -133,23 +129,15 @@ end_B = PARAMS.xhd.byte_loc(rfIdxN) + end_samp*floor(PARAMS.ltsa.nBits/8);
 bin_B = end_B-start_B;
 bin_samps = bin_B/floor(PARAMS.ltsa.nBits/8);
 
+
 % fprintf('end_s = %f,\tend_samp = %d,\tend_B = %d\n\n', ...
 %     end_s, end_samp, end_B);
 
 DATA = nan(bin_samps,1);
 fid = fopen(xwav,'r');
-% 
-% if rfIdx0 == rfIdxN
-%  
-%  % skip past data we don't want in first raw file
-%         b1 = skip_samp*floor(PARAMS.ltsa.nBits/8);
-%         fseek(fid,b1,'cof');
-% 
-%         % want to read remainder of raw file
-%         nb = end_samp*floor(PARAMS.ltsa.nBits/8);
-%         s1 = 1; % start samp idx
-% elseif rfIdx0 < rfIdxN
+dataIdx = 1;
 
+bytesPerSample = floor(PARAMS.ltsa.nBits / 8);
 
 for rf=rfIdx0:rfIdxN
     % jump to raw file start
@@ -160,43 +148,35 @@ for rf=rfIdx0:rfIdxN
         % skip past data we don't want in first raw file
         b1 = skip_samp*floor(PARAMS.ltsa.nBits/8);
         fseek(fid,b1,'cof');
-
         % read from start loc to end loc in 1 raw file
-        nb = (end_samp - skip_samp) * floor(PARAMS.ltsa.nBits/8);
-        s1 = 1; % start samp idx
+        nb = (end_samp - skip_samp) * bytesPerSample;
 
-    % if data times are over multiple raw files
-    elseif rfIdx0~=rfIdxN
-        if rf==rfIdx0
-            % skip past data we don't want in first raw file
-            b1 = skip_samp*floor(PARAMS.ltsa.nBits/8);
-            fseek(fid,b1,'cof');
+    elseif rf == rfIdx0
+        % First raw file in a multi-file segment
+        b1 = skip_samp * bytesPerSample;
+        fseek(fid, b1, 'cof');
+        nb = PARAMS.xhd.byte_length(rf) - b1;
+    elseif rf == rfIdxN
+        % Final raw file in a multi-file segment
+        nb = end_samp * bytesPerSample;
 
-            % want to read remainder of raw file
-            nb = PARAMS.xhd.byte_length(rf)-b1;
-            s1 = 1; % start samp idx
-        elseif rf==rfIdxN
-            % only read the part we care about in last raw file
-            nb = end_samp*floor(PARAMS.ltsa.nBits/8);
-        else
-            % read all data
-            nb = PARAMS.xhd.byte_length(rf);
-        end
+    else
+        % Fully included raw file in between
+        nb = PARAMS.xhd.byte_length(rf);
     end
 
-
     if nb < 0
-        disp('Buffer wrap around or sync loss is causing missing data in this rawfile, skipping to the next rawfile.')
+        disp('Buffer wrap around or sync loss is causing missing data in this rawfile, skipping to the next rawfile.');
         continue
     end
 
-    nr = nb/floor(PARAMS.ltsa.nBits/8);
-    s2 = s1+nr-1;
-    DATA(s1:s2) = fread(fid, nr, dtype);
-    s1 = s2+1;
-end
-fclose(fid);
+    nr = nb / bytesPerSample;
+    DATA(dataIdx:dataIdx + nr - 1) = fread(fid, nr, dtype);
+    dataIdx = dataIdx + nr;
 
+end
+
+fclose(fid);
 naIdx = find(isnan(DATA),1,'first');
 DATA(naIdx:end) = [];
 
