@@ -322,7 +322,8 @@ REMORA.mypsd.gui.recursiveSearch = uicontrol(tab2, 'Style', 'checkbox', ...
     'FontWeight', 'bold', ...
     'FontSize', fontSize, ...
     'Callback', @recursiveSearchCallback);
-REMORA.mypsd.recursiveSearch = get(REMORA.mypsd.gui.recursiveSearch, 'Value');
+REMORA.mypsd.gui.recursiveSearchValue = 0;  % initialize
+
 
 yCurrent = yCurrent - yStep;
 
