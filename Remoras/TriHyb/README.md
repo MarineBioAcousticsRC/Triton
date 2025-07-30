@@ -6,10 +6,9 @@
 
 ## 🚀 Key Features
 
-- Computes **minutely power spectral density (PSD)** data.
+- Computes **minutely hybrid-millidecade** (HMD) soundscape products.
 - Generates **daily netCDF** files for long-term acoustic archives.
 - Provides visualization-ready data products.
-- Supports flexible **frequency band selection** (e.g., 10–4000 Hz).
 - Built-in GUI tabs for **metadata entry** and **HMD computation**.
 - Integrated as a **Remora** within the Triton PAM software suite.
 
@@ -17,8 +16,8 @@
 
 ## 🧭 Use Cases
 
-- Identify sound sources (e.g., ships, marine mammals, fish, environmental noise).
 - Study temporal trends in underwater soundscapes.
+- Identify sound sources (e.g., ships, marine mammals, fish, environmental noise).
 - Compare soundscapes across different sites and deployments.
 - Quantify acoustic habitat conditions and anthropogenic impact.
 
@@ -94,17 +93,9 @@ Check **"Search Subfolders"** to include multiple disks in a deployment.
 
 ![Spectrogram Example](https://github.com/miguelgonzalez12/Remora-wiki-draft-/blob/main/IMG_1249.png)
 
-- **Box A:** PSD colorbar  
+- **Box A:** Power spectral density colorbar  
 - **Box B:** Ship noise  
 - **Box C:** Whale calls
-
----
-
-**Figure 2 – Example of high ship traffic day:**
-
-![Ship Day](https://github.com/miguelgonzalez12/Remora-wiki-draft-/blob/main/031724spectragraph.PNG)
-
-- On March 27, 2024, ~11 ships passed in the Santa Barbara Channel adjacent to the Channel Islands National Marine Sanctuary.
 
 ---
 
