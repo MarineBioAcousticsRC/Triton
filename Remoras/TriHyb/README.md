@@ -30,9 +30,6 @@
 
 Clone the Triton repository and the TriHyb Remora:
 
-```bash
-git clone https://github.com/MarineBioAcousticsRC/Triton.git
-
 Then, place the TriHyb Remora inside the `Remoras/` directory of Triton.
 
 ### 2. Add TriHyb to Triton
