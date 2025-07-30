@@ -61,45 +61,24 @@ Enter metadata about your deployment, or click **"Import from .xlsx file"** to a
 - `Instrument`, `Naming Authority`, `Keywords Vocabulary`  
 - `ID`, `Comment`, `Product Version`
 
-**CSV format example:**
-
-![CSV Example](https://github.com/miguelgonzalez12/Remora-wiki-draft-/blob/main/Meta_data1029.PNG)
-
 ---
 
 ### ⚙️ Compute HMD Tab
 
 Configure the HMD processing options:
-
-- **Input Directory:** Folder containing WAV/XWAV data  
-- **Filename Pattern:** Optional filter  
-- **Output Directory:** Destination folder for output  
-- **Transfer Function File (.tf):** Instrument calibration  
-- **Organization**, **Project**, **Site Name**, **Site Location**  
-- **Deployment #:** e.g., `CINMS_B_49`  
-- **Start/End Date (YYMMDD)**  
-- **Start/End Frequency (Hz)**  
-- **Minimum Effort for Minute Bin (%)**
+- `Input Directory`, `Filename Pattern`, `Output Directory`,
+- `Transfer Function File`, `Organization`, `Deployment`  
+- `Start Date`, `End Date`, `Start Frequency`, `End Frequency`  
+- `Project`, `Site Name`, `Site Location`  
+- `Start Frequency`, `End Frequency`  
+- `Minimum Effort for Minute Bin`
 
 Check **"Search Subfolders"** to include multiple disks in a deployment.
 
 ---
 
-## 📊 Example Outputs
-
-### Spectrograms
-
-**Figure 1 – Example spectrogram with ship and whale sounds:**
-
-![Spectrogram Example](https://github.com/miguelgonzalez12/Remora-wiki-draft-/blob/main/IMG_1249.png)
-
-- **Box A:** Power spectral density colorbar  
-- **Box B:** Ship noise  
-- **Box C:** Whale calls
-
----
-
 ## 🤝 Acknowledgments
+
 
 Developed by the **Marine Bioacoustics Research Collaborative** with support from NOAA, National Marine Sanctuary Foundation, and the HARP - NCEI working group.
 
