@@ -17,8 +17,6 @@ sm_get_headers_recur;
 
 
 % calculated averaged spectra
-profile on
 sm_calc_HMD
-profile viewer
 
 end

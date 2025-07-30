@@ -171,11 +171,7 @@ for i = 1:length(allDays)
 
     % if there aren't the maximum amount of minutes in this day
 
-    idxNaN = any(isnan(psd_matrix), 1);
-    psd_matrix(:, idxNaN) = [];
-    time_matrix(idxNaN) = [];
-    minPrct_vec(idxNaN) = [];
-    xwav_file(idxNaN) = [];
+
 
 
     % transfer function in dB re 1uPa
@@ -194,6 +190,7 @@ for i = 1:length(allDays)
     bandsOut = 10*log10(getBandMeanPowerSpectralDensity(linLevel, PARAMS.ltsa.fs/PARAMS.ltsa.nfft, F(1), ...
         1, length(freqTable), freqTable));
 
+
     figure(601)
     clf
     % Make figure wider
@@ -202,6 +199,7 @@ for i = 1:length(allDays)
     ax1 = axes('Position', [0.08, 0.1, 0.6, 0.8]);  % [left, bottom, width, height]
     surf(ax1, time_matrix, freqTable(:, 2), bandsOut', 'Linestyle', 'none');
     ylim([str2double(fStart) str2double(fStop)])
+    xlim([dayStart, dayEnd])
     view(ax1, [0 90])
     set(ax1, 'yscale', 'log')
     colormap(ax1, cmocean('thermal'));
@@ -234,6 +232,19 @@ for i = 1:length(allDays)
     hold(ax2, 'off')
     toc
 
+
+    idxNaN = any(isnan(bandsOut), 2);
+    bandsOut(idxNaN, :) = [];
+    time_matrix(idxNaN) = [];
+    minPrct_vec(idxNaN) = [];
+    xwav_file(idxNaN) = [];
+
+
+    if isempty(time_matrix)
+        continue
+    end
+
+
     outName = [
         PARAMS.metadata.organization, '_', ...
         PARAMS.metadata.project, '_', ...
@@ -254,14 +265,17 @@ for i = 1:length(allDays)
     % Delete file if it exists (and not already open)
     if isfile(outFile)
         try
+            fid = netcdf.open(outFile);
+            netcdf.close(fid)
+            clear fid  % release the variable
+
             delete(outFile);
         catch ME
             warning('Could not delete existing file: %s\n%s', outFile, ME.message);
         end
     end
-
-
-    ncid = netcdf.create(fullfile(PARAMS.metadata.outputDir, outName), 'NETCDF4');
+  
+    ncid = netcdf.create(fullfile(PARAMS.metadata.outputDir, outName), 'CLOBBER');
 
 
     % Add global attributes
@@ -305,13 +319,16 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'date_created', char(datetime("today", 'Format', 'yyyy-MM-dd')));
 
 
-    xwav_file = string(xwav_file);
+    xwav_file = char(string(xwav_file));
+    numFiles = size(xwav_file, 1);
+    maxStrLen = size(xwav_file, 2);
+
 
     % Define dimensions
     timeDimID = netcdf.defDim(ncid, 'time', length(time_matrix));
     freqDimID = netcdf.defDim(ncid, 'frequency', length(freqTable(:, 2)));
-    xwavFileDimID = netcdf.defDim(ncid, 'xwavFile', length(xwav_file));
-
+    dimStrLenID = netcdf.defDim(ncid, 'strLen', maxStrLen);
+    dimNumFilesID = netcdf.defDim(ncid, 'numFiles', numFiles);
     % Define variables
 
     % time
@@ -332,7 +349,8 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, effortVarID, 'units', 'percent');
 
     % xwav file associated with measurement
-    xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'string', xwavFileDimID);
+   % xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', xwavFileDimID);
+    xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', [dimStrLenID, dimNumFilesID]);
 
     % End Define Mode
     netcdf.endDef(ncid);
@@ -347,7 +365,7 @@ for i = 1:length(allDays)
     netcdf.putVar(ncid, freqVarID, double(freqTable(:, 2)));
     netcdf.putVar(ncid, psdVarID, double(bandsOut'));
     netcdf.putVar(ncid, effortVarID, double(minPrct_vec(:)*100));
-    netcdf.putVar(ncid, xwavFileVarID, xwav_file');
+    netcdf.putVar(ncid, xwavFileVarID, xwav_file);
 
 end
 
