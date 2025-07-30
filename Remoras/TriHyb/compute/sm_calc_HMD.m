@@ -262,20 +262,11 @@ for i = 1:length(allDays)
 
     fclose('all');
 
-    % Delete file if it exists (and not already open)
-    if isfile(outFile)
-        try
-            fid = netcdf.open(outFile);
-            netcdf.close(fid)
-            clear fid  % release the variable
+clobber_mode = netcdf.getConstant('CLOBBER');
+netcdf4_mode = netcdf.getConstant('NETCDF4');
+  creation_mode = bitor(clobber_mode, netcdf4_mode);
 
-            delete(outFile);
-        catch ME
-            warning('Could not delete existing file: %s\n%s', outFile, ME.message);
-        end
-    end
-  
-    ncid = netcdf.create(fullfile(PARAMS.metadata.outputDir, outName), 'CLOBBER');
+    ncid = netcdf.create(fullfile(PARAMS.metadata.outputDir, outName), creation_mode);
 
 
     % Add global attributes
@@ -319,15 +310,13 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'date_created', char(datetime("today", 'Format', 'yyyy-MM-dd')));
 
 
-    xwav_file = char(string(xwav_file));
+    xwav_file = string(xwav_file);
     numFiles = size(xwav_file, 1);
-    maxStrLen = size(xwav_file, 2);
 
 
     % Define dimensions
     timeDimID = netcdf.defDim(ncid, 'time', length(time_matrix));
     freqDimID = netcdf.defDim(ncid, 'frequency', length(freqTable(:, 2)));
-    dimStrLenID = netcdf.defDim(ncid, 'strLen', maxStrLen);
     dimNumFilesID = netcdf.defDim(ncid, 'numFiles', numFiles);
     % Define variables
 
@@ -350,7 +339,7 @@ for i = 1:length(allDays)
 
     % xwav file associated with measurement
    % xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', xwavFileDimID);
-    xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', [dimStrLenID, dimNumFilesID]);
+    xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_STRING', dimNumFilesID);
 
     % End Define Mode
     netcdf.endDef(ncid);
