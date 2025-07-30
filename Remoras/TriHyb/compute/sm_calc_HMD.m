@@ -8,7 +8,6 @@ function sm_calc_HMD
 % TO DO:
 % - Stitch minutes with 2 xwavs together, for now, it just uses
 % beginning xwav and keeps if it has 50% of data in minute
-% - batch run all disks in deployment...
 
 
 global PARAMS
@@ -18,8 +17,8 @@ global PARAMS
 
 fStart = PARAMS.metadata.startF;
 fStop = PARAMS.metadata.endF;
-PARAMS.ltsa.dfreq = 1; 
-PARAMS.ltsa.fs = double(PARAMS.ltsahd.sample_rate(1)); 
+PARAMS.ltsa.dfreq = 1;
+PARAMS.ltsa.fs = double(PARAMS.ltsahd.sample_rate(1));
 
 if ~all(PARAMS.ltsahd.sample_rate == PARAMS.ltsa.fs)
     error('Inconsistent sample rates detected in this folder.');
@@ -83,7 +82,7 @@ disp(['Creating HMD Products for ', PARAMS.metadata.project, ' ', PARAMS.metadat
 %% Processing minutely average SPL for each day
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for i = 1:length(allDays)
+for i = 2%1:length(allDays)
 
     % start and end time for day being processed
     dayStart = allDays(i);
@@ -98,59 +97,132 @@ for i = 1:length(allDays)
     minPrct_vec = nan(length(thisDayMins), 1);
     xwav_file = cell(length(thisDayMins), 1);
     tic
-    for m = 1:length(thisDayMins)
+    for m = 1420%1:length(thisDayMins)
         startMin = thisDayMins(m);                % start of first minute to process
-        endMin = startMin + seconds(60);     % end time is 60 seconds later
+        endMin = startMin + seconds(60);          % end time is 60 seconds later
 
 
         % xwav(s) associated with this day
         [~, idxRw] = find(fileStartTimes < endMin & fileEndTimes > startMin);
+
+        uxwav = unique(PARAMS.ltsahd.fname(idxRw, :), 'rows');
+
         if isempty(idxRw)
             disp(['No data for: ' char(startMin)])
             continue
         end
 
-        overlapFileName =  PARAMS.ltsahd.fname(idxRw(1), :);
-        overlapFiles = dir(fullfile(PARAMS.metadata.inputDir, '**', overlapFileName));
 
-        thisxwavIdx = all(PARAMS.ltsahd.fname == overlapFileName, 2);
-        
-        % compiling start and end times of this xwav
-        PARAMS.raw.dnumStart = PARAMS.ltsahd.dnumStart(thisxwavIdx);
-        PARAMS.raw.dvecStart = [PARAMS.ltsahd.year(thisxwavIdx); ...
-            PARAMS.ltsahd.month(thisxwavIdx); ...
-            PARAMS.ltsahd.day(thisxwavIdx); ...
-            PARAMS.ltsahd.hour(thisxwavIdx); ...
-            PARAMS.ltsahd.minute(thisxwavIdx); ...
-            PARAMS.ltsahd.secs(thisxwavIdx)]';
+        % ------------------------------------------
+        if size(uxwav, 1) == 1
 
-        PARAMS.raw.dvecEnd = datevec( ...
-            datetime( ...
-            PARAMS.ltsahd.year(thisxwavIdx), ...
-            PARAMS.ltsahd.month(thisxwavIdx), ...
-            PARAMS.ltsahd.day(thisxwavIdx), ...
-            PARAMS.ltsahd.hour(thisxwavIdx), ...
-            PARAMS.ltsahd.minute(thisxwavIdx), ...
-            PARAMS.ltsahd.secs(thisxwavIdx) ...
-            ) + seconds(PARAMS.ltsahd.byte_length(thisxwavIdx) / ((PARAMS.ltsa.nBits/8) * PARAMS.ltsahd.sample_rate(thisxwavIdx))) ...
-            );
+            overlapFileName =  uxwav(1, :);
+            overlapFiles = dir(fullfile(PARAMS.metadata.inputDir, '**', overlapFileName));
+
+            thisxwavIdx = all(PARAMS.ltsahd.fname == overlapFileName, 2);
 
 
+            % compiling start and end times of this xwav
+            PARAMS.raw.dnumStart = PARAMS.ltsahd.dnumStart(thisxwavIdx);
+            PARAMS.raw.dvecStart = [PARAMS.ltsahd.year(thisxwavIdx); ...
+                PARAMS.ltsahd.month(thisxwavIdx); ...
+                PARAMS.ltsahd.day(thisxwavIdx); ...
+                PARAMS.ltsahd.hour(thisxwavIdx); ...
+                PARAMS.ltsahd.minute(thisxwavIdx); ...
+                PARAMS.ltsahd.secs(thisxwavIdx)]';
 
-        PARAMS.raw.dnumEnd = datenum(PARAMS.raw.dvecEnd)';
-        PARAMS.xhd.byte_loc = PARAMS.ltsahd.byte_loc(thisxwavIdx);
-        PARAMS.xhd.byte_length = PARAMS.ltsahd.byte_length(thisxwavIdx);
-        PARAMS.start.dnum = PARAMS.raw.dnumStart(1);
-        PARAMS.end.dnum = PARAMS.raw.dnumEnd(end);
+            PARAMS.raw.dvecEnd = datevec( ...
+                datetime( ...
+                PARAMS.ltsahd.year(thisxwavIdx), ...
+                PARAMS.ltsahd.month(thisxwavIdx), ...
+                PARAMS.ltsahd.day(thisxwavIdx), ...
+                PARAMS.ltsahd.hour(thisxwavIdx), ...
+                PARAMS.ltsahd.minute(thisxwavIdx), ...
+                PARAMS.ltsahd.secs(thisxwavIdx) ...
+                ) + seconds(PARAMS.ltsahd.byte_length(thisxwavIdx) / ((PARAMS.ltsa.nBits/8) * PARAMS.ltsahd.sample_rate(thisxwavIdx))) ...
+                );
 
 
 
-        % Read 1-minute chunk of data from file
-        DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin));
+            PARAMS.raw.dnumEnd = datenum(PARAMS.raw.dvecEnd)';
+            PARAMS.xhd.byte_loc = PARAMS.ltsahd.byte_loc(thisxwavIdx);
+            PARAMS.xhd.byte_length = PARAMS.ltsahd.byte_length(thisxwavIdx);
+            PARAMS.start.dnum = PARAMS.raw.dnumStart(1);
+            PARAMS.end.dnum = PARAMS.raw.dnumEnd(end);
 
-        % Calculating percent effort in this minute
-        PARAMS.minPrctVecTemp = round((length(DATA)/PARAMS.ltsa.fs / 60));
 
+
+            % Read 1-minute chunk of data from file
+            DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin));
+
+
+            if length(DATA)/ PARAMS.ltsa.fs < 60*(str2double(PARAMS.metadata.minPrct)/100)
+                disp(['Less than ' PARAMS.metadata.minPrct '% of data in this minute, skipping!'])
+                continue
+            end
+
+            xwav_file(m) = cellstr(uxwav(1, :));
+            % Calculating percent effort in this minute
+            minPrct_vec(m) = round((length(DATA)/PARAMS.ltsa.fs / 60));
+
+        elseif size(uxwav, 1) > 1
+            DATA = [];
+
+            for ix = 1:size(uxwav, 1)
+                overlapFileName =  uxwav(ix, :);
+                overlapFiles = dir(fullfile(PARAMS.metadata.inputDir, '**', overlapFileName));
+
+                thisxwavIdx = all(PARAMS.ltsahd.fname == overlapFileName, 2);
+
+
+                % compiling start and end times of this xwav
+                PARAMS.raw.dnumStart = PARAMS.ltsahd.dnumStart(thisxwavIdx);
+                PARAMS.raw.dvecStart = [PARAMS.ltsahd.year(thisxwavIdx); ...
+                    PARAMS.ltsahd.month(thisxwavIdx); ...
+                    PARAMS.ltsahd.day(thisxwavIdx); ...
+                    PARAMS.ltsahd.hour(thisxwavIdx); ...
+                    PARAMS.ltsahd.minute(thisxwavIdx); ...
+                    PARAMS.ltsahd.secs(thisxwavIdx)]';
+
+                PARAMS.raw.dvecEnd = datevec( ...
+                    datetime( ...
+                    PARAMS.ltsahd.year(thisxwavIdx), ...
+                    PARAMS.ltsahd.month(thisxwavIdx), ...
+                    PARAMS.ltsahd.day(thisxwavIdx), ...
+                    PARAMS.ltsahd.hour(thisxwavIdx), ...
+                    PARAMS.ltsahd.minute(thisxwavIdx), ...
+                    PARAMS.ltsahd.secs(thisxwavIdx) ...
+                    ) + seconds(PARAMS.ltsahd.byte_length(thisxwavIdx) / ((PARAMS.ltsa.nBits/8) * PARAMS.ltsahd.sample_rate(thisxwavIdx))) ...
+                    );
+
+
+
+                PARAMS.raw.dnumEnd = datenum(PARAMS.raw.dvecEnd)';
+                PARAMS.xhd.byte_loc = PARAMS.ltsahd.byte_loc(thisxwavIdx);
+                PARAMS.xhd.byte_length = PARAMS.ltsahd.byte_length(thisxwavIdx);
+                PARAMS.start.dnum = PARAMS.raw.dnumStart(1);
+                PARAMS.end.dnum = PARAMS.raw.dnumEnd(end);
+
+
+
+                % Read 1-minute chunk of data from file
+                DATA = [DATA; get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin))];
+                1;
+                if length(DATA)/ PARAMS.ltsa.fs < 60*(str2double(PARAMS.metadata.minPrct)/100)
+                    disp(['Less than ' PARAMS.metadata.minPrct '% of data in this minute, skipping!'])
+                    continue
+                end
+
+
+
+            end
+            xwav_file(m) = {strjoin(cellstr(uxwav), '; ')};
+            % Calculating percent effort in this minute
+            minPrct_vec(m) = round((length(DATA)/PARAMS.ltsa.fs / 60));
+
+
+        end
+        %-----------------------------
 
 
         if isempty(DATA)
@@ -161,17 +233,10 @@ for i = 1:length(allDays)
         psd = 10*log10(pxx); % counts^2/Hz
         psd_matrix(:, m) = psd;
         time_matrix(m) = startMin;
-        minPrct_vec(m) = PARAMS.minPrctVecTemp;
-        xwav_file(m) = cellstr(overlapFiles.name);
-
 
         disp(['PSD for ', char(string(startMin, 'yyyy-MM-dd HH:mm:ss')), ' computed'])
 
     end
-
-    % if there aren't the maximum amount of minutes in this day
-
-
 
 
     % transfer function in dB re 1uPa
@@ -338,7 +403,7 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, effortVarID, 'units', 'percent');
 
     % xwav file associated with measurement
-   % xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', xwavFileDimID);
+    % xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', xwavFileDimID);
     xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_STRING', dimNumFilesID);
 
     % End Define Mode
@@ -361,8 +426,3 @@ end
 
 
 end
-
-
-
-
-

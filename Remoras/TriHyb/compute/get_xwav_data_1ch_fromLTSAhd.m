@@ -56,24 +56,12 @@ if dnum0 < ( PARAMS.start.dnum + Y2K )
     fprintf('Start time is before XWAV start!\n')
     fprintf('Setting start time to BOF\n');
     dnum0 = PARAMS.start.dnum + Y2K;
-    if ((abs(dnumN - (dnum0 )))*mnum2secs)/60 < 50
-        fprintf(['Less than ' num2str(PARAMS.metadata.minPrct) '%% of minute, skipping.\n'])
-        DATA = [];
-        return
-    end
-
 end
 
 if dnumN > ( PARAMS.end.dnum + Y2K )
     fprintf('End time is after XWAV end!\n')
     fprintf('Setting end time to EOF\n');
     dnumN = PARAMS.end.dnum + Y2K;
-    if ((abs(dnumN - ( dnum0 )))*mnum2secs)/60 < 50
-        fprintf(['Less than ' num2str(PARAMS.metadata.minPrct) '%% of minute, skipping.\n'])
-        DATA = [];
-        return
-    end
-
 end
 
 if dnumN < dnum0
