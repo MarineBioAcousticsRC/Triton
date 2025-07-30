@@ -51,7 +51,7 @@ This opens a tabbed GUI with the following sections:
 
 ### 🔖 Metadata Compiler Tab
 
-Enter metadata about your deployment, or click **"Import from .csv file"** to auto-fill fields.
+Enter metadata about your deployment, or click **"Import from .xlsx file"** to auto-fill fields.
 
 **Expected fields include:**
 
@@ -90,7 +90,7 @@ Check **"Search Subfolders"** to include multiple disks in a deployment.
 
 ### Spectrograms
 
-**Figure 1 – Example spectrogram with ship and whale detections:**
+**Figure 1 – Example spectrogram with ship and whale sounds:**
 
 ![Spectrogram Example](https://github.com/miguelgonzalez12/Remora-wiki-draft-/blob/main/IMG_1249.png)
 
@@ -104,17 +104,7 @@ Check **"Search Subfolders"** to include multiple disks in a deployment.
 
 ![Ship Day](https://github.com/miguelgonzalez12/Remora-wiki-draft-/blob/main/031724spectragraph.PNG)
 
-- On March 27, 2024, ~11 ships passed by the Channel Islands.
-
----
-
-### PSD Averages
-
-**Figure 3 – PSD average by frequency (Hz):**
-
-![PSD Average](https://github.com/miguelgonzalez12/Remora-wiki-draft-/blob/main/Combinedfrequencies500.PNG)
-
-- Highlights low-frequency dominance by ship and whale signals.
+- On March 27, 2024, ~11 ships passed in the Santa Barbara Channel adjacent to the Channel Islands National Marine Sanctuary.
 
 ---
 
