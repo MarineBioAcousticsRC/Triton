@@ -103,29 +103,15 @@ for i = 1:length(longFields)
     field = longFields{i};
     switch field
         case 'Title'
-            defaultStr = {'Hybrid Millidecade Band Sound Pressure Levels Computed at 1 Minute Resolution from Oceanic Passive Acoustic Monitoring Recordings at the XXXXX'};
+            defaultStr = {};
         case 'Summary'
-            defaultStr = {[
-                'To understand natural and anthropogenic sound in the ocean, and to compare underwater soundscapes globally, ', ...
-                'standard methods of analysis must be applied to passive acoustic monitoring (PAM) data. Methods that balance ', ...
-                'constrained volume and adequate resolution of acoustic spectra have recently been published (Martin et al., 2021a,b). ', ...
-                'A community effort supported by NOAA, BOEM, U.S. Navy, and ONR was initiated to apply these methods to PAM datasets ', ...
-                'from around the world. This record represents the hybrid millidecade band (HMB) spectra of sound levels derived from ', ...
-                'calibrated PAM data. Daily HMB spectra at 1 minute resolution were created using the SoundScape Remora in Triton (vXXX).';
-                ]};
+            defaultStr = {};
         case 'Acknowledgements'
-            defaultStr = {'The original audio recordings were supported by the Southern California Ocean Observing System'};
+            defaultStr = {};
         case 'History'
-            defaultStr = {'Original hybrid millidecade spectra were produced by the Marine Bioacoustics Research Collaborative (MBARC)'};
+            defaultStr = {};
         case 'Source'
-            defaultStr = {['Data analysis was performed using the HARP HMD Remora in Triton, to produce HMD spectra of sound ', ...
-                'levels from oceanic audio recordings. Processing utilized MATLAB code provided as supplemental material in ',...
-                'Martin et al. (2021b). Power spectral density (PSD) levels were computed from 1-minute segments of audio ',...
-                'data. Frequency-dependent calibrations are included in the HMD. By applying fast Fourier transform (FFT) ',...
-                'with length equal to the sample rate, using Hann window and 50% overlap, PSD estimates (V^2/Hz) were ', ...
-                'computed with a frequency resolution of 1 Hz and a temporal resolution of 1 second. The 1 second PSD estimates ', ...
-                'from each 1-minute segment were averaged, and the average spectrum for each minute was further processed to an ',...
-                'HMD spectrum following Martin et al. (2021b).']};
+            defaultStr = {};
         otherwise
             defaultStr = '';
     end
@@ -157,25 +143,25 @@ for i = 1:length(shortFields)
         case {'source'}
             defaultStr = {[]};
         case 'creator_name'
-            defaultStr = {'Vanessa ZoBell'};
+            defaultStr = {};
         case 'institution'
-            defaultStr = {'Scripps Institution of Oceanography'};
+            defaultStr = {};
         case 'instrument'
-            defaultStr = {'HARP'};
+            defaultStr = {};
         case 'keywords'
-            defaultStr = {'ocean acoustics, ambient noise, intensity, marine environment monitoring, marine habitat, soundscapes'};
+            defaultStr = {};
         case 'keywords_vocabulary'
-            defaultStr = {'GCMD Science Keywords'};
+            defaultStr = {};
         case 'conventions'
-            defaultStr = {'COARDS, CF-1.6, ACDD-1.3'};
+            defaultStr = {};
         case 'creator_url'
-            defaultStr = {'https://mbarc.ucsd.edu/'};
+            defaultStr = {};
         case 'naming_authority'
-            defaultStr = {'NOAA National Centers for Environmental Information'};
+            defaultStr = {};
         case 'publisher_url'
-            defaultStr = {'https://www.ncei.noaa.gov/products/passive-acoustic-data'};
+            defaultStr = {};
         case 'publisher_name'
-            defaultStr = {'NOAA National Centers for Environmental Information'};
+            defaultStr = {};
         otherwise
             defaultStr = '';
     end
@@ -206,7 +192,7 @@ end
 
 % Add "Import from CSV" button
 uicontrol(tab1, 'Style', 'pushbutton', ...
-    'String', 'Import from .csv file', ...
+    'String', 'Import from .xlsx file', ...
     'Units', 'normalized', ...
     'Position', [(figWidthPx/2 - 110) / figWidthPx, 10 / figHeightPx, 220 / figWidthPx, 35 / figHeightPx], ...
     'BackgroundColor', [0.40, 0.75, 0.40], ...
@@ -309,7 +295,7 @@ end
 
 % Create all fields with labels, default values, and browse buttons where needed
 yCurrent = yBase;
-createField(tab2, 'Input Directory:', 'Y:\CINMS\CINMS_B_49\CINMS_B_49_disk01_df100', yCurrent, @browse_dir);
+createField(tab2, 'Input Directory:', '', yCurrent, @browse_dir);
 
 % Checkbox directly above Input Directory browse button
 REMORA.mypsd.gui.recursiveSearch = uicontrol(tab2, 'Style', 'checkbox', ...
@@ -330,27 +316,27 @@ yCurrent = yCurrent - yStep;
 createField(tab2, 'Filename pattern:', '*df20*', yCurrent);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Output Directory:', 'D:\HMD', yCurrent, @browse_dir);
+createField(tab2, 'Output Directory:', '', yCurrent, @browse_dir);
 
 yCurrent = yCurrent - yStep;
 createField(tab2, 'Transfer Function File:', ...
-    'G:\Shared drives\MBARC_TF\800-899\856\856_170215_B_HARP.tf', ...
+    '', ...
     yCurrent, @browse_tf_file, 500);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Organization:', 'MBARC', yCurrent);
+createField(tab2, 'Organization:', '', yCurrent);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Project:', 'CINMS', yCurrent);
+createField(tab2, 'Project:', '', yCurrent);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Site Name:', 'B', yCurrent);
+createField(tab2, 'Site Name:', '', yCurrent);
 
 yCurrent = yCurrent - yStep;
 createField(tab2, 'Site Location:', '[dd.dddd, dd.ddd]', yCurrent);
 
 yCurrent = yCurrent - yStep;
-createField(tab2, 'Deployment #:', '47', yCurrent);
+createField(tab2, 'Deployment #:', '', yCurrent);
 
 yCurrent = yCurrent - yStep;
 labelWidthPx = 165;
@@ -457,14 +443,14 @@ end
 function import_csv_callback(~, ~)
     global REMORA
 
-    [file, path] = uigetfile('*.csv', 'Select Metadata CSV File');
+    [file, path] = uigetfile('*.xlsx', 'Select Metadata Excel File');
     if isequal(file, 0)
         return; % User canceled
     end
 
     fullFile = fullfile(path, file);
     try
-        data = readtable(fullFile, 'TextType', 'string');
+        data = readtable(fullFile);
     catch ME
         errordlg(['Failed to read file: ', ME.message], 'Import Error');
         return;

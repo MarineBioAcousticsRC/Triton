@@ -82,7 +82,7 @@ disp(['Creating HMD Products for ', PARAMS.metadata.project, ' ', PARAMS.metadat
 %% Processing minutely average SPL for each day
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for i = 2%1:length(allDays)
+for i = 1:length(allDays)
 
     % start and end time for day being processed
     dayStart = allDays(i);
@@ -97,7 +97,7 @@ for i = 2%1:length(allDays)
     minPrct_vec = nan(length(thisDayMins), 1);
     xwav_file = cell(length(thisDayMins), 1);
     tic
-    for m = 1420%1:length(thisDayMins)
+    for m = 1:length(thisDayMins)
         startMin = thisDayMins(m);                % start of first minute to process
         endMin = startMin + seconds(60);          % end time is 60 seconds later
 
@@ -327,11 +327,8 @@ for i = 2%1:length(allDays)
 
     fclose('all');
 
-    clobber_mode = netcdf.getConstant('CLOBBER');
-    netcdf4_mode = netcdf.getConstant('NETCDF4');
-    creation_mode = bitor(clobber_mode, netcdf4_mode);
 
-    ncid = netcdf.create(fullfile(PARAMS.metadata.outputDir, outName), creation_mode);
+    ncid = netcdf.create(fullfile(PARAMS.metadata.outputDir, outName), 'NETCDF4');
 
 
     % Add global attributes
