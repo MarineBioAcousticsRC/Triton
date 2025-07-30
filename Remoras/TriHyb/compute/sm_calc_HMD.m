@@ -262,9 +262,9 @@ for i = 1:length(allDays)
 
     fclose('all');
 
-clobber_mode = netcdf.getConstant('CLOBBER');
-netcdf4_mode = netcdf.getConstant('NETCDF4');
-  creation_mode = bitor(clobber_mode, netcdf4_mode);
+    clobber_mode = netcdf.getConstant('CLOBBER');
+    netcdf4_mode = netcdf.getConstant('NETCDF4');
+    creation_mode = bitor(clobber_mode, netcdf4_mode);
 
     ncid = netcdf.create(fullfile(PARAMS.metadata.outputDir, outName), creation_mode);
 
