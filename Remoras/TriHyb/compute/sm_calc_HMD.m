@@ -289,7 +289,7 @@ for i = 1:length(allDays)
     set(ax2, 'YScale', 'log', 'YDir', 'normal', 'YAxisLocation', 'right')
     xlabel(ax2, 'Spectrum Level (dB re 1\muPa^2/Hz)')
     ylabel(ax2, 'Frequency (Hz)')  % optional, since it's on right side
-    grid(ax2, 'on')
+    grid on
     xlim([50 120])
     ylim([str2double(fStart) str2double(fStop)])
     title(ax2, 'Percentiles')
