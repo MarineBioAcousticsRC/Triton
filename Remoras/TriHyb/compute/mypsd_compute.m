@@ -18,5 +18,7 @@ sm_get_headers_recur;
 
 % calculated averaged spectra
 sm_calc_HMD
+%sm_calc_perHz
+
 
 end

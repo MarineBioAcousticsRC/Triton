@@ -298,11 +298,11 @@ for i = 1:length(allDays)
     toc
 
 
-    idxNaN = any(isnan(bandsOut), 2);
-    bandsOut(idxNaN, :) = [];
-    time_matrix(idxNaN) = [];
-    minPrct_vec(idxNaN) = [];
-    xwav_file(idxNaN) = [];
+    idxAllNaN = all(isnan(bandsOut), 2);
+    bandsOut(idxAllNaN, :) = [];
+    time_matrix(idxAllNaN) = [];
+    minPrct_vec(idxAllNaN) = [];
+    xwav_file(idxAllNaN) = [];
 
 
     if isempty(time_matrix)
