@@ -231,9 +231,30 @@ parfor i = 1:length(allDays)
             continue
         end
 
-        [pxx,F] = pwelch(DATA,window,noverlap,localParams.ltsa.nfft,localParams.ltsa.fs);   % pwelch is supported psd'er
-        psd = 10*log10(pxx); % counts^2/Hz
-        psd_matrix(:, m) = psd;
+        % % Pwelch too slow
+        % tic
+        % [pxx,F] = pwelch(DATA,window,noverlap,localParams.ltsa.nfft,localParams.ltsa.fs);   % pwelch is supported psd'er
+        % toc
+        % psd = 10*log10(pxx); % counts^2/Hz
+        % psd_matrix(:, m) = psd;
+        % time_matrix(m) = startMin;
+
+    
+        % Compute Total Power (two-sided PSD)
+        [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
+
+        % Average two-sided PSD over the minute bin
+        P2 = mean(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
+
+        % Convert to one-sided
+        P1 = P2;
+        if rem(localParams.ltsa.nfft,2) % odd NFFT
+            P1(2:end) = 2*P1(2:end);
+        else % even NFFT
+            P1(2:end-1) = 2*P1(2:end-1);
+        end
+
+        psd_matrix(:, m) = 10*log10(P1);
         time_matrix(m) = startMin;
 
         disp(['PSD for ', char(string(startMin, 'yyyy-MM-dd HH:mm:ss')), ' computed'])
