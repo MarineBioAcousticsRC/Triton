@@ -1,4 +1,4 @@
-function DATA = get_xwav_data_1ch_fromLTSAhd( xwav, startt, endt )
+function DATA = get_xwav_data_1ch_fromLTSAhd( xwav, startt, endt, localParams)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  DATA = get_xwav_data_1ch( xwav, startt, endt )
 %
@@ -11,7 +11,6 @@ function DATA = get_xwav_data_1ch_fromLTSAhd( xwav, startt, endt )
 %         of file, data is read in until EOF
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global PARAMS
 
 DATA = [];
 
@@ -29,39 +28,39 @@ dnumN = datenum(endt);
 
 
 [ xpath, xfn, xext ] = fileparts(xwav);
-PARAMS.infile = sprintf('%s%s',xfn,xext);
-PARAMS.inpath = xpath;
+localParams.infile = sprintf('%s%s',xfn,xext);
+localParams.inpath = xpath;
 
 % need to initialize this stuff, rdxwavhd does not
-%PARAMS.xhd = [];
-%PARAMS.raw = [];
-PARAMS.ftype = 2;
+%localParams.xhd = [];
+%localParams.raw = [];
+localParams.ftype = 2;
 %rdxwavhd;
 
 
-if PARAMS.ltsa.nBits == 16
+if localParams.ltsa.nBits == 16
     dtype = 'int16';
-elseif PARAMS.ltsa.nBits== 32
+elseif localParams.ltsa.nBits== 32
     dtype = 'int32';
 else
-    disp('PARAMS.nBits = ')
-    disp(PARAMS.nBits)
+    disp('localParams.nBits = ')
+    disp(localParams.nBits)
     disp('not supported')
     return
 end
 
 
 % a lil sanity check doesn't hurt anybody
-if dnum0 < ( PARAMS.start.dnum + Y2K )
+if dnum0 < ( localParams.start.dnum + Y2K )
     fprintf('Start time is before XWAV start!\n')
     fprintf('Setting start time to BOF\n');
-    dnum0 = PARAMS.start.dnum + Y2K;
+    dnum0 = localParams.start.dnum + Y2K;
 end
 
-if dnumN > ( PARAMS.end.dnum + Y2K )
+if dnumN > ( localParams.end.dnum + Y2K )
     fprintf('End time is after XWAV end!\n')
     fprintf('Setting end time to EOF\n');
-    dnumN = PARAMS.end.dnum + Y2K;
+    dnumN = localParams.end.dnum + Y2K;
 end
 
 if dnumN < dnum0
@@ -70,8 +69,8 @@ if dnumN < dnum0
     return
 end
 
-rfStarts = PARAMS.raw.dnumStart + Y2K;
-rfEnds = PARAMS.raw.dnumEnd + Y2K;
+rfStarts = localParams.raw.dnumStart + Y2K;
+rfEnds = localParams.raw.dnumEnd + Y2K;
 rfIdx0 = find( rfStarts <= dnum0,1,'last' );
 rfIdxN = find( rfEnds >= dnumN, 1,'first' );
 
@@ -106,16 +105,16 @@ if rfIdxN < rfIdx0
 end
 
 
-skip_samp = round(skip_s * PARAMS.ltsa.fs);
+skip_samp = round(skip_s * localParams.ltsa.fs);
 % bytes to skip from start of file
-start_B = PARAMS.xhd.byte_loc(rfIdx0) + skip_samp * floor(PARAMS.ltsa.nBits/8);
+start_B = localParams.xhd.byte_loc(rfIdx0) + skip_samp * floor(localParams.ltsa.nBits/8);
 
-end_samp = round(end_s*PARAMS.ltsa.fs);
-end_B = PARAMS.xhd.byte_loc(rfIdxN) + end_samp*floor(PARAMS.ltsa.nBits/8);
+end_samp = round(end_s*localParams.ltsa.fs);
+end_B = localParams.xhd.byte_loc(rfIdxN) + end_samp*floor(localParams.ltsa.nBits/8);
 
 %define how much data to read in
 bin_B = end_B-start_B;
-bin_samps = bin_B/floor(PARAMS.ltsa.nBits/8);
+bin_samps = bin_B/floor(localParams.ltsa.nBits/8);
 
 
 % fprintf('end_s = %f,\tend_samp = %d,\tend_B = %d\n\n', ...
@@ -125,16 +124,16 @@ DATA = nan(bin_samps,1);
 fid = fopen(xwav,'r');
 dataIdx = 1;
 
-bytesPerSample = floor(PARAMS.ltsa.nBits / 8);
+bytesPerSample = floor(localParams.ltsa.nBits / 8);
 
 for rf=rfIdx0:rfIdxN
     % jump to raw file start
-    fseek(fid, PARAMS.xhd.byte_loc(rf),'bof');
+    fseek(fid, localParams.xhd.byte_loc(rf),'bof');
 
     % all data in 1 rawfile
     if rfIdx0 == rfIdxN
         % skip past data we don't want in first raw file
-        b1 = skip_samp*floor(PARAMS.ltsa.nBits/8);
+        b1 = skip_samp*floor(localParams.ltsa.nBits/8);
         fseek(fid,b1,'cof');
         % read from start loc to end loc in 1 raw file
         nb = (end_samp - skip_samp) * bytesPerSample;
@@ -143,14 +142,14 @@ for rf=rfIdx0:rfIdxN
         % First raw file in a multi-file segment
         b1 = skip_samp * bytesPerSample;
         fseek(fid, b1, 'cof');
-        nb = PARAMS.xhd.byte_length(rf) - b1;
+        nb = localParams.xhd.byte_length(rf) - b1;
     elseif rf == rfIdxN
         % Final raw file in a multi-file segment
         nb = end_samp * bytesPerSample;
 
     else
         % Fully included raw file in between
-        nb = PARAMS.xhd.byte_length(rf);
+        nb = localParams.xhd.byte_length(rf);
     end
 
     if nb < 0
