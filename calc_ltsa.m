@@ -146,10 +146,10 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
             if dsz < PARAMS.ltsa.nfft
                 %                 dz = zeros(PARAMS.ltsa.nfft-nsamp,1);
                 dz = zeros(PARAMS.ltsa.nfft-dsz,1);
-                if size(data,1) > 1 % column vector, typical for wav/flac
-                    data = [data;dz]; 
-                elseif size(data,2) > 1 % row vector, typical for xwav
+                if size(data,1) == 1 % row vector, typical for xwav 
                     data = [data,dz'];
+                elseif size(data,2) == 1 % column vector, typical for wav/flac
+                    data = [data;dz];
                 end
                 disp(['File# Raw# Ave# DataSize: ',num2str(k),'  ',num2str(r),'  ',num2str(n),'  ',num2str(dsz)])
                 %                 disp('Paused ... press any key to continue')
