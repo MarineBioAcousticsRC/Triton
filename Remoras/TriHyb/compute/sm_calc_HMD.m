@@ -8,7 +8,6 @@ function sm_calc_HMD
 % TO DO:
 % - Stitch minutes with 2 xwavs together, for now, it just uses
 % beginning xwav and keeps if it has 50% of data in minute
-% - batch run all disks in deployment...
 
 
 global PARAMS
@@ -16,15 +15,24 @@ global PARAMS
 %% Spectra Computation Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fStart = PARAMS.ltsa.startF;
-fStop = PARAMS.ltsa.endF;
+fStart = PARAMS.metadata.startF;
+fStop = PARAMS.metadata.endF;
+PARAMS.ltsa.dfreq = 1;
+PARAMS.ltsa.fs = double(PARAMS.ltsahd.sample_rate(1));
+
+if ~all(PARAMS.ltsahd.sample_rate == PARAMS.ltsa.fs)
+    error('Inconsistent sample rates detected in this folder.');
+end
+
+PARAMS.ltsa.nfft = double(floor(PARAMS.ltsa.fs / PARAMS.ltsa.dfreq));
+
 window = hanning(PARAMS.ltsa.nfft);
 overlap = 50;
 noverlap = round((overlap/100)*PARAMS.ltsa.nfft);
 
 % HMD
 [ freqTable ] = getBandTable_erat(PARAMS.ltsa.fs/PARAMS.ltsa.nfft, 0, PARAMS.ltsa.fs, 10, ...
-    1000, fStart, 1);
+    1000, str2double(fStart), 1);
 [~, firstBand]  = min(abs(str2double(fStart) - freqTable(:, 2)));
 [~, lastBand] = min(abs(str2double(fStop) - freqTable(:, 2)));
 freqTable = freqTable(firstBand:lastBand, :);
@@ -33,7 +41,7 @@ freqTable = freqTable(firstBand:lastBand, :);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % open transfer function and interpolate calibration curve
 
-fid = fopen(PARAMS.tfFilePath,'r');
+fid = fopen(PARAMS.metadata.tfFilePath,'r');
 [A,~] = fscanf(fid,'%f %f',[2,inf]);
 TFf = A(1,:);
 TFdb = A(2,:);
@@ -68,13 +76,15 @@ endDay = dateshift(max(fileEndTimes), 'start', 'day');
 allDays = (startDay:days(1):endDay)';
 
 %initiate loadbar showing progress
-disp(['Creating HMD Products for ', PARAMS.ltsa.project, ' ', PARAMS.ltsa.site, ' ', datestr(startDay, 'dd-mmm-yyyy'), ' to ', datestr(endDay, 'dd-mmm-yyyy')]);
+disp(['Creating HMD Products for ', PARAMS.metadata.project, ' ', PARAMS.metadata.site, ' ', datestr(startDay, 'dd-mmm-yyyy'), ' to ', datestr(endDay, 'dd-mmm-yyyy')]);
 
 
 %% Processing minutely average SPL for each day
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+PARAMS_local = PARAMS; % copy global to local before parallel loop
 
-for i = 1:length(allDays)
+parfor i = 1:length(allDays)
+    localParams = PARAMS_local;
 
     % start and end time for day being processed
     dayStart = allDays(i);
@@ -84,78 +94,172 @@ for i = 1:length(allDays)
     thisDayMins = dayStart:1/(24*60):dayEnd;
 
     % initialize empty matrix to hold PSD columns
-    psd_matrix = nan(length(0:PARAMS.ltsa.fs/2), length(thisDayMins));
+    psd_matrix = nan(length(0:localParams.ltsa.fs/2), length(thisDayMins));
     time_matrix = NaT(length(thisDayMins), 1);
     minPrct_vec = nan(length(thisDayMins), 1);
     xwav_file = cell(length(thisDayMins), 1);
     tic
-    for m = 1:3%length(thisDayMins)
-        PARAMS.minTime = thisDayMins(m);                % start of first minute to process
-        PARAMS.endt = PARAMS.minTime + seconds(60);     % end time is 60 seconds later
+    for m = 1:length(thisDayMins)
+        startMin = thisDayMins(m);                % start of first minute to process
+        endMin = startMin + seconds(60);          % end time is 60 seconds later
 
 
         % xwav(s) associated with this day
-        [~, idxRw] = find(fileStartTimes < PARAMS.endt & fileEndTimes > PARAMS.minTime);
-        overlapFiles = unique(PARAMS.ltsahd.fname(idxRw, :), 'rows');
+        [~, idxRw] = find(fileStartTimes < endMin & fileEndTimes > startMin);
 
-        % change to all overlapFiles when fixing xwav stitching
-        overlapFiles = overlapFiles(1, :);
-        thisxwavIdx = ismember(cellstr(PARAMS.ltsahd.fname), cellstr(overlapFiles));
+        uxwav = unique(localParams.ltsahd.fname(idxRw, :), 'rows');
 
-        % compiling start and end times of this xwav
-        PARAMS.raw.dnumStart = PARAMS.ltsahd.dnumStart(thisxwavIdx);
-        PARAMS.raw.dvecStart = [PARAMS.ltsahd.year(thisxwavIdx); ...
-            PARAMS.ltsahd.month(thisxwavIdx); ...
-            PARAMS.ltsahd.day(thisxwavIdx); ...
-            PARAMS.ltsahd.hour(thisxwavIdx); ...
-            PARAMS.ltsahd.minute(thisxwavIdx); ...
-            PARAMS.ltsahd.secs(thisxwavIdx)]';
-
-        PARAMS.raw.dvecEnd = datevec( ...
-            datetime( ...
-            PARAMS.ltsahd.year(thisxwavIdx), ...
-            PARAMS.ltsahd.month(thisxwavIdx), ...
-            PARAMS.ltsahd.day(thisxwavIdx), ...
-            PARAMS.ltsahd.hour(thisxwavIdx), ...
-            PARAMS.ltsahd.minute(thisxwavIdx), ...
-            PARAMS.ltsahd.secs(thisxwavIdx) ...
-            ) + seconds(75.9995) ...
-            );
-
-        PARAMS.raw.dnumEnd = datenum(PARAMS.raw.dvecEnd)';
-        PARAMS.xhd.byte_loc = PARAMS.ltsahd.byte_loc(thisxwavIdx);
-        PARAMS.xhd.byte_length = PARAMS.ltsahd.byte_length(thisxwavIdx);
-        PARAMS.start.dnum = PARAMS.raw.dnumStart(1);
-        PARAMS.end.dnum = PARAMS.raw.dnumEnd(end);
+        if isempty(idxRw)
+            disp(['No data for: ' char(startMin)])
+            continue
+        end
 
 
+        % ------------------------------------------
+        if size(uxwav, 1) == 1
 
-        % Read 1-minute chunk of data from file
-        DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(PARAMS.ltsa.inputDir, overlapFiles), datestr(PARAMS.minTime), datestr(PARAMS.endt));
+            overlapFileName =  uxwav(1, :);
+            overlapFiles = dir(fullfile(localParams.metadata.inputDir, '**', overlapFileName));
+
+            thisxwavIdx = all(localParams.ltsahd.fname == overlapFileName, 2);
+
+
+            % compiling start and end times of this xwav
+            localParams.raw.dnumStart = localParams.ltsahd.dnumStart(thisxwavIdx);
+            localParams.raw.dvecStart = [localParams.ltsahd.year(thisxwavIdx); ...
+                localParams.ltsahd.month(thisxwavIdx); ...
+                localParams.ltsahd.day(thisxwavIdx); ...
+                localParams.ltsahd.hour(thisxwavIdx); ...
+                localParams.ltsahd.minute(thisxwavIdx); ...
+                localParams.ltsahd.secs(thisxwavIdx)]';
+
+            localParams.raw.dvecEnd = datevec( ...
+                datetime( ...
+                localParams.ltsahd.year(thisxwavIdx), ...
+                localParams.ltsahd.month(thisxwavIdx), ...
+                localParams.ltsahd.day(thisxwavIdx), ...
+                localParams.ltsahd.hour(thisxwavIdx), ...
+                localParams.ltsahd.minute(thisxwavIdx), ...
+                localParams.ltsahd.secs(thisxwavIdx) ...
+                ) + seconds(localParams.ltsahd.byte_length(thisxwavIdx) / ((localParams.ltsa.nBits/8) * localParams.ltsahd.sample_rate(thisxwavIdx))) ...
+                );
+
+
+
+            localParams.raw.dnumEnd = datenum(localParams.raw.dvecEnd)';
+            localParams.xhd.byte_loc = localParams.ltsahd.byte_loc(thisxwavIdx);
+            localParams.xhd.byte_length = localParams.ltsahd.byte_length(thisxwavIdx);
+            localParams.start.dnum = localParams.raw.dnumStart(1);
+            localParams.end.dnum = localParams.raw.dnumEnd(end);
+
+
+
+            % Read 1-minute chunk of data from file
+            DATA = get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin), localParams);
+
+
+            if length(DATA)/ localParams.ltsa.fs < 60*(str2double(localParams.metadata.minPrct)/100)
+                disp(['Less than ' localParams.metadata.minPrct '% of data in this minute, skipping!'])
+                continue
+            end
+
+            xwav_file(m) = cellstr(uxwav(1, :));
+            % Calculating percent effort in this minute
+            minPrct_vec(m) = 100 * (length(DATA) / (60*localParams.ltsa.fs));
+
+        elseif size(uxwav, 1) > 1
+            DATA = [];
+
+            for ix = 1:size(uxwav, 1)
+                overlapFileName =  uxwav(ix, :);
+                overlapFiles = dir(fullfile(localParams.metadata.inputDir, '**', overlapFileName));
+
+                thisxwavIdx = all(localParams.ltsahd.fname == overlapFileName, 2);
+
+
+                % compiling start and end times of this xwav
+                localParams.raw.dnumStart = localParams.ltsahd.dnumStart(thisxwavIdx);
+                localParams.raw.dvecStart = [localParams.ltsahd.year(thisxwavIdx); ...
+                    localParams.ltsahd.month(thisxwavIdx); ...
+                    localParams.ltsahd.day(thisxwavIdx); ...
+                    localParams.ltsahd.hour(thisxwavIdx); ...
+                    localParams.ltsahd.minute(thisxwavIdx); ...
+                    localParams.ltsahd.secs(thisxwavIdx)]';
+
+                localParams.raw.dvecEnd = datevec( ...
+                    datetime( ...
+                    localParams.ltsahd.year(thisxwavIdx), ...
+                    localParams.ltsahd.month(thisxwavIdx), ...
+                    localParams.ltsahd.day(thisxwavIdx), ...
+                    localParams.ltsahd.hour(thisxwavIdx), ...
+                    localParams.ltsahd.minute(thisxwavIdx), ...
+                    localParams.ltsahd.secs(thisxwavIdx) ...
+                    ) + seconds(localParams.ltsahd.byte_length(thisxwavIdx) / ((localParams.ltsa.nBits/8) * localParams.ltsahd.sample_rate(thisxwavIdx))) ...
+                    );
+
+
+
+                localParams.raw.dnumEnd = datenum(localParams.raw.dvecEnd)';
+                localParams.xhd.byte_loc = localParams.ltsahd.byte_loc(thisxwavIdx);
+                localParams.xhd.byte_length = localParams.ltsahd.byte_length(thisxwavIdx);
+                localParams.start.dnum = localParams.raw.dnumStart(1);
+                localParams.end.dnum = localParams.raw.dnumEnd(end);
+
+
+
+                % Read 1-minute chunk of data from file
+                DATA = [DATA; get_xwav_data_1ch_fromLTSAhd(fullfile(overlapFiles.folder, overlapFiles.name), datestr(startMin), datestr(endMin), localParams)];
+                1;
+                if length(DATA)/ localParams.ltsa.fs < 60*(str2double(localParams.metadata.minPrct)/100)
+                    disp(['Less than ' localParams.metadata.minPrct '% of data in this minute, skipping!'])
+                    continue
+                end
+
+
+
+            end
+            xwav_file(m) = {strjoin(cellstr(uxwav), '; ')};
+            % Calculating percent effort in this minute
+            minPrct_vec(m) = 100 * (length(DATA) / (60*localParams.ltsa.fs));
+
+
+        end
+        %-----------------------------
+
 
         if isempty(DATA)
             continue
         end
 
-        [pxx,F] = pwelch(DATA,window,noverlap,PARAMS.ltsa.nfft,PARAMS.ltsa.fs);   % pwelch is supported psd'er
-        psd = 10*log10(pxx); % counts^2/Hz
-        psd_matrix(:, m) = psd;
-        time_matrix(m) = PARAMS.minTime;
-        minPrct_vec(m) = PARAMS.minPrctVecTemp;
-        xwav_file(m) = cellstr(overlapFiles);
+        % % Pwelch too slow
+        % tic
+        % [pxx,F] = pwelch(DATA,window,noverlap,localParams.ltsa.nfft,localParams.ltsa.fs);   % pwelch is supported psd'er
+        % toc
+        % psd = 10*log10(pxx); % counts^2/Hz
+        % psd_matrix(:, m) = psd;
+        % time_matrix(m) = startMin;
 
+    
+        % Compute Total Power (two-sided PSD)
+        [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
 
-        disp(['PSD for ', char(string(PARAMS.minTime, 'yyyy-MM-dd HH:mm:ss')), ' computed'])
+        % Average two-sided PSD over the minute bin
+        P2 = mean(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
+
+        % Convert to one-sided
+        P1 = P2;
+        if rem(localParams.ltsa.nfft,2) % odd NFFT
+            P1(2:end) = 2*P1(2:end);
+        else % even NFFT
+            P1(2:end-1) = 2*P1(2:end-1);
+        end
+
+        psd_matrix(:, m) = 10*log10(P1);
+        time_matrix(m) = startMin;
+
+        disp(['PSD for ', char(string(startMin, 'yyyy-MM-dd HH:mm:ss')), ' computed'])
 
     end
-
-    % if there aren't the maximum amount of minutes in this day
-
-    idxNaN = any(isnan(psd_matrix), 1);
-    psd_matrix(:, idxNaN) = [];
-    time_matrix(idxNaN) = [];
-    minPrct_vec(idxNaN) = [];
-    xwav_file(idxNaN) = [];
 
 
     % transfer function in dB re 1uPa
@@ -167,118 +271,137 @@ for i = 1:length(allDays)
 
 
     % If you want sound pressure level
-    % bandsOut = 10*log10(getBandSquaredSoundPressure(linLevel, PARAMS.ltsa.fs/PARAMS.ltsa.nfft, F(1), ...
+    % bandsOut = 10*log10(getBandSquaredSoundPressure(linLevel, localParams.ltsa.fs/localParams.ltsa.nfft, F(1), ...
     %     1, length(freqTable), freqTable));
 
     % if you want band width adjusted power spectral density
-    bandsOut = 10*log10(getBandMeanPowerSpectralDensity(linLevel, PARAMS.ltsa.fs/PARAMS.ltsa.nfft, F(1), ...
+    bandsOut = 10*log10(getBandMeanPowerSpectralDensity(linLevel, localParams.ltsa.fs/localParams.ltsa.nfft, F(1), ...
         1, length(freqTable), freqTable));
 
-    figure(601)
-    clf
-    % Make figure wider
-    set(gcf, 'Position', [100, 100, 1200, 600])  % [left, bottom, width, height]
-    % First subplot (wider)
-    ax1 = axes('Position', [0.08, 0.1, 0.6, 0.8]);  % [left, bottom, width, height]
-    surf(ax1, time_matrix, freqTable(:, 2), bandsOut', 'Linestyle', 'none');
-    ylim([str2double(fStart) str2double(fStop)])
-    view(ax1, [0 90])
-    set(ax1, 'yscale', 'log')
-    colormap(ax1, cmocean('thermal'));
-    caxis(ax1, [cm1 cm2])  % clim is caxis in axes
-    ylabel(ax1, 'Frequency (Hz)')
-    xlabel(ax1, 'UTC Time (HH:MM)')
-    title(ax1, [PARAMS.ltsa.organization ' ' PARAMS.ltsa.project ' ' PARAMS.ltsa.site ' ' PARAMS.ltsa.deployment ' Hybrid Millidecade ' datestr(dayStart)])
-    c = colorbar('eastoutside');
-    c.Label.String = 'Spectrum Level (dB re 1\muPa^2/Hz)';
-    datetick(ax1, 'x', 'keeplimits')
-    % Compute percentiles across time (columns of bandsOut')
-    percentiles = [1 10 25 50 75 90 99];
-    pctVals = prctile(bandsOut', percentiles, 2);  % size: [nFreqBands x nPercentiles]
-    % Second subplot (narrower, with y-ticks on right)
-    ax2 = axes('Position', [0.72, 0.1, 0.22, 0.8]);  % moved slightly right and narrow
-    hold(ax2, 'on')
 
-    % Plot amplitude percentiles vs frequency with semilog y
-    for n = 1:length(percentiles)
-        semilogy(ax2, pctVals(:, n), freqTable(:, 2), 'LineWidth', 1.2);
+    idxAllNaN = all(isnan(bandsOut), 2);
+    bandsOut(idxAllNaN, :) = [];
+    time_matrix(idxAllNaN) = [];
+    minPrct_vec(idxAllNaN) = [];
+    xwav_file(idxAllNaN) = [];
+
+
+    if isempty(time_matrix)
+        continue
     end
-    set(ax2, 'YScale', 'log', 'YDir', 'normal', 'YAxisLocation', 'right')
-    xlabel(ax2, 'Spectrum Level (dB re 1\muPa^2/Hz)')
-    ylabel(ax2, 'Frequency (Hz)')  % optional, since it's on right side
-    grid(ax2, 'on')
-    xlim([50 120])
-    ylim([str2double(fStart) str2double(fStop)])
-    title(ax2, 'Percentiles')
-    legend(ax2, strcat(string(percentiles'), 'th'), 'Location', 'northeast')
-    hold(ax2, 'off')
-    toc
+
 
     outName = [
-        PARAMS.ltsa.organization, '_', ...
-        PARAMS.ltsa.project, '_', ...
-        PARAMS.ltsa.site, '_', ...
-        PARAMS.ltsa.deployment, '_', ...
-        num2str(PARAMS.ltsa.fs/1000), 'kHz_',...
-        PARAMS.ltsa.startDep, '-', PARAMS.ltsa.endDep, ...
+        localParams.metadata.organization, '_', ...
+        localParams.metadata.project, '_', ...
+        localParams.metadata.site, '_', ...
+        localParams.metadata.deployment, '_', ...
+        num2str(localParams.ltsa.fs/1000), 'kHz_',...
+        localParams.metadata.startDep, '-', localParams.metadata.endDep, ...
         '_HMD_', ...
         datestr(dayStart + years(2000), 'yymmdd'), '.nc'];
 
-    outFile = fullfile(PARAMS.ltsa.outputDir, outName);
-    outFilePng = strrep(outFile, '.nc', '.png');
-    saveas(gcf, outFilePng);
 
-
-    fclose('all');
-
-    % Delete file if it exists (and not already open)
-    if isfile(outFile)
-        try
-            delete(outFile);
-        catch ME
-            warning('Could not delete existing file: %s\n%s', outFile, ME.message);
-        end
+    if ~exist(localParams.metadata.outputDir, 'dir')
+        mkdir(localParams.metadata.outputDir);
     end
+    outFile = fullfile(localParams.metadata.outputDir, outName);
+    outFilePng = strrep(outFile, '.nc', '.png');
 
 
-    ncid = netcdf.create(fullfile(PARAMS.ltsa.outputDir, outName), 'NETCDF4');
+    % Create invisible figure for parfor
+    fig = figure('Visible','off');
+    clf(fig);
+    set(fig, 'Position', [100, 100, 1200, 600]);  % [left, bottom, width, height]
+
+    % First subplot (wider)
+    ax1 = axes('Parent', fig, 'Position', [0.08, 0.1, 0.6, 0.8]);
+    surf(ax1, time_matrix, freqTable(:, 2), bandsOut', 'Linestyle', 'none');
+    ylim(ax1, [str2double(fStart) str2double(fStop)]);
+    xlim(ax1, [dayStart, dayEnd]);
+    view(ax1, [0 90]);
+    set(ax1, 'yscale', 'log');
+    colormap(ax1, cmocean('thermal'));
+    caxis(ax1, [cm1 cm2]);
+    ylabel(ax1, 'Frequency (Hz)');
+    xlabel(ax1, 'UTC Time (HH:MM)');
+    title(ax1, [localParams.metadata.organization ' ' localParams.metadata.project ' ' ...
+        localParams.metadata.site ' ' localParams.metadata.deployment ...
+        ' Hybrid Millidecade ' datestr(dayStart)]);
+    c = colorbar(ax1,'eastoutside');
+    c.Label.String = 'Spectrum Level (dB re 1\muPa^2/Hz)';
+    datetick(ax1, 'x', 'keeplimits');
+
+    % Compute percentiles
+    percentiles = [1 10 25 50 75 90 99];
+    pctVals = prctile(bandsOut', percentiles, 2);
+
+    % Second subplot (narrower)
+    ax2 = axes('Parent', fig, 'Position', [0.72, 0.1, 0.22, 0.8]);
+    hold(ax2, 'on');
+    for n = 1:length(percentiles)
+        semilogy(ax2, pctVals(:, n), freqTable(:, 2), 'LineWidth', 1.2);
+    end
+    set(ax2, 'YScale', 'log', 'YDir', 'normal', 'YAxisLocation', 'right');
+    xlabel(ax2, 'Spectrum Level (dB re 1\muPa^2/Hz)');
+    ylabel(ax2, 'Frequency (Hz)');
+    grid(ax2,'on');
+    xlim(ax2, [50 120]);
+    ylim(ax2, [str2double(fStart) str2double(fStop)]);
+    title(ax2, 'Percentiles');
+    legend(ax2, strcat(string(percentiles'), 'th'), 'Location', 'northeast');
+    hold(ax2, 'off');
+
+
+
+
+
+    % Save figure to file
+    saveas(fig, outFilePng);
+
+    % Close figure to free memory
+    close(fig);
+
+
+
+    ncid = netcdf.create(fullfile(localParams.metadata.outputDir, outName), 'NETCDF4');
 
 
     % Add global attributes
     globalID = netcdf.getConstant('NC_GLOBAL');
-    netcdf.putAtt(ncid, globalID, 'title', char(PARAMS.ltsa.title));
-    netcdf.putAtt(ncid, globalID, 'summary', char(PARAMS.ltsa.summary));
-    netcdf.putAtt(ncid, globalID, 'history', char(PARAMS.ltsa.history));
-    netcdf.putAtt(ncid, globalID, 'source', char(PARAMS.ltsa.source));
-    netcdf.putAtt(ncid, globalID, 'acknowledgements', char(PARAMS.ltsa.acknowledgements));
-    netcdf.putAtt(ncid, globalID, 'citation', char(PARAMS.ltsa.citation));
-    netcdf.putAtt(ncid, globalID, 'comment', char(PARAMS.ltsa.comment));
-    netcdf.putAtt(ncid, globalID, 'conventions', char(PARAMS.ltsa.conventions));
-    netcdf.putAtt(ncid, globalID, 'creator_name', char(PARAMS.ltsa.creator_name));
-    netcdf.putAtt(ncid, globalID, 'creator_role', char(PARAMS.ltsa.creator_role));
-    netcdf.putAtt(ncid, globalID, 'creator_url', char(PARAMS.ltsa.creator_url));
-    netcdf.putAtt(ncid, globalID, 'publisher_url', char(PARAMS.ltsa.publisher_url));
-    netcdf.putAtt(ncid, globalID, 'institution', char(PARAMS.ltsa.institution));
-    netcdf.putAtt(ncid, globalID, 'instrument', char(PARAMS.ltsa.instrument));
-    netcdf.putAtt(ncid, globalID, 'keywords', char(PARAMS.ltsa.keywords));
-    netcdf.putAtt(ncid, globalID, 'keywords_vocabulary', char(PARAMS.ltsa.keywords_vocabulary));
-    netcdf.putAtt(ncid, globalID, 'license',char( PARAMS.ltsa.license));
-    netcdf.putAtt(ncid, globalID, 'naming_authority', char(PARAMS.ltsa.naming_authority));
-    netcdf.putAtt(ncid, globalID, 'product_version', char(PARAMS.ltsa.product_version));
-    netcdf.putAtt(ncid, globalID, 'publisher_name', char(PARAMS.ltsa.publisher_name));
-    netcdf.putAtt(ncid, globalID, 'reference', char(PARAMS.ltsa.reference));
+    netcdf.putAtt(ncid, globalID, 'title', char(localParams.metadata.title));
+    netcdf.putAtt(ncid, globalID, 'summary', char(localParams.metadata.summary));
+    netcdf.putAtt(ncid, globalID, 'history', char(localParams.metadata.history));
+    netcdf.putAtt(ncid, globalID, 'source', char(localParams.metadata.source));
+    netcdf.putAtt(ncid, globalID, 'acknowledgements', char(localParams.metadata.acknowledgements));
+    netcdf.putAtt(ncid, globalID, 'citation', char(localParams.metadata.citation));
+    netcdf.putAtt(ncid, globalID, 'comment', char(localParams.metadata.comment));
+    netcdf.putAtt(ncid, globalID, 'conventions', char(localParams.metadata.conventions));
+    netcdf.putAtt(ncid, globalID, 'creator_name', char(localParams.metadata.creator_name));
+    netcdf.putAtt(ncid, globalID, 'creator_role', char(localParams.metadata.creator_role));
+    netcdf.putAtt(ncid, globalID, 'creator_url', char(localParams.metadata.creator_url));
+    netcdf.putAtt(ncid, globalID, 'publisher_url', char(localParams.metadata.publisher_url));
+    netcdf.putAtt(ncid, globalID, 'institution', char(localParams.metadata.institution));
+    netcdf.putAtt(ncid, globalID, 'instrument', char(localParams.metadata.instrument));
+    netcdf.putAtt(ncid, globalID, 'keywords', char(localParams.metadata.keywords));
+    netcdf.putAtt(ncid, globalID, 'keywords_vocabulary', char(localParams.metadata.keywords_vocabulary));
+    netcdf.putAtt(ncid, globalID, 'license',char( localParams.metadata.license));
+    netcdf.putAtt(ncid, globalID, 'naming_authority', char(localParams.metadata.naming_authority));
+    netcdf.putAtt(ncid, globalID, 'product_version', char(localParams.metadata.product_version));
+    netcdf.putAtt(ncid, globalID, 'publisher_name', char(localParams.metadata.publisher_name));
+    netcdf.putAtt(ncid, globalID, 'reference', char(localParams.metadata.reference));
 
-    netcdf.putAtt(ncid, globalID, 'organization', char(PARAMS.ltsa.organization));
-    netcdf.putAtt(ncid, globalID, 'project', char(PARAMS.ltsa.project));
-    netcdf.putAtt(ncid, globalID, 'site', char(PARAMS.ltsa.site));
-    netcdf.putAtt(ncid, globalID, 'deployment', PARAMS.ltsa.deployment);
-    pointStr = sprintf('POINT(%0.6f %0.6f)', PARAMS.ltsa.longitude, PARAMS.ltsa.latitude);
-    netcdf.putAtt(ncid, globalID, 'geospatial_bounds', pointStr);    netcdf.putAtt(ncid, globalID, 'id', char(PARAMS.ltsa.id));
-    netcdf.putAtt(ncid, globalID, 'sample_rate', PARAMS.ltsa.fs);
-    netcdf.putAtt(ncid, globalID, 'nfft', PARAMS.ltsa.nfft);
-    idxTF = find(PARAMS.tfFilePath == '\', 1, 'last');
-    netcdf.putAtt(ncid, globalID, 'transferFunction_file', PARAMS.tfFilePath(idxTF+1:end));
-    netcdf.putAtt(ncid, globalID, 'freq_bin_size', PARAMS.ltsa.dfreq);
+    netcdf.putAtt(ncid, globalID, 'organization', char(localParams.metadata.organization));
+    netcdf.putAtt(ncid, globalID, 'project', char(localParams.metadata.project));
+    netcdf.putAtt(ncid, globalID, 'site', char(localParams.metadata.site));
+    netcdf.putAtt(ncid, globalID, 'deployment', localParams.metadata.deployment);
+    pointStr = sprintf('POINT(%0.6f %0.6f)', localParams.metadata.longitude, localParams.metadata.latitude);
+    netcdf.putAtt(ncid, globalID, 'geospatial_bounds', pointStr);    netcdf.putAtt(ncid, globalID, 'id', char(localParams.metadata.id));
+    netcdf.putAtt(ncid, globalID, 'sample_rate', localParams.ltsa.fs);
+    netcdf.putAtt(ncid, globalID, 'nfft', localParams.ltsa.nfft);
+    idxTF = find(localParams.metadata.tfFilePath == '\', 1, 'last');
+    netcdf.putAtt(ncid, globalID, 'transferFunction_file', localParams.metadata.tfFilePath(idxTF+1:end));
+    netcdf.putAtt(ncid, globalID, 'freq_bin_size', localParams.ltsa.dfreq);
     netcdf.putAtt(ncid, globalID, 'cmd_data_type', 'TimeSeries');
     netcdf.putAtt(ncid, globalID, 'time_coverage_duration', 'P1D');
     netcdf.putAtt(ncid, globalID, 'time_coverage_resolution', 'P60S');
@@ -286,12 +409,13 @@ for i = 1:length(allDays)
 
 
     xwav_file = string(xwav_file);
+    numFiles = size(xwav_file, 1);
+
 
     % Define dimensions
     timeDimID = netcdf.defDim(ncid, 'time', length(time_matrix));
     freqDimID = netcdf.defDim(ncid, 'frequency', length(freqTable(:, 2)));
-    xwavFileDimID = netcdf.defDim(ncid, 'xwavFile', length(xwav_file));
-
+    dimNumFilesID = netcdf.defDim(ncid, 'numFiles', numFiles);
     % Define variables
 
     % time
@@ -312,7 +436,8 @@ for i = 1:length(allDays)
     netcdf.putAtt(ncid, effortVarID, 'units', 'percent');
 
     % xwav file associated with measurement
-    xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'string', xwavFileDimID);
+    % xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', xwavFileDimID);
+    xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_STRING', dimNumFilesID);
 
     % End Define Mode
     netcdf.endDef(ncid);
@@ -326,20 +451,14 @@ for i = 1:length(allDays)
     netcdf.putVar(ncid, timeVarID, double(secondsSinceEpoch));
     netcdf.putVar(ncid, freqVarID, double(freqTable(:, 2)));
     netcdf.putVar(ncid, psdVarID, double(bandsOut'));
-    netcdf.putVar(ncid, effortVarID, double(minPrct_vec(:)*100));
-    netcdf.putVar(ncid, xwavFileVarID, xwav_file');
+    netcdf.putVar(ncid, effortVarID, double(minPrct_vec(:)));
+    netcdf.putVar(ncid, xwavFileVarID, xwav_file);
+    netcdf.close(ncid);
+    disp(['Saved NetCDF: ', fullfile(localParams.metadata.outputDir, outName)]);
+
 
 end
 
 
 
 end
-
-
-% info = ncinfo('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc')
-% 
-% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'psd')
-% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'time')
-% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'effort')
-% data = ncread('D:\HMD\MBARC_CINMS_B_49_10kHz_230919-240317_HMD_230929.nc', 'xwavFile')
-

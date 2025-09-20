@@ -12,16 +12,25 @@ global PARAMS
 
 % only doing for HARP data right now...
 
-PARAMS.ltsa.ftype == 2;
-
 
 % get sample rate - only the first file sr for now.....
-% if PARAMS.ltsa.ftype == 1   % wav
-% %     [y, PARAMS.ltsa.fs, nBits, OPTS] = wavread( fullfile(PARAMS.ltsa.inputDir,PARAMS.ltsa.fname(1,:)),10);
-%     info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)));
-%     PARAMS.ltsa.fs = info.SampleRate;
-% elseif PARAMS.ltsa.ftype == 2   % xwav
-    fid = fopen(fullfile(PARAMS.ltsa.inputDir,PARAMS.ltsa.fname(1,:)),'r');
+
+if PARAMS.metadata.recursiveSearch == 1
+
+    ff = dir(fullfile(PARAMS.metadata.inputDir, '**', PARAMS.fname(1).name));
+
+    fid = fopen([ff.folder, '\' ff.name],'r');
+
+elseif PARAMS.metadata.recursiveSearch == 0
+
+    % Read 1-minute chunk of data from file
+    fid = fopen(fullfile(PARAMS.metadata.inputDir,PARAMS.metadata.fname(1,:)),'r');
+end
+
+
+
+
+ %   fid = fopen(fullfile(PARAMS.ltsa.inputDir,PARAMS.ltsa.fname(1,:)),'r');
     fseek(fid,24,'bof');
     PARAMS.ltsa.fs = fread(fid,1,'uint32');          % Sampling Rate (samples/second)
     fclose(fid);
@@ -60,53 +69,18 @@ end
         disp('ERROR -- number of channels not 1 nor 4')
         disp(['nchan = ',num2str(PARAMS.ltsa.nch)])
     end
-    % elseif PARAMS.ltsa.dtype == 2   % ARP data => 32 byte header + 2 byte tailer
-    %     PARAMS.ltsa.blksz = (65536 - 34)/2;
-    % elseif PARAMS.ltsa.dtype == 3   % OBS data => 128 samples per block
-    %     PARAMS.ltsa.blksz = 128;
-% elseif PARAMS.ltsa.dtype == 4 || PARAMS.ltsa.dtype == 5 % wave files
-%     % don't worry about it for this type...
-%     % added for very long wav files with only one raw file
-% 
-% else
-%     disp('Error - non-supported data type')
-%     disp(['PARAMS.ltsa.dtype = ',num2str(PARAMS.ltsa.dtype)])
-%     return
-% end
+
 
 % check to see if tave is too big, if so, set to max length
 %
  maxTave = (PARAMS.ltsahd.write_length(1) * 250) / PARAMS.ltsa.fs;
-if PARAMS.ltsa.ftype ~= 1
-    maxTave = (PARAMS.ltsahd.write_length(1) * PARAMS.ltsa.blksz) / PARAMS.ltsa.fs;
-    if PARAMS.ltsa.tave > maxTave
-        PARAMS.ltsa.tave = maxTave;
-        disp('Averaging time too long, set to maximum')
-        disp(['Tave = ',num2str(PARAMS.ltsa.tave)])
-    end
-end
+
 % number of samples for fft - make sure it is an integer
-% PARAMS.ltsa.nfft = ceil(PARAMS.ltsa.fs / PARAMS.ltsa.dfreq);
 PARAMS.ltsa.nfft = floor(PARAMS.ltsa.fs / PARAMS.ltsa.dfreq);
 disp(['Number of samples for fft: ', num2str(PARAMS.ltsa.nfft)])
 
-% compression factor
-PARAMS.ltsa.cfact = PARAMS.ltsa.tave * PARAMS.ltsa.fs / PARAMS.ltsa.nfft;
-if PARAMS.ltsa.ftype == 1
-    disp(['WAV to LTSA Compression Factor: ',num2str(PARAMS.ltsa.cfact)])
-else
-    disp(['XWAV to netCDF Compression Factor: ',num2str(PARAMS.ltsa.cfact)])
-end
-disp(' ')
 
-% LTSA version number based on number of samples (averages)
-% Version number is also set in previously called program, get_headers based
-% on number of raw files
-if PARAMS.ltsa.ftype == 1   % wav file
-    Nsamp = floor(sum(PARAMS.ltsahd.nsamp ./ PARAMS.ltsa.nch));
-else    % xwav file
-    Nsamp = floor(sum(PARAMS.ltsahd.byte_length)/(PARAMS.ltsa.nch *PARAMS.ltsa.nBits/8)); 
-end
+Nsamp = floor(sum(PARAMS.ltsahd.byte_length)/(PARAMS.ltsa.nch *PARAMS.ltsa.nBits/8)); 
 
 % number of frequencies in each spectral average:
 if mod(PARAMS.ltsa.nfft,2) % odd
