@@ -8,9 +8,12 @@ if p.normalizeTF
     
     linearSpec = 10.^(specClickTf_norm./20);
     spectraMean = 20*log10(mean(linearSpec,1));
-    
-else
 
-    linearSpec = 10.^(specSet./20);
-    spectraMean = 20*log10(mean(linearSpec,1)); 
+else
+    if p.linearTF
+        linearSpec = 10.^(specSet./20);
+        spectraMean = 20*log10(mean(linearSpec,1));
+    else
+        spectraMean = 20*log10(mean(specSet,1));
+    end
 end

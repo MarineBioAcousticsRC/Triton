@@ -241,12 +241,14 @@ for iC = 1:length(dateInterval)
         binData(cIdx,1).tInt = [dateInterval(iC),dateInterval(iC)+(p.timeStep/(24*60))]; % store start and end time of interval
         binData(cIdx,1).clickTimes = {ttSet}; % store click times.
         binData(cIdx,1).clusteredTF = 0;
-        binData(cIdx,1).envDur = envDur;
-        if size(envSet,1)>1
-            binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
-        elseif size(envSet,1)==1
-            binData(cIdx,1).envMean = envSet./max(envSet,[],2);
-        end
+        [Cb,Ib]=histc(envDur,1:p.maxDur);
+        binData(cIdx,1).envDur = Cb';
+        binData(cIdx,1).envMean = mean(envSet,1);
+        % if size(envSet,1)>1
+        %     binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
+        % elseif size(envSet,1)==1
+        %     binData(cIdx,1).envMean = envSet./max(envSet,[],2);
+        % end
         [binData(cIdx,1).dTT,binData(cIdx,1).clickRate] = ct_compute_rate_distributions(ttSet,p);
         
         cIdx = cIdx +1;
