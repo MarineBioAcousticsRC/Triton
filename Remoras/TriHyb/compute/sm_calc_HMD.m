@@ -243,8 +243,8 @@ parfor i = 1:length(allDays)
         % Compute Total Power (two-sided PSD)
         [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
 
-        % Average two-sided PSD over the minute bin
-        P2 = mean(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
+        % Median two-sided PSD over the minute bin
+        P2 = median(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
 
         % Convert to one-sided
         P1 = P2;
@@ -405,7 +405,7 @@ parfor i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'cmd_data_type', 'TimeSeries');
     netcdf.putAtt(ncid, globalID, 'time_coverage_duration', 'P1D');
     netcdf.putAtt(ncid, globalID, 'time_coverage_resolution', 'P60S');
-    netcdf.putAtt(ncid, globalID, 'date_created', char(datetime("today", 'Format', 'yyyy-MM-dd')));
+    netcdf.putAtt(ncid, globalID, 'date_created', char(datetime('today', 'Format', 'yyyy-MM-dd')));
 
 
     xwav_file = string(xwav_file);
