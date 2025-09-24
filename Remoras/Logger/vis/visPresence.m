@@ -216,7 +216,7 @@ if ~ isempty(presence)
 end
 
 axH = gca;  % get axis handle for current figure
-cmap = colormap(gca,brewermap([],'YlGnBu'));%'YlGnBu'
+cmap = colormap(gca,'gray');%'YlGnBu'
 %cmap= colormap(winter);
 cRange = [100,1000];
 if ~isempty(Counts)
