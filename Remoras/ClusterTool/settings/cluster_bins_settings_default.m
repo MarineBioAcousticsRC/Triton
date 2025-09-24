@@ -34,11 +34,11 @@ p.modular = 0; % if you use a number other than 0, modularity algorithm will be 
 % communities detected. 1 = no bias, >1 bias toward fewer communities, <1,
 % bias toward more communities.
 p.useSpectra = 1;
-p.useEnvelope = 0;
+p.useEnvelope = 1;
 
 p.mergeTF = 0; % If 1, when a graph is large, we will attempt to reduce computation time
 % by merging extremely similar nodes before clustering. 
-p.linearTF = 1;% compare spectra in linear space
+p.linearTF = 0;% compare spectra in linear space
 p.plotFlag = 1; % Want plots? Turn this off for large jobs, but useful for
 % seeing how your clusters are coming out when choosing parameters above.
 p.falseRM = 0; % Want to remove false positives? Working on removing the 
@@ -52,10 +52,10 @@ p.pauseAfterPlotting = 0; % if you want it to pause post plotting so you can loo
 % types. Results are typically better if you focus on comparing the region
 % where frequencies differ most.
 p.startFreq = 5; % index of start freq in vector "f" from TPWS
-p.endFreq = 98; % index of end freq
+p.endFreq = 100; % index of end freq
 
 %%% Vectors to use for binning ICI and click rate
-p.barIntMax = 0.6; % ICI bins in seconds (minICI:resolution:maxICI)
+p.barIntMax = 1; % ICI bins in seconds (minICI:resolution:maxICI)
 %p.barRate = 1:1:30; % click rate in clicks per second (minRate:resolution:maxRate)
 
 p.diff = 0;% compare first derivative of spectra if 1. If 0 spectra will be compared normally.

@@ -37,6 +37,7 @@ end
          
  
 deploy = strtrim(get(handles.deploy.disp, 'string'));
+site = strtrim(get(handles.site.disp, 'string'));
 userID = strtrim(get(handles.user.disp, 'string'));
 % region = strtrim(get(handles.region.disp, 'string'));
 
@@ -60,8 +61,9 @@ Header = get(Range, 'Value');
     lastrow=size(xlcell,1);
     M_rowstartnum=lastrow+1;
     
-    M = [{userID} {deploy} {effortstart} {effortend}];
+%     M = [{userID} {project} {region} {deploy} {site} {effortstart} {effortend}];
+    M = [{userID} {project} {deploy} {site} {effortstart} {effortend}];
     
     xlswrite([handles.logfilepath filesep handles.logfilename],...
-    M, 'MetaData', sprintf('A%d', M_rowstartnum));
+    M, 'MetaData', ['A' num2str(M_rowstartnum)]);
     handles = [];

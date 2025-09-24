@@ -56,7 +56,7 @@ for iD = 1:size(typeList,1)
             clusterTimes = [clusterTimes;inFile.thisType.Tfinal{iRow,7}];
             clusterSpectra = [clusterSpectra;inFile.thisType.Tfinal{iRow,1}];
             try 
-                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}];
+                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}(:,1:51)];
             catch
                 nRows = size(inFile.thisType.Tfinal{iRow,2},1);
                 nCols = size(clusterICI,2)- size(inFile.thisType.Tfinal{iRow,2},2);
@@ -68,13 +68,17 @@ for iD = 1:size(typeList,1)
             
         end
     end
+    
+    badRows = find(isnan(sum(clusterWave,2)));
+    clusterSpectra(badRows,:) = [];
+    clusterICI(badRows,:) = [];
+    clusterWave(badRows,:) = [];    
+    clusterTimes(badRows,:) = []; 
+    
     [clusterTimes,I] = sort(clusterTimes);
     clusterSpectra = clusterSpectra(I,:);
-    
-    % make sure spectra was reverted from linear convertion and is normalized between 0 and 1
-    if max(max(clusterSpectra)) > 1
-        clusterSpectra = (20*log10(clusterSpectra(:,:)))-1;
-    end
+%     clusterSpectraMin = clusterSpectra-min(clusterSpectra,[],2);
+%     clusterSpectra = clusterSpectraMin./max(clusterSpectraMin,[],2);
     clusterICI = clusterICI(I,:);
     if ~isempty(clusterWave)
         clusterWave = clusterWave(I,:);
@@ -86,7 +90,10 @@ for iD = 1:size(typeList,1)
     fprintf('   %0.0f encounters found\n',nBouts)
 
     %% Get training set
-    trainBoutIdx = sort(randperm(nBouts,round(nBouts*(trainPercent/100))))';
+    if trainPercent>1
+        trainPercent = trainPercent/100;
+    end
+    trainBoutIdx = sort(randperm(nBouts,round(nBouts*(trainPercent))))';
     fprintf('   %0.0f train encounters selected\n',length(trainBoutIdx))
     
     % pull out training data
@@ -96,6 +103,9 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTrain = sum(boutSizeTrain);
+    if nBinsTrain ==0
+        error('Problem finding data. Check input base folder and wildcard. Use \**\ to search subfolders')
+    end
     binIndicesTrain = sort(randi(nBinsTrain,1,nExamples));
     
     
@@ -125,12 +135,15 @@ for iD = 1:size(typeList,1)
     
     %% get validation set
     if REMORA.nn.train_test_set.validationTF 
+        if validPercent>1
+            validPercent = validPercent/100;
+        end
         if (nBouts-length(trainBoutIdx))<2
-            validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent/100)))))';        
+            validBoutIdx = sort(randperm(nBouts,max(1,round(nBouts*(validPercent)))))';        
         else
             boutsLeft = setdiff(1:nBouts,trainBoutIdx);
             boutsLeft = boutsLeft(randperm(length(boutsLeft)));% shuffle it
-            validBoutIdx = boutsLeft(1:max(1,floor(nBouts*(validPercent/100))))';
+            validBoutIdx = boutsLeft(1:max(1,floor(nBouts*(validPercent))))';
         end
         fprintf('   %0.0f validation encounters selected\n',length(validBoutIdx))
         
@@ -141,7 +154,7 @@ for iD = 1:size(typeList,1)
         
         % randomly select desired number of events across bouts
         nBinsValid  = sum(boutSizeValid);
-        nValidExamples = round(nExamples*(round(100*(validPercent/trainPercent))/100));
+        nValidExamples = round(nExamples*validPercent);
         binIndicesValid = sort(randi(nBinsValid,1,nValidExamples));
         
         % binIndicesValid  = sort(randperm(nBinsValid,min(nExamples,nBinsValid )));
@@ -182,7 +195,7 @@ for iD = 1:size(typeList,1)
     
     % randomly select desired number of events across bouts
     nBinsTest = sum(boutSizeTest);
-    nTestExamples = nExamples*round(100*(100-validPercent-trainPercent)/trainPercent)/100;
+    nTestExamples = round(nExamples*(1-validPercent-trainPercent));
 
     binIndicesTest = sort(randi(nBinsTest,1,nTestExamples));
     %binIndicesTest = sort(randperm(nBinsTest,min(nExamples,nBinsTest)));
@@ -204,9 +217,15 @@ for iD = 1:size(typeList,1)
     else
         testSetWave{iD} = [];
     end
+    
     testSetLabels{iD} = ones(size(binIndicesTest,2),1)*iD;
     trainSetSize(iD) = nBinsTrain;
 end
+
+setSpecHDim = size(trainSetMSP{1},2);
+setICIHDim  = size(trainSetICI{1},2);
+setWaveHDim = size(trainSetWave{1},2);
+
 fprintf('Minimum available unique training set size is %0.0f\n', min(trainSetSize))
 fprintf('Maximum available unique training set size is %0.0f\n', max(trainSetSize))
 
@@ -222,6 +241,10 @@ savedTrainFile = fullfile(saveDir,saveNameTrain);
 savedTestFile = fullfile(saveDir,saveNameTest);
 savedValidFile = fullfile(saveDir,saveNameValid);
 trainTestSetInfo = REMORA.nn.train_test_set;
+trainTestSetInfo.setSpecHDim = setSpecHDim;
+trainTestSetInfo.setICIHDim  = setICIHDim;
+trainTestSetInfo.setWaveHDim = setWaveHDim;
+
 save(fullfile(saveDir,saveNameTest),'testDataAll','testLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 save(fullfile(saveDir,saveNameTrain),'trainDataAll','trainLabelsAll','typeNames','trainTestSetInfo','-v7.3')
 save(fullfile(saveDir,saveNameValid),'validDataAll','validLabelsAll','typeNames','trainTestSetInfo','-v7.3')

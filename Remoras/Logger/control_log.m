@@ -42,12 +42,12 @@ switch action
         set(handles.logcallgui, 'color',BgColor)
         control_log('display_lastentry');  % Set last entry appropriately
     
-    case 'deployment_start'
-        deployment = handles.deploy.disp.Value;
-        if isnumeric(deployment)
-            values = handles.deploy.disp.String;
-            deployment = values(deployment);
-        end
+    case 'deployment_start'   
+        project = get(handles.project.disp, 'String');
+        site = get(handles.site.disp, 'String');
+        deployment = get(handles.deploy.disp, 'String');
+        %effort = dbGetEffort(
+        1;
         
     case 'display_lastentry'
         % Update the previous entry for this effort type
@@ -188,31 +188,17 @@ switch action
                 
     case 'set_metadata'
         
-        % Retrieve the set of ids associated with deployments
-        deployment_id = log_getdeploymentids();
         % Verify user has filled in requested fields before proceeding
-        fields = {'deploy', 'user', 'effort_start'};
-        WorksheetNames = { 'DeploymentId', 'User ID', 'Effort Start'};
+        fields = {'project', 'deploy', 'site', 'user', 'effort_start'};
+        WorksheetNames = {'Project', 'Deployment', 'Site', 'User ID', ...
+            'Effort Start'};
         values = cell(length(fields),1);
         bad = zeros(1, length(fields));
         for fidx = 1:length(fields)
-            current_h = handles.(fields{fidx}).disp;
-            switch current_h.Style
-                case 'popupmenu'
-                    % Retrieve currently selected value
-                    selection = current_h.Value
-                    values{fidx} = current_h.String{selection};
-                case 'edit'
-                    values{fidx} = current_h.String;
-            end
-            
+            values{fidx} = get(handles.(fields{fidx}).disp, 'String');
             bad(fidx) = isempty(values{fidx});
             % Additional checking
             switch fields{fidx}
-                case 'user'
-                    if isempty(values{fidx})
-                        bad(fidx) = true;  % no empty UserId
-                    end
                 case 'effort_start'
                     % Verify date format
                     try
@@ -222,26 +208,10 @@ switch action
                         bad(fidx) = true;
                     end
                 case 'deploy'
-                    % Verify correct deployment if possible
-                    if ~ isempty(deployment_id)
-                        matches = find(strcmpi(values{fidx}, deployment_id));
-                        if length(matches) == 1
-                            % Use canonical value from database in case
-                            % user had incorrect case
-                            values{fidx} = deployment_id(matches);
-                        else
-                            response = questdlg(join([
-                                "Proceed?  You will not be allowed to" ...
-                                "submit this log until a deployment" ...
-                                "with this Id is present, or the Id", ...
-                                "is changed."], " "), ...
-                                "No such deployment in the Tethys database", ...
-                                "Yes", "Let me fix it", "Let me fix it");
-                            switch response
-                                case "Let me fix it"
-                                    bad(fidx) = true;
-                            end
-                        end
+                    % Verify deployment is numeric
+                    [v, ok] = str2num(values{fidx});
+                    if ~ ok
+                        bad(fidx) = true;
                     end
             end
         end

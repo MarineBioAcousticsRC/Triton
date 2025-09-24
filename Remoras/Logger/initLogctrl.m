@@ -10,14 +10,7 @@ function initLogctrl(varargin)
 % Initialize GUI for logger and request log file
 % mode:  'create' - new log, 'append' - continue existing
 
-global PARAMS TREE handles HANDLES REMORA
-
-% Get a Tethys query handler instance from the Tethys REMORA
-if exist('get_tethys_server') ~= 2
-    error('Tethys Remora must be installed')
-else
-    query_h = get_tethys_server();
-end
+global PARAMS TREE handles HANDLES
 
 if length(varargin) > 2
     hObject = varargin{1};
@@ -41,7 +34,7 @@ end
 
 switch mode
     case 'create'
-        [fname, fdir] = uiputfile('.xlsx', 'New annotation log', 'unique_logname');
+        [fname, fdir] = uiputfile('.xls', 'New annotation log');
     case 'append'
         [fname, fdir] = ...
             uigetfile({'*.xls'; '*.xlsx'}, 'Open existing annotation log');
@@ -508,76 +501,78 @@ TextAttrib = {'Style', 'text', 'Units', 'normalized', ...
 EditAttrib = { ...
     'Style', 'edit', 'String', '', 'Units', 'normalized', ...
     'HorizontalAlignment', 'left', 'BackgroundColor', bgColor1};
-% popup menu have these attributes
-PopupAttrib = {
-    'Style', 'popupmenu', 'Units', 'normalized', ...
-    'HorizontalAlignment', 'left', 'BackgroundColor', bgColor1};
     
 % User ID
 btnpos = [x(1,1), y(4,1), w, h];
-handles.user.text= uicontrol(handles.logcallgui,TextAttrib{:},...
+handles.user.txt= uicontrol(handles.logcallgui,TextAttrib{:},...
     'String', 'User ID', 'Position', btnpos );
 btnpos = [x(1,2)-dsepx, y(4,1), w, h];
 handles.user.disp= uicontrol(handles.logcallgui,EditAttrib{:},...
     'Position', btnpos);
 
-% Retrieve valid deployment identifiers if we have a valid query handler
-if ~ isempty(query_h)
-    try
-        dep = dbGetDeployments(query_h, "return", "Id");
-        deployment_id = sort(string(arrayfun(@(x) x.Deployment.Id, dep)));
-    catch e
-        deployment_id = [];
-        fprintf("Unable to query Tethys, list of valid deployment identifiers unavailable\n")
-        fprintf("Error:\n")
-        e
+% Attempt to parse out the Project, Deployment, and Site from
+% an open LTSA or XWav file
+if length(PARAMS.ltsa.infile) + length(PARAMS.infile) > 0 
+    ProjectSiteDeployRE = '(?<Project>[A-Za-z]+)(?<Deployment>\d+)(?<Site>[A-Za-z0-9]+)_.*';
+    match = regexp(PARAMS.ltsa.infile, ProjectSiteDeployRE, 'names');
+    if isempty(match)
+        % Try the current input file
+        match = regexp(PARAMS.infile, ProjectSiteDeployRE, 'names');        
     end
-else
-    deployment_id = [];
-end
-% Attempt to divine the deployment identifier from an open LTSA or audio
-% file
-if length(PARAMS.ltsa.infile) + length(PARAMS.infile) > 0
-    % See if any of the deployment Ids are a substring of the filename
-    if ~ isempty(deployment_id)
-        fnames = string({PARAMS.ltsa.infile, PARAMS.infile});
-        for idx = 1:length(fnames)
-            if ~ isempty(fnames(idx))
-                % See if a deployment matches
-                matches = arrayfun(...
-                    @(dep) contains(fnames(1), dep, 'IgnoreCase', true), ...
-                    deployment_id);
-                match_idx = find(matches > 0, 1, 'first');
-                if ~ isempty(match_idx)
-                    break;
-                end
-            end
+    if isempty(match)
+        Project = ''; Deployment = ''; Site = '';
+        handles.DeploymentStart = '';
+        handles.DeploymentEnd = '';
+    else
+        Project = match.Project;
+        Deployment = str2double(match.Deployment);
+        Site = match.Site;
+        try
+            info = dbDeploymentInfo(handles.query, 'Project', Project, ...
+                'DeploymentID', Deployment, 'Site', Site);            
+           
+            handles.DeploymentStart = ...
+                dbISO8601toSerialDate(info.SamplingDetails.Channel(1).Start);
+            handles.DeploymentEnd = ...
+                dbISO8601toSerialDate(info.SamplingDetails.Channel(1).End);
+        catch
+            handles.DeploymentStart = '';
+            handles.DeploymentEnd = '';            
         end
     end
 else
-    match_idx = [];
+    % No LTSA or XWav open
+    Project = '';
+    Deployment = '';
+    Site = '';
+    handles.DeploymentStart = '';
+    handles.DeploymentEnd = '';
 end
-handles.DeploymentStart = '';
-handles.DeploymentEnd = '';
+% Project 
+btnpos = [x(1,1), y(5,1), w, h];
+handles.project.txt = uicontrol(handles.logcallgui, TextAttrib{:},...
+    'String', 'Project', 'position', btnpos);
+btnpos = [x(1,2)-dsepx, y(5,1), w, h];
+handles.project.disp = uicontrol(handles.logcallgui,EditAttrib{:},...
+    'position', btnpos,'String', Project);
 
 % Deployment
-labelStr = 'Deployment/Id';
-btnpos = [x(1,1), y(5,1), w, h];
+labelStr = 'Deployment';
+btnpos = [x(1,1), y(6,1), w, h];
 handles.deploy.text= uicontrol(handles.logcallgui, TextAttrib{:},...
-    'String', labelStr, 'Position', btnpos);
-btnpos = [x(1,2)-dsepx, y(5,1), w, h];
-if isempty(deployment_id)
-    handles.deploy.disp = uicontrol(handles.logcallgui, EditAttrib{:},...
-        'Position', btnpos,  'String', 'id');
-else
-    handles.deploy.disp = uicontrol(handles.logcallgui, PopupAttrib{:},...
-        'Position', btnpos,  'String', deployment_id);
-    if ~ isempty(match_idx)
-        % Set guess as first match
-        handles.deploy.disp.Value = match_idx;
-    end
-end
-    
+    'String', 'Deployment', 'Position', btnpos);
+btnpos = [x(1,2)-dsepx, y(6,1), w, h];
+handles.deploy.disp= uicontrol(handles.logcallgui,EditAttrib{:},...
+    'Position', btnpos,  'String', num2str(Deployment));
+
+% Site
+btnpos = [x(1,1), y(7,1), w, h];
+handles.site.txt= uicontrol(handles.logcallgui, TextAttrib{:},...
+    'String', 'Site', 'Position', btnpos);
+btnpos = [x(1,2)-dsepx, y(7,1), w, h];
+handles.site.disp= uicontrol(handles.logcallgui, EditAttrib{:},...
+    'Position', btnpos, 'String', Site);
+
 % Effort start time
 btnpos = [x(1,1), y(8,1), w, h];
 handles.effort_start.txt = uicontrol(handles.logcallgui,...
@@ -585,13 +580,14 @@ handles.effort_start.txt = uicontrol(handles.logcallgui,...
     'Callback', {@set_time, 'effort_start'}, ...
     'String', 'Effort Start Time', 'position', btnpos, ...
     'TooltipString', 'Set to start of deployment (if available)');
+
 btnpos = [x(1,2)-dsepx, y(8,1), w, h];
 handles.effort_start.disp = uicontrol(handles.logcallgui, EditAttrib{:},...
     'position', btnpos, ...
     'String', datestr(handles.DeploymentStart, 31));
 
 
-labelStr = 'Set deployment metadata';
+labelStr = 'set deployment metadata';
 btnpos = [mid-w, y(2,1), 2*w, 2*h];
 handles.done= uicontrol(handles.logcallgui,...
     'style', 'pushbutton',...
@@ -632,13 +628,17 @@ handles.end_pick.disp = uicontrol(handles.logcallgui, TextAttrib{:}, ...
 
 
 
-handles.log.disp = [handles.deploy.disp handles.user.disp];
-handles.log.text = [handles.deploy.text handles.user.text];
+handles.log.disp = [handles.deploy.disp handles.site.disp handles.user.disp];%...
+    %handles.region.disp];
+
+handles.log.text = [handles.deploy.text handles.site.txt handles.user.txt];% ...
+    %handles.region.txt];
 
 handles.log.effort = [...
-    handles.user.text handles.user.disp ...
-    handles.deploy.text handles.deploy.disp ...
+    handles.project.txt handles.project.disp ... 
     handles.effort_start.txt handles.effort_start.disp ...
+    handles.deploy.text handles.deploy.disp handles.site.txt... 
+    handles.site.disp handles.user.txt handles.user.disp ...
     handles.done ];
 
 handles.log.close = [handles.done, ...

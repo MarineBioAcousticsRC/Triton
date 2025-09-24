@@ -99,6 +99,7 @@ MSN = MSN(ppKeep,:);
 fprintf('%0.0f clicks left after applying amplitude threshold.\n',length(MTT))
 if isempty(MTT)
     warning('All clicks pruned out by amplitude threshold, nothing left to cluster.')
+    return
 end
 
 % Remove clicks that are really close together if desired.
@@ -121,11 +122,8 @@ if isempty(MTT) % go to next file if no clicks left in this one.
 end
 
 % Build vector of bin starts/ends.
-if isinf(p.timeStep)
-    dateInterval = [floor(MTT(1)), ceil(MTT(end))];
-else
-    dateInterval = floor(MTT(1)):datenum([0,0,0,0,p.timeStep,0]):ceil(MTT(end));
-end
+dateInterval = floor(MTT(1)):datenum([0,0,0,0,p.timeStep,0]):ceil(MTT(end));
+
 % Figure out which clicks are in which time bin.
 [testN,testBin] = histc(MTT,dateInterval);
 
@@ -245,9 +243,9 @@ for iC = 1:length(dateInterval)
         binData(cIdx,1).clusteredTF = 0;
         binData(cIdx,1).envDur = envDur;
         if size(envSet,1)>1
-            binData(cIdx,1).envMean = mean(envSet);%./max(envSet,[],2));
+            binData(cIdx,1).envMean = mean(envSet./max(envSet,[],2));
         elseif size(envSet,1)==1
-            binData(cIdx,1).envMean = envSet;%./max(envSet,[],2);
+            binData(cIdx,1).envMean = envSet./max(envSet,[],2);
         end
         [binData(cIdx,1).dTT,binData(cIdx,1).clickRate] = ct_compute_rate_distributions(ttSet,p);
         
@@ -261,5 +259,5 @@ for iC = 1:length(dateInterval)
 end
 TPWSfilename = fNameExt;
 % save output
-save(fullfile(outDir,outName),'TPWSfilename','binData','p','f')
+save(fullfile(outDir,outName),'TPWSfilename','binData','p','f','-v7.3')
 

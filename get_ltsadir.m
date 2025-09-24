@@ -12,7 +12,7 @@ global PARAMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % get the file type
 %
-prompt={'Enter File Type: (1 = WAVE, 2 = XWAV, 3 = FLAC)'};
+prompt={'Enter File Type: (1 = WAVE, 2 = XWAV)'};
 def={num2str(PARAMS.ltsa.ftype)};
 dlgTitle='Select File Type';
 lineNo=1;
@@ -35,10 +35,8 @@ if PARAMS.ltsa.ftype == 1
     str1 = 'Select Directory with WAV files';
 elseif PARAMS.ltsa.ftype == 2
     str1 = 'Select Directory with XWAV files';
-elseif PARAMS.ltsa.ftype == 3
-    str1 = 'Select Directory with FLAC files';
 else
-    disp_msg('Wrong file type. Input 1, 2, or 3 only')
+    disp_msg('Wrong file type. Input 1 or 2 only')
     disp_msg(['Not ',num2str(PARAMS.ltsa.ftype)])
     get_ltsadir
 end
@@ -60,8 +58,6 @@ if PARAMS.ltsa.ftype == 1
     d = dir(fullfile(PARAMS.ltsa.indir,'*.wav'));    % wav files
 elseif PARAMS.ltsa.ftype == 2
     d = dir(fullfile(PARAMS.ltsa.indir,'*.x.wav'));    % xwav files
-elseif PARAMS.ltsa.ftype == 3
-    d = dir(fullfile(PARAMS.ltsa.indir,'*.flac'));    % flac files
 end
 
 fn = char(d.name);      % file names in directory
@@ -82,7 +78,7 @@ if nfiles < 1
     get_ltsadir
 end
 
-if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3
+if PARAMS.ltsa.ftype == 1
     % sort filenames into ascending order based on time stamp of file name
     % don't rely on filename only for order
     % timing stuff:
