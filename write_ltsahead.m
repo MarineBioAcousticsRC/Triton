@@ -12,25 +12,29 @@ global PARAMS
 % disp('set up ltsa file')
 
 % get file name
-filterSpec1 = '*.ltsa';
-boxTitle1 = 'Save LTSA File';
-% user interface retrieve file to open through a dialog box
-PARAMS.ltsa.outdir = PARAMS.ltsa.indir;
-PARAMS.ltsa.outfile = 'LTSAout.ltsa';
-DefaultName = [PARAMS.ltsa.outdir,'\',PARAMS.ltsa.outfile];
-[PARAMS.ltsa.outfile,PARAMS.ltsa.outdir]=uiputfile(filterSpec1,boxTitle1,DefaultName);
-% if the cancel button is pushed, then no file is loaded
-% so exit this script
-if strcmp(num2str(PARAMS.ltsa.outfile),'0')
-    PARAMS.ltsa.gen = 0;
-    disp_msg('Canceled file creation')
-    return
-else
-    PARAMS.ltsa.gen = 1;
-    disp_msg('Opened File: ')
-    disp_msg([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile])
-    %     disp(' ')
-    cd(PARAMS.ltsa.outdir)
+% only if not already specified (in case of batchLTSA remora)
+% if making single LTSA through triton gui, prompt for filename
+if ~isfield(PARAMS.ltsa, 'outfile')
+    filterSpec1 = '*.ltsa';
+    boxTitle1 = 'Save LTSA File';
+    % user interface retrieve file to open through a dialog box
+    PARAMS.ltsa.outdir = PARAMS.ltsa.indir;
+    PARAMS.ltsa.outfile = 'LTSAout.ltsa';
+    DefaultName = [PARAMS.ltsa.outdir,'\',PARAMS.ltsa.outfile];
+    [PARAMS.ltsa.outfile,PARAMS.ltsa.outdir]=uiputfile(filterSpec1,boxTitle1,DefaultName);
+    % if the cancel button is pushed, then no file is loaded
+    % so exit this script
+    if strcmp(num2str(PARAMS.ltsa.outfile),'0')
+        PARAMS.ltsa.gen = 0;
+        disp_msg('Canceled file creation')
+        return
+    else
+        PARAMS.ltsa.gen = 1;
+        disp_msg('Opened File: ')
+        disp_msg([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile])
+        %     disp(' ')
+        cd(PARAMS.ltsa.outdir)
+    end
 end
 
 % calculate file header values, open file and fill up header
@@ -42,7 +46,7 @@ dirStartLoc = lhsz + 1;                               % directory start location
 dataStartLoc = rhsz * maxNrawfiles + lhsz;           % data start location in bytes
 
 % open output ltsa file
-fid = fopen([PARAMS.ltsa.outdir,PARAMS.ltsa.outfile],'w');
+fid = fopen(fullfile(PARAMS.ltsa.outdir,PARAMS.ltsa.outfile),'w');
 
 % LTSA file Header - 64 bytes total
 fwrite(fid,'LTSA','char');                  % 4 bytes - file ID type
@@ -85,9 +89,9 @@ for k = 1 : PARAMS.ltsa.nrftot
     %
     % calculate number of spectral averages for this raw file
     % number of samples in this raw file = # sectors in rawfile * # samples/sector:
-    if PARAMS.ltsa.ftype ~= 1   % for HARP and ARP data
+    if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3   % for HARP and ARP data
         Nsamp = (PARAMS.ltsahd.write_length(k) * PARAMS.ltsa.blksz) / PARAMS.ltsa.nch;
-    else        % for wav/Ishmael type data
+    elseif PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3   % for wav/Ishmael type data or flac files 
         Nsamp = PARAMS.ltsahd.nsamp(k);
     end
     %
@@ -110,7 +114,12 @@ for k = 1 : PARAMS.ltsa.nrftot
     
     %
     % write ltsa parameters:
-    %
+    % test if the data exceeds 32 bit limit of byteloc  @JAH 12-2021
+    bytelmax = 2^32;
+    if PARAMS.ltsa.byteloc(k) > bytelmax
+       disp('Input data exceeds limit, use fewer files in LTSA');
+       return
+    end
     fwrite(fid,PARAMS.ltsa.byteloc(k) ,'uint32');     % 4 byte - Byte location in ltsa file of the spectral averages for this rawfile
     fwrite(fid,PARAMS.ltsa.nave(k) ,'uint32');          % 4 byte - number of spectral averages for this raw file
     % 16 bytes up to here

@@ -42,7 +42,7 @@ elseif state1 == get(HANDLES.ltsa.eq.tog,'Max') && ...
         state2 == get(HANDLES.ltsa.eq.tog2,'Max')
     pwr = PARAMS.ltsa.pwr - PARAMS.ltsa.mean.save* ones(1,length(PARAMS.ltsa.t));
     eflag = 2;
-elseif state1 == get(HANDLES.ltsa.eq.tog,'Min')
+elseif state1 == get(HANDLES.ltsa.eq.tog,'Min') %CMS-used by BS disk 06 but also for disk 03 that works! 
     pwr = PARAMS.ltsa.pwr;
     eflag = 0;
 end
@@ -50,7 +50,7 @@ end
 % change plot freq axis
 pwr = pwr(PARAMS.ltsa.fimin:PARAMS.ltsa.fimax,:);
 
-c = (PARAMS.ltsa.contrast/100) .* pwr + PARAMS.ltsa.bright;
+c = (PARAMS.ltsa.contrast/100) .* pwr + PARAMS.ltsa.bright; % CMS-pwr has infinity (+/-) in here
 
 % plot specgram
 HANDLES.subplt.ltsa = subplot(HANDLES.plot.now);
@@ -102,7 +102,7 @@ minc = min(min(c));
 maxc = max(max(c));
 difc = 2;
 set(PARAMS.ltsa.cbb,'CData',[minc:difc:maxc]')
-set(PARAMS.ltsa.cbb,'YData',[minp maxp])
+set(PARAMS.ltsa.cbb,'YData',[minp maxp]) %CMS - breaking here for BS_disk04, because minc and minp are neg. infinity
 %sets the tick mode for color bar to manual to fix printing error
 set(PARAMS.ltsa.cb,'YTickMode','manual')
 

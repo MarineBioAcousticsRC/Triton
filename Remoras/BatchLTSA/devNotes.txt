@@ -1,0 +1,52 @@
+Development Notes 
+(SF notes to self about remoras and order of functions)
+
+initialize.m
+- sets up the pull down menu. use 'Callback' to reference an action in _pulldown.m to make something happen. 
+
+_pulldown.m
+- function that outlines possible 'actions' triggered by selection of something in the pulldown menu, then calls new functions for those actions. 
+*for now just 1 action possible here. 
+	action is: batch_ltsas
+	- this triggers setting up the GUI figure (_init_batch_figure.m), some initial settings (_init_settings.m), and then the actual gui (_init_batch_gui.m)
+
+_init_figure.m
+- defines GUI figure size, position, color, etc. 
+
+init_settings.m
+- define some initial LTSA, filetype, directory settings
+
+_init_gui.m
+- gui for setting up the batch LTSA creation (using _init_figure.m settings)
+- set directory to look for sound files, file type, and LTSA settings for all (or at least most of the directories...can change 1 by 1 later)
+- lots of manual arrangement of how the GUI looks
+- each button or text box calls an ACTION in batchLTSA_control
+
+_control.m
+- defines various actions that happen based on different interactions with the GUI. Most set variables or call basic MATLAB functions. 
+- Only RUN button at bottom calls another Remora function (batchLTSA_init_batch_LTSA.m)
+
+_init_batch_ltsa.m
+- displays a message and runs the actual precheck and batch LTSA functions
+*this is really small...maybe unnecessary/could be combined with control above? 
+
+_mk_batch_ltsa_precheck.m
+- check the input data is as is it should be and confirm ltsa settings
+- this calls another gui (batchLTSA_chk_ltsa_params.m) where settings can be updated. 
+- may call batchLTSA_rename_wavs.m of filenames are not all same length or lack timing info
+- this was originally included in _mk_ltsa_batch but pulled it out to make a bit easier to modify for multi-channel/not have a 300+ line function
+
+_rename_wavs.m
+- option to rename sound files if the file names are not consistent within a folder. 
+
+_mk_batch_ltsa.m
+- actually make LTSAs, looping through multiple directories! 
+
+_mk_ltsa_dir.m
+- make LTSA for a single directory
+
+_calc_LTSA_dir.m
+- calculate an LTSA slice for above. 
+
+
+
