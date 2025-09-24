@@ -10,15 +10,15 @@ REMORA.logmenu = uimenu(HANDLES.remmenu,'Label','&Log',...
     'Enable','on','Visible','on');
 % select a logging GUI
  uimenu(REMORA.logmenu,'Label', 'New log', ...
-    'MenuSelectedFcn', {@initLogctrl, 'create'});
+    'Callback', {@initLogctrl, 'create'});
 uimenu(REMORA.logmenu, 'Label', 'Continue existing log', ...
-    'MenuSelectedFcn', {@initLogctrl, 'append'});
+    'Callback', {@initLogctrl, 'append'});
 uimenu(REMORA.logmenu, 'Label', 'Submit log', ...
-    'MenuSelectedFcn', @submit_to_tethys);
+    'Callback', @dbSubmit);
 uimenu(REMORA.logmenu, 'Label', 'Toggle workbook visibility', ...
-    'MenuSelectedFcn', {@control_log, 'workbook_visibility_toggle'});
+    'Callback', {@control_log, 'workbook_visibility_toggle'});
 uimenu(REMORA.logmenu, 'Label', '&Add hotkey', 'Enable', 'on', ...
-    'Visible', 'on', 'MenuSelectedFcn', @addHotKey);
+    'Visible', 'on', 'Callback', @addHotKey);
 
 % allow Logger Remora to use the mouse click down button in the main
 % Plot Window 

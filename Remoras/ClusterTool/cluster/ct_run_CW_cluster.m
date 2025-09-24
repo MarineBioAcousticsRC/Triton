@@ -11,8 +11,14 @@ distClickEIdx = 1:size(distClickEFull,1);
 noChange = 0;
 cwItr = 1;
 
+if length(clusterID)==1
+    return
+end
 % itrMax = 10;
-
+if p.plotFlag
+    figure(110);clf
+    cList = colormap(110,lines);
+end
 while ~noChange && (cwItr<=p.maxCWiterations)
     rOrder = randperm(length(list2cluster));% randomize order
     noChange = 1; % set no change flag to 1, it will be flipped to 0 as soon as a change is made    
@@ -46,14 +52,13 @@ while ~noChange && (cwItr<=p.maxCWiterations)
   
 end
 if p.plotFlag && size(distClickEFull,1)<3000
-     figure(110);clf
-    cList = colormap(110,lines);
+    
     % G = graph(squareform(distClickE));
-    figure(110)
     G = graph(distClickEFull,'upper');
     h = plot(G,'layout','force');
     uID = unique(clusterID);
     h.EdgeColor = [.9,.9,.9];
+    h.NodeLabel = {};
     for iC=1:size(uID,1)
         highlight(h, clusterID==uID(iC),'nodeColor',cList(mod(uID(iC),64)+1,:))
     end

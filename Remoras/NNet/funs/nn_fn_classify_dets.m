@@ -15,16 +15,17 @@ else
 end
 nFiles = size(TPWSList,1);
 fprintf('%0.0f TPWS files found\n',nFiles)
-
-if ~exist('trainTestSetInfo','var')
+trainTestSetInfo = trainedNet.trainTestSetInfo;
+if ~exist('trainedNet.','var')
     warning('No variable called ''trainTestSetInfo''')
     disp('Assume both spectra and waveform should be used.')
     trainTestSetInfo.useSpectra = 1;
     trainTestSetInfo.useWave = 1;
 end
 
-if ~exist('netTrainingInfo','var')
-    warning('WARNING: No variable called ''netTrainingInfo''')
+netTrainingInfo = trainedNet.netTrainingInfo;
+if ~exist('trainTestSetInfo','var')
+    warning('WARNING: No variable called ''trainTestSetInfo''')
     netTrainingInfo = [];
 end
 typeNames = trainedNet.typeNames;
@@ -51,14 +52,18 @@ for iTPWS = 1:nFiles
     
     if trainTestSetInfo.useSpectra
         load(fullfile(TPWSList(iTPWS).folder,TPWSList(iTPWS).name),'MSP')
+        MSP =(MSP-trainTestSetInfo.minSpec)./(trainTestSetInfo.maxSpec-trainTestSetInfo.minSpec);
+    
     end
     
     if trainTestSetInfo.useWave
         load(fullfile(TPWSList(iTPWS).folder,TPWSList(iTPWS).name),'MSN')
+        MSN =MSN./trainTestSetInfo.maxWave;
+
     end
-    
-    test4D = table(mat2cell([nn_fn_normalize_spectrum(MSP),nn_fn_normalize_timeseries(MSN)],ones(size(MSN,1),1)));
-    %test4D = table(mat2cell([(MSP),(MSN)],ones(size(MSN,1),1)));
+  
+    %test4D = table(mat2cell([nn_fn_normalize_spectrum(MSP),nn_fn_normalize_timeseries(MSN(sum(MSN,2)~=0,:))],ones(size(MSN(sum(MSN,2)~=0,:),1),1)));
+    test4D = table(mat2cell([(MSP),(MSN)],ones(size(MSN,1),1)));
 
     % classify
     [predLabels,predScores] = classify(trainedNet.net,test4D);

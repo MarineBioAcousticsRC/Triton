@@ -8,35 +8,19 @@ p.plot = 0;
 fTypes = sp_io_getFileType(fullFiles);
 fOut = [];
 clickParamsOut = [];
+pTemp = p;
 
-
-% check if there is a current parallel pool and apply the number of workers
-% specified. If a pool exsists, uptate the specified number of workers
-poolobj = gcp('nocreate'); % returns the current pool, if not empty
-
-if isempty(poolobj)
-    if isfield(p,'parpool')
-        parpool(p.parpool)
-    else
-        parpool(1);
-    end
-else
-    % if number of workers specified is different from the existing pool,
-    % deletes the current one and creates a new one with the specified
-    % number of workers
-    if poolobj.NumWorkers ~= p.parpool
-        disp('Shutting down current pool to update number of workers')
-        delete(gcp('nocreate'))
+if isfield(p,'parpool')&& p.parpool>1
+    try
         parpool(p.parpool)
     end
+% else
+%     parpool(1);
 end
-    
-
 
 parfor idx1 = 1:N % for each data file
     f=[];
     pTemp = p;
-    
     outFileName = fullLabels{idx1};
     if ~pTemp.overwrite && exist(outFileName, 'file') == 2
         fprintf('DetectionFile %s already exists.\n',outFileName)

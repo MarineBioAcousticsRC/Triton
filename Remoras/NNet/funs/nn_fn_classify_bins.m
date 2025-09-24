@@ -1,7 +1,14 @@
-function nn_fn_classify_bins
+function nn_fn_classify_bins(varargin)
 
 global REMORA
-minSize = 1;
+
+if ~isempty(varargin)
+    excludeList = varargin{1};
+else
+    excludeList = [];
+end
+
+minSize = 2;
 disp('Classifying bins from cluster bins output files')
 % load network
 trainedNet = load(REMORA.nn.classify.networkPath);
@@ -10,7 +17,7 @@ fprintf('Loaded network %s\n', REMORA.nn.classify.networkPath)
 % identify files.
 fWild = [REMORA.nn.classify.wildcard,'*.mat'];
 if REMORA.nn.classify.searchSubDirsTF
-    fList = nn_fn_rdir(REMORA.nn.classify.inDir,fWild);
+    fList = rdir(REMORA.nn.classify.inDir,fWild);
 else
     fList = dir(fullfile(REMORA.nn.classify.inDir,fWild));
 end
@@ -56,6 +63,7 @@ for iFile = 1:nFiles
     if strcmp(inFile, saveFullFile)
         error('Something went wrong: Input and output names match, might overwrite. Aborting.')
     end
+
     tooFew = find([binData(:).nSpec]'< minSize);
     goodSize = find([binData(:).nSpec]'>= minSize);
     nRows = size(goodSize,1);
@@ -68,38 +76,65 @@ for iFile = 1:nFiles
 %             nInt+[0:1:numClusters(iRow,1)-1]']];
 %         nInt = nInt+1;
 %     end
-    if trainedNet.trainTestSetInfo.useSpectra
-        specSet = vertcat(binData(:).sumSpec);
-        specSet(tooFew,:) = [];
-        specSetMin = specSet-min(specSet,[],2);
-        specSet = specSetMin./max(specSetMin,[],2);
-    end
-    
-    if trainedNet.trainTestSetInfo.useICI
-        iciSet = vertcat(binData.dTT);
-        iciSet(tooFew,:) = [];
-        iciSet = iciSet./max(max(iciSet,[],2),1);
-    end
-        
-    if trainedNet.trainTestSetInfo.useWave
-        % check for old bug where envs were averaged to a single value
-        % along wrong dimension.
-        waveLen = arrayfun(@(x) size(binData(x).envMean,2),1:numel(binData));
-        tooShort = find(waveLen ==1);
-        for iS = 1:length(tooShort)
-            binData(tooShort(iS)).envMean = ones(1,max(waveLen));
-        end
-        waveSet = vertcat(binData.envMean);
-        waveSet = waveSet./max(waveSet,[],2);
-        waveSet(tooFew,:) = [];
-    end
-    
-    test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
-    
+    tTSI = trainedNet.trainTestSetInfo;
+    specSet = vertcat(binData(:).sumSpec);
+    iciSet = vertcat(binData.dTT);
+    iciSet = iciSet(:,1:51);
+    waveSet = vertcat(binData.envMean);
+    dataInput = [specSet,iciSet,waveSet];
+
+    [dataInputStd,~ ] = nn_fn_standardize_data(trainedNet.trainTestSetInfo,dataInput(goodSize,:),0);
+    % if trainedNet.trainTestSetInfo.useSpectra
+    %     specSet = vertcat(binData(:).sumSpec);
+    %     specSet(tooFew,:) = [];
+    %     %specSet = (specSet*60)+60; %TEMP!!!
+    %     specSet= (specSet-tTSI.specStd(1))/(tTSI.specStd(2)-tTSI.specStd(1));
+    % end
+    % 
+    % if trainedNet.trainTestSetInfo.useICI
+    %     iciSet = vertcat(binData.dTT);
+    %     iciSet = iciSet./max(iciSet,[],2);
+    %     max0 = find(max(iciSet,[],2)>0);
+    %     iciSet(max0,:) = iciSet(max0,:)./(tTSI.iciStd);
+    %     iciSet(tooFew,:) = [];
+    % 
+    % end
+    % 
+    % if trainedNet.trainTestSetInfo.useWave
+    %     % check for old bug where envs were averaged to a single value
+    %     % along wrong dimension.
+    %     waveLen = arrayfun(@(x) size(binData(x).envMean,2),1:numel(binData));
+    %     tooShort = find(waveLen ==1);
+    %     for iS = 1:length(tooShort)
+    %         binData(tooShort(iS)).envMean = ones(1,max(waveLen));
+    %     end
+    %     waveSet = vertcat(binData.envMean);
+    %     waveSet(tooFew,:) = [];
+    %     maxWave = max(waveSet,[],2);
+    %     waveSet= waveSet./maxWave;
+    % end
+    % 
+
+    %test4D = table(mat2cell([specSet,iciSet,waveSet],ones(nRows,1)));
+
     % classify
-    [predLabels,predScores] = classify(trainedNet.net,test4D);
-    predScoresMax = max(predScores,[],2);
-    predLabels = double(predLabels);
+    % dataInputStdR = reshape(dataInputStd,[1,size(dataInputStd,2),1,...
+    % size(dataInputStd,1)]);
+    predScoresAll = predict(trainedNet.net,dataInputStd);
+%    if ~isempty(excludeList)
+    [~,keepCols] = setdiff(trainedNet.typeNames,excludeList);
+    typeNames = trainedNet.typeNames;
+    if ~isempty(excludeList)
+         typeNames = typeNames(keepCols);
+    end
+    predScoresAll = predScoresAll(:,keepCols);
+    [predLabels,predScoresMax] = scores2label(predScoresAll,categorical(1:length(typeNames)));
+
+    % else
+    %     predLabels = double(predLabels);
+    %     predScoresMax = max(predScores,[],2);       
+    % 
+    % end
     % map bin labels back into binData
     predLabelsExpand = nan(size([binData(:).nSpec]',1),1);
     predLabelsExpand(goodSize) = predLabels;
@@ -116,17 +151,21 @@ for iFile = 1:nFiles
     % save all the things
     netTrainingInfo = trainedNet.netTrainingInfo;
     trainTestSetInfo = trainedNet.trainTestSetInfo;
-    typeNames = trainedNet.typeNames;
+
     save(saveFullFile,'predScoresMax','trainTestSetInfo',...
-        'netTrainingInfo','classificationInfo','typeNames','binData',...
-        'f','p','TPWSfilename','predScores','-v7.3')
+        'netTrainingInfo','classificationInfo','typeNames','binData','predScoresAll',...
+        'f','p','TPWSfilename','-v7.3')
     fprintf('Done with file %0.0f of %0.0f: %s\n',iFile, nFiles,inFile)
     % should we plot here?
+
     if REMORA.nn.classify.intermedPlotCheck
-        classifiedThings  = [specSet,iciSet,waveSet];
+        classifiedThings  = dataInputStd;
         nPlots = length(typeNames);
         nRows = 3;
         nCols = ceil(nPlots/nRows);
+        if ~isfield(REMORA.fig, 'nn')
+            REMORA.fig.nn = [];
+        end
         if ~isfield(REMORA.fig.nn,'binClass') || ~isvalid(REMORA.fig.nn.binClass)
             REMORA.fig.nn.binClass = figure;
         else
@@ -136,10 +175,10 @@ for iFile = 1:nFiles
         set(gcf,'name', 'Bin Classifications (Intermediate)')
         for iR = 1:nPlots
             ax1 = subplot(nRows,nCols,iR);
-            idxToPlot = find(predLabels==iR);
+            idxToPlot = find(double(predLabels)==iR);
             [classScore,plotOrder] = sort(predScoresMax(idxToPlot),'descend');
             imagesc(classifiedThings(idxToPlot(plotOrder),:)')
-            set(gca,'ydir','normal')
+            set(gca,'ydir','normal','clim',[0,1.8])
             title(typeNames{iR})
             if size(classScore,1)>1
                 ax2 = axes('Position', get(ax1, 'Position'),'Color', 'none');
@@ -153,9 +192,11 @@ for iFile = 1:nFiles
                 set(ax2, 'XTick',confidenceLevelIdx(iA)+.5,...
                     'XTickLabel',confidenceLabels(iA),'TickDir','out','YTick',[],'FontSize',8);
             end
+           
         end
-        %disp('Paused: Press any key to continue.')
-        %pause
+        disp('Paused: Press any key to continue.')
+        drawnow
+        pause
     end
     % TODO: Have option to hold on to output and make plot of everything
     % classified at the end. 
