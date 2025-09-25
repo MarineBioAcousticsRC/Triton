@@ -231,7 +231,7 @@ parfor i = 1:length(allDays)
             continue
         end
 
-        % % Pwelch too slow
+        % Pwelch does MEAN but we need MEDIAN
         % tic
         % [pxx,F] = pwelch(DATA,window,noverlap,localParams.ltsa.nfft,localParams.ltsa.fs);   % pwelch is supported psd'er
         % toc
