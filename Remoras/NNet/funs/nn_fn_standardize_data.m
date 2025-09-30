@@ -35,11 +35,12 @@ function [dataInput,trainTestSetInfo] = nn_fn_standardize_data(trainTestSetInfo,
 
 
     wavestart = trainTestSetInfo.setSpecHDim+trainTestSetInfo.setICIHDim+1;
-    if trainTF
+    if trainTF 
+        
         trainTestSetInfo.waveMed = median(max(dataInput(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2));
+        trainTestSetInfo.waveMode = mode(max(dataInput(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2));
 
     end
-    trainTestSetInfo.waveMode = mode(max(dataInput(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2));
 
     if trainTestSetInfo.waveMode==1 % sometimes most of the waveforms are normalized to 1, if so, make them all that way.
         trainTestSetInfo.maxWave = max( dataInput(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);

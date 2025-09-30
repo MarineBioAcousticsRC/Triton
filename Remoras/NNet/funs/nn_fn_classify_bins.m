@@ -79,7 +79,7 @@ for iFile = 1:nFiles
     tTSI = trainedNet.trainTestSetInfo;
     specSet = vertcat(binData(:).sumSpec);
     iciSet = vertcat(binData.dTT);
-    iciSet = iciSet(:,1:51);
+    %iciSet = iciSet(:,1:51);
     waveSet = vertcat(binData.envMean);
     dataInput = [specSet,iciSet,waveSet];
 

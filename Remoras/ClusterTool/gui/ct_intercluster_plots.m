@@ -79,7 +79,7 @@ for iF = 1:length(nodeSet)
     
     hSet(4) = figure(44); % plot click rate distributions
     subplot(n1,m1,iF)
-    imagesc(1:length(nodeSet{iF}),p.barInt(1:s.maxICIidx),[Tfinal{iF,2}./max(Tfinal{iF,2},[],2)]')
+    imagesc(1:length(nodeSet{iF}),p.barInt(1:s.maxICIidx),[Tfinal{iF,2}]')%./max(Tfinal{iF,2},[],2)]')
     set(gca,'ydir','normal')
         
     hSet(5) = figure(45); % plot click rate distributions
