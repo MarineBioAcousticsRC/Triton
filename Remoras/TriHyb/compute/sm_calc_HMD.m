@@ -84,6 +84,7 @@ disp(['Creating HMD Products for ', PARAMS.metadata.project, ' ', PARAMS.metadat
 PARAMS_local = PARAMS; % copy global to local before parallel loop
 
 parfor i = 1:length(allDays)
+
     localParams = PARAMS_local;
 
     % start and end time for day being processed
@@ -231,20 +232,13 @@ parfor i = 1:length(allDays)
             continue
         end
 
-        % Pwelch does MEAN but we need MEDIAN
-        % tic
-        % [pxx,F] = pwelch(DATA,window,noverlap,localParams.ltsa.nfft,localParams.ltsa.fs);   % pwelch is supported psd'er
-        % toc
-        % psd = 10*log10(pxx); % counts^2/Hz
-        % psd_matrix(:, m) = psd;
-        % time_matrix(m) = startMin;
-
-    
+ 
         % Compute Total Power (two-sided PSD)
         [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
 
-        % Median two-sided PSD over the minute bin
-        P2 = median(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
+        % Mean two-sided PSD over the minute bin (119 samples) in linear
+        % space
+        P2 = mean(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
 
         % Convert to one-sided
         P1 = P2;
@@ -254,6 +248,7 @@ parfor i = 1:length(allDays)
             P1(2:end-1) = 2*P1(2:end-1);
         end
 
+        % convert from linear to dB
         psd_matrix(:, m) = 10*log10(P1);
         time_matrix(m) = startMin;
 
