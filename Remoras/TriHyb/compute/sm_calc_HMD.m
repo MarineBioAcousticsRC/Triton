@@ -96,7 +96,7 @@ parfor i = 1:length(allDays)
     % initialize empty matrix to hold PSD columns
     nFreq = floor(localParams.ltsa.nfft/2) + 1;
     psd_matrix = nan(nFreq, length(thisDayMins), 'single');
-    
+
     time_matrix = NaT(length(thisDayMins), 1);
     minPrct_vec = nan(length(thisDayMins), 1, 'single');
     xwav_file = cell(length(thisDayMins), 1);
@@ -358,16 +358,11 @@ parfor i = 1:length(allDays)
     hold(ax2, 'off');
 
 
-
-
-
     % Save figure to file
     saveas(fig, outFilePng);
 
     % Close figure to free memory
     close(fig);
-
-
 
     ncid = netcdf.create(fullfile(localParams.metadata.outputDir, outName), 'NETCDF4');
 
