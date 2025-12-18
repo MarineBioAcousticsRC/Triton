@@ -459,6 +459,4 @@ parfor i = 1:length(allDays)
 
 end
 
-
-
 end
