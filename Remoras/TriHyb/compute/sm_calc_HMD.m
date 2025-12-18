@@ -5,9 +5,6 @@ function sm_calc_HMD
 % calculate minutely spectral averages for daily files (called by mypst_compute)
 %
 %
-% TO DO:
-% - Stitch minutes with 2 xwavs together, for now, it just uses
-% beginning xwav and keeps if it has 50% of data in minute
 
 
 global PARAMS
@@ -84,6 +81,9 @@ disp(['Creating HMD Products for ', PARAMS.metadata.project, ' ', PARAMS.metadat
 PARAMS_local = PARAMS; % copy global to local before parallel loop
 
 parfor i = 1:length(allDays)
+    % Only first worker uses GPU (safer for parfor)
+    useGPU = (labindex == 1);
+
     localParams = PARAMS_local;
 
     % start and end time for day being processed
@@ -94,9 +94,11 @@ parfor i = 1:length(allDays)
     thisDayMins = dayStart:1/(24*60):dayEnd;
 
     % initialize empty matrix to hold PSD columns
-    psd_matrix = nan(length(0:localParams.ltsa.fs/2), length(thisDayMins));
+    nFreq = floor(localParams.ltsa.nfft/2) + 1;
+    psd_matrix = nan(nFreq, length(thisDayMins), 'single');
+    
     time_matrix = NaT(length(thisDayMins), 1);
-    minPrct_vec = nan(length(thisDayMins), 1);
+    minPrct_vec = nan(length(thisDayMins), 1, 'single');
     xwav_file = cell(length(thisDayMins), 1);
     tic
     for m = 1:length(thisDayMins)
@@ -231,20 +233,22 @@ parfor i = 1:length(allDays)
             continue
         end
 
-        % Pwelch does MEAN but we need MEDIAN
-        % tic
-        % [pxx,F] = pwelch(DATA,window,noverlap,localParams.ltsa.nfft,localParams.ltsa.fs);   % pwelch is supported psd'er
-        % toc
-        % psd = 10*log10(pxx); % counts^2/Hz
-        % psd_matrix(:, m) = psd;
-        % time_matrix(m) = startMin;
+        DATA = single(DATA);
 
-    
-        % Compute Total Power (two-sided PSD)
-        [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
-
-        % Median two-sided PSD over the minute bin
-        P2 = median(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
+        if gpuDeviceCount > 0 && useGPU
+            DATAg = gpuArray(DATA);
+            % Compute Total Power (two-sided PSD)
+            [S,F] = spectrogram(DATAg, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
+            % Mean two-sided PSD over the minute bin (119 samples) in linear
+            % space
+            P2 = gather(single(mean(abs(S).^2, 2))) / (localParams.ltsa.fs * sum(window.^2));
+        else
+            % Compute Total Power (two-sided PSD)
+            [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
+            % Mean two-sided PSD over the minute bin (119 samples) in linear
+            % space
+            P2 = mean(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
+        end
 
         % Convert to one-sided
         P1 = P2;
@@ -254,6 +258,7 @@ parfor i = 1:length(allDays)
             P1(2:end-1) = 2*P1(2:end-1);
         end
 
+        % convert from linear to dB
         psd_matrix(:, m) = 10*log10(P1);
         time_matrix(m) = startMin;
 
