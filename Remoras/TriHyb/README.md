@@ -76,8 +76,8 @@ Configure the HMD processing options:
 Check **"Search Subfolders"** to include multiple disks in a deployment.
 
 ### 🔀 Version Control
-v1.0.0: First release
-v1.1.0: Added remove FIFO option (commit: 85ecd1f)
+- v1.0.0: First release
+- v1.1.0: Added remove FIFO option (commit: 85ecd1f)
 
 ---
 
