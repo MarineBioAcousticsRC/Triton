@@ -71,9 +71,9 @@ Configure the HMD processing options:
 - `Start Date`, `End Date`, `Start Frequency`, `End Frequency`  
 - `Project`, `Site Name`, `Site Location`  
 - `Start Frequency`, `End Frequency`  
-- `Minimum Effort for Minute Bin`
+- `Minimum Effort for Minute Bin`, `Remove FIFO`
 
-Check **"Search Subfolders"** to include multiple disks in a deployment.
+---
 
 ### 🔀 Version Control
 - v1.0.0: First release
