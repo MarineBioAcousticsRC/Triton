@@ -10,11 +10,8 @@ function sm_get_headers_recur
 global PARAMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if PARAMS.metadata.recursiveSearch == 1
-    PARAMS.fname = dir(fullfile(PARAMS.metadata.inputDir, '**', [PARAMS.metadata.FilenamePattern_ '.x.wav']));
-elseif PARAMS.metadata.recursiveSearch == 0
-    PARAMS.fname = dir(fullfile(PARAMS.metadata.inputDir, '*.x.wav'));    % xwav files
-end
+PARAMS.fname = dir(fullfile(PARAMS.metadata.inputDir, '**', [PARAMS.metadata.FilenamePattern_ '.x.wav']));
+
 
 
 fnsz = size(PARAMS.fname);        % number of data files in directory
@@ -75,39 +72,22 @@ m = 0;                                  % total number of raw files used for lts
 for k = 1:PARAMS.nxwav            % loop over all files in directory
 
 
-    if PARAMS.metadata.recursiveSearch == 1
-        try
-            info = audioinfo(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));    % xwav files
-            disp(['Compiling xwav times for batch processing: ', PARAMS.fname(k).name])
+    try
+        info = audioinfo(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));    % xwav files
+        disp(['Compiling xwav times for batch processing: ', PARAMS.fname(k).name])
 
-        catch ME
-            disp(ME.message)
-            dmsg = sprintf('Is %s a real wave file?', ...
-                fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));
-            disp(dmsg);
-            PARAMS.ltsa.gen = 0; % need to cancel
-            return
-        end
-
-        fid = fopen(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name),'r');
-
-
-    elseif PARAMS.metadata.recursiveSearch == 0
-        try
-            info = audioinfo(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));    % xwav files
-            disp(['Compiling xwav times for batch processing: ', PARAMS.fname(k).name])
-
-        catch ME
-            disp(ME.message)
-            dmsg = sprintf('Is %s a real wave file?', ...
-                fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));
-            disp(dmsg);
-            PARAMS.ltsa.gen = 0; % need to cancel
-            return
-        end
-        fid = fopen(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name),'r');
-
+    catch ME
+        disp(ME.message)
+        dmsg = sprintf('Is %s a real wave file?', ...
+            fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));
+        disp(dmsg);
+        PARAMS.ltsa.gen = 0; % need to cancel
+        return
     end
+
+    fid = fopen(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name),'r');
+
+
     PARAMS.ltsahd.nsamp(k) = info.TotalSamples;
 
 

@@ -5,7 +5,7 @@ clear global PARAMS
 global REMORA PARAMS
 
 PARAMS.metadata.inputDir = get(REMORA.mypsd.gui.InputDirectory_, 'String');
-PARAMS.metadata.recursiveSearch = REMORA.mypsd.gui.recursiveSearchValue;
+PARAMS.metadata.rmvFifo = REMORA.mypsd.gui.rmvFifo;
 PARAMS.metadata.FilenamePattern_ = get(REMORA.mypsd.gui.FilenamePattern_, 'String');
 PARAMS.metadata.outputDir = get(REMORA.mypsd.gui.OutputDirectory_, 'String');
 

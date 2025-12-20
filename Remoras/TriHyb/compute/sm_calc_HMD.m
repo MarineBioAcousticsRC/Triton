@@ -16,6 +16,8 @@ fStart = PARAMS.metadata.startF;
 fStop = PARAMS.metadata.endF;
 PARAMS.ltsa.dfreq = 1;
 PARAMS.ltsa.fs = double(PARAMS.ltsahd.sample_rate(1));
+rmFifo = PARAMS.metadata.rmvFifo;
+
 
 if ~all(PARAMS.ltsahd.sample_rate == PARAMS.ltsa.fs)
     error('Inconsistent sample rates detected in this folder.');
@@ -82,7 +84,7 @@ PARAMS_local = PARAMS; % copy global to local before parallel loop
 
 parfor i = 1:length(allDays)
     % Only first worker uses GPU (safer for parfor)
-    useGPU = (labindex == 1);
+    %useGPU = (labindex == 1);
 
     localParams = PARAMS_local;
 
@@ -100,7 +102,7 @@ parfor i = 1:length(allDays)
     time_matrix = NaT(length(thisDayMins), 1);
     minPrct_vec = nan(length(thisDayMins), 1, 'single');
     xwav_file = cell(length(thisDayMins), 1);
-    tic
+
     for m = 1:length(thisDayMins)
         startMin = thisDayMins(m);                % start of first minute to process
         endMin = startMin + seconds(60);          % end time is 60 seconds later
@@ -235,20 +237,20 @@ parfor i = 1:length(allDays)
 
         DATA = single(DATA);
 
-        if gpuDeviceCount > 0 && useGPU
-            DATAg = gpuArray(DATA);
-            % Compute Total Power (two-sided PSD)
-            [S,F] = spectrogram(DATAg, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
-            % Mean two-sided PSD over the minute bin (119 samples) in linear
-            % space
-            P2 = gather(single(mean(abs(S).^2, 2))) / (localParams.ltsa.fs * sum(window.^2));
-        else
-            % Compute Total Power (two-sided PSD)
-            [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
-            % Mean two-sided PSD over the minute bin (119 samples) in linear
-            % space
-            P2 = mean(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
-        end
+        % if gpuDeviceCount > 0 && useGPU
+        %     DATAg = gpuArray(DATA);
+        %     % Compute Total Power (two-sided PSD)
+        %     [S,F] = spectrogram(DATAg, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
+        %     % Mean two-sided PSD over the minute bin (119 samples) in linear
+        %     % space
+        %     P2 = gather(single(mean(abs(S).^2, 2))) / (localParams.ltsa.fs * sum(window.^2));
+        % else
+        % Compute Total Power (two-sided PSD)
+        [S,F] = spectrogram(DATA, window, noverlap, localParams.ltsa.nfft, localParams.ltsa.fs);
+        % Mean two-sided PSD over the minute bin (119 samples) in linear
+        % space
+        P2 = mean(abs(S).^2, 2) / (localParams.ltsa.fs * sum(window.^2));
+        % end
 
         % Convert to one-sided
         P1 = P2;
@@ -258,8 +260,16 @@ parfor i = 1:length(allDays)
             P1(2:end-1) = 2*P1(2:end-1);
         end
 
-        % convert from linear to dB
-        psd_matrix(:, m) = 10*log10(P1);
+        % lienar to dB
+        P1dB = 10*log10(P1);
+
+        % if rmFIFO
+        if rmFifo && ismember(localParams.ltsa.fs, [2000 10000 200000])
+            [P1dB, ~] = fun_removeFIFO(P1dB, F, localParams.ltsa.fs);
+        end
+
+        % store in matrix
+        psd_matrix(:, m) = P1dB;
         time_matrix(m) = startMin;
 
         disp(['PSD for ', char(string(startMin, 'yyyy-MM-dd HH:mm:ss')), ' computed'])
