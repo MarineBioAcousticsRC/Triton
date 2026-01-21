@@ -1,6 +1,6 @@
 # TriHyb: Triton-based Hybrid Millidecade Products
 
-**TriHyb** is a [Triton](https://github.com/MarineBioAcousticsRC/Triton)-compatible Remora developed to compute **Hybrid Millidecade (HMD)** soundscape products, as described in Martin et al. (2021). These minutely-resolution products follow standards established by NOAA's [National Centers for Environmental Information (NCEI)](https://www.ncei.noaa.gov/), and enable detailed analysis of long-term underwater soundscapes.
+**TriHyb** is a [Triton](https://github.com/MarineBioAcousticsRC/Triton)-compatible Remora developed to compute **Hybrid Millidecade (HMD)** soundscape products for High-frequency Acoustic Recording Package (HARP) data, as described in Martin et al. (2021). These minutely-resolution products follow standards established by NOAA's [National Centers for Environmental Information (NCEI)](https://www.ncei.noaa.gov/), and enable detailed analysis of long-term underwater soundscapes.
 
 ---
 
