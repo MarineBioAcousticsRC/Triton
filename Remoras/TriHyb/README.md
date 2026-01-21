@@ -6,7 +6,7 @@
 
 ## 🚀 Key Features
 
-- Computes **minutely hybrid-millidecade** (HMD) soundscape products.
+- Computes **hybrid-millidecade** (HMD) soundscape products in one-minute resolution.
 - Generates **daily netCDF** files for long-term acoustic archives.
 - Provides visualization-ready data products.
 - Built-in GUI tabs for **metadata entry** and **HMD computation**.
