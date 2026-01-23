@@ -264,7 +264,7 @@ parfor i = 1:length(allDays)
         P1dB = 10*log10(P1);
 
         % if rmFIFO
-        if rmFifo && ismember(localParams.ltsa.fs, [2000 10000 200000])
+        if rmFifo
             [P1dB, ~] = fun_removeFIFO(P1dB, F, localParams.ltsa.fs);
         end
 
