@@ -31,7 +31,7 @@ Nf = numel(f_hz);
 switch round(Fs)
     case {2000, 10000, 200000}
         fifoBaseHz = 50;
-    case 320000
+    case {320000, 16000, 32000}
         fifoBaseHz = 80;
     otherwise
         fifoBaseHz = [];
