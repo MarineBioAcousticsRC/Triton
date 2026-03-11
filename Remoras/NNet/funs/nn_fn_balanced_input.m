@@ -8,14 +8,14 @@ nAll.inDir = inDir;
 nAll.validPercent = validPercent;
 nAll.trainPercent = trainPercent;
 nAll.boutGap = boutGap;
-nAll.normData = 1;
+nAll.normData = 0;
 nAll.myPerc = 98;
-if ~nAll.normData
-    disp('No pruning because data are not normalized.\n')
-    nAll.myPerc = 0;
-else
-    fprintf('Pruning at %0.2f\n',nAll.myPerc)
-end
+% if ~nAll.normData
+%     disp('No pruning because data are not normalized.\n')
+%     nAll.myPerc = 100;
+% else
+%     fprintf('Pruning at %0.2f\n',nAll.myPerc)
+% end
 nExamplesPad = ceil(nAll.nExamples/(nAll.myPerc/100));
 
 saveNameTrain = [saveName ,'_det_train.mat'];
@@ -35,18 +35,27 @@ trainTSAll = [];
 trainLabelsAll = [];
 trainTimesAll = [];
 trainAmpAll = [];
+trainMaxAmpNAll = [];
+trainPeakFrNAll = [];
+trainICINAll = [];
 
 testSpecAll = [];
 testTSAll = [];
 testLabelsAll = [];
 testTimesAll = [];
 testAmpAll = [];
+testMaxAmpNAll = [];
+testPeakFrNAll = [];
+testICINAll = [];
 normData = 1;
 
 validSpecAll = [];
 validTSAll = [];
 validLabelsAll = [];
 validAmpAll = [];
+validMaxAmpNAll = [];
+validPeakFrNAll = [];
+validICINAll = [];
 
 minGapTimeHour = boutGap/60;
 minGapTimeDnum = minGapTimeHour/24;    % gap time in datenum
@@ -54,7 +63,7 @@ for iT = 1:nTypes
     %wBar = waitbar(0,sprintf('Processing type %0.0f',subDirList(iT).name));
     fprintf('Beginning type %0.0f, name: %s\n',iT, subDirList(iT).name)
     folderPath = fullfile(subDirList(iT).folder,subDirList(iT).name);
-    n(iT).fList = dir(fullfile(folderPath,'*detLevel.mat'));
+    n(iT).fList = dir(fullfile(folderPath,REMORA.nn.train_test_set.detWild));
     if isempty(n(iT).fList)
         disp('No files found for this type, skipping to next.')
         continue
@@ -124,7 +133,7 @@ for iT = 1:nTypes
     n(iT).clickIndicesTrain = sort(randi(n(iT).nClicksTrain,1,nExamplesPad));
     [~,edges,bin] = histcounts(n(iT).clickIndicesTrain,[1;cumsum(n(iT).boutSizeAllTrain)+1]);
     
-    [trainSetSN,trainSetSP,trainSetAmp] = nn_fn_extract_examples(folderPath,n(iT).fList,...
+    [trainSetSN,trainSetSP,trainSetAmp,trainNeighborData] = nn_fn_extract_examples(folderPath,n(iT).fList,...
         nExamplesPad,n(iT).fListIdxTrain,n(iT).boutStartIdxAllTrain,...
         n(iT).boutEndIdxAllTrain,n(iT).clickIndicesTrain,edges,bin);
     
@@ -141,7 +150,12 @@ for iT = 1:nTypes
     trainTSAll = [trainTSAll;trainSetSN(n(iT).keepersTrain(1:nExamples),:)];
     trainSpecAll = [trainSpecAll;trainSetSP(n(iT).keepersTrain(1:nExamples),:)];
     trainAmpAll = [trainAmpAll;trainSetAmp(n(iT).keepersTrain(1:nExamples),:)];     
-    
+    if ~isempty(trainNeighborData)
+        trainMaxAmpNAll = [trainMaxAmpNAll;trainNeighborData.setMaxAmpNeighbor(n(iT).keepersTrain(1:nExamples),:)];
+        trainPeakFrNAll = [trainPeakFrNAll;trainNeighborData.setPeakFrNeighbor(n(iT).keepersTrain(1:nExamples),:)];
+        trainICINAll = [trainICINAll;trainNeighborData.setICINeighbor(n(iT).keepersTrain(1:nExamples),:)];
+    end
+
     trainLabelsAll = [trainLabelsAll;repmat(iT,size(trainSetSN(n(iT).keepersTrain(1:nExamples),:),1),1)];
     
     fprintf('  %0.0f Training examples gathered\n',length(trainLabelsAll))
@@ -160,7 +174,7 @@ for iT = 1:nTypes
         n(iT).clickIndicesValid = sort(randi(n(iT).nClicksValid,1,nAll.nExamplesValid));
         [~,edges,bin] = histcounts(n(iT).clickIndicesValid,[1;cumsum(n(iT).boutSizeAllValid)+1]);
         
-        [validSetSN,validSetSP,validSetAmp] = nn_fn_extract_examples(folderPath,...
+        [validSetSN,validSetSP,validSetAmp,validNeighborData] = nn_fn_extract_examples(folderPath,...
             n(iT).fList,nAll.nExamplesValid,n(iT).fListIdxValid,n(iT).boutStartIdxAllValid,...
             n(iT).boutEndIdxAllValid,n(iT).clickIndicesValid,edges,bin);
         
@@ -178,7 +192,12 @@ for iT = 1:nTypes
         validTSAll = [validTSAll;validSetSN(n(iT).keepersValid(1:nAll.nValid),:)];
         validSpecAll = [validSpecAll;validSetSP(n(iT).keepersValid(1:nAll.nValid),:)];
         validAmpAll = [validAmpAll;validSetAmp(n(iT).keepersValid(1:nAll.nValid),:)];
-        
+        if ~isempty(validNeighborData)
+            validMaxAmpNAll = [validMaxAmpNAll;validNeighborData.setMaxAmpNeighbor(n(iT).keepersValid(1:nAll.nValid),:)];
+            validPeakFrNAll = [validPeakFrNAll;validNeighborData.setPeakFrNeighbor(n(iT).keepersValid(1:nAll.nValid),:)];
+            validICINAll = [validICINAll;validNeighborData.setICINeighbor(n(iT).keepersValid(1:nAll.nValid),:)];
+        end
+
         validLabelsAll = [validLabelsAll;repmat(iT,size(validSetSN(n(iT).keepersValid(1:nAll.nValid),:),1),1)];
         
         fprintf('  %0.0f Validation examples gathered\n',length(validLabelsAll))
@@ -203,7 +222,7 @@ for iT = 1:nTypes
     n(iT).clickIndicesTest = sort(randi(n(iT).nClicksTest,1,nAll.nExamplesTest));
     [N,edges,bin] = histcounts(n(iT).clickIndicesTest,[1;cumsum(n(iT).boutSizeAllTest)+1]);
     
-    [testSetSN,testSetSP,testSetAmp] = nn_fn_extract_examples(folderPath,n(iT).fList,...
+    [testSetSN,testSetSP,testSetAmp,testNeighborData] = nn_fn_extract_examples(folderPath,n(iT).fList,...
         nAll.nExamplesTest,n(iT).fListIdxTest,n(iT).boutStartIdxAllTest,...
         n(iT).boutEndIdxAllTest,n(iT).clickIndicesTest,edges,bin);
     
@@ -218,17 +237,30 @@ for iT = 1:nTypes
     testTSAll = [testTSAll;testSetSN(n(iT).keepersTest(1:nAll.nTest),:)];
     testSpecAll = [testSpecAll;testSetSP(n(iT).keepersTest(1:nAll.nTest),:)];
     testAmpAll = [testAmpAll;testSetAmp(n(iT).keepersTest(1:nAll.nTest),:)];
-    
+    if ~isempty(testNeighborData)
+        testMaxAmpNAll = [testMaxAmpNAll;testNeighborData.setMaxAmpNeighbor(n(iT).keepersTest(1:nAll.nTest),:)];
+        testPeakFrNAll = [testPeakFrNAll;testNeighborData.setPeakFrNeighbor(n(iT).keepersTest(1:nAll.nTest),:)];
+        testICINAll = [testICINAll;testNeighborData.setICINeighbor(n(iT).keepersTest(1:nAll.nTest),:)];
+    end
     testLabelsAll = [testLabelsAll;repmat(iT,size(testSetSN(n(iT).keepersTest(1:nAll.nTest),:),1),1)];
-    
+
     fprintf('  %0.0f Testing examples gathered\n',length(testLabelsAll))
     fprintf('Done with type %0.0f of %0.0f\n',iT,nTypes)
     
 end
 
 trainTestSetInfo = REMORA.nn.train_test_set;
+trainTestSetInfo.setSpecHDim = size(trainSpecAll,2);
+trainTestSetInfo.setICIHDim = 0;
+trainTestSetInfo.setWaveHDim = size(trainTSAll,2);
+trainTestSetInfo.trainMaxAmpNAll = size(trainMaxAmpNAll,2);
+trainTestSetInfo.trainPeakFrNAll = size(trainPeakFrNAll,2);
+trainTestSetInfo.trainICINAll = size(trainICINAll,2);
 % Save training set
 trainDataAll = [trainSpecAll,trainTSAll];%trainAmpAll
+if ~isempty(trainMaxAmpNAll)
+    trainDataAll = [trainDataAll,trainICINAll];
+end
 nAll.specSize = size(trainSpecAll,2);
 nAll.tsSize = size(trainTSAll,2);
 savedTrainFullfile = fullfile(saveDir,saveNameTrain);
@@ -236,13 +268,17 @@ save(savedTrainFullfile,'trainDataAll','trainLabelsAll','typeNames','trainTestSe
 
 % Save validation set
 validDataAll = [validSpecAll,validTSAll];%validAmpAll
-
+if ~isempty(trainMaxAmpNAll)
+    validDataAll = [validDataAll,validICINAll];
+end
 savedValidFullfile = fullfile(saveDir,saveNameValid);
 save(savedValidFullfile,'validDataAll','validLabelsAll','typeNames','trainTestSetInfo','nAll','-v7.3')
 
 % Save test set
 testDataAll = [testSpecAll,testTSAll];
-
+if ~isempty(trainMaxAmpNAll)
+    testDataAll = [testDataAll,testICINAll];
+end
 savedTestFullfile = fullfile(saveDir,saveNameTest);
 save(savedTestFullfile,'testDataAll','testLabelsAll','typeNames',...
     'trainTestSetInfo','nAll','n','-v7.3')

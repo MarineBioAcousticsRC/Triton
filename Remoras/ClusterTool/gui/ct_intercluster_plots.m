@@ -47,9 +47,17 @@ for iF = 1:length(nodeSet)
     subplot(n1,m1,iF)
 
     if s.normalizeSpectra
-        imagesc(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)')
+        hs = pcolor(1:length(nodeSet{iF}),f,min(max(Tfinal{iF,1},0),1)');
+        hs.LineStyle = 'none';
+        %set(gca, 'YScale', 'log');
+
     else
-       imagesc(1:length(nodeSet{iF}),f,Tfinal{iF,1}')
+       hs = pcolor(1:length(nodeSet{iF}),f,Tfinal{iF,1}');
+       hs.LineStyle = 'none';
+       %set(gca,'clim',[-1,1])
+       %set(gca, 'YScale', 'log','ylim',[min(f),max(f)]);
+       set(gca, 'ylim',[min(f),max(f)]);
+
     end
     set(gca,'ydir','normal')
     title(labelStr{iF})
@@ -71,7 +79,7 @@ for iF = 1:length(nodeSet)
     
     hSet(4) = figure(44); % plot click rate distributions
     subplot(n1,m1,iF)
-    imagesc(1:length(nodeSet{iF}),p.barInt(1:s.maxICIidx),[Tfinal{iF,2}./max(Tfinal{iF,2},[],2)]')
+    imagesc(1:length(nodeSet{iF}),p.barInt(1:s.maxICIidx),[Tfinal{iF,2}]')%./max(Tfinal{iF,2},[],2)]')
     set(gca,'ydir','normal')
         
     hSet(5) = figure(45); % plot click rate distributions
@@ -79,6 +87,7 @@ for iF = 1:length(nodeSet)
         subplot(n1,m1,iF)
         imagesc(1:length(nodeSet{iF}),1:p.maxDur,[Tfinal{iF,10}./max(Tfinal{iF,10},[],2)]')
         set(gca,'ydir','normal')
+
     end
 end
 figure(41)

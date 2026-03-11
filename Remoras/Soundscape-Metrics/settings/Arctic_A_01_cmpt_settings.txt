@@ -1,0 +1,42 @@
+% Settings for Computation of Soundscape Metrics
+
+% Input / Output Settings 
+
+REMORA.sm.cmpt.indir = 'O:\ARCTIC01_disk1_triton';
+REMORA.sm.cmpt.outdir = 'O:\ARCTIC01_disk1_triton_metrics';
+
+REMORA.sm.cmpt.ltsaout = 0;
+REMORA.sm.cmpt.csvout = 1;
+REMORA.sm.cmpt.fstart = 1;
+
+% Analysis Options 
+
+REMORA.sm.cmpt.lfreq = 10;
+REMORA.sm.cmpt.hfreq = 15000;
+
+REMORA.sm.cmpt.bb = 1;
+REMORA.sm.cmpt.ol = 0;
+REMORA.sm.cmpt.tol = 0;
+REMORA.sm.cmpt.psd = 1;
+
+REMORA.sm.cmpt.avgt = 3600;
+REMORA.sm.cmpt.avgf = 1;
+REMORA.sm.cmpt.perc = 0.0;
+
+REMORA.sm.cmpt.mean = 0;
+REMORA.sm.cmpt.median = 1;
+REMORA.sm.cmpt.prctile = 1;
+
+REMORA.sm.cmpt.fifo = 0;
+REMORA.sm.cmpt.dw = 0;
+REMORA.sm.cmpt.strum = 0;
+REMORA.sm.cmpt.perc = 0;
+
+% Calibration Options 
+
+REMORA.sm.cmpt.cal = 1;
+REMORA.sm.cmpt.sval = 0;
+REMORA.sm.cmpt.tfval = 1;
+REMORA.sm.cmpt.tfile = '320_081208_B_HARP.tf';
+REMORA.sm.cmpt.tpath = 'O:\320\';
+

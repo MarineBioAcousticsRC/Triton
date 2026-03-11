@@ -110,4 +110,6 @@ end
 function ct_cc_close_label_gui(hObject,eventdata)
 global REMORA
 close(REMORA.fig.ct.cc_applylabels)
+% save to file
+REMORA.ct.CC.output.labelStr
 end

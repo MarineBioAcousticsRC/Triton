@@ -309,7 +309,7 @@ REMORA.ct.CB_verify.diffCheck = uicontrol(REMORA.fig.ct.CB_settings,...
 
 %% Cluster on Waveform Envelope
 if ~isfield(REMORA.ct.CB_params,'useEnvelope')
-    REMORA.ct.CB_params.useEnvelope = 0;
+    REMORA.ct.CB_params.useEnvelope = 1;
 end
 labelStr = 'Cluster on Waveform';
 btnPos = [x(1)+w/6 y(12)+ybuff w dy];
@@ -326,7 +326,7 @@ REMORA.ct.CB_verify.useEnvelope = uicontrol(REMORA.fig.ct.CB_settings,...
    'Callback','ct_cb_control(''setUseEnvelopeTF'')');
 
 if ~isfield(REMORA.ct.CB_params,'normalizeTF')
-    REMORA.ct.CB_params.normalizeTF = 1;
+    REMORA.ct.CB_params.normalizeTF = 0;
 end
 labelStr = 'Normalize Amplitudes';
 btnPos = [x(1)+w/6 y(13)+ybuff w dy];

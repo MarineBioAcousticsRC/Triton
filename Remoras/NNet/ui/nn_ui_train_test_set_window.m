@@ -365,7 +365,7 @@ REMORA.fig.nn.nn_train_test_set.boutGapEdTxt = uicontrol(REMORA.fig.nn.nn_train_
 
 %% Add noise to mitigate resampling
 if ~isfield(REMORA.nn.train_test_set,'addNoise')
-    REMORA.nn.train_test_set.addNoise = 1;
+    REMORA.nn.train_test_set.addNoise = 0;
 end
 labelStr = 'Add Noise';
 btnPos=[.5 .25 .20 .08];
@@ -414,7 +414,7 @@ REMORA.fig.nn.nn_train_test_set.useSpectraCheck = uicontrol(REMORA.fig.nn.nn_tra
 
 % use wave
 if ~isfield(REMORA.nn.train_test_set,'useWave')
-    REMORA.nn.train_test_set.useWave = 0;
+    REMORA.nn.train_test_set.useWave = 1;
 end
 btnPos = [.5 .16 .2 .08];
 REMORA.fig.nn.nn_train_test_set.useWaveCheck = uicontrol(REMORA.fig.nn.nn_train_test_set.figH,...
@@ -431,7 +431,7 @@ REMORA.fig.nn.nn_train_test_set.useWaveCheck = uicontrol(REMORA.fig.nn.nn_train_
 
 % use ici
 if ~isfield(REMORA.nn.train_test_set,'useICI')
-    REMORA.nn.train_test_set.useICI = 0;
+    REMORA.nn.train_test_set.useICI = 1;
 end
 btnPos = [.7 .16 .2 .08];
 REMORA.fig.nn.nn_train_test_set.useICICheck = uicontrol(REMORA.fig.nn.nn_train_test_set.figH,...
@@ -467,6 +467,6 @@ REMORA.nn.train_test_set.trainPerc = 60;
 REMORA.nn.train_test_set.validPerc = 10;
 REMORA.nn.train_test_set.trainSize = 1000;
 REMORA.nn.train_test_set.boutGap = 15;
-REMORA.nn.train_test_set.binWild = '*binLevel.mat';
-REMORA.nn.train_test_set.detWild = '*detLevel.mat';
+REMORA.nn.train_test_set.binWild = '\**\*binLevel.mat';
+REMORA.nn.train_test_set.detWild = '\**\*detLevel.mat';
 REMORA.nn.train_test_set.validationTF = 1;

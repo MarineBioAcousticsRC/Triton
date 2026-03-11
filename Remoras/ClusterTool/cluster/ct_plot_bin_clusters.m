@@ -27,7 +27,7 @@ hold off
 box on
 xlim([min(f),max(f)])
 %ylim([0,1])
-ylabel('Normalized Amplitude','Fontsize',12)
+ylabel('Amplitude','Fontsize',12)
 xlabel('Frequency (kHz)','Fontsize',12)
 title('Mean Spectra' )
 set(gca,'OuterPosition',get(gca,'OuterPosition')+[0,0.1,0,-.2])

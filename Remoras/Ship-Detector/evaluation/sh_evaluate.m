@@ -507,10 +507,11 @@ if FilterIndex >0
     handles.DetectionFile = FileName;
     handles.DetectionFilePath = PathName;
     
-    load([PathName,handles.DetectionFile],'shipTimes','shipLabels','settings');
+    load([PathName,handles.DetectionFile]);
     handles.shipTimes = shipTimes;
     handles.shipLabels = shipLabels;
-    handles.settingsRemora = settings;
+    handles.settingsRemora = struct;
+    handles.settingsRemora = settings(:);
     set(handles.detection_filename,'String',handles.DetectionFile)
     
     % enable select ltsa file

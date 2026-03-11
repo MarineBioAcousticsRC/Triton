@@ -1,6 +1,6 @@
 function lt_lEdit_mod_chLabels_LTSA(labType)
 
-global PARAMS REMORA 
+global PARAMS HANDLES REMORA
 
 %work for LTSA window
 % get LTSA range times
@@ -13,31 +13,11 @@ if REMORA.lt.lVis_det.detection.PlotLabels
     yPos = plotFreq*1;
     if (REMORA.lt.lEdit.ychSt<=yPos && yPos<=REMORA.lt.lEdit.ychEd)
         lablFull = [REMORA.lt.lVis_det.detection.starts,REMORA.lt.lVis_det.detection.stops];
-        winDetsIdx = find(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE);
-        %deal with floating-point issues. If first detection is on cusp of
-        %ltsaS,include anyway
-        if ~isempty(winDetsIdx)
-            firstdet = winDetsIdx(1);
-            if firstdet ~= 1 && abs(lablFull(firstdet-1,1) - ltsaS) <= 0.0001
-                %include this detection in the window 
-                winDetsIdx = [firstdet-1;winDetsIdx];
-            end
-            %if last detection end is close to ltsaE, include detection
-            lastdet = winDetsIdx(end);
-            if lastdet ~= size(lablFull,1) && abs(lablFull(lastdet+1,2) - ltsaE) <= 0.0001
-                winDetsIdx = [winDetsIdx;lastdet+1];
-            end
-            %if windets is empty, check if ltsaS value very close to any of labl values
-        elseif min(abs(lablFull(:,1) - ltsaS)) <= 0.0001
-        [~,winDetsIdx] = min(abs(lablFull(:,1) - ltsaS));
-        else
-           winDetsIdx = [];
-        end
-            winDets = lablFull(winDetsIdx,:);
-            
+        winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
+        
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'one',labType,winDets)
         end
@@ -51,8 +31,8 @@ if REMORA.lt.lVis_det.detection2.PlotLabels
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'two',labType,winDets)
         end
@@ -65,8 +45,8 @@ if REMORA.lt.lVis_det.detection3.PlotLabels
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'three',labType,winDets)
         end
@@ -79,8 +59,8 @@ if REMORA.lt.lVis_det.detection4.PlotLabels
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'four',labType,winDets)
         end
@@ -93,8 +73,8 @@ if REMORA.lt.lVis_det.detection5.PlotLabels
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'five',labType,winDets)
         end
@@ -107,8 +87,8 @@ if REMORA.lt.lVis_det.detection6.PlotLabels
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'six',labType,winDets)
         end
@@ -121,8 +101,8 @@ if REMORA.lt.lVis_det.detection7.PlotLabels
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             ch_Labels(detXstart,detXend,'sev',labType,winDets)
         end
     end
@@ -134,8 +114,8 @@ if REMORA.lt.lVis_det.detection8.PlotLabels
         winDets = lablFull(lablFull(:,1)>= ltsaS & lablFull(:,2)<=ltsaE,:);
         
         if ~isempty(winDets)
-            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts');
-            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops');
+            detXstart = lt_lVis_get_LTSA_Offset(winDets,'starts',ltsaS);
+            detXend = lt_lVis_get_LTSA_Offset(winDets,'stops',ltsaS);
             
             ch_Labels(detXstart,detXend,'eight',labType,winDets)
         end
@@ -543,17 +523,3 @@ elseif strcmp(oldLabel,'eight')
     end
 end
 
-%plot everything again
-global HANDLES
-    %which labels to display
-    if HANDLES.display.ltsa.Value
-        lt_lVis_plot_LTSA_labels
-    end
-    
-    if HANDLES.display.specgram.Value
-        lt_lVis_plot_WAV_labels
-    end
-    
-    if HANDLES.display.timeseries.Value
-        lt_lVis_plot_TS_labels
-    end

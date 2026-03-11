@@ -126,21 +126,20 @@ nSpecMat = horzcat(binDataPruned.nSpec)';
 dTTmat = vertcat(binDataPruned.dTT);
 cRateMat = vertcat(binDataPruned.clickRate);
 clickTimes = horzcat(binDataPruned(:).clickTimes);
-if ~isfield(p,'maxDur')
-    p.maxDur = 1;
-end
 for iEM = 1:size(binDataPruned,1)
-    if ~isfield(binDataPruned,'envMean')
-       binDataPruned(iEM).envMean = [];
-    end
-    if size(binDataPruned(iEM).envMean,2) == 1 || size(binDataPruned(iEM).envMean,2) == 0
+    if size(binDataPruned(iEM).envMean,2) == 1
         binDataPruned(iEM).envMean = zeros(1,p.maxDur);
     end
     %     if size(binDataPruned(iEM).envMean,2) == 1
     %         binDataPruned(iEM).envDur = zeros(1,p.envDur);
     %     end
 end
-envShape = vertcat(binDataPruned(:).envMean);
+try
+    envShape = vertcat(binDataPruned(:).envMean);
+catch
+    envShape = ones(size(sumSpecMat,1),1);
+end
+
 %envDistrib = vertcat(binDataPruned(:).envDur);
 
 clustersInBin = nan(size(dTTmat,1),1);
@@ -183,8 +182,11 @@ end
 [~,s.stIdx] = min(abs(f-s.startFreq));
 [~,s.edIdx] = min(abs(f-s.endFreq));
 
-if ~isfield(s,'normalizeSpectra') 
+s.normalizeSpectraAcross = 0;
+if ~isfield(s,'normalizeSpectra')
     s.normalizeSpectra = 1;
+    s.normalizeSpectraAcross = 0;
+
 end
 
 if s.useEnvShapeTF
@@ -230,6 +232,9 @@ clickTimes = clickTimes(useBins);
 tIntMat = tIntMat(useBins);
 subOrder = subOrder(useBins);
 fileNumExpand = fileNumExpand(useBins);
+if size(envShape,1)<size(useBins,1)
+    envShape = zeros(size(useBins));
+end
 envShape = envShape(useBins,:);
 %% Cluster N times for evidence accumulation/robustness
 % CoMat = zeros(tempN,tempN);
@@ -500,19 +505,21 @@ for iNodeSet = 1:length(nodeSet)
     clusterIDreduced(setIntersect) = iNodeSet;
 end
 
-if tritonMode && (size(clusterIDreduced,1)<10000)
+if tritonMode && (size(clusterIDreduced,1)<1000)
 
     fprintf('Plotting network\n')
 
     figure(110);clf
-    G = graph(compDist);    
+    G = graph(compDist(clusterIDreduced>0,clusterIDreduced>0),'upper');    
     h = plot(G,'layout','force');
 
-    set(h,'MarkerSize',8,'NodeLabel',clusterIDreduced)
-    
-%     for iClustPlot=1:size(nodeSet,2)
-%         highlight(h, nodeSet{iClustPlot},'nodeColor',rand(1,3))
-%     end    
+    set(h,'MarkerSize',5)%'NodeLabel',clusterIDreduced)
+    cList = colormap(110,lines);
+    for iClustPlot=1:size(nodeSet,2)
+       
+         highlight(h, clusterIDreduced(clusterIDreduced>0)==iClustPlot,'NodeColor',(rand(1,3)));%cList(mod(iClustPlot,64)+1,:))
+    end    
+    h.EdgeColor = [.9,.9,.9];
 
 else
     disp('Too many nodes to plot as network.')
@@ -533,16 +540,10 @@ compositeData = struct(...
     'spectraMeanSet',[],'specPrctile',{},'iciMean',[],...
     'iciStd',[],'cRateMean',[],'cRateStd',[]);
 Tfinal = {};
-
-if s.linearTF
-    specNorm = (20*log10(specNorm))-1;
-end
-
 for iTF = 1:length(nodeSet)
     % compute mean of spectra in linear space
-    compositeData(iTF,1).spectraMeanSet = nanmean(specNorm(nodeSet{iTF},:),1);
-
-    %linearSpec = 10.^(specNorm(nodeSet{iTF},:)./20);
+    linearSpec = 10.^(specNorm(nodeSet{iTF},:)./20);
+    compositeData(iTF,1).spectraMeanSet = 20*log10(nanmean(linearSpec));
     compositeData(iTF,1).specPrctile = prctile(specNorm(nodeSet{iTF},:),[25,75]);
     compositeData(iTF,1).iciMean = nanmean(dTTmatNorm(nodeSet{iTF},:));
     compositeData(iTF,1).iciStd = nanstd(dTTmatNorm(nodeSet{iTF},:));
@@ -560,6 +561,8 @@ for iTF = 1:length(nodeSet)
     Tfinal{iTF,8} = nodeSet{iTF};% primary index of bin in
     Tfinal{iTF,9} = subOrder(nodeSet{iTF}); % subIndex of bin
     Tfinal{iTF,10} = envShape(nodeSet{iTF},:); % all mean envelope shape
+    TfinalFields = {'specNorm','dTTmatNorm','diffNormSpec','iciModes','compositeData',...
+        'fileNum','tIntMat','nodeSet','subOrder','envShape'};
 end
 bestWNodeDeg = wNodeDeg{bokIdx};
 s.barAdj = .5*mode(diff(p.barInt));%p.stIdx = 2;
@@ -590,7 +593,7 @@ if s.saveOutput
     outputDataFile = fullfile(s.outDir,[s.outputName,'_types_all']);
     fprintf('Saving data file to %s\n',outputDataFile)
     save(outputDataFile,'inputSet','nodeSet','NMIList','bokVal','bokIdx','f',...
-        'p','s','nList','ka','naiItr','isolatedSet','compositeData','Tfinal',...
+        'p','s','nList','ka','naiItr','isolatedSet','compositeData','Tfinal','TfinalFields',...
         'specNorm','dTTmatNorm','iciModes','diffNormSpec','cRateNorm','fileNumExpand',...
         'bestWNodeDeg','prunedNodeSet','tIntMat','subOrder','binIdx','inFileList',...
         'clickTimes','labelStr','TPWSList')
@@ -601,12 +604,12 @@ if s.saveOutput
         thisType.Tfinal = Tfinal(iType,:);
         % [~,~,bin2Nodes] = intersect(thisType.Tfinal{1,7},tIntMat,'stable');
         thisType.tIntMat = tIntMat(Tfinal{iType,8});
-        thisType.clickTimes = clickTimes(Tfinal{iType,8});
+        thisType.clickTimes = vertcat(clickTimes{Tfinal{iType,8}});
         thisType.fileNumExpand = fileNumExpand(Tfinal{iType,8});
         if ~exist('TPWSList','var')
             TPWSList = [];
         end
-        save(outputTypeFile,'thisType','inFileList','TPWSList')
+        save(outputTypeFile,'thisType','inFileList','TPWSList','f','p','s')
     end
 end
 

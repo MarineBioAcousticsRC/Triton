@@ -21,7 +21,10 @@ saveas(REMORA.fig.nn.training_plots{7},fullfile(REMORA.nn.train_net.outDir,[file
 h = findall(groot,'Type','Figure');
 trainFig = find(~cellfun(@isempty,strfind({h(:).Name},'Training Progress')),1,'first');
 REMORA.fig.nn.training_plots{8} = h(trainFig);
-saveas(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.png']))
-saveas(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.fig']))
+try
+    saveas(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.png']))
+catch
+    disp('error saving figure')%exportgraphics(h(trainFig),fullfile(REMORA.nn.train_net.outDir,[filenameStem,'Training_progress.jpg']),'ContentType','auto')    
+end
 
 disp('Done saving figs')

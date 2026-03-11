@@ -1,0 +1,54 @@
+/dbCannedReports.m/1.6/Tue Aug 10 01:42:59 2010//
+/dbCannedReportsLoSubtype.m/1.1/Fri Jul 30 18:49:35 2010//
+/dbDateToOffsets.m/1.6/Wed Jul 31 21:49:08 2013//
+/dbDemo.m/1.24/Result of merge+Mon Dec  8 16:05:27 2014//
+/dbDemoLunar.m/1.1/Thu Jul  7 19:19:31 2011//
+/dbDeploymentInfo.m/1.18/Wed Dec 17 00:51:50 2014//
+/dbDeployments2kml.m/1.4/Mon Dec  8 16:05:27 2014//
+/dbDetections2XML.m/1.1/Thu May 16 17:52:34 2013//
+/dbDiel.m/1.9/Thu Feb 13 02:00:55 2014//
+/dbERDDAP.m/1.3/Wed Feb  5 00:37:35 2014//
+/dbERDDAPReshape.m/1.1/Tue Nov 20 18:04:24 2012//
+/dbERDDAPSearch.m/1.4/Mon Dec  8 16:05:27 2014//
+/dbEffort.m/1.1/Fri Jul 30 15:45:52 2010//
+/dbFindFiles.m/1.1/Sun Feb 26 22:10:01 2012//
+/dbGetCalltypes.m/1.1/Mon Jul 19 03:35:47 2010//
+/dbGetCannedQuery.m/1.3/Tue Dec 16 23:58:36 2014//
+/dbGetDetections.m/1.36/Wed Dec 17 00:59:01 2014//
+/dbGetDocuments.m/1.1/Wed Dec 17 00:59:51 2014//
+/dbGetEffort.m/1.29/Mon Mar  2 21:58:51 2015//
+/dbGetEvents.m/1.3/Mon Jan  7 18:45:18 2013//
+/dbGetLunarIllumination.m/1.9/Mon Dec  8 16:05:27 2014/-kb/
+/dbGetSpecies.m/1.2/Sat Apr  3 14:26:39 2010//
+/dbGetTransferFn.m/1.3/Tue Feb  4 00:32:06 2014//
+/dbGetUsers.m/1.1/Thu Jul 14 21:13:02 2011//
+/dbISO8601toSerialDate.m/1.4/Wed May 18 21:28:40 2011//
+/dbInit.m/1.18/Thu Feb 20 21:28:52 2014//
+/dbInitQueryHandler.m/1.3/Fri Jan 10 20:22:10 2014//
+/dbJavaPaths.m/1.8/Wed Jan 29 22:05:06 2014//
+/dbListMemberOp.m/1.3/Tue Jun 24 21:40:47 2014//
+/dbLunarIlluminationCB.m/1.1/Thu Nov 11 00:51:46 2010/-kb/
+/dbNormDiel.m/1.2/Wed Nov 17 12:19:54 2010//
+/dbParseDates.m/1.2/Mon May 12 19:39:33 2014//
+/dbPresenceAbsence.m/1.6/Mon Jul  1 21:32:59 2013//
+/dbRelOp.m/1.3/Mon Dec  8 16:05:27 2014//
+/dbRelOpChar.m/1.1/Thu May 30 00:23:31 2013/-kb/
+/dbRemoveDetectionDoc.m/-1.1/Wed Jan  2 21:45:03 2013//
+/dbRemoveDetections.m/-1.1/Wed May 29 20:28:46 2013//
+/dbRemoveOverlap.m/1.1/Thu Jul 22 05:12:43 2010//
+/dbRunQuery.m/1.2/Mon Oct 14 02:41:23 2013//
+/dbRunQueryFile.m/1.8/Tue Sep 11 19:53:04 2012//
+/dbSerialDateToISO8601.m/1.2/Sun Oct 19 22:37:06 2014//
+/dbSpeciesFmt.m/1.1/Tue Sep 11 19:56:15 2012//
+/dbStats.m/1.1/Fri Jul 30 15:45:52 2010//
+/dbSubmit.m/1.9/Fri Sep 12 22:55:02 2014//
+/dbTimeZone.m/1.3/Thu Feb 13 02:00:55 2014//
+/dbUserEffort.m/1.2/Thu Jul 14 21:13:23 2011//
+/dbXPathDomQuery.m/1.2/Fri Dec 14 19:39:57 2012//
+/dbYearly.m/1.7/Mon Jan  7 18:46:05 2013//
+/dbYearlyReport.m/1.3/Fri Dec  3 13:38:56 2010//
+/jaxb_test.m/1.1/Thu May 16 17:52:34 2013//
+D/private////
+/xml_read.m/1.9/Wed Jul  2 21:38:01 2014//
+D/xqueries////
+D/xquery////

@@ -10,8 +10,13 @@ if s.normalizeSpectra
         minSSsection(:,ones(1,size(specClickTf,2))));
     maxSSsection = max(specClickTf_minNorm(:,stIdx:edIdx),[],2);
     specClickTf_norm = specClickTf_minNorm./maxSSsection(:,ones(1,size(specClickTf_minNorm,2)));
-    specClickTf_diff = diff(specClickTf_norm,1,2);
+    
+elseif s.normalizeSpectraAcross
+    myMean = mean(specClickTf,1);
+    myStd = std(specClickTf,1);
+    specClickTf_norm = (specClickTf-myMean)./myStd;
 else
     specClickTf_norm = specClickTf;
-    specClickTf_diff = diff(specClickTf_norm,1,2);
 end
+
+specClickTf_diff = diff(specClickTf_norm,1,2);

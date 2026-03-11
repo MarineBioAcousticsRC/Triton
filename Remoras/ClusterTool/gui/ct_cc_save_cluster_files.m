@@ -18,18 +18,19 @@ thisName = [];
 thisTypeAll = [];
 
 for iF = 1:nTypes
-    
+
     thisName{iF} = uNames{iF};
-    newDir{iF} = fullfile(REMORA.ct.CC.output.clustDir,thisName{iF});
-    if ~isdir(newDir{iF})
-        mkdir(fullfile(REMORA.ct.CC.output.clustDir,thisName{iF}))
-    end
     cIdx = find(strcmp(thisName{iF},REMORA.ct.CC.output.labelStr));
+
+    newDir{iF} = fullfile(REMORA.ct.CC.output.clustDir,[REMORA.ct.CC_params.outputName,sprintf('_type%d_',cIdx),thisName{iF}]);
+    if ~isdir(newDir{iF})
+        mkdir(newDir{iF})
+    end
     thisTypeAll(iF).clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
     thisTypeAll(iF).fileNumExpand = REMORA.ct.CC.output.fileNumExpand(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
     thisTypeAll(iF).Tfinal = vertcat(REMORA.ct.CC.output.Tfinal(cIdx,:)); % This keeps cells apart.
     % Will need to watch out for this later.
-    
+    % TODO add settings and freq vector! 
     thisTypeAll(iF).tIntMat = REMORA.ct.CC.output.tIntMat(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
 end
 
@@ -48,11 +49,11 @@ if REMORA.ct.CC.output.saveBinLevelDataTF
         % thisType(iF).clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
 
         inFileList = REMORA.ct.CC.output.inFileList;
-        
+
         [~,outputNameRoot,~] = fileparts(REMORA.ct.CC_params.outputName);
-        
+
         binLevelOutputFile = fullfile(newDir,[REMORA.ct.CC_params.outputName,'_', thisName{iF},'_binLevel.mat']);
-        
+
         outputNameRoot = REMORA.ct.CC_params.outputName;
         binLevelOutputFile = fullfile(newDir{iF},[outputNameRoot,'_', thisName{iF},'_binLevel.mat']);
         thisType = thisTypeAll(iF);
@@ -72,17 +73,17 @@ if REMORA.ct.CC.output.saveDetLevelDataTF
         if isempty(thisTPWSList{iTPWS}) % JMJ fix added to skip if empty dir entries are in the thisTPWSlist array
             continue
         end
-	TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
-        
-	load(TPWSname,'MTT');
+    	TPWSname = fullfile(REMORA.ct.CC.output.TPWSDir,thisTPWSList{iTPWS});
+
+    	load(TPWSname,'MTT');
         MSN = [];
         MSP = [];
         fprintf('Loading data from %s...\n',TPWSname)
         for iF = 1:nTypes
             %cIdx = find(strcmp(thisName{iF},REMORA.ct.CC.output.labelStr));
-            
+
             % thisType.clickTimes = REMORA.ct.CC.output.clickTimes(horzcat(REMORA.ct.CC.output.Tfinal{cIdx,8}));
-             
+
             trainTimes = vertcat(thisTypeAll(iF).clickTimes{(thisTypeAll(iF).fileNumExpand...
                 == iTPWS)});
             [~,I] = intersect(MTT,trainTimes);
@@ -91,7 +92,7 @@ if REMORA.ct.CC.output.saveDetLevelDataTF
                 % matching times
                 continue
             end
-            
+
             if isempty(MSN)
                 load(TPWSname,'MSN','MSP');
             end
@@ -99,16 +100,16 @@ if REMORA.ct.CC.output.saveDetLevelDataTF
             trainMSP = MSP(I,:);
             trainTimes = MTT(I,:);
             [~,outputName,~] = fileparts(TPWSname);
-            
+
             detLevelOutputFile = fullfile(newDir{iF},sprintf('%s_%s_file%0.0f_detLevel.mat',...
                 outputName,thisName{iF},iTPWS));
             fprintf('Saving detection-level file %0.0f of %0.0f\n',iF,nTypes)
             save(detLevelOutputFile,'trainTimes','trainMSN','trainMSP','TPWSname','-v7.3')
-            
+
         end
         fprintf('Done saving detection-level output for %s.\n',TPWSname)
         MSN = [];
-        MSP = []; 
+        MSP = [];
         trainTimes = [];
     end
 end

@@ -7,7 +7,7 @@ timeStepDNum = REMORA.ct.CC.output.p.timeStep./(60*24);
 fNameCells = {REMORA.ct.CC.output.inFileList(:).name};
 dataAll = [];
 labelsAll = [];
-binFileNamesAll = [];
+binFileNamesAll = {};
 for iT = 1:size(REMORA.ct.CC.output.Tfinal)
     % For each cluster:
     % Get times of all bins and associated file.

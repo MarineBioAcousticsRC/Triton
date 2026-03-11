@@ -75,16 +75,16 @@ for iF = 1:length(nodeSet)
         
     hc = colorbar(hs3);
     %set(h3im,'Position',[hs3Pos(1),hs2Pos(2)+.05,hs2Pos(3)-.01,hs2Pos(4)-.05])
-    caxis([0 1])
+    %caxis([0 1])
     hcp = get(hc,'Position');
-    set(hc,'Position',[hs3Pos(1)+hs3Pos(3)+.02,hs2Pos(2),hcp(3),hs2Pos(4)],'Ylim',[0,1],...
-        'FontSize',12)
+    set(hc,'Position',[hs3Pos(1)+hs3Pos(3)+.01,hcp(2)+.1,hcp(3),hcp(4)-.1],'Ylim',[0,1],...
+        'FontSize',11)
     
     hcy = ylabel(hc,'Relative Amplitude','Rotation',-90);
     set(hcy,'Units','normalized','Position',get(hcy,'Position')+[1,0,0],'Units','normalized')
     colormap(jet)
     drawnow
-   mtit(400,[siteNameNo_,': Cluster ',num2str(iF)],'FontSize',12);
+    mtit(400,[siteNameNo_,': Cluster ',num2str(iF)],'FontSize',12);
    
 %     % sorry but things are moving around.
 %     hs3Pos = get(hs3,'Position');    
