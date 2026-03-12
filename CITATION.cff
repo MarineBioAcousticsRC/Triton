@@ -69,10 +69,12 @@ references:
   message: "Cite the following link to reference the concepts of this Remora"
   url: https://sanctuaries.noaa.gov/science/monitoring/sound
 - type: software
-  title: "TriHyb"
+  title: "TriHyb Remora"
   authors:
       - family-names: ZoBell
         given-names: Vanessa
+      - family-names: Gonzalez
+        given-names: Miguel
       - family-names: Frasier
         given-names: Kaitlin
   message: "Cite the following link to reference the concepts of this Remora"
