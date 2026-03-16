@@ -24,9 +24,19 @@ if savalue && MultiCh_On
 end
 
 % ellipical filter
+%if PARAMS.filter
+%    [b,a] = ellip(4,0.1,40,[PARAMS.ff1 PARAMS.ff2]*2/PARAMS.fs);
+%    DATA(:,PARAMS.ch) = filter(b,a,DATA(:,PARAMS.ch));
+%end
+% fir filter
 if PARAMS.filter
-    [b,a] = ellip(4,0.1,40,[PARAMS.ff1 PARAMS.ff2]*2/PARAMS.fs);
-    DATA(:,PARAMS.ch) = filter(b,a,DATA(:,PARAMS.ch));
+     % Just remove mean, no detrend for large-amplitude data
+    DATA(:,PARAMS.ch) = DATA(:,PARAMS.ch) - mean(DATA(:,PARAMS.ch));
+    
+    % Design and apply FIR filter
+    Wn = [PARAMS.ff1 PARAMS.ff2] / (PARAMS.fs/2);
+    b = fir1(200, Wn, 'bandpass');
+    DATA(:,PARAMS.ch) = filtfilt(b, 1, DATA(:,PARAMS.ch));
 end
 
 len = length(DATA(:,PARAMS.ch));
