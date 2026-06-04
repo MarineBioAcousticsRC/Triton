@@ -49,6 +49,15 @@ elseif strcmp(extFile,'.txt')
     table = readtable(fileFullPath);
     numCol = size(table,2);
     
+    if numCol>3
+        %This is probably a neural net output file
+        filenames = table{:,1};
+        RegDate = '(?<yr>\d\d)(?<mon>\d\d)(?<day>\d\d)(?<hr>\d\d)(?<min>\d\d)(?<s>\d\d)';
+        fileDates = dateregexp(filenames,RegDate);
+        Starts = fileDates + (table{:,3}/(24*3600));
+        Stops = fileDates + (table{:,4}/(24*3600));
+        Labels = table{:,2};
+    else
 %     if numCol > 3
 %         data = lt_read_RavenTextFile(fileFullPath);
 %         joinDateTime = @(date,time) datenum([date.Year  date.Month  date.Day  time.Hour  time.Minute time.Second]);
@@ -61,7 +70,9 @@ elseif strcmp(extFile,'.txt')
         % columns, with start times, end times, and labels
         Starts = table{:,1};
         Stops = table{:,2};
-        
+        Labels = table{:,3};
+        disp('.txt file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
+    end
         %check if date range should be modified- if first column of datevec
         %times is >2000, assume that should remove year to match triton
         %dates
@@ -72,8 +83,7 @@ elseif strcmp(extFile,'.txt')
             Stops = Stops - datenum(2000,0,0,0,0,0);
         end
         
-        Labels = table{:,3};
-        disp('.txt file assumed to have three columns: real start times (serial date number), real end times (serial date number), labels')
+        
 %     end
     
 elseif strcmp(extFile,'.cTg')
