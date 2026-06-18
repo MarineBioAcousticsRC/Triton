@@ -13,8 +13,10 @@ end
 disp('Compiling xwav files...')
 
 % read data file headers
-sm_get_headers_recur;
-
+ok = sm_get_headers_recur;
+if ~ok
+    return
+end
 
 % calculated averaged spectra
 sm_calc_HMD

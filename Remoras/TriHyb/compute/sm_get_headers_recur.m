@@ -1,4 +1,4 @@
-function sm_get_headers_recur
+function ok = sm_get_headers_recur
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % sm_get_headers.m
@@ -8,6 +8,7 @@ function sm_get_headers_recur
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global PARAMS
+ok = true;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 PARAMS.fname = dir(fullfile(PARAMS.metadata.inputDir, '**', [PARAMS.metadata.FilenamePattern_ '.x.wav']));
@@ -16,19 +17,22 @@ PARAMS.fname = dir(fullfile(PARAMS.metadata.inputDir, '**', [PARAMS.metadata.Fil
 
 fnsz = size(PARAMS.fname);        % number of data files in directory
 nfiles = fnsz(1);
-disp_msg(' ')
-disp_msg([num2str(nfiles),'  data files for all LTSAs'])
+disp(' ')
+disp([num2str(nfiles),'  data files for all LTSAs'])
 if fnsz(2)>80
-    disp_msg('Error: filename length too long')
-    disp_msg('Rename to 80 characters or less')
-    disp_msg('Abort LTSA generation')
+    disp('Error: filename length too long')
+    disp('Rename to 80 characters or less')
+    disp('Abort LTSA generation')
+    ok = false;
     return
 end
 
 if nfiles < 1
-    disp_msg(['No data files in this directory: ',PARAMS.inputDir])
-    disp_msg('Pick another directory')
+    disp(['No data files in this directory: ',PARAMS.metadata.inputDir])
+    disp('Pick another directory')
     %sm_ltsa_params_window; % in gui folder, related to the pop up window with all of our inputted parameters
+    ok = false;
+    return
 end
 
 
@@ -72,18 +76,8 @@ m = 0;                                  % total number of raw files used for lts
 for k = 1:PARAMS.nxwav            % loop over all files in directory
 
 
-    try
-        info = audioinfo(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));    % xwav files
-        disp(['Compiling xwav times for batch processing: ', PARAMS.fname(k).name])
-
-    catch ME
-        disp(ME.message)
-        dmsg = sprintf('Is %s a real wave file?', ...
-            fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));
-        disp(dmsg);
-        PARAMS.ltsa.gen = 0; % need to cancel
-        return
-    end
+    info = audioinfo(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));    % xwav files
+    disp(['Compiling xwav times for batch processing: ', PARAMS.fname(k).name])
 
     fid = fopen(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name),'r');
 
