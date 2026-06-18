@@ -75,9 +75,28 @@ Configure the HMD processing options:
 
 ---
 
-### 🔀 Version Control
-- v1.0.0: First release
-- v1.1.0: Added remove FIFO option (commit: 85ecd1f)
+### 📊 Visualize HMD Tab
+
+After computing HMD products, generate figures from the output `.nc` files using **`TriHyb > Visualize HMD Products`** from the Remoras menu.
+
+Configure the following options:
+- `Path with .nc files` — directory containing output `.nc` files (searched recursively)
+- `Figure Output Path` — directory where the figure will be saved
+- `Bin by` — temporal resolution for the longterm spectrogram: **Hourly**, **Daily**, or **Keep one-minute resolution**
+
+Clicking **Generate Figures** produces a single PNG with three panels:
+- **Longterm spectrogram** (top) — full deployment view with deployment boundaries marked
+- **Monthly average spectra** (bottom left) — one line per month, color-coded
+- **Seasonal average spectra** (bottom right) — pooled Summer, Spring, Fall, Winter averages
+
+The figure is saved as `<Organization>_<Project>_<Site>_HMD_Visualization.png` in the specified output directory.
+
+---
+
+### 🔀 Version History
+v1.2.0: Added Visualize GUI and figure generation; bug fixes for MATLAB 2016/2017 compatibility (commit: e465f8b)
+v1.1.0: Added Remove FIFO option (commit: 85ecd1f)
+v1.0.0: First release
 
 ---
 
