@@ -131,7 +131,7 @@ surf(ax1, t_plot, freqRef, SPL_plot_dB, 'LineStyle', 'none');
 view(ax1, [0 90]);
 set(ax1, 'YScale', 'log', 'FontSize', 11);
 climLo = min(SPL_plot_dB(:));
-climHi = max(SPL_plot_dB(:)) + 3;
+climHi = max(SPL_plot_dB(:))-10;
 caxis(ax1, [climLo climHi]);
 colormap(ax1, cmocean('thermal'));
 cb = colorbar(ax1, 'eastoutside');
