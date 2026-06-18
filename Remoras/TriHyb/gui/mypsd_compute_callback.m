@@ -25,27 +25,39 @@ PARAMS.metadata.minPrct = get(REMORA.mypsd.gui.MinimumEffortForMinuteBin____, 'S
 latlon = str2double(strsplit(erase(erase(get(REMORA.mypsd.gui.SiteLocation_, 'String'), '['), ']'), ','));
 [PARAMS.metadata.latitude, PARAMS.metadata.longitude] = deal(latlon(1), latlon(2));
 
-% Plot the location on a geographic map
-figure(500)
-geoplot(PARAMS.metadata.latitude, PARAMS.metadata.longitude, 'p', 'MarkerSize', 30, ...
-    'MarkerFaceColor', [1.0, 0.6, 0.8] , ...
-    'MarkerEdgeColor', 'k', ...
-    'LineWidth', 1.5);
-geobasemap satellite
+% Plot the location on a geographic map (geoplot/geobasemap need MATLAB
+% R2018b+ and may also require internet access for basemap tiles -- skip
+% gracefully rather than crashing the whole compute run if unavailable)
+if exist('geoplot', 'file') ~= 0
+    try
+        figure(500)
+        geoplot(PARAMS.metadata.latitude, PARAMS.metadata.longitude, 'p', 'MarkerSize', 30, ...
+            'MarkerFaceColor', [1.0, 0.6, 0.8] , ...
+            'MarkerEdgeColor', 'k', ...
+            'LineWidth', 1.5);
+        geobasemap satellite
 
-% Set map limits around the point
-latBuffer = 5;
-lonBuffer = 5;
-geolimits([PARAMS.metadata.latitude - latBuffer, PARAMS.metadata.latitude + latBuffer], [PARAMS.metadata.longitude - lonBuffer, PARAMS.metadata.longitude + lonBuffer]);
-title([PARAMS.metadata.organization ' ' PARAMS.metadata.project ' ' PARAMS.metadata.site ' ' PARAMS.metadata.deployment])
-outNameMap = [
-    PARAMS.metadata.organization, '_', ...
-    PARAMS.metadata.project, '_', ...
-    PARAMS.metadata.site, '_', ...
-    PARAMS.metadata.deployment, '_', 'siteMap.png'];
-outFileMap = fullfile(PARAMS.metadata.outputDir, outNameMap);
+        % Set map limits around the point
+        latBuffer = 5;
+        lonBuffer = 5;
+        geolimits([PARAMS.metadata.latitude - latBuffer, PARAMS.metadata.latitude + latBuffer], [PARAMS.metadata.longitude - lonBuffer, PARAMS.metadata.longitude + lonBuffer]);
+        title([PARAMS.metadata.organization ' ' PARAMS.metadata.project ' ' PARAMS.metadata.site ' ' PARAMS.metadata.deployment])
+        outNameMap = [
+            PARAMS.metadata.organization, '_', ...
+            PARAMS.metadata.project, '_', ...
+            PARAMS.metadata.site, '_', ...
+            PARAMS.metadata.deployment, '_', 'siteMap.png'];
+        outFileMap = fullfile(PARAMS.metadata.outputDir, outNameMap);
 
-saveas(gcf, outFileMap);
+        saveas(gcf, outFileMap);
+    catch ME
+        warning(['Could not generate site location map -- skipping. ', ...
+            'This usually means geoplot/geobasemap failed at runtime (e.g. no internet access for basemap tiles). ', ...
+            'Error: ', ME.message]);
+    end
+else
+    warning('geoplot is not available in this MATLAB installation (requires R2018b or newer) -- skipping site location map.');
+end
 
 
 % META DATA

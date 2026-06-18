@@ -2,6 +2,8 @@ function mypsd_run(option)
     switch option
         case 'Compute HMD Products'
             mypsd_gui;
+        case 'Visualize HMD Products'
+            mypsd_visualize_gui;
         otherwise
             error('Unknown option in mypsd_run: %s', option);
     end

@@ -446,8 +446,16 @@ parfor i = 1:length(allDays)
     netcdf.putAtt(ncid, effortVarID, 'units', 'percent');
 
     % xwav file associated with measurement
-    % xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_CHAR', xwavFileDimID);
-    xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_STRING', dimNumFilesID);
+    % NC_STRING isn't supported on all MATLAB/netcdf-c releases (e.g. older
+    % MATLAB like 2016) -- skip this variable entirely on those rather than
+    % erroring out.
+    writeXwavFileVar = true;
+    try
+        xwavFileVarID = netcdf.defVar(ncid, 'xwavFile', 'NC_STRING', dimNumFilesID);
+    catch
+        writeXwavFileVar = false;
+        warning('NC_STRING is not supported by this MATLAB/netcdf-c release -- skipping the xwavFile variable.');
+    end
 
     % End Define Mode
     netcdf.endDef(ncid);
@@ -462,7 +470,9 @@ parfor i = 1:length(allDays)
     netcdf.putVar(ncid, freqVarID, double(freqTable(:, 2)));
     netcdf.putVar(ncid, psdVarID, double(bandsOut'));
     netcdf.putVar(ncid, effortVarID, double(minPrct_vec(:)));
-    netcdf.putVar(ncid, xwavFileVarID, xwav_file);
+    if writeXwavFileVar
+        netcdf.putVar(ncid, xwavFileVarID, xwav_file);
+    end
     netcdf.close(ncid);
     disp(['Saved NetCDF: ', fullfile(localParams.metadata.outputDir, outName)]);
 
