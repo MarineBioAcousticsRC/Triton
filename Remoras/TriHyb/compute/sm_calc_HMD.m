@@ -405,7 +405,7 @@ parfor i = 1:length(allDays)
     netcdf.putAtt(ncid, globalID, 'project', char(localParams.metadata.project));
     netcdf.putAtt(ncid, globalID, 'site', char(localParams.metadata.site));
     netcdf.putAtt(ncid, globalID, 'deployment', localParams.metadata.deployment);
-    pointStr = sprintf('POINT(%0.6f %0.6f)', localParams.metadata.longitude, localParams.metadata.latitude);
+    pointStr = sprintf('POINT(%0.6f %0.6f)', localParams.metadata.latitude, localParams.metadata.longitude);
     netcdf.putAtt(ncid, globalID, 'geospatial_bounds', pointStr);    netcdf.putAtt(ncid, globalID, 'id', char(localParams.metadata.id));
     netcdf.putAtt(ncid, globalID, 'sample_rate', localParams.ltsa.fs);
     netcdf.putAtt(ncid, globalID, 'nfft', localParams.ltsa.nfft);
