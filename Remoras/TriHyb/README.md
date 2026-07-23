@@ -94,6 +94,7 @@ The figure is saved as `<Organization>_<Project>_<Site>_HMD_Visualization.png` i
 ---
 
 ### 🔀 Version History
+v1.2.1: Latitude / Longitude metadata correction per NCEI standards (commit: a19b526)
 v1.2.0: Added Visualize GUI and figure generation; bug fixes for MATLAB 2016/2017 compatibility (commit: e465f8b)
 v1.1.0: Added Remove FIFO option (commit: 85ecd1f)
 v1.0.0: First release
