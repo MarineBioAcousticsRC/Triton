@@ -65,16 +65,18 @@ changeIdx = [1; find(~strcmp(deploy_all(2:end), deploy_all(1:end-1))) + 1];
 boundaryTimes = datnum_all(changeIdx);
 boundaryNames = deploy_all(changeIdx);
 
-%% Bin the longterm spectrogram per the selected resolution (mean in linear space -> dB)
+%% Bin the longterm spectrogram per the selected resolution.
+% Use the median in dB space to match the stored PSD representation and avoid
+% the upward bias introduced by taking a linear mean of already-logarithmic
+% levels or by transient high-power outliers.
 switch binMode
     case 'oneminute'
         t_plot = datnum_all;
         SPL_plot_dB = SPL_all;
     case {'hourly', 'daily'}
-        linPower = 10.^(SPL_all/10);   % nFreq x nTime
-        TT = timetable(datetime(datnum_all, 'ConvertFrom', 'datenum'), linPower');
-        TTbinned = retime(TT, binMode, 'mean');
-        SPL_plot_dB = 10*log10(TTbinned.Var1');
+        TT = timetable(datetime(datnum_all, 'ConvertFrom', 'datenum'), SPL_all');
+        TTbinned = retime(TT, binMode, 'median');
+        SPL_plot_dB = TTbinned.Var1';
         t_plot = datenum(TTbinned.Time);
     otherwise
         error(['Unknown bin mode: ', binMode])
@@ -91,8 +93,7 @@ monthlySpectra = nan(nFreqRef, nMonthGroups);
 monthlyLabels = cell(nMonthGroups, 1);
 for g = 1:nMonthGroups
     idx = monthGroupKey == uniqueMonthGroups(g);
-    linP = 10.^(SPL_all(:, idx)/10);
-    monthlySpectra(:, g) = 10*log10(mean(linP, 2));
+    monthlySpectra(:, g) = median(SPL_all(:, idx), 2);
     yG = floor(uniqueMonthGroups(g)/100);
     mG = mod(uniqueMonthGroups(g), 100);
     monthlyLabels{g} = datestr(datenum(yG, mG, 1), 'mmm yyyy');
@@ -113,8 +114,7 @@ seasonalPresent = false(length(seasonNames), 1);
 for s = 1:length(seasonNames)
     idx = ismember(moVec, seasonMonths{s});
     if any(idx)
-        linP = 10.^(SPL_all(:, idx)/10);
-        seasonalSpectra(:, s) = 10*log10(mean(linP, 2));
+        seasonalSpectra(:, s) = median(SPL_all(:, idx), 2);
         seasonalLegend{s} = [seasonNames{s}, ': ', seasonAbbrev{s}];
         seasonalPresent(s) = true;
     end
