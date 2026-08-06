@@ -41,7 +41,9 @@ function [dataInput,trainTestSetInfo] = nn_fn_standardize_data(trainTestSetInfo,
         trainTestSetInfo.waveMode = mode(max(dataInput(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2));
 
     end
-
+    if ~isfield(trainTestSetInfo,"waveMode")
+        trainTestSetInfo.waveMode=0; % set to zero if not specified, but better would be to check if the modal peak amp = 1
+    end
     if trainTestSetInfo.waveMode==1 % sometimes most of the waveforms are normalized to 1, if so, make them all that way.
         trainTestSetInfo.maxWave = max( dataInput(:,wavestart:(wavestart+trainTestSetInfo.setWaveHDim-1)),[],2);
 
