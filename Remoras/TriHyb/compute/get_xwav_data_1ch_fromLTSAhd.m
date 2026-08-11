@@ -165,6 +165,7 @@ for rf=rfIdx0:rfIdxN
         continue
     end
     DATA(dataIdx:dataIdx + nr - 1) = raw;
+    
     dataIdx = dataIdx + nr;
 
 end
