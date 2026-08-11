@@ -158,21 +158,22 @@ for rf=rfIdx0:rfIdxN
     end
 
     nr = nb / bytesPerSample;
-    DATA(dataIdx:dataIdx + nr - 1) = fread(fid, nr, dtype);
+    raw = fread(fid, nr, dtype);
+    if numel(raw) < nr
+        warning('%s: rawfile %d has fewer bytes on disk than its header claims (expected %d samples, found %d) -- likely truncated/corrupt, skipping this rawfile.', ...
+            xwav, rf, nr, numel(raw));
+        continue
+    end
+    DATA(dataIdx:dataIdx + nr - 1) = raw;
     dataIdx = dataIdx + nr;
 
 end
 
 fclose(fid);
 naIdx = find(isnan(DATA),1,'first');
-DATA(naIdx:end) = [];
-
-
-
 if ~isempty(naIdx)
-    fprintf('Not enough data read %d of %d\n', length(DATA), bin_samps);
-    DATA = [];
-    return
+    fprintf('Read %d of %d requested samples for %s (rawfile gap or corruption)\n', naIdx-1, bin_samps, xwav);
+    DATA(naIdx:end) = [];
 end
 
 end
