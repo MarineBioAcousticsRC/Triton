@@ -56,7 +56,7 @@ for iD = 1:size(typeList,1)
             clusterTimes = [clusterTimes;inFile.thisType.Tfinal{iRow,7}];
             clusterSpectra = [clusterSpectra;inFile.thisType.Tfinal{iRow,1}];
             try 
-                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}(:,1:51)];
+                clusterICI = [clusterICI;inFile.thisType.Tfinal{iRow,2}(:,:)];
             catch
                 nRows = size(inFile.thisType.Tfinal{iRow,2},1);
                 nCols = size(clusterICI,2)- size(inFile.thisType.Tfinal{iRow,2},2);
