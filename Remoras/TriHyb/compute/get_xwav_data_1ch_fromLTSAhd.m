@@ -158,7 +158,14 @@ for rf=rfIdx0:rfIdxN
     end
 
     nr = nb / bytesPerSample;
-    DATA(dataIdx:dataIdx + nr - 1) = fread(fid, nr, dtype);
+    raw = fread(fid, nr, dtype);
+    if numel(raw) < nr
+        warning('%s: rawfile %d has fewer bytes on disk than its header claims (expected %d samples, found %d) -- likely truncated/corrupt, skipping this rawfile.', ...
+            xwav, rf, nr, numel(raw));
+        continue
+    end
+    DATA(dataIdx:dataIdx + nr - 1) = raw;
+    
     dataIdx = dataIdx + nr;
 
 end
