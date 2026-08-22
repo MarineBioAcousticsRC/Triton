@@ -129,7 +129,7 @@ function [specMean,specMeanDiff]= nn_norm_mean_spec(mySpectra,stIdx,edIdx)
     maxSSsection = max(mySpectra_minNorm(:,stIdx:edIdx),[],2);
     mySpectra_norm = mySpectra_minNorm./maxSSsection(:,ones(1,size(mySpectra_minNorm,2)));
     linearSpec = 10.^(mySpectra_norm./20);
-    specMeanTemp = 20*log10(nanmean(linearSpec,1));
+    specMeanTemp = 20*log10(mean(linearSpec, 1, 'omitnan'));
     
     specMeanTemp_minNorm = specMeanTemp - min(specMeanTemp);
     specMean = specMeanTemp_minNorm/max(specMeanTemp_minNorm);

@@ -36,7 +36,7 @@ for a = 1:nfiles
         
         load(filename)
         Calls(a,:) = Call;
-        kernel = nanmean(Calls);       
+        kernel = mean(Calls, 'omitnan');       
         
       
         clear Call 

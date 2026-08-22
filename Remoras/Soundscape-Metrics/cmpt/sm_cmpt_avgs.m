@@ -223,8 +223,8 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
                 % if power spectral density selected
                 if REMORA.sm.cmpt.psd
                     % arithmetic mean
-                    REMORA.sm.cmpt.pre.meanpsd = 10*log10(nanmean(REMORA.sm.cmpt.pre.pwr));
-                    REMORA.sm.cmpt.pre.logmeanpsd = nanmean(REMORA.sm.cmpt.pre.psd);
+                    REMORA.sm.cmpt.pre.meanpsd = 10*log10(mean(REMORA.sm.cmpt.pre.pwr, 'omitnan'));
+                    REMORA.sm.cmpt.pre.logmeanpsd = mean(REMORA.sm.cmpt.pre.psd, 'omitnan');
 
                     if REMORA.sm.cmpt.avgf == 1
                         % if a csv output is to be written; crop at lower frequency edge
@@ -241,12 +241,12 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
 
                 % if broadband levels selected
                 if REMORA.sm.cmpt.bb
-                   REMORA.sm.cmpt.pre.meanbb = 10*log10(nanmean(bb));               
+                   REMORA.sm.cmpt.pre.meanbb = 10*log10(mean(bb, 'omitnan'));               
                 end
 
                 % if octave levels selected
                 if REMORA.sm.cmpt.ol
-                   REMORA.sm.cmpt.pre.meanol = 10*log10(nanmean(ol));
+                   REMORA.sm.cmpt.pre.meanol = 10*log10(mean(ol, 'omitnan'));
                    % adjust for octave level rounding based on 1 Hz increments
                    REMORA.sm.cmpt.pre.meanol = REMORA.sm.cmpt.pre.meanol + ...
                        REMORA.sm.cmpt.OLcorr.';
@@ -254,7 +254,7 @@ for tidx = 1:REMORA.sm.cmpt.pre.thisltsa
 
                 % if 1/3 octave levels selected
                 if REMORA.sm.cmpt.tol
-                   REMORA.sm.cmpt.pre.meantol = 10*log10(nanmean(tol));
+                   REMORA.sm.cmpt.pre.meantol = 10*log10(mean(tol, 'omitnan'));
                    % adjust for octave level rounding based on 1 Hz increments
                    REMORA.sm.cmpt.pre.meantol = REMORA.sm.cmpt.pre.meantol + ...
                        REMORA.sm.cmpt.TOLcorr.';

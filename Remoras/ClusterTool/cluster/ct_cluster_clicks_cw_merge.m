@@ -87,7 +87,7 @@ if mergeTF
         tempN,specClickTfNorm(:,p.startFreqIdx:p.endFreqIdx));
 end
 
-connectedList = nansum(distClickEFull)>0; % isolated nodes have NAN
+connectedList = sum(distClickEFull, 'omitnan')>0; % isolated nodes have NAN
 nodesRemaining = sum(connectedList);
 fprintf('%.0f (%.2f%%) of %.0f components are isolated\n', ...
     tempN-nodesRemaining, 100*((tempN-nodesRemaining)/tempN),tempN)

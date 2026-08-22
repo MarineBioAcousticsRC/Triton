@@ -403,7 +403,7 @@ for iEA = 1:s.N
     end
     numNodes = size(compDist,1);% in case pruning has happened, compute this
     % for use in preallocation
-    connectedList = nansum(compDist)>0; % isolated nodes have NAN
+    connectedList = sum(compDist, 'omitnan')>0; % isolated nodes have NAN
     allIndices = 1:numNodes;
     isolated = setdiff(allIndices, allIndices(connectedList));
     
@@ -449,7 +449,7 @@ for iEA = 1:s.N
         for i4 = 1:length(keepClust)
             nodeIndex = clusterID==clustNums(i4);
             nodeSet{i4} = excludedIn(nodeIndex);
-            withinClusterWDegree{i4} = nansum(compDist(nodeIndex,nodeIndex),2);
+            withinClusterWDegree{i4} = sum(compDist(nodeIndex,nodeIndex), 2, 'omitnan');
         end
     end
     
@@ -543,12 +543,12 @@ Tfinal = {};
 for iTF = 1:length(nodeSet)
     % compute mean of spectra in linear space
     linearSpec = 10.^(specNorm(nodeSet{iTF},:)./20);
-    compositeData(iTF,1).spectraMeanSet = 20*log10(nanmean(linearSpec));
+    compositeData(iTF,1).spectraMeanSet = 20*log10(mean(linearSpec, 'omitnan'));
     compositeData(iTF,1).specPrctile = prctile(specNorm(nodeSet{iTF},:),[25,75]);
-    compositeData(iTF,1).iciMean = nanmean(dTTmatNorm(nodeSet{iTF},:));
-    compositeData(iTF,1).iciStd = nanstd(dTTmatNorm(nodeSet{iTF},:));
-    compositeData(iTF,1).cRateMean = nanmean(cRateNorm(nodeSet{iTF},:));
-    compositeData(iTF,1).cRateStd = nanstd(cRateNorm(nodeSet{iTF},:));
+    compositeData(iTF,1).iciMean = mean(dTTmatNorm(nodeSet{iTF},:), 'omitnan');
+    compositeData(iTF,1).iciStd = std(dTTmatNorm(nodeSet{iTF},:), 'omitnan');
+    compositeData(iTF,1).cRateMean = mean(cRateNorm(nodeSet{iTF},:), 'omitnan');
+    compositeData(iTF,1).cRateStd = std(cRateNorm(nodeSet{iTF},:), 'omitnan');
     
     % Save stuff in a compact way for matching
     Tfinal{iTF,1} = specNorm(nodeSet{iTF},:);% all mean spectra

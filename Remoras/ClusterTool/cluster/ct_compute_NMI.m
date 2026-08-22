@@ -28,7 +28,7 @@ for i = 1:N
             nai(iA) = length(set_a{iA}); 
         end
         Entropy_A = nai.*log2(nai/n);
-        denom1 = nansum(Entropy_A); % Denominator term 1
+        denom1 = sum(Entropy_A, 'omitnan'); % Denominator term 1
         
         % Compute entropy of B for each cluster
         set_b = {};
@@ -39,7 +39,7 @@ for i = 1:N
             nbj(jB) = length(set_b{jB}); 
         end
         Entropy_B = nbj.*log2(nbj/n);
-        denom2 = nansum(Entropy_B); % Denominator term 2
+        denom2 = sum(Entropy_B, 'omitnan'); % Denominator term 2
         
         % Determine common nodes btwn each pair of clusters, and compute
         % mutual information
@@ -53,7 +53,7 @@ for i = 1:N
             end
         end
 
-        NMIList(i,j) = (-2*nansum(mutInfoAB))/(denom1+denom2);
+        NMIList(i,j) = (-2*sum(mutInfoAB, 'omitnan'))/(denom1+denom2);
         NMIList(j,i) = NMIList(i,j);
         cntr2 = cntr2 + 1;
     end

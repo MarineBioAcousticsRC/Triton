@@ -51,10 +51,10 @@ timestep = PARAMS.nfft/PARAMS.fs*(100-PARAMS.overlap)/100;
 FreqNew = Freq(where:end);
 
 Call(1) = firstM;
-Call(2) = nanmean(FreqNew(floor(1.5/timestep):ceil(1.5/timestep))); %1.5s
-Call(3) = nanmean(FreqNew(floor(3/timestep):ceil(3/timestep))); %3s
-Call(4) = nanmean(FreqNew(floor(4.5/timestep):ceil(4.5/timestep))); %4.5s
-Call(5) = nanmean(FreqNew(floor(10/timestep):ceil(10/timestep))); %10s
+Call(2) = mean(FreqNew(floor(1.5/timestep):ceil(1.5/timestep)), 'omitnan'); %1.5s
+Call(3) = mean(FreqNew(floor(3/timestep):ceil(3/timestep)), 'omitnan'); %3s
+Call(4) = mean(FreqNew(floor(4.5/timestep):ceil(4.5/timestep)), 'omitnan'); %4.5s
+Call(5) = mean(FreqNew(floor(10/timestep):ceil(10/timestep)), 'omitnan'); %10s
 
 SiteDep = [handles.Meta.Site '_' num2str(handles.Meta.Deployment)];
 newMatFile = [SiteDep '_Bcall.mat'];
