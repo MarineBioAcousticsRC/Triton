@@ -23,10 +23,10 @@ if savalue && MultiCh_On
   PARAMS.ch = PARAMS.ch - 1;
 end
 
-% ellipical filter
+% zero-phase FIR bandpass (see display_filter.m)
 if PARAMS.filter
-    [b,a] = ellip(4,0.1,40,[PARAMS.ff1 PARAMS.ff2]*2/PARAMS.fs);
-    DATA(:,PARAMS.ch) = filter(b,a,DATA(:,PARAMS.ch));
+    DATA(:,PARAMS.ch) = display_filter(DATA(:,PARAMS.ch), ...
+        PARAMS.fs, PARAMS.ff1, PARAMS.ff2);
 end
 
 len = length(DATA(:,PARAMS.ch));
