@@ -69,9 +69,19 @@ elseif PARAMS.ltsa.fax == 2
     HANDLES.plt.ltsa = image(PARAMS.ltsa.t,PARAMS.ltsa.f/1000,c);
 end
 
-% Make sure color range is fixed.
+% Scale the color range to the data instead of a fixed [1,65].
 set(HANDLES.plt.ltsa,'CDataMapping','scaled');
-caxis([1,65]);
+cLimPwr = PARAMS.ltsa.pwr(isfinite(PARAMS.ltsa.pwr));
+if isempty(cLimPwr)
+    caxis([1,65]);              % no finite data; keep the historical range
+else
+    cLimLo = min(cLimPwr);
+    cLimHi = max(cLimPwr);
+    if cLimHi <= cLimLo         % flat data; caxis requires an increasing range
+        cLimHi = cLimLo + 1;
+    end
+    caxis([cLimLo,cLimHi]);
+end
 
 % shift and shrink plot by dv
 dv = 0.075;
