@@ -64,7 +64,7 @@ total = PARAMS.ltsa.endIdx - PARAMS.ltsa.startIdx + 1; %number of wav files for 
 for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all x.wav raw files / wav files
     if PARAMS.ltsa.ftype ~= 1           % only for HARP and ARP & OBS data
         % open xwav file
-        fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsahd.fname(k,:)),'r');
+        fid = fopen(fullfile(PARAMS.ltsahd.fdir(k,:),PARAMS.ltsahd.fname(k,:)),'r');
 %         fseek(fid,80,'bof');
 %         nrf = fread(fid,1,'uint16');         % Number of RawFiles in XWAV file (80 bytes from bof)
         nrf = 1;
@@ -166,7 +166,7 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all x.w
                 else
                     %                 dall = wavread(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)),[yi yi-1+nsamp]);
                     %                 dall = double(wavread(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)),[yi yi-1+nsamp],'Native'));
-                    [dall,Fs] = audioread( fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)), [yi yi-1+nsamp], 'native' );
+                    [dall,Fs] = audioread( fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)), [yi yi-1+nsamp], 'native' );
                     dall = double(dall);
                     data = dall(:,PARAMS.ltsa.ch);
                 end

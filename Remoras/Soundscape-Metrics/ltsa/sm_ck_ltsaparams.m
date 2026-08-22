@@ -13,10 +13,10 @@ global PARAMS
 % get sample rate - only the first file sr for now.....
 if PARAMS.ltsa.ftype == 1   % wav
 %     [y, PARAMS.ltsa.fs, nBits, OPTS] = wavread( fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)),10);
-    info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)));
+    info = audioinfo(fullfile(PARAMS.ltsa.fdir(1,:),PARAMS.ltsa.fname(1,:)));
     PARAMS.ltsa.fs = info.SampleRate;
 elseif PARAMS.ltsa.ftype == 2   % xwav
-    fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)),'r');
+    fid = fopen(fullfile(PARAMS.ltsa.fdir(1,:),PARAMS.ltsa.fname(1,:)),'r');
     fseek(fid,24,'bof');
     PARAMS.ltsa.fs = fread(fid,1,'uint32');          % Sampling Rate (samples/second)
     fclose(fid);
