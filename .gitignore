@@ -40,3 +40,8 @@ Settings/InstalledRemoras.cnf
 *.prj
 *.cp.txt
 mathworks-gcp-support/
+Remoras/Logger/pathdef.m
+
+# Example / test data -- large, versioned outside git
+ExampleData/
+TestData/
