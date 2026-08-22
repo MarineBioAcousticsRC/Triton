@@ -80,6 +80,9 @@ for fidx = 1:size(FileList,1)
     Fc1 = 100;   % First Cutoff Frequency.
     Fc2 = 450;  % Second Cutoff Frequency.
     
+    settings.Fc1 = Fc1;
+    settings.Fc2 = Fc2;
+    
     N = 10;     % Order.
     [B,A] = butter(N/2, [Fc1 Fc2]/(fs/2));
     
