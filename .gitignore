@@ -25,9 +25,6 @@ $RECYCLE.BIN/
 
 # Matlab
 *.asv
-Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM.m
-Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM.m
-Remoras/SPICE-Detector/settings/settings_detector_xwav_GOM_test.m
 *.mat
 !Remoras/Fish detector/Bocaccio1_template.mat
 !Remoras/Fish detector/Bocaccio2_template.mat
@@ -45,3 +42,24 @@ Remoras/Logger/pathdef.m
 # Example / test data -- large, versioned outside git
 ExampleData/
 TestData/
+
+# ---------------------------------------------------------------------------
+# Remora settings folders
+#
+# Settings files are usually specific to one deployment, site or instrument,
+# and are not useful to other people -- but they live alongside the shared
+# defaults, so they get committed by accident. Everything in a Remora settings
+# folder is therefore ignored by default.
+#
+# To share a settings file deliberately, name it so one of the exceptions
+# below matches: *default*, *_init.m, *example* or *template*.
+# ---------------------------------------------------------------------------
+Remoras/*/settings/*
+!Remoras/*/settings/*default*
+!Remoras/*/settings/*Default*
+!Remoras/*/settings/*_init.m
+!Remoras/*/settings/*example*
+!Remoras/*/settings/*Example*
+!Remoras/*/settings/*template*
+!Remoras/*/settings/*Template*
+!Remoras/*/settings/README*
