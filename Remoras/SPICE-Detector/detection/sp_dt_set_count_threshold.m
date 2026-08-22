@@ -1,6 +1,6 @@
 function p = sp_dt_set_count_threshold(p)
 
-if ~p.whiten
+if ~isfield(p,'whiten') || ~p.whiten
     [~,minxfrIdx] = min(abs(p.xfr_f-p.bpRanges(1)));
     [~,maxxfrIdx] = min(abs(p.xfr_f-p.bpRanges(2)));
     

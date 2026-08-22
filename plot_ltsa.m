@@ -98,7 +98,7 @@ maxp = max(max(PARAMS.ltsa.pwr));
 % One of the child objects of the colorbar is an image, find it so we can
 % set an appropriate scale.
 PARAMS.ltsa.cbb = findobj(get(PARAMS.ltsa.cb, 'Children'), 'Type', 'image');
-minc = min(min(c));
+minc = min(abs(c(:)));
 maxc = max(max(c));
 difc = 2;
 set(PARAMS.ltsa.cbb,'CData',[minc:difc:maxc]')
