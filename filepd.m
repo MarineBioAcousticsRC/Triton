@@ -11,12 +11,11 @@ function filepd(action)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS HANDLES DATA
 if strcmp(action,'openltsa')
-    if isfield(PARAMS.ltsa,'inpath')
-        ipnamesave = PARAMS.ltsa.inpath;
-        ifnamesave = PARAMS.ltsa.infile;
-    else
+    if ~isfield(PARAMS.ltsa,'inpath')
         initparams
     end
+    ipnamesave = PARAMS.ltsa.inpath;
+    ifnamesave = PARAMS.ltsa.infile;
     % user interface retrieve file to open through a dialog box
     boxTitle1 = 'Open LTSA File';
     filterSpec1 = '*.ltsa';
