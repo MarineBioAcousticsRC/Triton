@@ -104,7 +104,7 @@ else
     set(HANDLES.stfreq.edtxt,'String',PARAMS.freq0);
 end
 
-if PARAMS.ftype == 1
+if PARAMS.ftype == 1 || PARAMS.ftype == 3 % wav or flac
     PARAMS.plot.dvec = PARAMS.start.dvec;
     PARAMS.plot.dnum = PARAMS.start.dnum;
     % new stuff needed v1.60

@@ -82,7 +82,7 @@ fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
 %     %       
 %     end       
 % else
-    if PARAMS.ftype == 1        % wav file
+    if PARAMS.ftype == 1 || PARAMS.ftype == 3   % wav or flac file
         skip = floor((PARAMS.plot.dnum - PARAMS.start.dnum) * 24 * 60 * 60 * PARAMS.fs);   % number of samples to skip over
         % %
         %PARAMS.tseg.samp = floor( PARAMS.tseg.sec * PARAMS.fs )+1;

@@ -31,7 +31,7 @@ triton_compare('tests/baseline/before.json','tests/baseline/after.json')
 A clean result looks like this:
 
 ```
-  unchanged : 444
+  unchanged : 450
   changed   : 0
   appeared  : 0
   vanished  : 0
@@ -60,7 +60,12 @@ For every `.ltsa` file: the header fields, and a fingerprint of one hour of powe
 
 For plain `.wav`: the header fields.
 
-That comes to **444 cases** over the current example data. `current.json` is the baseline as of the
+For every `.flac` file: the header from `audioinfo`, and three reads at fixed offsets. flac carries
+no harp header, so there is no per-raw-file timing to step through; the reads run through
+`initparams` then `initdata` then `readseg`, the same order the application uses, which exercises
+the `ftype == 3` path end to end.
+
+That comes to **450 cases** over the current example data. `current.json` is the baseline as of the
 commit that added it.
 
 Large outputs are stored as MD5 fingerprints rather than as arrays, which keeps the record to about
@@ -92,18 +97,45 @@ breaking it.
 
 ## Known errors in the current baseline
 
-Three of the 444 cases record an error. All three are expected, and all three are useful.
+One of the 450 cases records an error.
 
-- **`Flac/CINMS01C_sitC_080216_083730.x.flac`** and its sibling — `rdxwavhd` reports *"not wav file
-  - exit"*. Current Triton has no flac reading path: there is no `ftype == 3` anywhere in the base
-  folder, though `decimatewav.m` handles flac and several comments mention it. The
-  `D:\Code\Triton-master` checkout *does* have `ftype == 3` in `ck_ltsaparams.m`, `get_headers.m`
-  and `get_ltsadir.m`, so this is a capability that exists in another version and not in this one.
-  When it is merged back, these two cases will flip from error to a real fingerprint.
+**`200kHz_xwavs/SOCAL_E_63_EN_LTSA_testSet.ltsa.wav`** — the file begins with the bytes `LTSA`, so
+it is an LTSA file that has been given a `.wav` extension. Triton declines it cleanly with *"not
+wav file - exit"*. Nothing to fix in Triton; renaming it to end in `.ltsa` rather than `.wav` would
+move it into the LTSA cases and clear the error.
 
-- **`200kHz_xwavs/SOCAL_E_63_EN_LTSA_testSet.x.wav`** — the same message, for a different reason:
-  the file begins with the bytes `LTSA`, so it is an LTSA file that has been given a `.x.wav`
-  extension. Renaming it to `.ltsa` would move it into the LTSA cases. Nothing to fix in Triton.
+Flac used to be the other one, and is now covered: 2 headers and 6 reads, no errors.
+
+## Baselines in this folder
+
+| File | What it is |
+|---|---|
+| `current.json` | master, 450 cases, the reference to compare against |
+| `variant_harplab.json` | `Triton-HARPLab/triton1.95.20231113` over the same data |
+| `variant_spotcheck.json` | `Triton-SpotCheck/triton1.93.20170330_dev` |
+| `variant_dataproc.json` | `Triton1.95.20230315-DataProcessing/Triton-DataProc` |
+
+The variant snapshots were taken with the `'triton'` option, which points the harness at another
+checkout while using the same data:
+
+```matlab
+triton_baseline('triton','D:/Code/Triton-HARPLab/triton1.95.20231113', ...
+                'out','tests/baseline/variant_harplab.json')
+```
+
+The path is reset before each run, so one tree is never mixed with another.
+
+**What those three comparisons showed.** Each variant differs from master in 32 to 38 of the roughly
+80 core `.m` files, yet all three produce **byte-identical output on every one of the 443 comparable
+cases**. So on the paths this harness covers — header parsing, audio reads, spectrograms and LTSA
+reading — the divergence between the four trees is entirely cosmetic.
+
+That is a useful and narrowing result, but read the limit carefully: **the harness does not cover
+LTSA generation.** `calc_ltsa`, `write_ltsahead`, `get_headers` and `ck_ltsaparams` are only
+exercised through reading an LTSA that already exists, not through making one. Those are precisely
+the files where the known divergences live. Extending the harness to build an LTSA and fingerprint
+the result is the obvious next step, and until that exists "identical" means identical *at reading
+and display*, not everywhere.
 
 ## Notes
 

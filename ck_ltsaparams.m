@@ -11,7 +11,7 @@ function ck_ltsaparams
 global PARAMS
 
 % get sample rate - only the first file sr for now.....
-if PARAMS.ltsa.ftype == 1   % wav
+if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3   % wav or flac
 %     [y, PARAMS.ltsa.fs, nBits, OPTS] = wavread( fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)),10);
     info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)));
     PARAMS.ltsa.fs = info.SampleRate;
@@ -72,7 +72,7 @@ end
 % check to see if tave is too big, if so, set to max length
 %
 % maxTave = (PARAMS.ltsahd.write_length(1) * 250) / PARAMS.ltsa.fs;
-if PARAMS.ltsa.ftype ~= 1
+if PARAMS.ltsa.ftype ~= 1 && PARAMS.ltsa.ftype ~= 3 % (not wav or flac)
     maxTave = (PARAMS.ltsahd.write_length(1) * PARAMS.ltsa.blksz) / PARAMS.ltsa.fs;
     if PARAMS.ltsa.tave > maxTave
         PARAMS.ltsa.tave = maxTave;
@@ -89,6 +89,8 @@ disp(['Number of samples for fft: ', num2str(PARAMS.ltsa.nfft)])
 PARAMS.ltsa.cfact = PARAMS.ltsa.tave * PARAMS.ltsa.fs / PARAMS.ltsa.nfft;
 if PARAMS.ltsa.ftype == 1
     disp(['WAV to LTSA Compression Factor: ',num2str(PARAMS.ltsa.cfact)])
+elseif PARAMS.ltsa.ftype == 3
+    disp(['FLAC to LTSA Compression Factor: ',num2str(PARAMS.ltsa.cfact)])
 else
     disp(['XWAV to LTSA Compression Factor: ',num2str(PARAMS.ltsa.cfact)])
 end
@@ -97,7 +99,7 @@ disp(' ')
 % LTSA version number based on number of samples (averages)
 % Version number is also set in previously called program, get_headers based
 % on number of raw files
-if PARAMS.ltsa.ftype == 1   % wav file
+if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3 % wav or flac file
     Nsamp = floor(sum(PARAMS.ltsahd.nsamp ./ PARAMS.ltsa.nch));
 else    % xwav file
     Nsamp = floor(sum(PARAMS.ltsahd.byte_length)/(PARAMS.ltsa.nch *PARAMS.ltsa.nBits/8)); 

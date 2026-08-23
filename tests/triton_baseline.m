@@ -23,6 +23,9 @@ function manifest = triton_baseline(varargin)
 % tomorrow is a change worth seeing, and one bad file should not abandon the run.
 %
 % Options
+%   'triton' Triton tree to exercise (default: the tree this tests folder is in).
+%            Use it to baseline another checkout against the same data, e.g.
+%            triton_baseline('triton','D:/Code/Triton-HARPLab/triton1.95.20231113')
 %   'data'   folder to walk (default: ExampleData beside this tests folder)
 %   'out'    manifest path (default: tests/baseline/baseline_<timestamp>.json)
 %   'sets'   cellstr of subfolder names to restrict to (default: all)
@@ -37,6 +40,7 @@ here = fileparts(mfilename('fullpath'));
 tritonRoot = fileparts(here);
 
 p = inputParser;
+addParameter(p,'triton','');
 addParameter(p,'data', fullfile(tritonRoot,'ExampleData'));
 addParameter(p,'out',  '');
 addParameter(p,'sets', {});
@@ -53,7 +57,23 @@ end
 outDir = fileparts(opt.out);
 if ~isempty(outDir) && ~exist(outDir,'dir'); mkdir(outDir); end
 
+% Exercise the requested tree, not necessarily the one this file lives in, so
+% one harness can baseline several checkouts against the same data. The path is
+% reset first: leaving another Triton on it would silently mix the two, and
+% which copy of a duplicated function wins would depend on path order.
+if ~isempty(opt.triton)
+    tritonRoot = opt.triton;
+    if ~exist(fullfile(tritonRoot,'triton.m'),'file')
+        error('triton_baseline: no triton.m in %s', tritonRoot);
+    end
+end
+restoredefaultpath;
 addpath(tritonRoot);
+addpath(fullfile(tritonRoot,'Settings'));
+addpath(fullfile(tritonRoot,'Extras'));
+if exist(fullfile(tritonRoot,'Remoras'),'dir')
+    addpath(genpath(fullfile(tritonRoot,'Remoras')));
+end
 addpath(here);
 
 if ~exist(opt.data,'dir')
@@ -146,6 +166,7 @@ global PARAMS DATA %#ok<GVMIS>
 
 recs = {};
 isXwav = ~isempty(regexpi(f.name,'\.x\.wav$'));
+isFlac = ~isempty(regexpi(f.name,'\.flac$'));
 
 % ---- header
 rec = local_blank(f, 'header');
@@ -156,6 +177,22 @@ try
     PARAMS.infile = f.name;
     if isXwav
         PARAMS.ftype = 2; rdxwavhd;
+    elseif isFlac
+        % flac has no RIFF header; it is read through audioread, so take
+        % the parameters from audioinfo and use ftype 3 as filepd now does.
+        PARAMS.ftype = 3;
+        I = audioinfo(fullfile(PARAMS.inpath,PARAMS.infile));
+        rec.values = struct( ...
+            'ftype',        PARAMS.ftype, ...
+            'SampleRate',   I.SampleRate, ...
+            'NumChannels',  I.NumChannels, ...
+            'BitsPerSample',I.BitsPerSample, ...
+            'duration_sec', I.Duration, ...
+            'compression',  I.CompressionMethod);
+        fprintf('  %-52s header ok (flac)\n', f.name);
+        recs{end+1} = rec;
+        recs = [recs, local_case_flac_read(f, opt, I)];
+        return
     else
         PARAMS.ftype = 1; rdwavhd;
     end
@@ -264,6 +301,56 @@ end
 
 
 %% ===================================================================== ltsa
+function recs = local_case_flac_read(f, opt, I)
+%LOCAL_CASE_FLAC_READ  Drive readseg's ftype==3 path over a flac file.
+%
+% flac carries no harp header, so there is no per-raw-file timing to walk;
+% reads are taken at fixed offsets into the file instead.
+global PARAMS DATA %#ok<GVMIS>
+
+recs = {};
+offsets = unique([0, floor(I.Duration/2), max(0, floor(I.Duration) - opt.tseg - 1)]);
+
+for si = 1:numel(offsets)
+    label = sprintf('flac_read_%ds', offsets(si));
+    rec = local_blank(f, label);
+    try
+        % Faithful startup order: initparams then initdata, exactly as the
+        % application does, rather than a hand-picked field list. initdata
+        % reads the flac through audioinfo and readseg through audioread.
+        tr_headless_handles();
+        PARAMS = [];
+        initparams;
+        PARAMS.inpath = [f.folder filesep];
+        PARAMS.infile = f.name;
+        PARAMS.ftype  = 3;
+        PARAMS.start.dnum = datenum([0 1 1 0 0 0]);
+        PARAMS.start.dvec = datevec(PARAMS.start.dnum);
+        PARAMS.tseg.sec   = opt.tseg;
+        initdata;
+        PARAMS.plot.dnum  = PARAMS.start.dnum + offsets(si)/86400;
+        PARAMS.plot.dvec  = datevec(PARAMS.plot.dnum);
+        readseg;
+        rec.values = struct( ...
+            'offset_sec', offsets(si), ...
+            'tseg_sec',   opt.tseg, ...
+            'rows',       size(DATA,1), ...
+            'cols',       size(DATA,2), ...
+            'data_hash',  tr_hash(DATA), ...
+            'data_min',   min(DATA(:)), ...
+            'data_max',   max(DATA(:)), ...
+            'data_sum',   sum(DATA(:)));
+        fprintf('  %-52s %-16s %dx%d %s\n', f.name, label, ...
+            size(DATA,1), size(DATA,2), rec.values.data_hash(1:8));
+    catch e
+        rec.error = local_why(e);
+        fprintf('  %-52s %-16s ERROR %s\n', f.name, label, rec.error);
+    end
+    recs{end+1} = rec; %#ok<AGROW>
+end
+end
+
+
 function recs = local_case_ltsa(f, opt) %#ok<INUSD>
 %LOCAL_CASE_LTSA  Header fields and one block of power for one .ltsa file.
 global PARAMS %#ok<GVMIS>

@@ -48,6 +48,21 @@ end
 set(HANDLES.motion.stop,'Userdata',-1);        % -1 == not auto-advancing (motion.m:102)
 set(HANDLES.ltsa.motion.stop,'Userdata',-1);
 
+% initdata touches the control-window widgets when it sets up channels, the
+% frequency range and the display/filter/sound toggles. Plain wav and flac
+% both go through that path, so they cannot be exercised without these.
+HANDLES.fig.ctrl        = f;
+HANDLES.chan            = uicontrol(f,'Style','popupmenu','String',{'1'},'Visible','off');
+HANDLES.ch.pop          = uicontrol(f,'Style','popupmenu','String',{'1'},'Visible','off');
+HANDLES.ch.txt          = uicontrol(f,'Style','text','Visible','off');
+HANDLES.displaycontrol  = uicontrol(f,'Style','checkbox','Visible','off');
+HANDLES.filtcontrol     = uicontrol(f,'Style','checkbox','Visible','off');
+HANDLES.sndcontrol      = uicontrol(f,'Style','checkbox','Visible','off');
+HANDLES.snd.button      = uicontrol(f,'Style','pushbutton','Visible','off');
+HANDLES.stfreq.edtxt    = uicontrol(f,'Style','edit','Visible','off');
+HANDLES.endfreq.edtxt   = uicontrol(f,'Style','edit','Visible','off');
+HANDLES.mc.on           = uicontrol(f,'Style','checkbox','Value',0,'Visible','off');
+
 % check_ltsa_time writes the segment length back into the control window
 HANDLES.ltsa.time.edtxt3 = uicontrol(f,'Style','edit','Visible','off');
 
