@@ -70,13 +70,20 @@ elseif PARAMS.ltsa.fax == 2
 end
 
 % Scale the color range to the data instead of a fixed [1,65].
+%
+% Take the limits from c, not from PARAMS.ltsa.pwr: c is what image() was just
+% handed, after the frequency range was cropped, after brightness and contrast
+% were applied at line 53, and after the log-frequency remap if that is on.
+% Using the untransformed power array agrees with c only at the default
+% brightness 0 / contrast 100 and full frequency range, and disagrees as soon
+% as the user changes either.
 set(HANDLES.plt.ltsa,'CDataMapping','scaled');
-cLimPwr = PARAMS.ltsa.pwr(isfinite(PARAMS.ltsa.pwr));
-if isempty(cLimPwr)
+cLim = c(isfinite(c));
+if isempty(cLim)
     caxis([1,65]);              % no finite data; keep the historical range
 else
-    cLimLo = min(cLimPwr);
-    cLimHi = max(cLimPwr);
+    cLimLo = min(cLim);
+    cLimHi = max(cLim);
     if cLimHi <= cLimLo         % flat data; caxis requires an increasing range
         cLimHi = cLimLo + 1;
     end
