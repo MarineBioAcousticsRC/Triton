@@ -81,9 +81,10 @@ and is not. See `timebase.md` in the path above.
 stubbing the function under test.
 
 **Generating an LTSA from a file with thousands of raw-file entries crashes MATLAB R2023a.** An
-internal assertion inside `calc_ltsa`, not a Triton error. R2025b runs the same job to completion,
-so build LTSAs from high-raw-count deployments on a newer release. Details and everything ruled out
-are in [tests/README.md](tests/README.md).
+internal assertion inside `calc_ltsa`, not a Triton error. R2024a and R2025b both run the same job
+to completion and produce byte-identical output, so build LTSAs from high-raw-count deployments on
+R2024a or newer. It is not a simple capacity limit -- synthetic attempts to reproduce it under
+R2023a all succeeded. Details and everything ruled out are in [tests/README.md](tests/README.md).
 
 **An interrupted LTSA used to read back as valid data.** Fixed, but the shape of the bug is worth
 knowing: a failed `fseek` leaves the file pointer where it was, so a subsequent `fread` returns

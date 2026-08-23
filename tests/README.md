@@ -230,13 +230,29 @@ This is an assertion inside MATLAB itself, not a Triton error. It happens **insi
 after `write_ltsahead` has succeeded, about 16% of the way through writing the spectra. Those two
 files declare 5,368 raw-file entries each -- 10,736 for the pair, against 30 for a typical x.wav.
 
-**R2025b runs the identical job to completion**, producing the full 2,898,448-byte file. So this is
-release-specific rather than a scale limit in Triton, and the practical guidance is to build LTSAs
-from high-raw-count deployments on a newer release.
+**R2024a and R2025b both run the identical job to completion**, producing the full 2,898,448-byte
+file. So this is release-specific rather than a scale limit in Triton, and the guidance is simply to
+build LTSAs from high-raw-count deployments on R2024a or newer.
+
+The two releases also produced **byte-identical output** -- same header hash, same power hash. That
+is worth knowing separately: the general warning above about comparing baselines only within one
+release does not appear to bite for LTSA generation across R2024a and R2025b, at least on this
+input.
 
 Ruled out by direct test rather than reasoning, in case it resurfaces: `tr_hash` (1.5 million
 elements, clean), headless `loadbar` (12,000 create-update-close cycles, clean), `pwelch` at volume
 (200,000 calls, clean), and a file-handle leak (`fopen`/`fclose` are per-file, only two opens).
+
+Attempts to reproduce it synthetically under R2023a all **succeeded**, so it is not a simple
+capacity limit: 11,000 raw-file entries in one x.wav, 160,000 spectral averages over 1,000 raw
+files, and 3,000 small wav files in a directory each completed normally. Whatever the trigger is,
+it involves something about the real files that those do not capture.
+
+Separately, and not the same thing: LTSA versions 1 and 2 stored `nrftot` as a 2-byte field, capping
+total raw files at 65,535 (`read_ltsahead.m:71`). Version 4 widened it to 4 bytes and
+`get_headers.m:126` now always writes version 4, so that ceiling is long gone. The count of *input
+files*, `nxwav`, is still 2 bytes; `write_ltsahead` now refuses above 65,535 rather than letting
+`fwrite` saturate silently.
 
 The crash is also what exposed the truncated-LTSA bug described next, so it was worth chasing.
 
