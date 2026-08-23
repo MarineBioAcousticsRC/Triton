@@ -185,6 +185,8 @@ Flac used to be the other one, and is now covered: 2 headers and 6 reads, no err
 | `variant_harplab.json` | `Triton-HARPLab/triton1.95.20231113` over the same data |
 | `variant_spotcheck.json` | `Triton-SpotCheck/triton1.93.20170330_dev` |
 | `variant_dataproc.json` | `Triton1.95.20230315-DataProcessing/Triton-DataProc` |
+| `ltsa_master.json` | master, LTSA generation over a scoped set (see below) |
+| `ltsa_harplab.json` `ltsa_spotcheck.json` `ltsa_dataproc.json` | the same six builds on each variant |
 
 The variant snapshots were taken with the `'triton'` option, which points the harness at another
 checkout while using the same data:
@@ -201,12 +203,43 @@ The path is reset before each run, so one tree is never mixed with another.
 cases**. So on the paths this harness covers — header parsing, audio reads, spectrograms and LTSA
 reading — the divergence between the four trees is entirely cosmetic.
 
-That is a useful and narrowing result, but read the limit carefully: **the harness does not cover
-LTSA generation.** `calc_ltsa`, `write_ltsahead`, `get_headers` and `ck_ltsaparams` are only
-exercised through reading an LTSA that already exists, not through making one. Those are precisely
-the files where the known divergences live. Extending the harness to build an LTSA and fingerprint
-the result is the obvious next step, and until that exists "identical" means identical *at reading
-and display*, not everywhere.
+**LTSA generation says the same thing.** All four trees were run through `triton_ltsa_baseline`
+over six builds -- both padding fixtures, `Flac`, `Wavs`, `4Channel_100kHz` and `200kHz_xwavs` -- and
+all three variants produce **byte-identical header and power blocks to master on all six**. So the
+32-38 differing core files per tree are cosmetic for LTSA generation as well as for reading.
+
+That includes the two cases most likely to separate them: the flac path, and the `calc_ltsa` padding
+branch on both wav and x.wav. If any tree carried the broken bracket form, `pad_xwav` would have
+errored instead of matching.
+
+The six builds deliberately exclude the two duty-cycled sets and `ExampleSpotCheck`. Those are slow,
+they exercise the same code paths as the sets above rather than new ones, and `Duty_cycled_df100`
+triggers the MATLAB crash described next.
+
+### A MATLAB crash on the duty-cycled sets
+
+Generating an LTSA from `ExampleData/Duty_cycled_df100_xwavs_and_LTSA` kills MATLAB R2023a:
+
+```
+Assertion in foundation::usm::Detail<struct foundation::usm::scope::Mvm>::find
+  at B:\matlab\foundation\usm\management.cpp line 778:
+  find: no active context for type 'struct mcos::COSContext_Proxy'
+```
+
+This is an assertion inside MATLAB itself, not a Triton error -- `management.cpp` and `mcos` are
+MathWorks internals, and the stack unwinds through graphics teardown and `RtlExitUserProcess`. It
+reproduces: the set fails the same way when run on its own.
+
+What is established so far. The LTSA **is written correctly** -- 1.4 MB on disk -- so `get_headers`,
+`ck_ltsaparams`, `write_ltsahead` and `calc_ltsa` all complete their work. MATLAB then dies before
+the manifest is written, which is why no output file appears. These files are unusual in scale: 5,368
+raw-file entries each, so 10,736 directory entries for the pair, against 30 for a typical x.wav.
+`tr_hash` was ruled out as the trigger -- hashing 1.5 million elements and exiting is clean.
+
+Not yet resolved, and worth pursuing on its own account: a crash while building an LTSA from real
+duty-cycled deployment data matters to users whether or not the harness is involved. The first thing
+to try is a different release -- R2024a and R2025b are both installed, and an internal assertion of
+this kind is often release-specific.
 
 ## Notes
 
