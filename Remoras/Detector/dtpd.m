@@ -82,6 +82,13 @@ elseif strcmp(action, 'dt_procStreamv2')
     setpointers('watch');
     dtProcStream_v2;
     setpointers('arrow');
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dialog box - convert detection files to TPWS files
+elseif strcmp(action, 'make_TPWS')
+    setpointers('watch');
+    dt_mkTPWS_gui;
+    setpointers('arrow');
 end
 
 
