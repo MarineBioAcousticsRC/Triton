@@ -90,6 +90,24 @@ R2023a all succeeded. Details and everything ruled out are in [tests/README.md](
 knowing: a failed `fseek` leaves the file pointer where it was, so a subsequent `fread` returns
 real-looking values from the wrong place. Check `fseek` status and return, rather than carrying on.
 
+**Several behaviours look like bugs, are load-bearing, and must not be "tidied".** Fixing any of
+them changes numbers the lab has already published, so they are decisions for the group rather than
+for whoever is editing the file. They are catalogued with evidence, blast radius and who can settle
+each one in `D:\Code\Triton_python\docs\OPEN_DECISIONS.md`. The ones most likely to be
+encountered while editing:
+
+- `calc_ltsa.m:95-100` advances the input pointer by *this* spectral average's sample count where
+  the distance to move is the *previous* average's length, so the last average of every unevenly
+  divided raw file re-reads earlier data. Live in existing LTSAs.
+- `rdxwavhd.m:135,137` assign `PARAMS.xhd.dt` and `.padding` unsubscripted inside the per-raw-file
+  loop, so only the last raw file's values survive. Some Remoras may compensate for this.
+- `readseg.m:117-119` divides only column `PARAMS.ch` by the gain, leaving other channels of a
+  multichannel file unscaled, and uses `xgain(1)` for every raw file.
+- `rdxwavhd.m:160` and `read_ltsahead.m:159` both compute an end time one sample short, and the
+  first divides by the `fmt` chunk `ByteRate` rather than the raw file's own `sample_rate`.
+
+If you find another of these, add it to that register rather than fixing it in passing.
+
 ---
 
 ## Running MATLAB from a shell
@@ -130,7 +148,21 @@ assume a difference is meaningful because the files differ; measure it.
 
 ## Related repositories
 
-**`D:\Code\Triton_python`** — a Python port of Triton, currently specification and test fixtures
-only. Its `docs/formats/` holds the byte-exact format documentation referenced above, and its
-`tools/matlab/dump_reference.m` is where this repository's regression harness came from. Worth
-consulting before making any claim about file layout.
+**`D:\Code\Triton_python`** — a Python port of Triton, published privately at
+`github.com/MarineBioAcousticsRC/Triton_python`. Its core library is complete and verified against
+this repository: reading x.wav and LTSA, spectra, and an `mkltsa` whose output is byte-for-byte
+identical to `calc_ltsa`'s.
+
+Three things in it are worth consulting from here:
+
+- **`docs/formats/`** — the byte-exact format documentation referenced above (`xwav.md`,
+  `ltsa.md`, `timebase.md`). Authoritative for layout questions.
+- **`docs/OPEN_DECISIONS.md`** — the register of behaviours that look like bugs but must not be
+  changed unilaterally, plus the questions that need archive data or a particular person's memory.
+  Add to it rather than acting alone.
+- **`tools/matlab/dump_reference.m`** — where this repository's regression harness came from.
+
+The byte-identical `mkltsa` is also the most sensitive check that exists on this repository's
+numerics: it depends on the window definition, the PSD normalisation, the int8 quantiser *and* the
+LTSA parameter derivation all being simultaneously unchanged. If a change here breaks it, something
+real moved.
