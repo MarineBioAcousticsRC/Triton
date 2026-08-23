@@ -35,10 +35,10 @@ before = local_load(beforeFile);
 after  = local_load(afterFile);
 
 fprintf('Comparing Triton output\n');
-fprintf('  before : %s   (%s, %s, git %s)\n', beforeFile, before.created, ...
-    before.matlab, local_str(before.git_head));
-fprintf('  after  : %s   (%s, %s, git %s)\n\n', afterFile, after.created, ...
-    after.matlab, local_str(after.git_head));
+fprintf('  before : %s   (%s, %s, git %s)\n', beforeFile, local_get(before,'created','?'), ...
+    local_get(before,'matlab','?'), local_str(local_get(before,'git_head','-')));
+fprintf('  after  : %s   (%s, %s, git %s)\n\n', afterFile, local_get(after,'created','?'), ...
+    local_get(after,'matlab','?'), local_str(local_get(after,'git_head','-')));
 
 bKeys = local_keys(before);
 aKeys = local_keys(after);
