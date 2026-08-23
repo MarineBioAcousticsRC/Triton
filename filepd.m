@@ -82,6 +82,7 @@ elseif strcmp(action,'openwav')
         cd(PARAMS.inpath)
     end
     set(HANDLES.fig.ctrl, 'Pointer', 'watch');
+    PARAMS.specgram.clim = [];   % new file: re-derive the colour range
     % The open dialog has offered flac since 2022, but ftype was hardcoded to
     % 1, so a flac file was read as a RIFF wav and failed. Pick the type from
     % the extension. Both are read through audioread, which handles flac.
@@ -151,6 +152,7 @@ elseif strcmp(action,'openxwav')
     end
     % calculate the number of blocks in the opened file
     set(HANDLES.fig.ctrl, 'Pointer', 'watch');
+    PARAMS.specgram.clim = [];   % new file: re-derive the colour range
     PARAMS.ftype = 2;
     initdata
     if ~isempty(PARAMS.xhd.byte_length)

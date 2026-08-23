@@ -63,6 +63,17 @@ HANDLES.stfreq.edtxt    = uicontrol(f,'Style','edit','Visible','off');
 HANDLES.endfreq.edtxt   = uicontrol(f,'Style','edit','Visible','off');
 HANDLES.mc.on           = uicontrol(f,'Style','checkbox','Value',0,'Visible','off');
 
+% plot_specgram, plot_ltsa and plot_triton read the display checkboxes and a few
+% spectrogram controls, so the plotting path needs these to run headlessly.
+HANDLES.display.ltsa       = uicontrol(f,'Style','checkbox','Value',0,'Visible','off');
+HANDLES.display.specgram   = uicontrol(f,'Style','checkbox','Value',1,'Visible','off');
+HANDLES.display.spectra    = uicontrol(f,'Style','checkbox','Value',0,'Visible','off');
+HANDLES.display.timeseries = uicontrol(f,'Style','checkbox','Value',0,'Visible','off');
+HANDLES.sgeq.tog           = uicontrol(f,'Style','togglebutton','Value',0,'Visible','off');
+HANDLES.sgeq.tog2          = uicontrol(f,'Style','togglebutton','Value',0,'Visible','off');
+HANDLES.specnfft.edtxt     = uicontrol(f,'Style','edit','Visible','off');
+HANDLES.BC                 = uicontrol(f,'Style','text','Visible','off');
+
 % init_ltsadata and check_ltsa_time reach into the LTSA control window for the
 % frequency range and the expand toggle, so the LTSA read path needs these too.
 HANDLES.ltsa.endfreq.edtxt  = uicontrol(f,'Style','edit','Visible','off');

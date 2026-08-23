@@ -26,6 +26,12 @@ PARAMS.sgfax = 0;       %linear or log freq axis for specgram
 PARAMS.aptime = 0.25;		%  pause time, can set to zero but sometimes to fast
 PARAMS.bright = 0;			% shift in dB
 PARAMS.contrast = 100;		% amplify in % dB
+% Spectrogram colour limits. Empty means "derive from the first frame drawn";
+% plot_specgram fills it in once and then leaves it alone, so levels stay
+% comparable while an analyst scrolls. Cleared when a file is opened from the
+% File menu -- see filepd.m -- and deliberately not cleared when advancing to
+% the next file, which is the case where comparability matters most.
+PARAMS.specgram.clim = [];
 PARAMS.freq0 = 0;			% set frequency PARAMS lower limit
 PARAMS.freq1 = -1;          % set frequency PARAMS upper limit
 PARAMS.nfft = 1000;			% length of fft

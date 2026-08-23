@@ -121,9 +121,39 @@ if PARAMS.ftype ~=1 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~
     end
 end
 
-% Make sure color range is fixed.
+% Colour range: derived from the data the first time a spectrogram is drawn
+% after a file is opened, then held.
+%
+% It used to be a fixed caxis([1,65]). Measured spectrogram power on real
+% recordings runs from about -108 dB to +49 dB depending on instrument, gain and
+% sample rate, so on many datasets the whole image fell below 1 dB and rendered
+% as one flat colour -- issue #111, reported as a blank white spectrogram. The
+% brightness and contrast controls could bring it into range, but nothing told
+% the user that.
+%
+% Held rather than recomputed per frame on purpose: a range that moved as the
+% analyst scrolled would make the same sound level look different from one
+% window to the next, which defeats the point of a spectrogram. Brightness and
+% contrast still apply on top, and their effect persists, because they are
+% baked into c above while these limits stay put.
 set(HANDLES.plt.specgram,'CDataMapping','scaled');
-caxis([1,65]);
+if ~isfield(PARAMS,'specgram') || ~isfield(PARAMS.specgram,'clim')
+    PARAMS.specgram.clim = [];
+end
+if isempty(PARAMS.specgram.clim)
+    cLim = c(isfinite(c));
+    if isempty(cLim)
+        PARAMS.specgram.clim = [1 65];      % no finite data; historical range
+    else
+        lo = min(cLim);
+        hi = max(cLim);
+        if hi <= lo                         % flat data; caxis needs lo < hi
+            hi = lo + 1;
+        end
+        PARAMS.specgram.clim = [lo hi];
+    end
+end
+caxis(PARAMS.specgram.clim);
 
 axis xy
 
