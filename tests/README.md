@@ -105,22 +105,45 @@ marked in the source with *"what the dialogs would do"*. Everything that compute
 Generated LTSAs go to a temp folder and are deleted afterwards; pass `'keep',true` to inspect them.
 Nothing is written into the data folder.
 
-### A coverage gap worth knowing about
+### The calc_ltsa padding branch, and the fixtures that reach it
 
-The zero-padding branch in `calc_ltsa` — the one where the four trees are known to differ, and the
-one carrying the misplaced-bracket bug found on six branches — **is not exercised by any of the
-example data.**
+`calc_ltsa` pads the final spectral average of a raw file with zeros when that average holds fewer
+samples than `nfft`. That branch is where the four checkouts differ, and it carries the
+misplaced-bracket bug found on six branches:
 
-It only runs when a raw file's sample count is not a whole multiple of `nfft`. Checked directly:
-`calc_ltsa` prints a `File# Raw# Ave# DataSize` line whenever it fires, and that line appears zero
-times across the xwav, wav and flac directories, at the default `dfreq` and at values chosen
-specifically to leave a remainder. Injecting the broken bracket form into `calc_ltsa` and
-re-running produced byte-identical output, because the code was never reached.
+```matlab
+if length(data(1,:) == length(dz(1,:)))     % always true -- the else is dead
+```
 
-So a clean LTSA comparison currently says nothing about that branch. Closing this needs an input
-whose raw files are not a multiple of `nfft` samples — most simply, a short synthetic wav built for
-the purpose. Until that exists, treat `calc_ltsa`'s padding behaviour as unverified and settle it by
-reading the code rather than by measurement.
+**None of the real example data reaches it**, because every raw file's sample count happens to be a
+whole multiple of `nfft`. `tests/fixtures/` holds two small pairs of files, built by
+`make_pad_fixture.m`, that do:
+
+| Fixture | Reaches padding with | Why both are needed |
+|---|---|---|
+| `fixtures/pad_wav` | 50 samples left over, `nfft` 100 | wav samples are a **column**, so the correct and broken forms both concatenate vertically. Output is identical. This is the case that proves the bug is harmless here |
+| `fixtures/pad_xwav` | 250 samples left over, `nfft` 300 | x.wav samples are a **row** (`data = data(ch,:)`), so the correct form appends horizontally and the broken form vertically. This is the case that exposes the bug |
+
+Both fire at the harness's default `tave` and `dfreq` — no special parameters needed. The x.wav is
+one channel, 16-bit, version 1, written to the byte layout in `docs/formats/xwav.md` of the Python
+port, and confirmed readable by Triton's own `rdxwavhd`.
+
+Demonstrated by injecting the broken form into `calc_ltsa` and re-running:
+
+```
+  fixtures/pad_wav    wav   hdr b21140f3  pwr 6a0df0bd     <- unchanged
+  fixtures/pad_xwav   xwav  ERROR Dimensions of arrays being concatenated are not consistent.
+
+  unchanged : 1
+  changed   : 1
+```
+
+So the branch is now covered, and it is worth knowing *how* it fails: on x.wav input the bug is not
+a quiet numerical drift, it is a hard error. Any tree carrying that form cannot build an LTSA from
+x.wav at all whenever the last average comes up short.
+
+The fixtures are about 800 KB in total and are committed, so this case runs on a fresh clone with
+no example data present. Pass `'fixtures',false` to skip them.
 
 ## Reading the comparison
 

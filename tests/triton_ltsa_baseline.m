@@ -31,6 +31,9 @@ function manifest = triton_ltsa_baseline(varargin)
 %   'dfreq'   frequency bin size in Hz (default: 100)
 %   'workdir' where LTSAs are built (default: a temp folder, removed afterwards)
 %   'keep'    true to leave the generated LTSAs in place for inspection
+%   'fixtures' include tests/fixtures in the walk (default true). Those are
+%            committed and tiny, so the padding case runs without the example
+%            data being present at all.
 %
 % See tests/README.md.
 
@@ -47,6 +50,7 @@ addParameter(p,'tave',5);
 addParameter(p,'dfreq',100);
 addParameter(p,'workdir','');
 addParameter(p,'keep',false);
+addParameter(p,'fixtures',true);
 parse(p,varargin{:});
 opt = p.Results;
 
@@ -97,15 +101,31 @@ manifest.settings    = struct('tave',opt.tave,'dfreq',opt.dfreq);
 manifest.cases       = {};
 
 %% ---------------------------------------------------------------- walk sets
-sets = dir(opt.data);
-sets = sets([sets.isdir]);
-sets = sets(~ismember({sets.name},{'.','..'}));
+% Roots to walk: the example data, plus the committed fixtures. The fixtures
+% carry cases the real recordings do not reach -- see tests/README.md.
+roots = {};
+if exist(opt.data,'dir'); roots{end+1} = opt.data; end
+fixRoot = fullfile(here,'fixtures');
+if opt.fixtures && exist(fixRoot,'dir'); roots{end+1} = fixRoot; end
+if isempty(roots)
+    error('triton_ltsa_baseline: nothing to walk (data folder missing, fixtures off)');
+end
+
+sets = struct('name',{},'root',{});
+for ri = 1:numel(roots)
+    listing = dir(roots{ri});
+    listing = listing([listing.isdir]);
+    listing = listing(~ismember({listing.name},{'.','..'}));
+    for li = 1:numel(listing)
+        sets(end+1) = struct('name',listing(li).name,'root',roots{ri}); %#ok<AGROW>
+    end
+end
 if ~isempty(opt.sets)
     sets = sets(ismember({sets.name}, opt.sets));
 end
 
 for si = 1:numel(sets)
-    setDir = fullfile(opt.data, sets(si).name);
+    setDir = fullfile(sets(si).root, sets(si).name);
 
     % One case per directory that holds recordings of a single type, since an
     % LTSA is built from a whole directory rather than one file.
