@@ -63,6 +63,12 @@ HANDLES.stfreq.edtxt    = uicontrol(f,'Style','edit','Visible','off');
 HANDLES.endfreq.edtxt   = uicontrol(f,'Style','edit','Visible','off');
 HANDLES.mc.on           = uicontrol(f,'Style','checkbox','Value',0,'Visible','off');
 
+% init_ltsadata and check_ltsa_time reach into the LTSA control window for the
+% frequency range and the expand toggle, so the LTSA read path needs these too.
+HANDLES.ltsa.endfreq.edtxt  = uicontrol(f,'Style','edit','Visible','off');
+HANDLES.ltsa.stfreq.edtxt   = uicontrol(f,'Style','edit','Visible','off');
+HANDLES.ltsa.expand.button  = uicontrol(f,'Style','togglebutton','Value',0,'Visible','off');
+
 % check_ltsa_time writes the segment length back into the control window
 HANDLES.ltsa.time.edtxt3 = uicontrol(f,'Style','edit','Visible','off');
 

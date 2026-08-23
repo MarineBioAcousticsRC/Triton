@@ -74,6 +74,54 @@ tested by introducing a one-part-in-ten-million error in the gain applied by `re
 comparison caught in all eight affected cases while correctly leaving the two header-only cases
 alone.
 
+## The other half: LTSA generation
+
+`triton_baseline` covers *reading*. `triton_ltsa_baseline` covers *making an LTSA*, which is the
+other half of Triton's core and the half where the four checkouts are known to disagree —
+`calc_ltsa`, `write_ltsahead`, `get_headers` and `ck_ltsaparams` are only reachable this way.
+
+```matlab
+triton_ltsa_baseline('out','tests/baseline/ltsa_before.json')
+% ... change something ...
+triton_ltsa_baseline('out','tests/baseline/ltsa_after.json')
+triton_compare('tests/baseline/ltsa_before.json','tests/baseline/ltsa_after.json')
+```
+
+Same comparison tool — both recorders emit the same identity fields.
+
+For each directory holding two or more recordings of one type it builds an LTSA into a temporary
+folder and records the **header block and the power block as separate fingerprints**, so a change
+in the computed spectra is distinguishable from a change in the metadata written around it. It also
+records the parameters the pipeline derived on the way — `nfft`, `cfact`, `nfreq`, the LTSA version,
+the per-file averaging counts and the start times.
+
+`mk_ltsa` cannot be driven headlessly: it asks for the directory and the averaging parameters
+through dialogs. Those two steps are replaced by setting the same `PARAMS` fields the dialogs set,
+marked in the source with *"what the dialogs would do"*. Everything that computes anything —
+`get_headers`, `ck_ltsaparams`, `write_ltsahead`, `calc_ltsa` — is the real function, unmodified.
+`write_ltsahead` skips its save dialog because `PARAMS.ltsa.outfile` is pre-set, which the
+`isfield` guard in that file makes possible.
+
+Generated LTSAs go to a temp folder and are deleted afterwards; pass `'keep',true` to inspect them.
+Nothing is written into the data folder.
+
+### A coverage gap worth knowing about
+
+The zero-padding branch in `calc_ltsa` — the one where the four trees are known to differ, and the
+one carrying the misplaced-bracket bug found on six branches — **is not exercised by any of the
+example data.**
+
+It only runs when a raw file's sample count is not a whole multiple of `nfft`. Checked directly:
+`calc_ltsa` prints a `File# Raw# Ave# DataSize` line whenever it fires, and that line appears zero
+times across the xwav, wav and flac directories, at the default `dfreq` and at values chosen
+specifically to leave a remainder. Injecting the broken bracket form into `calc_ltsa` and
+re-running produced byte-identical output, because the code was never reached.
+
+So a clean LTSA comparison currently says nothing about that branch. Closing this needs an input
+whose raw files are not a multiple of `nfft` samples — most simply, a short synthetic wav built for
+the purpose. Until that exists, treat `calc_ltsa`'s padding behaviour as unverified and settle it by
+reading the code rather than by measurement.
+
 ## Reading the comparison
 
 ```
@@ -152,8 +200,9 @@ and display*, not everywhere.
   and `mkspecgram` run **for real** rather than being reimplemented here — the numbers recorded are
   the ones users get. If you add a case that needs another handle, extend the shim rather than
   working around it.
-- The files are `triton_baseline.m` (record), `triton_compare.m` (diff), `tr_hash.m` (fingerprint)
-  and `tr_headless_handles.m` (the shim).
+- The files are `triton_baseline.m` (record reading), `triton_ltsa_baseline.m` (record LTSA
+  generation), `triton_compare.m` (diff either), `tr_hash.m` (fingerprint) and
+  `tr_headless_handles.m` (the shim).
 
 ## Where this came from
 

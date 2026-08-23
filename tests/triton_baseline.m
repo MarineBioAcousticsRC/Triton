@@ -360,6 +360,7 @@ rec = local_blank(f, 'ltsa_header');
 try
     tr_headless_handles();
     PARAMS = [];
+    initparams;   % faithful startup order; supplies ltsa.tseg.step and friends
     PARAMS.ltsa.inpath = [f.folder filesep];
     PARAMS.ltsa.infile = f.name;
     read_ltsahead;
@@ -393,10 +394,12 @@ rec = local_blank(f, 'ltsa_data');
 try
     % read_ltsadata works out plotStartRawIndex/Bin itself from plot.dnum,
     % the way init_ltsadata leaves things (init_ltsadata.m:33-34).
-    PARAMS.ltsa.plot.dnum = PARAMS.ltsa.start.dnum;
-    PARAMS.ltsa.plot.dvec = PARAMS.ltsa.start.dvec;
+    % Real sequence is read_ltsahead -> init_ltsadata -> read_ltsadata
+    % (filepd.m, 'openltsa'). init_ltsadata sets plotStartRawIndex and the
+    % plot times that read_ltsadata and check_ltsa_time then rely on.
     PARAMS.ltsa.tseg.hr   = 1;
     PARAMS.ltsa.tseg.sec  = 3600;
+    init_ltsadata;
     read_ltsadata;
     rec.values = struct( ...
         'pwr_hash', tr_hash(PARAMS.ltsa.pwr), ...
