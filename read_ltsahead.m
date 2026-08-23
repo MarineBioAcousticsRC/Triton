@@ -175,6 +175,26 @@ else        % even
     PARAMS.ltsa.nf = PARAMS.ltsa.nfft/2 + 1;
 end
 
+% Check the file actually holds the spectra its header promises. An LTSA whose
+% generation was interrupted -- a crash, a cancel, a full disk -- is otherwise
+% opened without comment, and the missing part reads as data from the wrong
+% time (see the failed-seek branch in read_ltsadata).
+ltsaInfo = dir(fullfile(PARAMS.ltsa.inpath,PARAMS.ltsa.infile));
+if ~isempty(ltsaInfo)
+    expectedBytes = double(PARAMS.ltsa.dataStartLoc) + ...
+        sum(double(PARAMS.ltsa.nave)) * double(PARAMS.ltsa.nf);
+    if ltsaInfo.bytes < expectedBytes
+        written = ltsaInfo.bytes - double(PARAMS.ltsa.dataStartLoc);
+        total   = expectedBytes - double(PARAMS.ltsa.dataStartLoc);
+        disp_msg('WARNING: this LTSA is incomplete')
+        disp_msg(sprintf('  header declares %d spectral averages needing %d bytes', ...
+            sum(double(PARAMS.ltsa.nave)), expectedBytes))
+        disp_msg(sprintf('  file holds %d bytes, so %.1f%% of the spectra are missing', ...
+            ltsaInfo.bytes, 100*(1 - max(written,0)/total)))
+        disp_msg('  it was probably interrupted while being made; consider remaking it')
+    end
+end
+
 % initialize the timing parameters
 PARAMS.ltsa.start.dnum = PARAMS.ltsa.dnumStart(1);
 PARAMS.ltsa.start.dvec = PARAMS.ltsa.dvecStart(1,:);
