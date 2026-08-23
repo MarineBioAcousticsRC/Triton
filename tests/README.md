@@ -216,30 +216,44 @@ The six builds deliberately exclude the two duty-cycled sets and `ExampleSpotChe
 they exercise the same code paths as the sets above rather than new ones, and `Duty_cycled_df100`
 triggers the MATLAB crash described next.
 
-### A MATLAB crash on the duty-cycled sets
+### An R2023a crash on files with thousands of raw files
 
-Generating an LTSA from `ExampleData/Duty_cycled_df100_xwavs_and_LTSA` kills MATLAB R2023a:
+Generating an LTSA from `ExampleData/Duty_cycled_df100_xwavs_and_LTSA` kills **MATLAB R2023a**:
 
 ```
 Assertion in foundation::usm::Detail<struct foundation::usm::scope::Mvm>::find
-  at B:\matlab\foundation\usm\management.cpp line 778:
+  at ...matlab/foundation/usm/management.cpp line 778:
   find: no active context for type 'struct mcos::COSContext_Proxy'
 ```
 
-This is an assertion inside MATLAB itself, not a Triton error -- `management.cpp` and `mcos` are
-MathWorks internals, and the stack unwinds through graphics teardown and `RtlExitUserProcess`. It
-reproduces: the set fails the same way when run on its own.
+This is an assertion inside MATLAB itself, not a Triton error. It happens **inside `calc_ltsa`**,
+after `write_ltsahead` has succeeded, about 16% of the way through writing the spectra. Those two
+files declare 5,368 raw-file entries each -- 10,736 for the pair, against 30 for a typical x.wav.
 
-What is established so far. The LTSA **is written correctly** -- 1.4 MB on disk -- so `get_headers`,
-`ck_ltsaparams`, `write_ltsahead` and `calc_ltsa` all complete their work. MATLAB then dies before
-the manifest is written, which is why no output file appears. These files are unusual in scale: 5,368
-raw-file entries each, so 10,736 directory entries for the pair, against 30 for a typical x.wav.
-`tr_hash` was ruled out as the trigger -- hashing 1.5 million elements and exiting is clean.
+**R2025b runs the identical job to completion**, producing the full 2,898,448-byte file. So this is
+release-specific rather than a scale limit in Triton, and the practical guidance is to build LTSAs
+from high-raw-count deployments on a newer release.
 
-Not yet resolved, and worth pursuing on its own account: a crash while building an LTSA from real
-duty-cycled deployment data matters to users whether or not the harness is involved. The first thing
-to try is a different release -- R2024a and R2025b are both installed, and an internal assertion of
-this kind is often release-specific.
+Ruled out by direct test rather than reasoning, in case it resurfaces: `tr_hash` (1.5 million
+elements, clean), headless `loadbar` (12,000 create-update-close cycles, clean), `pwelch` at volume
+(200,000 calls, clean), and a file-handle leak (`fopen`/`fclose` are per-file, only two opens).
+
+The crash is also what exposed the truncated-LTSA bug described next, so it was worth chasing.
+
+### Truncated LTSAs
+
+An LTSA whose generation is interrupted -- a crash, a cancelled run, a full disk, a dropped network
+share -- used to read back as valid data. Fixed, and worth knowing the shape of:
+
+`read_ltsahead` accepted a file holding 16% of its declared spectra without comment. `read_ltsadata`
+then sought past end-of-file; `fseek` returned -1 and a message was logged, but the code fell
+through to the `fread` anyway. A failed seek leaves the file pointer where it was, so the read
+returned a full block of **real-looking values from the wrong part of the file** -- not zeros, not
+an error, just plausible spectra at incorrect times.
+
+Now `read_ltsahead` reports how much is missing, and `read_ltsadata` returns NaN for a window it
+cannot reach. Verified against a real truncated file, and against the full baseline to confirm
+nothing changes for complete ones.
 
 ## Notes
 
