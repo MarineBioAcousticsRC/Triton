@@ -91,27 +91,15 @@ fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
         [DATA,Fs] = audioread( fullfname, [skip+1 skip+PARAMS.tseg.samp], 'native' );
         DATA = double(DATA);
 %         DATA = DATA(:,PARAMS.ch).*2^15;     % un-normalize wavread
-    elseif PARAMS.ftype == 2    % xwav file
+    elseif PARAMS.ftype == 2    % xwav file, stored as either wav or flac
         index = PARAMS.raw.currentIndex;
-        if PARAMS.nBits == 16
-            dtype = 'int16';
-        elseif PARAMS.nBits == 24
-            dtype = 'int24';
-        elseif PARAMS.nBits == 32
-            dtype = 'int32';
-        else
-            disp_msg('PARAMS.nBits = ')
-            disp_msg(PARAMS.nBits)
-            disp_msg('not supported')
-            return
-        end
         skip = floor((PARAMS.plot.dnum - PARAMS.raw.dnumStart(index)) * 24 * 60 * 60 * PARAMS.fs);   % number of samples to skip over
         % %
         PARAMS.tseg.samp = ceil( PARAMS.tseg.sec * PARAMS.fs );	% number of samples in segment
-        fid = fopen(fullfname,'r');
-        fseek(fid,PARAMS.xhd.byte_loc(index) + skip*PARAMS.nch*PARAMS.samp.byte,'bof');
-        DATA = fread(fid,[PARAMS.nch,PARAMS.tseg.samp],dtype)';
-        fclose(fid);
+        % xwav_read fetches the samples whichever container holds them: byte
+        % offsets for an x.wav, sample indices for an x.flac. The bit-depth
+        % check that used to sit here moved there with the read.
+        DATA = xwav_read(index, skip, PARAMS.tseg.samp);
 %         DATA = DATA(PARAMS.ch,:);
         if PARAMS.xgain > 0
             DATA(:,PARAMS.ch) = DATA(:,PARAMS.ch) ./ PARAMS.xgain(1);
