@@ -32,7 +32,7 @@ if gco == HANDLES.subplt.ltsa || gco == HANDLES.plt.ltsa
         disp_msg('Select correct directory & file')
         % get file name
         %
-        filterSpec1 = '*.x.wav';
+        filterSpec1 = {'*.x.wav;*.x.flac', 'XWAV files (*.x.wav, *.x.flac)'};
         boxTitle1 = 'Open XWAV based on LTSA';
         % user interface retrieve file to open through a dialog box
         DefaultName = PARAMS.inpath;
@@ -54,10 +54,11 @@ if gco == HANDLES.subplt.ltsa || gco == HANDLES.plt.ltsa
         end
     end
 
+    % An LTSA built from x.flac stores names ending .x.flac, so match either.
     fstr = [];
-    fstr = regexp(char(fname),'.x.wav','match');
+    fstr = regexp(char(fname),'\.x\.(wav|flac)','match');
     if ~isempty(fstr)
-        PARAMS.ftype = 2;       % xwav format
+        PARAMS.ftype = 2;       % xwav format, either container
     else
         PARAMS.ftype = 1;       % wav format
         PARAMS.start.dnum = PARAMS.ltsa.dnumStart(rawIndex);

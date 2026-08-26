@@ -76,7 +76,16 @@ if PARAMS.ftype == 1 || PARAMS.ftype == 3 % wav or flac
     PARAMS.xhd.sample_rate = PARAMS.fs;
     
 elseif PARAMS.ftype == 2
-    rdxwavhd
+    % ftype 2 is an xwav, in either container. An x.flac holds the same harp
+    % header, preserved as RIFF metadata; rdxflachd pulls it out and hands it
+    % to rdxwavhd, so PARAMS ends up identical either way and everything
+    % downstream of here is unaware of the difference.
+    [~,~,xext] = fileparts(PARAMS.infile);
+    if strcmpi(xext,'.flac')
+        rdxflachd
+    else
+        rdxwavhd
+    end
 end
 PARAMS.ch = 1;  % set to first channel for reading single after multichannel files
 % data block set up

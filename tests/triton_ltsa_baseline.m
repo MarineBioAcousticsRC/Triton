@@ -129,7 +129,11 @@ for si = 1:numel(sets)
 
     % One case per directory that holds recordings of a single type, since an
     % LTSA is built from a whole directory rather than one file.
-    for spec = { {'xwav','*.x.wav',2}, {'wav','*.wav',1}, {'flac','*.flac',3} }
+    % x.flac is ftype 2, not 3: it is an xwav with a preserved harp header,
+    % and only xwav_read knows it is compressed. Type 3 is a plain flac with
+    % no harp chunk, whose timing comes from the filename.
+    for spec = { {'xwav','*.x.wav',2}, {'xflac','*.x.flac',2}, ...
+                 {'wav','*.wav',1}, {'flac','*.flac',3} }
         kind = spec{1}{1}; pat = spec{1}{2}; ftype = spec{1}{3};
         dirs = local_dirs_with(setDir, pat, kind);
         for di = 1:numel(dirs)
@@ -327,6 +331,10 @@ while ~isempty(stack)
         % *.wav also matches *.x.wav; keep only the plain ones
         hits = hits(cellfun(@(n) isempty(regexpi(n,'\.x\.wav$')), {hits.name}));
     end
+    % *.flac deliberately still matches *.x.flac. An x.flac read as type 3 is
+    % a real thing users do by accident, so the harness keeps covering it --
+    % and the same directory also produces an xflac case, so both readings of
+    % the same files are pinned and can be compared.
     if numel(hits) >= 2
         out{end+1} = d; %#ok<AGROW>
     end
@@ -337,9 +345,10 @@ end
 
 function pat = local_pat(kind)
 switch kind
-    case 'xwav'; pat = '*.x.wav';
-    case 'flac'; pat = '*.flac';
-    otherwise;   pat = '*.wav';
+    case 'xwav';  pat = '*.x.wav';
+    case 'xflac'; pat = '*.x.flac';
+    case 'flac';  pat = '*.flac';
+    otherwise;    pat = '*.wav';
 end
 end
 

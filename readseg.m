@@ -99,7 +99,9 @@ fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
         % xwav_read fetches the samples whichever container holds them: byte
         % offsets for an x.wav, sample indices for an x.flac. The bit-depth
         % check that used to sit here moved there with the read.
-        DATA = xwav_read(index, skip, PARAMS.tseg.samp);
+        byteLoc = double(PARAMS.xhd.byte_loc(index)) ...
+            + skip * double(PARAMS.nch) * double(PARAMS.samp.byte);
+        DATA = xwav_read(byteLoc, PARAMS.tseg.samp);
 %         DATA = DATA(PARAMS.ch,:);
         if PARAMS.xgain > 0
             DATA(:,PARAMS.ch) = DATA(:,PARAMS.ch) ./ PARAMS.xgain(1);

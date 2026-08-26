@@ -72,7 +72,18 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         PARAMS.ltsahd.ticks(m) = 0;
         
     elseif PARAMS.ltsa.ftype == 2               % do the following for xwavs
-        fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)),'r');
+        % An x.flac is an xwav too: same harp header, stored inside the flac as
+        % preserved RIFF metadata. xwav_hdrfile hands back a file whose bytes
+        % are that header, so every fseek below is unchanged and there is only
+        % one copy of this parsing. For an x.wav it hands back the file itself.
+        try
+            [hdrFile, hdrKeeper] = xwav_hdrfile(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+        catch ME
+            disp(ME.message)
+            PARAMS.ltsa.gen = 0; % need to cancel
+            return
+        end
+        fid = fopen(hdrFile,'r');
         
         fseek(fid,22,'bof');
         PARAMS.ltsa.nch = fread(fid,1,'uint16');         % Number of Channels
@@ -118,6 +129,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
             
         end
         fclose(fid);
+        clear hdrKeeper                 % deletes the temporary header, if any
     end
     
 end

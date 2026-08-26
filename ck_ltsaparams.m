@@ -15,11 +15,16 @@ if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3   % wav or flac
 %     [y, PARAMS.ltsa.fs, nBits, OPTS] = wavread( fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)),10);
     info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)));
     PARAMS.ltsa.fs = info.SampleRate;
-elseif PARAMS.ltsa.ftype == 2   % xwav
-    fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)),'r');
+elseif PARAMS.ltsa.ftype == 2   % xwav, either .x.wav or .x.flac
+    % xwav_hdrfile gives back a file whose bytes are the x.wav header, so the
+    % seek to 24 works for a compressed xwav too. For a .x.wav it is the file
+    % itself and nothing is copied.
+    [hdrFile, hdrKeeper] = xwav_hdrfile(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(1,:)));
+    fid = fopen(hdrFile,'r');
     fseek(fid,24,'bof');
     PARAMS.ltsa.fs = fread(fid,1,'uint32');          % Sampling Rate (samples/second)
     fclose(fid);
+    clear hdrKeeper                 % deletes the temporary header, if any
 end
 
 % check that all sample rates match first file

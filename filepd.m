@@ -88,9 +88,46 @@ elseif strcmp(action,'openwav')
     % the extension. Both are read through audioread, which handles flac.
     [~,~,fext] = fileparts(PARAMS.infile);
     if strcmpi(fext,'.flac')
-        PARAMS.ftype = 3;   % flac
+        % *.flac in this dialog also matches *.x.flac, which is an xwav and
+        % must not be read as a plain flac: doing so would ignore the harp
+        % header and take the recording time from the file name instead, which
+        % is wrong by however much the deployment clock drifted, silently.
+        % Decide from the header rather than the name, since a file can be an
+        % xwav without being named .x.flac.
+        if ck_xflac_isxwav(fullfile(PARAMS.inpath,PARAMS.infile))
+            disp_msg('This flac carries a harp header - opening it as an XWAV')
+            PARAMS.ftype = 2;   % compressed xwav
+        else
+            PARAMS.ftype = 3;   % plain flac
+        end
     else
         PARAMS.ftype = 1;   % wav
+    end
+    if PARAMS.ftype == 2
+        initdata
+        if ~isempty(PARAMS.xhd.byte_length)
+            PARAMS.plot.initbytel = PARAMS.xhd.byte_loc(1);
+        end
+        if isempty(DATA)
+            set(HANDLES.display.timeseries,'Value',1);
+        end
+        readseg
+        plot_triton
+        control('timeon')
+        control('menuon')
+        control('button')
+        set([HANDLES.motion.seekbof HANDLES.motion.back HANDLES.motion.autoback ...
+            HANDLES.motion.stop],'Enable','off');
+        set(HANDLES.fig.ctrl, 'Pointer', 'arrow');
+        set(HANDLES.motioncontrols,'Visible','on')
+        set(HANDLES.delimit.but,'Visible','on')
+        if PARAMS.nch > 1
+            set(HANDLES.mc.on,'Visible','on');
+        elseif PARAMS.nch == 1
+            set(HANDLES.multi,'Visible','off');
+        end
+        init_tslider(0)
+        return
     end
     % enter start date and time
     prompt={'Enter Start Date and Time'};
@@ -137,7 +174,11 @@ elseif strcmp(action,'openwav')
 elseif strcmp(action,'openxwav')
     % user interface retrieve file to open through a dialog box
     boxTitle1 = 'Open XWAV File';
-    filterSpec1 = '*.x.wav';
+    % .x.flac is an xwav too, just compressed, so it is offered here rather
+    % than under the wav/flac dialog, which is for plain flacs with no header.
+    filterSpec1 = {'*.x.wav;*.x.flac', 'XWAV files (*.x.wav, *.x.flac)'; ...
+                   '*.x.wav',         'XWAV (*.x.wav)'; ...
+                   '*.x.flac',        'Compressed XWAV (*.x.flac)'};
     [ infile, inpath ]=uigetfile( filterSpec1, boxTitle1 );
     % if the cancel button is pushed, then no file is loaded so exit this script
     if strcmp( num2str( infile ), '0' )

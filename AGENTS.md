@@ -134,9 +134,36 @@ so changing what `DATA` contains would silently alter detector and soundscape re
 information travels separately, through a `PARAMS.raw` field the plotting code reads — the same way
 `PARAMS.raw.delimit_time` already carries raw-file boundaries. This is the open question on PR #128.
 
-**flac is file type 3.** `PARAMS.ftype` is 1 for wav, 2 for x.wav, 3 for flac. Both wav and flac
-are read through `audioread`, which handles flac natively, so most code paths take them together as
-`ftype == 1 || ftype == 3`.
+**flac is file type 3. A *compressed xwav* is file type 2.** `PARAMS.ftype` is 1 for wav, 2 for
+xwav, 3 for flac. Types 1 and 3 are read through `audioread`, which handles flac natively, so most
+code paths take them together as `ftype == 1 || ftype == 3`.
+
+Type 3 means a *plain* flac, with no `harp` header, whose start time comes from its file name. An
+`.x.flac` is different: it is an x.wav compressed with `--keep-foreign-metadata`, so the `harp`
+chunk survives byte for byte and it is an xwav in every way that matters. It stays **type 2**, and
+the forty-odd `ftype` branches downstream are right as they are.
+
+**Only two functions may know which container a type-2 file is in.** Both decide from the file
+extension, so there is no state to thread through the pipeline and nothing that can fall out of step
+with the file actually open:
+
+- **`xwav_read`** — fetches samples. wav seeks to a byte offset; flac converts that offset to a
+  sample index, because a compressed stream has no fixed bytes per sample.
+- **`xwav_hdrfile`** — hands back a path whose bytes *are* the x.wav header. For a `.x.wav` that is
+  the file itself; for a `.x.flac` it is a temporary file holding the preserved RIFF chunks. This
+  exists so that `rdxwavhd`, `get_headers`, `ck_ltsaparams` and `calc_ltsa` keep their existing
+  `fseek(fid,22|24|34|80|100,'bof')` reads unchanged. **There is one header parser, and it must stay
+  that way.** Do not add a second one for flac.
+
+  The object it returns second is an `onCleanup` that deletes the temporary file. MATLAB destroys
+  such an object as soon as it can prove the variable is never read again, so every caller must end
+  with `clear <keeper>` — that is the mention keeping the file alive, not just tidiness. Omitting it
+  deletes the header before it is read, and the symptom is a confusing parse failure elsewhere.
+
+If you add a new site that reads an xwav header by byte offset, route it through `xwav_hdrfile`.
+`ck_ltsaparams` was missed on the first pass and produced a garbage sample rate from compressed
+audio; nothing failed loudly, it just returned early and left `blksz` unset for a caller to trip
+over later. See `docs/flac.md`.
 
 **The four Triton checkouts produce identical output.** `Triton-HARPLab`, `Triton-SpotCheck` and
 `Triton1.95.20230315-DataProcessing` each differ from this repository in 32–38 of the ~80 core

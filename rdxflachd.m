@@ -31,43 +31,25 @@ global PARAMS
 
 flacFile = fullfile(PARAMS.inpath, PARAMS.infile);
 
-%% ---- pull the preserved RIFF chunks out of the flac
+%% ---- reassemble the preserved header and let rdxwavhd parse it
+% xwav_hdrfile turns the flac's preserved RIFF chunks into a small file whose
+% bytes are the original x.wav header, so the real parser can read it unchanged.
 try
-    riff = local_riff_chunks(flacFile);
+    [hdrFile, keeper] = xwav_hdrfile(flacFile);
 catch e
     disp_msg(['Error reading flac metadata: ', e.message]);
     return
 end
 
-if isempty(riff)
-    disp_msg('Error - this flac carries no preserved RIFF metadata')
-    disp_msg('  It was compressed without --keep-foreign-metadata, so the harp')
-    disp_msg('  header is gone and the recording times cannot be recovered.')
-    disp_msg('  Use Extras/ck_xflac_metadata.m to audit a folder for this.')
-    return
-end
-if ~any(local_chunk_is(riff,'harp'))
+if ~ck_xflac_isxwav(flacFile)
     disp_msg('Error - preserved RIFF metadata contains no harp chunk')
     disp_msg('  This looks like a plain wav compressed to flac, not an x.flac.')
     return
 end
 
-%% ---- reassemble them into the original header and let rdxwavhd parse it
-hdrBytes = cat(1, riff{:});
-
-tmpFile = [tempname '.x.wav'];
-fid = fopen(tmpFile,'w');
-if fid < 0
-    disp_msg('Error - cannot write a temporary file to read the flac header');
-    return
-end
-fwrite(fid, hdrBytes, 'uint8');
-fclose(fid);
-cleanup = onCleanup(@() local_delete(tmpFile));
-
 savedInpath = PARAMS.inpath;
 savedInfile = PARAMS.infile;
-[tp, tn, te] = fileparts(tmpFile);
+[tp, tn, te] = fileparts(hdrFile);
 PARAMS.inpath = [tp filesep];
 PARAMS.infile = [tn te];
 
@@ -82,6 +64,12 @@ end
 
 PARAMS.inpath = savedInpath;
 PARAMS.infile = savedInfile;
+
+% Deletes the temporary header. This also has to be here for correctness, not
+% just tidiness: MATLAB destroys an onCleanup object as soon as it can prove
+% the variable is never read again, so without a later mention of keeper the
+% temporary file would be deleted before rdxwavhd got to read it.
+clear keeper
 
 if ~isfield(PARAMS,'xhd') || ~isfield(PARAMS.xhd,'byte_length')
     disp_msg('Error - the flac''s harp header did not parse');
@@ -121,41 +109,3 @@ end
 
 
 %% ================================================================== helpers
-function chunks = local_riff_chunks(f)
-%LOCAL_RIFF_CHUNKS  Payloads of the APPLICATION blocks with id 'riff', in order.
-chunks = {};
-fid = fopen(f,'r');
-if fid < 0; error('cannot open %s', f); end
-c = onCleanup(@() fclose(fid));
-
-magic = fread(fid,4,'*char')';
-if ~strcmp(magic,'fLaC'); error('not a flac file'); end
-
-while true
-    h = fread(fid,4,'*uint8');
-    if numel(h) < 4; break; end
-    isLast = bitand(h(1),128) > 0;
-    btype  = double(bitand(h(1),127));
-    len    = double(h(2))*65536 + double(h(3))*256 + double(h(4));
-    body   = fread(fid,len,'*uint8');
-    if numel(body) < len; error('metadata block truncated'); end
-    if btype == 2 && len >= 4 && strcmp(char(body(1:4))','riff')
-        chunks{end+1} = body(5:end); %#ok<AGROW>
-    end
-    if isLast; break; end
-end
-end
-
-
-function tf = local_chunk_is(chunks, tag)
-tf = false(1,numel(chunks));
-for k = 1:numel(chunks)
-    b = chunks{k};
-    if numel(b) >= 4 && strcmp(char(b(1:4))', tag); tf(k) = true; end
-end
-end
-
-
-function local_delete(f)
-if exist(f,'file'); delete(f); end
-end

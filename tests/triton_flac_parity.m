@@ -74,6 +74,9 @@ fprintf('  compressed %d -> %d bytes (%.1f%% saved)\n\n', ...
     a.bytes, b.bytes, 100*(1 - b.bytes/a.bytes));
 
 %% ---- 1. header parity
+% Stand in for the GUI so disp_msg has somewhere to write; without it any
+% message Triton tries to report fails with a confusing dot-indexing error.
+tr_headless_handles();
 PARAMS = []; PARAMS.inpath = [fileparts(xwavFile) filesep];
 PARAMS.infile = [stem ext]; PARAMS.ftype = 2;
 rdxwavhd;
@@ -123,8 +126,12 @@ end
 
 for k = 1:size(cases,1)
     label = cases{k,1}; ri = cases{k,2}; skip = cases{k,3};
-    PARAMS = W; dw = xwav_read(ri, skip, nWant);
-    PARAMS = F; df = xwav_read(ri, skip, nWant);
+    PARAMS = W;
+    bw = double(W.xhd.byte_loc(ri)) + skip*double(W.nch)*double(W.samp.byte);
+    dw = xwav_read(bw, nWant);
+    PARAMS = F;
+    bf = double(F.xhd.byte_loc(ri)) + skip*double(F.nch)*double(F.samp.byte);
+    df = xwav_read(bf, nWant);
     if isempty(dw) && isempty(df)
         report = local_note(report, ['waveform: ' label], true, 'both empty');
     elseif ~isequal(size(dw), size(df))

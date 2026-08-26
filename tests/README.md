@@ -145,6 +145,45 @@ x.wav at all whenever the last average comes up short.
 The fixtures are about 800 KB in total and are committed, so this case runs on a fresh clone with
 no example data present. Pass `'fixtures',false` to skip them.
 
+## Compressed XWAVs
+
+Two tests answer the two questions that matter about `.x.flac`. Both need the
+[flac](https://xiph.org/flac/) command-line tool. Neither is part of the baseline sweep -- they
+convert data and compare against themselves, so they pass or fail on their own.
+
+```matlab
+triton_flac_parity('ExampleData/200kHz_xwavs/SOCAL_E_63_EN_180315_234230.x.wav')
+triton_flac_ltsa_parity('ExampleData/4Channel_100kHz_xwavs_and_LTSA')
+```
+
+**`triton_flac_parity`** -- *can Triton read it?* Converts one x.wav, then checks that every header
+field `rdxflachd` derives matches `rdxwavhd`, that the raw-file start and end times are equal, that
+the same time window yields the same samples from both containers at five positions including one
+straddling a raw-file boundary, and that decompressing reproduces the x.wav byte for byte. 19
+checks.
+
+**`triton_flac_ltsa_parity`** -- *can Triton generate from it?* The harder question. LTSA creation
+is a separate path: `get_headers` reads the harp directory itself, `ck_ltsaparams` reads the sample
+rate itself, and `calc_ltsa` walks the file with its own byte arithmetic. Reading working does not
+imply generating works, and in fact it did not -- `ck_ltsaparams` was still seeking to byte 24 of
+the real file, which for a flac is compressed audio rather than the `fmt` chunk. The test converts a
+directory, builds an LTSA from each container through `triton_ltsa_baseline`, and requires the
+spectral block to be **byte-identical**. 21 checks.
+
+Results on real data: 21/21 on `4Channel_100kHz_xwavs_and_LTSA` -- 4 channels, 60 raw files, 210,420
+bytes of spectra identical.
+
+The stored *header* bytes differ between the two LTSAs, and should: they carry the input file names,
+and `x.flac` is a byte longer than `x.wav`. Everything the header is computed from is compared field
+by field instead.
+
+**The baseline sweep covers x.flac too.** `local_dirs_with` now recognises an `xflac` kind
+(`*.x.flac`, file type 2) alongside `xwav`, `wav` and `flac`. `*.flac` still deliberately matches
+`*.x.flac` as well, so `ExampleData/Flac` produces **two** cases from the same files: read as
+compressed XWAVs, and read as plain flacs. Both readings are pinned. That second one is not
+hypothetical -- reading an x.flac as a plain flac is a real thing users do by accident, and it takes
+each file's start time from its name instead of its header.
+
 ## Reading the comparison
 
 ```
@@ -185,7 +224,7 @@ Flac used to be the other one, and is now covered: 2 headers and 6 reads, no err
 | `variant_harplab.json` | `Triton-HARPLab/triton1.95.20231113` over the same data |
 | `variant_spotcheck.json` | `Triton-SpotCheck/triton1.93.20170330_dev` |
 | `variant_dataproc.json` | `Triton1.95.20230315-DataProcessing/Triton-DataProc` |
-| `ltsa_master.json` | master, LTSA generation over a scoped set (see below) |
+| `ltsa_master.json` | master, LTSA generation over a scoped set (see below) -- **7 cases** since x.flac support; the three variant snapshots below predate it and have 6 |
 | `ltsa_harplab.json` `ltsa_spotcheck.json` `ltsa_dataproc.json` | the same six builds on each variant |
 
 The variant snapshots were taken with the `'triton'` option, which points the harness at another
@@ -207,6 +246,10 @@ reading — the divergence between the four trees is entirely cosmetic.
 over six builds -- both padding fixtures, `Flac`, `Wavs`, `4Channel_100kHz` and `200kHz_xwavs` -- and
 all three variants produce **byte-identical header and power blocks to master on all six**. So the
 32-38 differing core files per tree are cosmetic for LTSA generation as well as for reading.
+
+Master has since gained a seventh case -- `ExampleData/Flac` read as compressed XWAVs -- so a
+comparison against a variant snapshot now reports one case as vanished. That is the variants lacking
+the x.flac wiring, not a regression.
 
 That includes the two cases most likely to separate them: the flac path, and the `calc_ltsa` padding
 branch on both wav and x.wav. If any tree carried the broken bracket form, `pad_xwav` would have
