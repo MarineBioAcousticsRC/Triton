@@ -63,3 +63,20 @@ Remoras/*/settings/*
 !Remoras/*/settings/*template*
 !Remoras/*/settings/*Template*
 !Remoras/*/settings/README*
+
+# Third-party binaries that are used but not redistributed here.
+#
+# The precedent in this repo is Extras/dd/dd.exe, which is committed *with* its
+# Copying.txt -- GPL and similar licences require the licence to accompany the
+# binary. We do not have licence text for the files below, so they are left out
+# rather than distributed incorrectly. Each is obtainable from its vendor;
+# Extras/msdxfer/msdxfer_setup_210209.txt says where, and
+# Remoras/HARPproc/README.md explains the consequence.
+#
+# To include any of them: add the licence file alongside and drop the line here.
+Remoras/HARPproc/pdftk.exe
+Remoras/HARPproc/libiconv2.dll
+Extras/msdxfer/FT_Prog_v3.10.132.511 Installer.exe
+Extras/msdxfer/USBDeview.exe
+Extras/msdxfer/USBDeview.cfg
+Extras/msdxfer/ftd2xx.dll

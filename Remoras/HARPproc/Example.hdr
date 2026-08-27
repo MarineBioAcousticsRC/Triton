@@ -1,0 +1,24 @@
+% Example.hdr
+%
+% Header file input for generating xwavs from hrp files
+%
+% The xwav headers are fixed size, but could be made dynamic with new file version if needed
+% Unknown if ExperimentName, SiteName, InstrumentID metadata are used by anyone ...
+% Longitude, Latitude, Depth might be used by analysts?
+% last update 220316
+%
+% file is run through eval(), so other PARAMS can be set via this file if wanted
+%
+
+% ExperimentName, SiteName used to set the xwav filename:
+PARAMS.xhd.ExperimentName = 'EXPER001'; % experiment name - 8 chars
+PARAMS.xhd.SiteName = 'Yard';           % site name - 4 chars
+PARAMS.xhd.InstrumentID = 'HRP1';       % harp instrument number - 4 chars
+
+% site location Integer Degrees Decimal Minutes: 
+% DDDMMmmm or DDMMmmm (negative  W or S)
+% Scripps Whale Acoustics Laboratory:
+PARAMS.xhd.Longitude = -11715224;		% deg, min & decimal min * 10^3
+PARAMS.xhd.Latitude = 3251923;			% deg, min & decimal min * 10^3
+PARAMS.xhd.Depth = -8;					% meters down is positive
+
