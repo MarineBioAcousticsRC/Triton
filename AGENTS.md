@@ -143,9 +143,8 @@ Type 3 means a *plain* flac, with no `harp` header, whose start time comes from 
 chunk survives byte for byte and it is an xwav in every way that matters. It stays **type 2**, and
 the forty-odd `ftype` branches downstream are right as they are.
 
-**Only two functions may know which container a type-2 file is in.** Both decide from the file
-extension, so there is no state to thread through the pipeline and nothing that can fall out of step
-with the file actually open:
+**Only two functions may know which container a type-2 file is in.** Both ask `xwav_container`,
+which decides from the file's first four bytes — `fLaC` or `RIFF`:
 
 - **`xwav_read`** — fetches samples. wav seeks to a byte offset; flac converts that offset to a
   sample index, because a compressed stream has no fixed bytes per sample.
@@ -159,6 +158,14 @@ with the file actually open:
   such an object as soon as it can prove the variable is never read again, so every caller must end
   with `clear <keeper>` — that is the mention keeping the file alive, not just tidiness. Omitting it
   deletes the header before it is read, and the symptom is a confusing parse failure elsewhere.
+
+**Never decide a container from a file name.** Triton keeps file names in padded char matrices —
+`PARAMS.ltsahd.fname` is `char(zeros(n,80))` with each name written into the leading columns — so a
+row carries trailing nulls and `fileparts` returns `.flac` followed by nulls, which compares equal to
+nothing. The file is then read as a wav: `fopen` accepts the padded name, `fread` returns compressed
+frames as int16, and you get plausible-looking noise with no error anywhere. That is what happened
+the first time the Soundscape-Metrics LTSA code called `xwav_read`. `xwav_container` also returns the
+deblanked path; use the one it hands back.
 
 If you add a new site that reads an xwav header by byte offset, route it through `xwav_hdrfile`.
 `ck_ltsaparams` was missed on the first pass and produced a garbage sample rate from compressed

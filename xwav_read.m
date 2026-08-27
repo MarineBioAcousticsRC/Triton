@@ -26,9 +26,11 @@ function data = xwav_read(byteLoc, nSamples, fullname, geom)
 % PARAMS.ltsa rather than at the top level and PARAMS describes whatever file
 % the display last opened, which is usually a different one.
 %
-% Whether the file is a flac is decided from its extension, not from a flag
-% carried in PARAMS. There is then no state to thread through the LTSA
-% pipeline and nothing that can fall out of step with the file actually open.
+% Whether the file is a flac is decided by reading its first four bytes, not
+% from a flag carried in PARAMS and not from its name. There is then no state
+% to thread through the LTSA pipeline, nothing that can fall out of step with
+% the file actually open, and no way for a padded file name to send a flac
+% down the wav path and return noise. See xwav_container.
 %
 % WHY CALLERS STILL SPEAK IN BYTES
 %
@@ -77,8 +79,12 @@ if nargin < 3 || isempty(fullname)
     fullname = fullfile(PARAMS.inpath, PARAMS.infile);
 end
 
-[~, ~, ext] = fileparts(fullname);
-isFlac = strcmpi(ext, '.flac');
+[kind, fullname] = xwav_container(fullname);
+if strcmp(kind,'unknown')
+    disp_msg(['Error - cannot tell what kind of file this is: ', fullname]);
+    return
+end
+isFlac = strcmp(kind, 'flac');
 
 if nargin < 4 || isempty(geom)
     geom = struct();

@@ -25,8 +25,16 @@ has to be guessed from its file name.
 
 Inside Triton there is exactly one function that knows the difference —
 `xwav_read` — plus one that reproduces the header for the parsers that read it
-by byte offset (`xwav_hdrfile`). Everything else, including every Remora,
-treats the two identically.
+by byte offset (`xwav_hdrfile`). Both ask `xwav_container`, which decides from
+the file's first four bytes rather than its name. Everything else, including
+every Remora, treats the two identically.
+
+Reading the magic bytes rather than the extension is not fussiness. Triton
+keeps file names in padded character matrices, so a name arrives with trailing
+null characters and its extension matches nothing. Decide from the name and an
+`.x.flac` gets read as a wav: the file opens, compressed frames come back
+interpreted as 16-bit samples, and the result is plausible-looking noise with
+no error anywhere.
 
 ---
 
@@ -156,6 +164,14 @@ file rather than trusting its name or your choice of type:
 - **LTSA file type 3** — if every flac in the folder carries a `harp` header,
   Triton switches the type to 2 and says so. If only some do, it warns and
   suggests separating them.
+- **Decimate Single/All WAV or FLAC File(s)** — same check. This one mattered
+  most: decimating a compressed XWAV as though it were a plain flac would have
+  written an output with no `harp` header at all, losing the raw-file structure
+  and the deployment times permanently.
+
+Decimation also accepts `.x.flac` directly now, under the XWAV entries. The
+decimated output is written as `.x.wav`; compress it afterwards with
+`xwav2flac` if you want it back.
 
 Without these, an `.x.flac` read as a plain flac would take each file's start
 time from its **name** instead of its header, which is wrong by however much the

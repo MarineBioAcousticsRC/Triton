@@ -19,6 +19,7 @@ function chunks = xflac_riff_chunks(fullname)
 
 chunks = {};
 
+fullname = deblank(fullname);   % names arrive as padded char-matrix rows
 fid = fopen(fullname,'r');
 if fid < 0
     error('xflac_riff_chunks:cannotOpen','cannot open %s', fullname);

@@ -14,9 +14,11 @@ function [hdrFile, keeper] = xwav_hdrfile(fullname)
 % caller a second way to read a header, this hands back a path that can be
 % opened and seeked exactly as before:
 %
-%   .wav    the file itself; nothing is copied and keeper is empty
-%   .flac   a small temporary file holding the reassembled chunks, which are
+%   wav     the file itself; nothing is copied and keeper is empty
+%   flac    a small temporary file holding the reassembled chunks, which are
 %           byte-identical to the original x.wav header
+%
+% Which one it is comes from the file's first four bytes, not its name.
 %
 % Callers keep their existing fopen/fseek/fread untouched. The two containers
 % therefore cannot drift apart: there is only one parser, and a fix to it
@@ -42,8 +44,14 @@ function [hdrFile, keeper] = xwav_hdrfile(fullname)
 
 keeper = [];
 
-[~, ~, ext] = fileparts(fullname);
-if ~strcmpi(ext, '.flac')
+% Ask the file what it is rather than trusting its name: names reach here as
+% padded char-matrix rows whose extension does not compare equal to anything.
+[kind, fullname] = xwav_container(fullname);
+if strcmp(kind,'unknown')
+    error('xwav_hdrfile:unknownFile', ...
+        'Cannot read %s, or it is not a wav or flac file.', fullname);
+end
+if ~strcmp(kind, 'flac')
     hdrFile = fullname;
     return
 end
