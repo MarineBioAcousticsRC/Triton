@@ -12,6 +12,13 @@ ok = true;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 PARAMS.fname = dir(fullfile(PARAMS.metadata.inputDir, '**', [PARAMS.metadata.FilenamePattern_ '.x.wav']));
+if isempty(PARAMS.fname)
+    % An .x.flac is an .x.wav compressed with --keep-foreign-metadata: same
+    % harp header, same raw files, same times, about half the size. Only
+    % xwav_read knows the difference.
+    PARAMS.fname = dir(fullfile(PARAMS.metadata.inputDir, '**', ...
+        [PARAMS.metadata.FilenamePattern_ '.x.flac']));
+end
 
 
 
@@ -42,11 +49,17 @@ PARAMS.nxwav = fnsz(1);           % number of xwav files
 
 m_total = 0;
 for k = 1:PARAMS.nxwav
-    fid = fopen(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name),'r');
+    % xwav_hdrfile returns a path whose bytes are the x.wav header, so the
+    % seek to 80 is unchanged for a compressed xwav. For an .x.wav it hands
+    % back the file itself and nothing is copied. hdrKeeper deletes the
+    % temporary header when cleared, so the file is closed first.
+    [hdrFile, hdrKeeper] = xwav_hdrfile(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));
+    fid = fopen(hdrFile,'r');
     fseek(fid, 80, 'bof');
     nrf = fread(fid,1,'uint16');
     m_total = m_total + nrf;
     fclose(fid);
+    clear hdrKeeper
 end
 
 
@@ -79,7 +92,8 @@ for k = 1:PARAMS.nxwav            % loop over all files in directory
     info = audioinfo(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));    % xwav files
     disp(['Compiling xwav times for batch processing: ', PARAMS.fname(k).name])
 
-    fid = fopen(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name),'r');
+    [hdrFile, hdrKeeper] = xwav_hdrfile(fullfile(PARAMS.fname(k).folder, PARAMS.fname(k).name));
+    fid = fopen(hdrFile,'r');
 
 
     PARAMS.ltsahd.nsamp(k) = info.TotalSamples;
@@ -130,6 +144,7 @@ for k = 1:PARAMS.nxwav            % loop over all files in directory
 
     end
     fclose(fid);
+    clear hdrKeeper                 % deletes the temporary header, if any
 
 
 end

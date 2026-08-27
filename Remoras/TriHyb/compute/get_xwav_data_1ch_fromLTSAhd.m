@@ -121,27 +121,34 @@ bin_samps = bin_B/floor(localParams.ltsa.nBits/8);
 %     end_s, end_samp, end_B);
 
 DATA = nan(bin_samps,1);
-fid = fopen(xwav,'r');
 dataIdx = 1;
+
+% Sample layout, for xwav_read. audioStart is where this file's audio begins
+% in the equivalent x.wav; xwav_read needs it to address a compressed xwav by
+% sample, and ignores it for an .x.wav. localParams.xhd holds only this file's
+% raw files, so entry 1 is the right one.
+geom = struct('nch', 1, 'nBits', localParams.ltsa.nBits, ...
+    'audioStart', localParams.xhd.byte_loc(1));
 
 bytesPerSample = floor(localParams.ltsa.nBits / 8);
 
 for rf=rfIdx0:rfIdxN
-    % jump to raw file start
-    fseek(fid, localParams.xhd.byte_loc(rf),'bof');
+    % Byte offset of this read within the equivalent x.wav. The old code did
+    % this as a seek to the raw file start followed by a relative seek; the
+    % sum is the same number, and stating it outright is what lets xwav_read
+    % turn it into a sample index when the file is a flac.
+    b1 = 0;
 
     % all data in 1 rawfile
     if rfIdx0 == rfIdxN
         % skip past data we don't want in first raw file
         b1 = skip_samp*floor(localParams.ltsa.nBits/8);
-        fseek(fid,b1,'cof');
         % read from start loc to end loc in 1 raw file
         nb = (end_samp - skip_samp) * bytesPerSample;
 
     elseif rf == rfIdx0
         % First raw file in a multi-file segment
         b1 = skip_samp * bytesPerSample;
-        fseek(fid, b1, 'cof');
         nb = localParams.xhd.byte_length(rf) - b1;
     elseif rf == rfIdxN
         % Final raw file in a multi-file segment
@@ -158,7 +165,8 @@ for rf=rfIdx0:rfIdxN
     end
 
     nr = nb / bytesPerSample;
-    raw = fread(fid, nr, dtype);
+    % xwav_read fetches from either container.
+    raw = xwav_read(double(localParams.xhd.byte_loc(rf)) + b1, nr, xwav, geom);
     if numel(raw) < nr
         warning('%s: rawfile %d has fewer bytes on disk than its header claims (expected %d samples, found %d) -- likely truncated/corrupt, skipping this rawfile.', ...
             xwav, rf, nr, numel(raw));
@@ -170,7 +178,6 @@ for rf=rfIdx0:rfIdxN
 
 end
 
-fclose(fid);
 naIdx = find(isnan(DATA),1,'first');
 if ~isempty(naIdx)
     fprintf('Read %d of %d requested samples for %s (rawfile gap or corruption)\n', naIdx-1, bin_samps, xwav);
