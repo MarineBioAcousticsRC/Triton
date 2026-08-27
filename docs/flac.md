@@ -156,7 +156,7 @@ The result is byte-identical to the original — this is checked by
 
 ## Guard rails
 
-Two dialogs can be pointed at an `.x.flac` by accident, and both now check the
+Three dialogs can be pointed at an `.x.flac` by accident, and all now check the
 file rather than trusting its name or your choice of type:
 
 - **Open Wav or Flac File** — if the flac you pick carries a `harp` header,
