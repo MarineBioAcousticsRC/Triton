@@ -16,10 +16,14 @@ if PARAMS.ltsa.ftype == 1   % wav
     info = audioinfo(fullfile(PARAMS.ltsa.fdir(1,:),PARAMS.ltsa.fname(1,:)));
     PARAMS.ltsa.fs = info.SampleRate;
 elseif PARAMS.ltsa.ftype == 2   % xwav
-    fid = fopen(fullfile(PARAMS.ltsa.fdir(1,:),PARAMS.ltsa.fname(1,:)),'r');
+    % For a .x.flac this reads the preserved header rather than the file, so
+    % the seek to 24 finds the fmt chunk instead of compressed audio.
+    [hdrFile, hdrKeeper] = xwav_hdrfile(fullfile(PARAMS.ltsa.fdir(1,:),PARAMS.ltsa.fname(1,:)));
+    fid = fopen(hdrFile,'r');
     fseek(fid,24,'bof');
     PARAMS.ltsa.fs = fread(fid,1,'uint32');          % Sampling Rate (samples/second)
     fclose(fid);
+    clear hdrKeeper                 % deletes the temporary header, if any
 end
 
 % check that all sample rates match first file

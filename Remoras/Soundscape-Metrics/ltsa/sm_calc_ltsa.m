@@ -63,8 +63,14 @@ total = PARAMS.ltsa.endIdx - PARAMS.ltsa.startIdx + 1; %number of wav files for 
 
 for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all x.wav raw files / wav files
     if PARAMS.ltsa.ftype ~= 1           % only for HARP and ARP & OBS data
-        % open xwav file
-        fid = fopen(fullfile(PARAMS.ltsahd.fdir(k,:),PARAMS.ltsahd.fname(k,:)),'r');
+        thisFile = fullfile(PARAMS.ltsahd.fdir(k,:),PARAMS.ltsahd.fname(k,:));
+        % Sample layout of this file, for xwav_read. audioStart is where the
+        % audio begins in the equivalent x.wav; xwav_read needs it to address
+        % a compressed xwav by sample, and ignores it for an .x.wav.
+        geom = struct('nch',PARAMS.ltsa.nch(1), 'nBits',PARAMS.ltsa.nBits);
+        if isfield(PARAMS.ltsahd,'audioStart') && numel(PARAMS.ltsahd.audioStart) >= k
+            geom.audioStart = PARAMS.ltsahd.audioStart(k);
+        end
 %         fseek(fid,80,'bof');
 %         nrf = fread(fid,1,'uint16');         % Number of RawFiles in XWAV file (80 bytes from bof)
         nrf = 1;
@@ -146,14 +152,14 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all x.w
                 data = [];
                 % jump to correct location in xwav file
                 if PARAMS.ltsa.ftype ~= 1
-                    fseek(fid,xi,'bof');
-                    % get data for spectra
-                    if nsamp == sampPerAve
-                        data = fread(fid,[PARAMS.ltsa.nch,nsamp],PARAMS.ltsa.dbtype);   %
-                    else            % add pad with zeros if not full data for spectra average
-                        data = fread(fid,[PARAMS.ltsa.nch,nsamp],PARAMS.ltsa.dbtype);
-                                        padsize = sampPerAve - nsamp; % uncommented CMS
-                                        data = padarray(data,padsize);
+                    % xwav_read fetches from either container. xi stays an
+                    % x.wav byte offset on both paths, so the positions -- and
+                    % any quirks in how xi advances -- are identical for
+                    % .x.wav and .x.flac, and the two produce the same LTSA.
+                    data = xwav_read(xi, nsamp, thisFile, geom)';
+                    if nsamp ~= sampPerAve   % pad with zeros if not a full average
+                        padsize = sampPerAve - nsamp; % uncommented CMS
+                        data = padarray(data,padsize);
                     end
                     if ~isempty(data)
                         data = data(PARAMS.ltsa.ch,:);
@@ -207,10 +213,6 @@ for k = PARAMS.ltsa.startIdx : PARAMS.ltsa.endIdx            % loop over all x.w
             loadbar(['Calculating, ',num2str(int8(pcntDone*100)),'% complete'],h, pcntDone)
         end
     end     % end for r - loop over each raw file
-    if PARAMS.ltsa.ftype ~= 1           % only for xwav HARP and ARP data
-        % close input xwav file
-        fclose(fid);
-    end
     if PARAMS.ltsa.ftype ~= 1 % for x.wav HARP files
         disp_msg(['Completed processing raw XWAV file ',num2str(fCount),'/',num2str(total)])
     else % for wav files

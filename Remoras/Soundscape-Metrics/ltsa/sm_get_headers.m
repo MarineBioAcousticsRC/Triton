@@ -77,7 +77,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
             info = audioinfo(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
         catch ME
             disp(ME.message)
-            dmsg = sprintf('Is %s a real wave file?', ...
+            dmsg = sprintf('Is %s a real wave or flac file?', ...
                 fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
             disp(dmsg);
             PARAMS.ltsa.gen = 0; % need to cancel
@@ -86,7 +86,11 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
         
         PARAMS.ltsahd.nsamp(k) = info.TotalSamples;
         
-        fid = fopen(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)),'r');
+        % xwav_hdrfile gives back a path whose bytes are the x.wav header, so
+        % every fseek below works unchanged for a compressed xwav. For an
+        % .x.wav it hands back the file itself and nothing is copied.
+        [hdrFile, hdrKeeper] = xwav_hdrfile(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
+        fid = fopen(hdrFile,'r');
         
         fseek(fid,22,'bof');
         PARAMS.ltsa.nch = fread(fid,1,'uint16');         % Number of Channels
@@ -128,6 +132,15 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
             PARAMS.ltsahd.fdir(m,:) = PARAMS.ltsa.fdir(k,:);        % xwav file name for this raw file header
 
             PARAMS.ltsahd.fnum(m) = k;
+            % Where this file's audio begins, which sm_calc_ltsa needs to turn
+            % an x.wav byte offset into a sample index when the file is a
+            % flac. Recorded here because this is where the first raw file of
+            % each file is known; it is the same for every raw file of one
+            % xwav, and equals the size of that file's header.
+            if r == 1
+                fileAudioStart = PARAMS.ltsahd.byte_loc(m);
+            end
+            PARAMS.ltsahd.audioStart(m) = fileAudioStart;
             
             PARAMS.ltsahd.dnumStart(m) = datenum([PARAMS.ltsahd.year(m) PARAMS.ltsahd.month(m)...
                 PARAMS.ltsahd.day(m) PARAMS.ltsahd.hour(m) PARAMS.ltsahd.minute(m) ...
@@ -135,6 +148,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
             
         end
         fclose(fid);
+        clear hdrKeeper                 % deletes the temporary header, if any
     end
     
 end

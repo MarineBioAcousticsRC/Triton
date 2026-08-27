@@ -22,6 +22,12 @@ if PARAMS.ltsa.ftype == 1
     d = dir(fullfile(PARAMS.ltsa.indir,'*.wav'));    % wav files
 elseif PARAMS.ltsa.ftype == 2
     d = dir(fullfile(PARAMS.ltsa.indir,'*.x.wav'));    % xwav files
+    if isempty(d)
+        % An x.flac is an x.wav compressed with --keep-foreign-metadata, so it
+        % carries the same harp header and is an xwav in every way that
+        % matters here. Only xwav_read knows it is compressed.
+        d = dir(fullfile(PARAMS.ltsa.indir,'*.x.flac'));
+    end
 end
 
 fn = char(d.name);      % file names in directory
