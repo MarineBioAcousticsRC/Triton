@@ -32,6 +32,7 @@ PARAMS.contrast = 100;		% amplify in % dB
 % File menu -- see filepd.m -- and deliberately not cleared when advancing to
 % the next file, which is the case where comparability matters most.
 PARAMS.specgram.clim = [];
+PARAMS.ltsa.clim = [];      % derive from first frame drawn
 PARAMS.freq0 = 0;			% set frequency PARAMS lower limit
 PARAMS.freq1 = -1;          % set frequency PARAMS upper limit
 PARAMS.nfft = 1000;			% length of fft
