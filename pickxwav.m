@@ -58,9 +58,15 @@ if gco == HANDLES.subplt.ltsa || gco == HANDLES.plt.ltsa
     fstr = [];
     fstr = regexp(char(fname),'\.x\.(wav|flac)','match');
     if ~isempty(fstr)
-        PARAMS.ftype = 2;       % xwav format, either container
+        PARAMS.ftype = 2;       % xwav format, either regular or compressed (x.flac)
     else
-        PARAMS.ftype = 1;       % wav format
+        % not xwav (or xflac) so check extension for wav or flac
+        [~, ~, ext] = fileparts(fname);
+        if strcmpi(ext, '.flac')
+            PARAMS.ftype = 3;   % plain flac
+        else
+            PARAMS.ftype = 1;   % wav format
+        end
         PARAMS.start.dnum = PARAMS.ltsa.dnumStart(rawIndex);
         PARAMS.start.dvec = PARAMS.ltsa.dvecStart(rawIndex);
     end
