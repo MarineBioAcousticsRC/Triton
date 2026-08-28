@@ -178,7 +178,7 @@ if sgvalue
   else
     if gco == HANDLES.subplt.specgram | gco == HANDLES.plt.specgram | ...
       (~isempty(gco) & find(HANDLES.delimit.sgline==gco))
-      if PARAMS.ftype == 2 % xwav or xflac
+      if PARAMS.ftype ~= 1
         time = get_time_xwav(cx);
       else
         time = get_time_wav(cx);
