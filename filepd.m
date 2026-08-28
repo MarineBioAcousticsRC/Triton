@@ -42,6 +42,8 @@ if strcmp(action,'openltsa')
     set(HANDLES.display.ltsa,'Visible','on')
     set(HANDLES.display.ltsa,'Value',1);
     set(HANDLES.ltsa.delimit.but,'Visible','on')
+    % reset color range for new file
+    PARAMS.ltsa.clim = []; 
     control_ltsa('button')
     set([HANDLES.ltsa.motion.seekbof HANDLES.ltsa.motion.back HANDLES.ltsa.motion.autoback HANDLES.ltsa.motion.stop],...
         'Enable','off');

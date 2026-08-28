@@ -78,17 +78,20 @@ end
 % brightness 0 / contrast 100 and full frequency range, and disagrees as soon
 % as the user changes either.
 set(HANDLES.plt.ltsa,'CDataMapping','scaled');
-cLim = c(isfinite(c));
-if isempty(cLim)
-    caxis([1,65]);              % no finite data; keep the historical range
-else
-    cLimLo = min(cLim);
-    cLimHi = max(cLim);
-    if cLimHi <= cLimLo         % flat data; caxis requires an increasing range
-        cLimHi = cLimLo + 1;
+if ~isfield(PARAMS.ltsa,'clim') || isempty(PARAMS.ltsa.clim)
+    cLim = c(isfinite(c));
+    if isempty(cLim)
+        PARAMS.ltsa.clim = [1 65];  % no finite data; keep the historical range
+    else
+        cLimLo = min(cLim);
+        cLimHi = max(cLim);
+        if cLimHi <= cLimLo         % flat data; caxis requires an increasing range
+            cLimHi = cLimLo + 1;
+        end
+        PARAMS.ltsa.clim = [cLimLo cLimHi];
     end
-    caxis([cLimLo,cLimHi]);
 end
+caxis(PARAMS.ltsa.clim);
 
 % shift and shrink plot by dv
 dv = 0.075;
@@ -115,7 +118,7 @@ maxp = max(max(PARAMS.ltsa.pwr));
 % One of the child objects of the colorbar is an image, find it so we can
 % set an appropriate scale.
 PARAMS.ltsa.cbb = findobj(get(PARAMS.ltsa.cb, 'Children'), 'Type', 'image');
-minc = min(abs(c(:)));
+minc = min(c(:)); % match plot_specgram, don't mislabel negative values
 maxc = max(max(c));
 difc = 2;
 set(PARAMS.ltsa.cbb,'CData',[minc:difc:maxc]')
