@@ -80,8 +80,25 @@ HANDLES.ltsa.endfreq.edtxt  = uicontrol(f,'Style','edit','Visible','off');
 HANDLES.ltsa.stfreq.edtxt   = uicontrol(f,'Style','edit','Visible','off');
 HANDLES.ltsa.expand.button  = uicontrol(f,'Style','togglebutton','Value',0,'Visible','off');
 
-% check_ltsa_time writes the segment length back into the control window
+% check_ltsa_time writes the segment length back into the control window, and
+% plot_ltsa writes the plot start time and segment length into edtxt1/edtxt3.
+HANDLES.ltsa.time.edtxt1 = uicontrol(f,'Style','edit','Visible','off');
+HANDLES.ltsa.time.edtxt2 = uicontrol(f,'Style','edit','Visible','off');
 HANDLES.ltsa.time.edtxt3 = uicontrol(f,'Style','edit','Visible','off');
+HANDLES.ltsa.time.edtxt4 = uicontrol(f,'Style','edit','Visible','off');
+
+% Every plot_* function selects its panel with subplot(HANDLES.plot.now); plot_triton
+% normally points that at one of HANDLES.plot1..plot4. An invisible axes on the shim's
+% own figure is enough to draw into and be thrown away.
+HANDLES.plot.now = axes('Parent',f,'Visible','off');
+
+% plot_ltsa reads the two LTSA equalisation toggles at its lines 34-35 to decide
+% whether to subtract a mean spectrum. Both at Min is the plain, unequalised case,
+% which is what a headless caller wants unless it says otherwise.
+HANDLES.ltsa.eq.tog  = uicontrol(f,'Style','togglebutton','Min',0,'Max',1, ...
+    'Value',0,'Visible','off');
+HANDLES.ltsa.eq.tog2 = uicontrol(f,'Style','togglebutton','Min',0,'Max',1, ...
+    'Value',0,'Visible','off');
 
 end
 

@@ -32,6 +32,11 @@ PARAMS.contrast = 100;		% amplify in % dB
 % File menu -- see filepd.m -- and deliberately not cleared when advancing to
 % the next file, which is the case where comparability matters most.
 PARAMS.specgram.clim = [];
+% Same for the LTSA, and for the same reason. The LTSA had been left recomputing
+% its range every frame when the spectrogram was made sticky, so brightness and
+% contrast changes did not survive scrolling -- reported by sfregosi-noaa in
+% PR #131.
+PARAMS.ltsa.clim = [];
 PARAMS.freq0 = 0;			% set frequency PARAMS lower limit
 PARAMS.freq1 = -1;          % set frequency PARAMS upper limit
 PARAMS.nfft = 1000;			% length of fft

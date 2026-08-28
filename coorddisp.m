@@ -133,7 +133,7 @@ if tsvalue
         get(gcf,'CurrentAxes') == HANDLES.plot4 | ...
         gco == HANDLES.plt.timeseries | ...
         (~isempty(gco) & find(HANDLES.delimit.tsline==gco))
-      if PARAMS.ftype ~= 1
+      if PARAMS.ftype == 2   % x.wav or x.flac; plain flac has no raw files
         time = get_time_xwav(cx);
       else
         time = get_time_wav(cx);
@@ -146,7 +146,7 @@ if tsvalue
     if gco == HANDLES.subplt.timeseries | gco == HANDLES.plot1 | ...
         gco == HANDLES.plt.timeseries | ...
         (~isempty(gco) & find(HANDLES.delimit.tsline==gco))
-      if PARAMS.ftype ~= 1
+      if PARAMS.ftype == 2   % x.wav or x.flac; plain flac has no raw files
         time = get_time_xwav(cx);
       else
         time = get_time_wav(cx);
@@ -167,7 +167,7 @@ if sgvalue
         get(gcf,'CurrentAxes') == HANDLES.plot3|...
         get(gcf,'CurrentAxes') == HANDLES.plot4|...
         (~isempty(gco) & find(HANDLES.delimit.sgline==gco))
-      if PARAMS.ftype ~= 1
+      if PARAMS.ftype == 2   % x.wav or x.flac; plain flac has no raw files
         time = get_time_xwav(cx);
       else
         time = get_time_wav(cx);
@@ -178,7 +178,7 @@ if sgvalue
   else
     if gco == HANDLES.subplt.specgram | gco == HANDLES.plt.specgram | ...
       (~isempty(gco) & find(HANDLES.delimit.sgline==gco))
-      if PARAMS.ftype ~= 1
+      if PARAMS.ftype == 2   % x.wav or x.flac; plain flac has no raw files
         time = get_time_xwav(cx);
       else
         time = get_time_wav(cx);

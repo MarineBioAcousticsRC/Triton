@@ -60,7 +60,17 @@ if gco == HANDLES.subplt.ltsa || gco == HANDLES.plt.ltsa
     if ~isempty(fstr)
         PARAMS.ftype = 2;       % xwav format, either container
     else
-        PARAMS.ftype = 1;       % wav format
+        % Not an x.wav, so it is a plain wav or a plain flac -- and those are
+        % different ftypes. fileparts is safe here only because fname was
+        % deblanked at line 21: an undeblanked ltsahd.fname row would give an
+        % "extension" of '.flac' followed by NULs, matching nothing. See
+        % xwav_container.m's header for why that trap exists.
+        [~, ~, pickExt] = fileparts(fname);
+        if strcmpi(pickExt, '.flac')
+            PARAMS.ftype = 3;   % plain flac
+        else
+            PARAMS.ftype = 1;   % wav format
+        end
         PARAMS.start.dnum = PARAMS.ltsa.dnumStart(rawIndex);
         PARAMS.start.dvec = PARAMS.ltsa.dvecStart(rawIndex);
     end

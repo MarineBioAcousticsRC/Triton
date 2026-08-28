@@ -48,8 +48,9 @@ else
 end
 
 % plot red line if plot figure crosses RawFile boundary & delimit button on
-% & not a wav file
-if PARAMS.ftype ~=1 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~= 1
+% & this is an x.wav or x.flac. ftype == 2 rather than ~= 1: ftype 3 is a plain
+% flac with no raw-file structure (sfregosi-noaa, PR #132).
+if PARAMS.ftype == 2 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~= 1
   for r=1:length(PARAMS.raw.delimit_time)
     y = [v(3),v(4)];
     x = [PARAMS.raw.delimit_time(r), PARAMS.raw.delimit_time(r)];

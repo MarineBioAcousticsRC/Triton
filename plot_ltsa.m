@@ -77,18 +77,28 @@ end
 % Using the untransformed power array agrees with c only at the default
 % brightness 0 / contrast 100 and full frequency range, and disagrees as soon
 % as the user changes either.
+% Derived once and then held, not recomputed per frame. A range that moved as the
+% analyst scrolled would make the same sound level look different from one window
+% to the next, which is the whole reason the spectrogram holds its own limits.
+% This was the half that got missed when plot_specgram was made sticky.
 set(HANDLES.plt.ltsa,'CDataMapping','scaled');
-cLim = c(isfinite(c));
-if isempty(cLim)
-    caxis([1,65]);              % no finite data; keep the historical range
-else
-    cLimLo = min(cLim);
-    cLimHi = max(cLim);
-    if cLimHi <= cLimLo         % flat data; caxis requires an increasing range
-        cLimHi = cLimLo + 1;
-    end
-    caxis([cLimLo,cLimHi]);
+if ~isfield(PARAMS,'ltsa') || ~isfield(PARAMS.ltsa,'clim')
+    PARAMS.ltsa.clim = [];
 end
+if isempty(PARAMS.ltsa.clim)
+    cLim = c(isfinite(c));
+    if isempty(cLim)
+        PARAMS.ltsa.clim = [1 65];  % no finite data; keep the historical range
+    else
+        cLimLo = min(cLim);
+        cLimHi = max(cLim);
+        if cLimHi <= cLimLo         % flat data; caxis requires an increasing range
+            cLimHi = cLimLo + 1;
+        end
+        PARAMS.ltsa.clim = [cLimLo cLimHi];
+    end
+end
+caxis(PARAMS.ltsa.clim);
 
 % shift and shrink plot by dv
 dv = 0.075;
@@ -107,19 +117,42 @@ yl=get(PARAMS.ltsa.cb,'YLabel');
 set(yl,'String','Spectrum Level [dB re counts^2/Hz]')
 
 % set color bar xlimit
-minp = min(min(PARAMS.ltsa.pwr));
-maxp = max(max(PARAMS.ltsa.pwr));
+%
+% isfinite first. PARAMS.ltsa.pwr can hold +/-Inf -- see the note at line 53 --
+% and an infinite minp is what the "breaking here for BS_disk04" comment below
+% was about.
+pFinite = PARAMS.ltsa.pwr(isfinite(PARAMS.ltsa.pwr));
+if isempty(pFinite)
+    minp = 1;
+    maxp = 65;
+else
+    minp = min(pFinite);
+    maxp = max(pFinite);
+end
 %set(PARAMS.ltsa.cb,'YLim',[minp maxp]) %Commented out because it changes
 %colorbar to show only part of the range.
 
 % One of the child objects of the colorbar is an image, find it so we can
 % set an appropriate scale.
 PARAMS.ltsa.cbb = findobj(get(PARAMS.ltsa.cb, 'Children'), 'Type', 'image');
-minc = min(abs(c(:)));
-maxc = max(max(c));
+% Was min(abs(c(:))), which mislabelled the colorbar whenever the data went
+% negative -- sfregosi-noaa raised this in PR #131. The abs() was doing double
+% duty though: it also kept an -Inf out of the colon expression below, and
+% [-Inf:2:maxc] does not merely misbehave, it errors with "Requested array
+% exceeds the maximum possible variable size". Filtering non-finite values gets
+% the correct label and keeps the colon finite, which the abs() could not do
+% both of.
+cFinite = c(isfinite(c));
+if isempty(cFinite)
+    minc = 1;
+    maxc = 65;
+else
+    minc = min(cFinite);
+    maxc = max(cFinite);
+end
 difc = 2;
 set(PARAMS.ltsa.cbb,'CData',[minc:difc:maxc]')
-set(PARAMS.ltsa.cbb,'YData',[minp maxp]) %CMS - breaking here for BS_disk04, because minc and minp are neg. infinity
+set(PARAMS.ltsa.cbb,'YData',[minp maxp])
 %sets the tick mode for color bar to manual to fix printing error
 set(PARAMS.ltsa.cb,'YTickMode','manual')
 

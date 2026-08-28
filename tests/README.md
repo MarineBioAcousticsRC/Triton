@@ -184,6 +184,36 @@ compressed XWAVs, and read as plain flacs. Both readings are pinned. That second
 hypothetical -- reading an x.flac as a plain flac is a real thing users do by accident, and it takes
 each file's start time from its name instead of its header.
 
+## Display state, which the fingerprints cannot see
+
+The baseline records what Triton **reads**. Colour limits, axis labels and button states are
+display state and never reach a fingerprint, so a regression in any of them passes the harness
+untouched. That is not a flaw in the harness -- it is the boundary of what it is for -- but it
+does mean display behaviour needs its own checks.
+
+```matlab
+ok = triton_ltsa_clim_check
+```
+
+**`triton_ltsa_clim_check`** drives the real `plot_ltsa.m` headlessly and asserts four things: the
+colour range is derived from the data on the first draw, it is then **held** across a redraw after
+brightness changes, clearing `PARAMS.ltsa.clim` re-derives it, and an `-Inf` in
+`PARAMS.ltsa.pwr` does not crash the colorbar. Returns true on success and prints one line per
+check.
+
+Both of the first two exist because of real regressions. The LTSA was left recomputing its range
+every frame when `plot_specgram` was made sticky for issue #111, so brightness and contrast did not
+survive scrolling (found by sfregosi-noaa, PR #131). And the colorbar minimum was
+`min(abs(c(:)))`, which mislabels negative values -- but the obvious fix, `min(c(:))`, reintroduces
+a crash, because `PARAMS.ltsa.pwr` can hold non-finite values and `[-Inf:2:maxc]` errors outright.
+The live code filters with `isfinite`. This check is what stops someone simplifying it back.
+
+The harness saw none of that: 496 of 496 cases were byte-identical across both the bug and the fix.
+
+Extending this to the spectrogram, the timeseries and the motion buttons would be worthwhile; the
+groundwork is that `tr_headless_handles` now supplies `HANDLES.plot.now`, so any `plot_*` function
+can be driven without a GUI.
+
 ## Reading the comparison
 
 ```
