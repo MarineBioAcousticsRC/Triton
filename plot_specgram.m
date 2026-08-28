@@ -111,9 +111,9 @@ elseif PARAMS.sgfax == 1
 %     set(sgAx,'Ylim',[ PARAMS.freq0 PARAMS.freq1 ]);
 end
 
-% draw delimiter line if button is active and is xwav or xflac
+% draw delimiter line if active and not wav file
 % draw delimiter line does NOT work for new log specgram/surf
-if PARAMS.ftype == 2 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~= 1
+if PARAMS.ftype ~=1 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~= 1
     for r=1:length(PARAMS.raw.delimit_time)
         y = [min(PARAMS.f),max(PARAMS.f)];
         x = [PARAMS.raw.delimit_time(r), PARAMS.raw.delimit_time(r)];
