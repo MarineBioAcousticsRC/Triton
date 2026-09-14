@@ -29,6 +29,11 @@ by byte offset (`xwav_hdrfile`). Both ask `xwav_container`, which decides from
 the file's first four bytes rather than its name. Everything else, including
 every Remora, treats the two identically.
 
+**[xflac_handling.md](xflac_handling.md) explains the mechanism** — how a header
+full of byte offsets still finds the right samples in a file that has none, and
+what "without decompressing" does and does not mean. Read that one if someone
+asks you how this works.
+
 Reading the magic bytes rather than the extension is not fussiness. Triton
 keeps file names in padded character matrices, so a name arrives with trailing
 null characters and its extension matches nothing. Decide from the name and an
