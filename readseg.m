@@ -8,7 +8,7 @@ function readseg
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global PARAMS DATA
-check_time      % check to see if ok plot start time (PARAMS.plot.dvec or 
+check_time      % check to see if ok plot start time (PARAMS.plot.dvec or
                 % PARAMS.plot.dnum)
 
 DATA = [];  % clear DATA vector
@@ -22,16 +22,16 @@ fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
 %             disp_msg(sprintf([ 'Unable to get info on file %s: Not a wave ',...
 %                 'or unsupported bit depth ( > 16-bit )?' ], fullfname));
 %             return
-%         end       
+%         end
 %         skip = floor((PARAMS.plot.dnum - PARAMS.start.dnum) * 24 * 60 * 60 * PARAMS.fs);   % number of samples to skip over
 %         % %
 %         %PARAMS.tseg.samp = floor( PARAMS.tseg.sec * PARAMS.fs )+1;
 %         PARAMS.tseg.samp = ceil( PARAMS.tseg.sec * PARAMS.fs );	% number of samples in segment
 % %        DATA = wavread(fullfname, [skip+1 skip+PARAMS.tseg.samp], 'Native' );
-% 
+%
 %         mDATA = double(wavread(fullfname, [skip+1 skip+PARAMS.tseg.samp], 'Native' ));
 %         %DATA = DATA(:,PARAMS.ch).*2^15;     % un-normalize wavread
-% 
+%
 %     elseif PARAMS.ftype == 2    % xwav file
 %         index = PARAMS.raw.currentIndex;
 %         if PARAMS.nBits == 16
@@ -76,8 +76,8 @@ fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
 %     %     else
 %     %       PARAMS.plot.uuu = 0;
 %     %     end
-%     %       
-%     end       
+%     %
+%     end
 % else
     if PARAMS.ftype == 1        % wav file
         skip = floor((PARAMS.plot.dnum - PARAMS.start.dnum) * 24 * 60 * 60 * PARAMS.fs);   % number of samples to skip over
@@ -89,80 +89,82 @@ fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
         DATA = double(DATA);
 %         DATA = DATA(:,PARAMS.ch).*2^15;     % un-normalize wavread
     elseif PARAMS.ftype == 2    % xwav file
-    if PARAMS.nBits == 16
-        dtype = 'int16';
-    elseif PARAMS.nBits == 24
-        dtype = 'int24';
-    elseif PARAMS.nBits == 32
-        dtype = 'int32';
-    else
-        disp_msg('PARAMS.nBits = ')
-        disp_msg(PARAMS.nBits)
-        disp_msg('not supported')
-        return
-    end
+        index = PARAMS.raw.currentIndex;
+        if PARAMS.nBits == 16
+            dtype = 'int16';
+        elseif PARAMS.nBits == 24
+            dtype = 'int24';
+        elseif PARAMS.nBits == 32
+            dtype = 'int32';
+        else
+            disp_msg('PARAMS.nBits = ')
+            disp_msg(PARAMS.nBits)
+            disp_msg('not supported')
+            return
+        end
 
-    PARAMS.tseg.samp = ceil( PARAMS.tseg.sec * PARAMS.fs );  % number of samples in segment
+        skip = floor((PARAMS.plot.dnum - PARAMS.raw.dnumStart(index)) * 24 * 60 * 60 * PARAMS.fs);   % number of samples to skip over
+        PARAMS.tseg.samp = ceil( PARAMS.tseg.sec * PARAMS.fs );	% number of samples in segment
 
-    fid = fopen(fullfname,'r');            % open once, reused across the rest of the code
+        fid = fopen(fullfname,'r');
+        fseek(fid,PARAMS.xhd.byte_loc(index) + skip*PARAMS.nch*PARAMS.samp.byte,'bof');
+        DATA = fread(fid,[PARAMS.nch,PARAMS.tseg.samp],dtype)';
+        fclose(fid);
 
-    segIdx = PARAMS.raw.currentIndex;      % raw segment containing the window's start time
-    samplesNeeded = PARAMS.tseg.samp;      % how many samples we still owe the window
-    DATA = [];                              
-    raw_end_times = [];                     % one real boundary per segment crossed
-    readStartDnum = PARAMS.plot.dnum;       % calendar time this chunk's read should start at
+        if PARAMS.xgain > 0
+            DATA(:,PARAMS.ch) = DATA(:,PARAMS.ch) ./ PARAMS.xgain(1);
+        end
 
-    while samplesNeeded > 0 && segIdx <= numel(PARAMS.raw.dnumStart)
+        % Work out, for this plot window, where each raw file actually ends
+        % and where the real recording gaps are. Both are measured in
+        % seconds from the start of the window.
+        %
+        % Boundaries are read from PARAMS.raw.dnumEnd rather than
+        % extrapolated from the first raw file's length, which was wrong
+        % whenever a segment was short or a gap intervened.
+        %
+        % DATA is deliberately NOT modified here. Gaps are reported through
+        % PARAMS.raw.gap_time so the plotting code can mark them, while
+        % every analysis caller keeps receiving exactly the samples it
+        % always has.
 
-        % how many samples into THIS segment does our read start point fall?
-        skip = round((readStartDnum - PARAMS.raw.dnumStart(segIdx)) * 24*60*60 * PARAMS.fs);
+        winStart = PARAMS.plot.dnum;                    % window start [days]
+        winEnd   = winStart + PARAMS.tseg.sec / 86400;  % window end   [days]
 
-        % how many samples does this segment actually have left, from here to its own true end?
-        segSamplesAvail = round((PARAMS.raw.dnumEnd(segIdx) - readStartDnum) * 24*60*60 * PARAMS.fs);
+        % A gap only counts if it is longer than a millisecond. Measured
+        % timestamp rounding between consecutive raw files is about one
+        % sample, which is far below this; real duty cycles are far above.
+        gapTol = 1e-3;                                  % [seconds]
 
-        samplesToRead = min(samplesNeeded, segSamplesAvail);   % never read past this segment's real end
+        raw_end_times = [];   % boundary positions, seconds into the window
+        gap_time      = [];   % one row per gap: [position_sec, length_sec]
 
-        fseek(fid, PARAMS.xhd.byte_loc(segIdx) + skip*PARAMS.nch*PARAMS.samp.byte, 'bof');
-        chunk = fread(fid, [PARAMS.nch, samplesToRead], dtype)';
-        DATA = [DATA; chunk];                                   % tack this segment's audio onto the window
-
-        samplesNeeded = samplesNeeded - samplesToRead;
-
-        raw_end_times(end+1) = (PARAMS.raw.dnumEnd(segIdx) - PARAMS.plot.dnum) * 60*60*24;
-                                                                  % this segment's real boundary, for the marker line
-
-        if samplesNeeded > 0                                    % window still isn't full
-            if segIdx == numel(PARAMS.raw.dnumStart)
-                % no raw segments left at all -- pad the remainder so the plot still spans the GUI's requested length
-                disp_msg('Reached the end of the last raw file before filling the plot window; padding remainder');
-                DATA = [DATA; zeros(samplesNeeded, PARAMS.nch)];
-                samplesNeeded = 0;
-                break
+        for k = PARAMS.raw.currentIndex : numel(PARAMS.raw.dnumEnd)
+            if PARAMS.raw.dnumStart(k) >= winEnd
+                break                                   % starts after the window
             end
 
-            gapSec = (PARAMS.raw.dnumStart(segIdx+1) - PARAMS.raw.dnumEnd(segIdx)) * 24*60*60;
-            if gapSec >  1/PARAMS.fs % setting the need for padding based on any time skip that is smaller than one sample's worth of time (similar to check_time.m)
-                % real recording gap -- pad just the missing duration, then keep reading real audio after it
-                disp_msg('Recording gap encountered mid plot window; padding the gap to preserve requested plot length');
-                gapSamples = min(round(gapSec * PARAMS.fs), samplesNeeded);
-                DATA = [DATA; zeros(gapSamples, PARAMS.nch)];
-                samplesNeeded = samplesNeeded - gapSamples;
+            endSec = (PARAMS.raw.dnumEnd(k) - winStart) * 86400;
+            inWindow = endSec > 0 && endSec < PARAMS.tseg.sec;
+
+            if inWindow
+                raw_end_times(end+1) = endSec;                       %#ok<AGROW>
             end
 
-            if samplesNeeded > 0
-                segIdx = segIdx + 1;                             % move on to the next segment and keep collecting
-                readStartDnum = PARAMS.raw.dnumStart(segIdx);
+            if k < numel(PARAMS.raw.dnumStart)
+                gapSec = (PARAMS.raw.dnumStart(k+1) - PARAMS.raw.dnumEnd(k)) * 86400;
+                if gapSec > gapTol && inWindow
+                    gap_time(end+1, 1:2) = [endSec, gapSec];         %#ok<AGROW>
+                end
             end
         end
-    end
 
-    fclose(fid);
+        if isempty(raw_end_times)
+            raw_end_times = 0;   % keeps the existing "one value = draw nothing" behaviour
+        end
 
-    if PARAMS.xgain > 0
-        DATA(:,PARAMS.ch) = DATA(:,PARAMS.ch) ./ PARAMS.xgain(1);
-    end
-
-    PARAMS.raw.delimit_time = raw_end_times;
+        PARAMS.raw.delimit_time = raw_end_times;
+        PARAMS.raw.gap_time     = gap_time;
         %calculate micro seconds skipped since time resolution is too low
     %     micro_samples = mod(skip,PARAMS.fs/1000);
     %     if micro_samples < PARAMS.fs/1000 && micro_samples ~= 0
@@ -172,7 +174,7 @@ fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
     %     else
     %       PARAMS.plot.uuu = 0;
     %     end
-    %       
+    %
     end
 % end
 

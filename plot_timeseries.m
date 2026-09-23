@@ -29,11 +29,20 @@ if PARAMS.filter
     DATA(:,PARAMS.ch) = filter(b,a,DATA(:,PARAMS.ch));
 end
 
-len = length(DATA(:,PARAMS.ch));
+% ---- display-only gap padding ----------------------------------------------
+% See gap_pad_display: DATA comes back from readseg spliced across real
+% recording gaps, so the plotted axis is short by the gap length after each one.
+% Pad a LOCAL copy for the picture; the global DATA is left as readseg gave it.
+tsDATA = DATA;
+if PARAMS.ftype ~= 1 && isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
+    tsDATA = gap_pad_display(DATA, PARAMS.raw.gap_time, PARAMS.fs, PARAMS.tseg.samp);
+end
+
+len = length(tsDATA(:,PARAMS.ch));
 
 % time series only
 HANDLES.subplt.timeseries = subplot(HANDLES.plot.now);
-HANDLES.plt.timeseries = plot((0:len-1)/PARAMS.fs,DATA(:,PARAMS.ch));
+HANDLES.plt.timeseries = plot((0:len-1)/PARAMS.fs,tsDATA(:,PARAMS.ch));
 
 % check to see if time series plot goes past end of data, if so,
 % correct it
@@ -49,12 +58,26 @@ end
 
 % plot red line if plot figure crosses RawFile boundary & delimit button on
 % & not a wav file
-if PARAMS.ftype ~=1 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~= 1
+if PARAMS.ftype ~=1 && PARAMS.delimit.value && any(PARAMS.raw.delimit_time > 0)
   for r=1:length(PARAMS.raw.delimit_time)
     y = [v(3),v(4)];
     x = [PARAMS.raw.delimit_time(r), PARAMS.raw.delimit_time(r)];
     HANDLES.delimit.tsline(r) = line(x,y,'Color','r','LineWidth',4);
   end
+end
+
+% shade real recording gaps -- inserted silence, not quiet water
+if PARAMS.ftype ~= 1 && PARAMS.delimit.value && ...
+        isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
+    y = [v(3), v(4)];
+    for r = 1:size(PARAMS.raw.gap_time,1)
+        x0 = PARAMS.raw.gap_time(r,1);
+        x1 = x0 + PARAMS.raw.gap_time(r,2);
+        HANDLES.delimit.tsgap(r) = patch('XData', [x0 x1 x1 x0], ...
+            'YData', [y(1) y(1) y(2) y(2)], 'FaceColor', [1 0.55 0], ...
+            'FaceAlpha', 0.25, 'EdgeColor', [1 0.55 0], 'LineStyle', ':', ...
+            'LineWidth', 1.5);
+    end
 end
 
 %labels
