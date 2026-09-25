@@ -34,11 +34,11 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
 %         PARAMS.ltsahd.nsamp(m) = siz(1);
 %         PARAMS.ltsa.nch(m) = siz(2);
         try
-            info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+            info = audioinfo(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
         catch ME
             disp(ME.message)
             dmsg = sprintf('Is %s a real wave file?', ...
-                fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+                fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
             disp(dmsg);
             PARAMS.ltsa.gen = 0; % need to cancel
             return 
@@ -51,6 +51,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
         bytespersample = floor(PARAMS.ltsa.nBits/8);
         
         PARAMS.ltsahd.fname(m,1:fnsz(2)) = PARAMS.ltsa.fname(k,:);        % xwav file name for this raw file header
+        PARAMS.ltsahd.fdir(m,1:fnsz(2)) = PARAMS.ltsa.fdir(k,:);
         PARAMS.ltsahd.rfileid(m) = 1;                           % raw file id / number in this xwav file
         
         % timing stuff:
@@ -73,11 +74,11 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
         
     elseif PARAMS.ltsa.ftype == 2               % do the following for xwavs
         try
-            info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+            info = audioinfo(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
         catch ME
             disp(ME.message)
             dmsg = sprintf('Is %s a real wave file?', ...
-                fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+                fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
             disp(dmsg);
             PARAMS.ltsa.gen = 0; % need to cancel
             return 
@@ -85,7 +86,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
         
         PARAMS.ltsahd.nsamp(k) = info.TotalSamples;
         
-        fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)),'r');
+        fid = fopen(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)),'r');
         
         fseek(fid,22,'bof');
         PARAMS.ltsa.nch = fread(fid,1,'uint16');         % Number of Channels
@@ -124,6 +125,8 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
             PARAMS.ltsahd.gain(m) = fread(fid,1,'uint8');          % gain (1 = no change)
             PARAMS.ltsahd.padding = fread(fid,7,'uchar');    % Padding to make it 32 bytes...misc info can be added here
             PARAMS.ltsahd.fname(m,1:fnsz(2)) = PARAMS.ltsa.fname(k,:);        % xwav file name for this raw file header
+            PARAMS.ltsahd.fdir(m,:) = PARAMS.ltsa.fdir(k,:);        % xwav file name for this raw file header
+
             PARAMS.ltsahd.fnum(m) = k;
             
             PARAMS.ltsahd.dnumStart(m) = datenum([PARAMS.ltsahd.year(m) PARAMS.ltsahd.month(m)...

@@ -25,6 +25,7 @@ elseif PARAMS.ltsa.ftype == 2
 end
 
 fn = char(d.name);      % file names in directory
+fd = char(d.folder);
 fnsz = size(fn);        % number of data files in directory
 nfiles = fnsz(1);
 disp_msg(' ')
@@ -60,6 +61,7 @@ if PARAMS.ltsa.ftype == 1
 elseif PARAMS.ltsa.ftype == 2
     % filenames
     PARAMS.ltsa.fname = fn;
+    PARAMS.ltsa.fdir = fd;
 end
 
 

@@ -96,16 +96,16 @@ else
     error('Provide a transfer function file or a singular gain value')
 end
 
-avg_pwrB1 = nanmean(pwrB1,1);
-avg_pwrB2 = nanmean(pwrB2,1);
-avg_pwrB3 = nanmean(pwrB3,1);
+avg_pwrB1 = mean(pwrB1,1,'omitnan');
+avg_pwrB2 = mean(pwrB2,1,'omitnan');
+avg_pwrB3 = mean(pwrB3,1,'omitnan');
 
 % exclude gaps with missing data (it can vary). Outlier considered as value
 % 50% less than the average dB
 if REMORA.sh.settings.dutyCycle
-    outliersB1 = nanmean(avg_pwrB1) - (nanmean(avg_pwrB1)*0.5);
-    outliersB2 = nanmean(avg_pwrB2) - (nanmean(avg_pwrB2)*0.5);
-    outliersB3 = nanmean(avg_pwrB3) - (nanmean(avg_pwrB3)*0.5);
+    outliersB1 = mean(avg_pwrB1,'omitnan') - (mean(avg_pwrB1,'omitnan')*0.5);
+    outliersB2 = mean(avg_pwrB2,'omitnan') - (mean(avg_pwrB2,'omitnan')*0.5);
+    outliersB3 = mean(avg_pwrB3,'omitnan') - (mean(avg_pwrB3,'omitnan')*0.5);
     avg_pwrB1(avg_pwrB1 <= outliersB1) = nan;
     avg_pwrB2(avg_pwrB2 <= outliersB2) = nan;
     avg_pwrB3(avg_pwrB3 <= outliersB3) = nan;
@@ -330,9 +330,9 @@ if ~isempty(noise)
             istop = istop + 1;
         end
         
-        RLB1 = 10*log10(sum(10.^(nanmean(pwrB1(:,istart:istop-1),2)./10)));
-        RLB2 = 10*log10(sum(10.^(nanmean(pwrB2(:,istart:istop-1),2)./10)));
-        RLB3 = 10*log10(sum(10.^(nanmean(pwrB3(:,istart:istop-1),2)./10)));
+        RLB1 = 10*log10(sum(10.^(mean(pwrB1(:,istart:istop-1),2,'omitnan')./10)));
+        RLB2 = 10*log10(sum(10.^(mean(pwrB2(:,istart:istop-1),2,'omitnan')./10)));
+        RLB3 = 10*log10(sum(10.^(mean(pwrB3(:,istart:istop-1),2,'omitnan')./10)));
         
         %add to complete noise vector RL for this minute
         RLsB1 = [RLsB1; RLB1];

@@ -1,0 +1,43 @@
+%%% 02/09/2021
+%%% BJT
+
+To disable disk initialization prompt in windows 10...connect USB device with disk/card
+Cancel when prompted to initilize disk
+Open "Disk Management" 
+Select disk/card connected to USB device 
+Remove drive letter 
+Prompt will no longer show up when reconnecting USB device w/ disk/card 
+
+Setup Notes for devices and software
+
+A.  Connect HRESDA card to USB port via USB-B-A cable
+	-Device should show up as "USB Serial Converter" in device manager
+		-Manufacter: FTDI
+	-Device should show up as "FT201X USB 12C" in USBDeview
+	-If drivers not found, use installer FT_Prog_v3.10.132.511 Installer.exe
+	
+B.  Connect USB sdcard reader
+	-Note hard disk number(s) associated with reader using dd.exe --list
+		Example: \\?\Device\Harddisk2\Partition0
+		
+	-Should match disk numbers that show up in disk management when reader is connected
+	
+D.  Add msdxfer.exe to windows path
+	1.  Open "Environmental Variables" GUI in windows ( searchable in run bar of windows 10 )
+	2.  Edit "Path" variable
+	3.  Add new variable, copying full path to directory that contains msdxfer.exe 
+		-Changes only take effect in command windows opened AFTER saving changes to environmental variables
+		
+
+NOTE: 
+	-filename for executable should be "msdxfer.exe"...change filename if different to avoid unwanted behavior
+	-USB card reader will need to be disconnected/power cycled between msdxfer commands...a USB hub with power switches is useful
+	-HRESDA can connect directly into SD card reader...SD card extender cable is recommended in between
+	
+Physical connections:
+
+	1. Plug the HRESD card into the HRMSD.
+	2. Plug the HRESD into the SD/USD reader ( preferably using SD extender cable )
+	3. Plug the USB cable into the HRESD to power it on.
+	4. Open CMD/Powershell as Administrator
+	4. Run the "msdxfer" program 

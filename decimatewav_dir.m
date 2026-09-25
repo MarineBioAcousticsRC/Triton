@@ -6,9 +6,11 @@ function decimatewav_dir(wavType)
 % Decimate a directory of wav, flac, or xwav files.
 %
 % Parameters:
-%       wavType - a string that is either 'wav' or 'xwav' depending on the
-%                       type of file you are decimating.
-%               - works with flac files, treated similar to 'wav'
+%       wavType - 'wav' for plain recordings, 'x.wav' for XWAVs.
+%               - a plain flac is handled like a wav: no header, nothing to
+%                 preserve but the samples.
+%               - an .x.flac is handled like an .x.wav, because that is what it
+%                 is. Output is written as .x.wav.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -34,11 +36,23 @@ if strcmp(wavType,'wav')
     if isempty(d)
         d = dir(fullfile(PARAMS.idir{ii},'*.flac'));    % maybe flac files?
         if ~isempty(d)
-            wavType = 'flac'; % if it is flac files, update waveType
+            % *.flac also matches *.x.flac, which is a compressed XWAV.
+            % Decimating one as a plain flac would write an output with no
+            % harp header: no raw-file directory, no recording times, gone for
+            % good and with nothing on screen to say so. Ask the file.
+            if ck_xflac_isxwav(fullfile(PARAMS.idir{ii},d(1).name))
+                disp_msg('These flac files carry harp headers - decimating them as XWAVs')
+                wavType = 'x.wav';
+            else
+                wavType = 'flac'; % if it is flac files, update waveType
+            end
         end
     end
 else
-    d = dir(fullfile(PARAMS.idir{ii},['*.' wavType]));    % directory info
+    d = dir(fullfile(PARAMS.idir{ii},'*.x.wav'));         % directory info
+    if isempty(d)
+        d = dir(fullfile(PARAMS.idir{ii},'*.x.flac'));    % compressed XWAVs
+    end
 end
 
 PARAMS.fname{ii} = char(d.name);                % file names
@@ -61,8 +75,12 @@ elseif strcmp(wavType, 'flac')
     PARAMS.nch = info.NumChannels;         % Number of Channels
     PARAMS.fs = info.SampleRate;          % Sampling Rate(samples/second)
 else
-    PARAMS.ftype = 2;
-    rdxwavhd
+    PARAMS.ftype = 2;   % xwav, in either container
+    if local_isflac(PARAMS.infile)
+        rdxflachd
+    else
+        rdxwavhd
+    end
 end
 
 
@@ -111,13 +129,9 @@ tic % start stopwatch timer
 h = loadbar([' Decimating ' wavType ' Files ']);
 total = PARAMS.nfiles{ii};
 
-if strcmp(wavType,'wav')
-    extension_size = 4;
-elseif strcmp(wavType,'flac')
-    extension_size = 5;
-elseif strcmp(wavType, 'xwav')
-    extension_size = 6;
-end
+% The extension is matched rather than counted. The old character count tested
+% for 'xwav' while every caller passes 'x.wav', so it was never set for XWAVs
+% and naming the output failed with an undefined-variable error.
 
 
 % loop over the files and
@@ -126,8 +140,8 @@ for jj = 1:PARAMS.nfiles{ii}
     disp_msg(['File Number ', num2str(jj)])
     % these needed for rdxwavhd
     PARAMS.infile = deblank(PARAMS.fname{ii}(jj,:)); % get file names sequentally
-    PARAMS.outfile = [PARAMS.infile(1:length(PARAMS.infile)-extension_size),'.d',...
-        num2str(PARAMS.df),'.' wavType];
+    outbase = regexprep(PARAMS.infile, '\.(x\.wav|x\.flac|wav|flac)$', '', 'ignorecase');
+    PARAMS.outfile = [outbase,'.d',num2str(PARAMS.df),'.',wavType];
     PARAMS.xhd.dSubchunkSize = [];
     if strcmp(wavType, 'wav') || strcmp(wavType, 'flac')
 %         rdwavhd % this used to check df but now that is checked above
@@ -168,7 +182,11 @@ for jj = 1:PARAMS.nfiles{ii}
             '% complete'], h, pcntDone)
         continue
     else
-        rdxwavhd
+        if local_isflac(PARAMS.infile)
+            rdxflachd
+        else
+            rdxwavhd
+        end
         wrxwavhd(2)
     end
     
@@ -243,9 +261,9 @@ for jj = 1:PARAMS.nfiles{ii}
                 % jump over header and the number of decimations done so far...
                 %                 fseek(fid,PARAMS.xhd.byte_loc(1) +...
                 %                     (di-1)*nsamp*PARAMS.nch*PARAMS.samp.byte,'bof');
-                fseek(fid,PARAMS.xhd.byte_loc(di),'bof');
-                % read the data
-                data = fread(fid,[PARAMS.nch,nsamp],'int16');
+                % xwav_read fetches from either container; for an .x.flac it
+                % turns this byte offset into a sample index.
+                data = xwav_read(PARAMS.xhd.byte_loc(di), nsamp)';
                 %decimate and write
                 if PARAMS.nch == 1
                     fwrite(fod,decimate(data,PARAMS.df),'int16');
@@ -270,3 +288,9 @@ for jj = 1:PARAMS.nfiles{ii}
 end
 toc
 close(h)
+
+
+function tf = local_isflac(infile)
+%LOCAL_ISFLAC  Is this file name a flac? Trailing padding tolerated.
+[~,~,e] = fileparts(deblank(infile));
+tf = strcmpi(e,'.flac');

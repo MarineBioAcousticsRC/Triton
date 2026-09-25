@@ -15,6 +15,18 @@ elseif strcmp(action,'setOutDir')
     outDir = get(REMORA.pi_verify.outDirEdTxt, 'string');
     REMORA.pi.settings.outDir = outDir;
     
+elseif strcmp(action,'setTemplate')
+    Template = get(REMORA.pi_verify.tempEdTxt, 'string');
+    REMORA.pi.settings.templateFile = Template;
+
+elseif strcmp(action,'setFc1')
+    Fc1 = str2double(get(REMORA.pi_verify.Fc1EdTxt, 'string'));
+    REMORA.pi.settings.Fc1 = Fc1;
+
+elseif strcmp(action,'setFc2')
+    Fc2 = str2double(get(REMORA.pi_verify.Fc2EdTxt, 'string'));
+    REMORA.pi.settings.Fc2 = Fc2;
+
 elseif strcmp(action,'setThresh')
     ThreshEdText = str2double(get(REMORA.pi_verify.ThreshEdText, 'string'));
     REMORA.pi.settings.thresh = ThreshEdText;
@@ -26,6 +38,10 @@ elseif strcmp(action, 'setDiffS')
 elseif strcmp(action, 'setRmsASmin')
     rmsASminEdText = str2double(get(REMORA.pi_verify.rmsASminEdText, 'string'));
     REMORA.pi.settings.rmsASmin = rmsASminEdText;
+
+elseif strcmp(action, 'setdurShort')
+    durShortEdText = str2double(get(REMORA.pi_verify.durShortEdText, 'string'));
+    REMORA.pi.settings.durShort_s = durShortEdText;
     
 elseif strcmp(action,'RunBatchDetection')
     close(REMORA.fig.pi.batch)

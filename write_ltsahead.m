@@ -67,6 +67,19 @@ else
     return
 end
 
+% nxwav is a 2-byte field, so it cannot represent more than 65535 input files.
+% fwrite saturates rather than erroring, which would silently record the wrong
+% count in the header, so refuse instead. nrftot below is 4 bytes and has no
+% such limit -- that was the point of LTSA version 4 (get_headers.m:126).
+if PARAMS.ltsa.nxwav > 65535
+    disp_msg('Error: too many input files for one LTSA')
+    disp_msg(sprintf('  %d files given; the LTSA header can record at most 65535', ...
+        PARAMS.ltsa.nxwav))
+    disp_msg('  split them across several LTSAs')
+    fclose(fid);
+    PARAMS.ltsa.gen = 0;
+    return
+end
 fwrite(fid,PARAMS.ltsa.nxwav,'uint16');     % 2 bytes - total number of xwavs files used
 % 36 bytes used, up to here
 % add channel ltsa'ed 061011 smw

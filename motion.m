@@ -173,12 +173,10 @@ elseif strcmp(action,'nextfile')
     %         filter = '.wav'; %it wasn't an xwav file so it's a wav.
     %     end
     %     files = dir( [PARAMS.inpath '*' filter] );
-    if PARAMS.ftype == 1
-        ftstr = '.wav';
-    elseif PARAMS.ftype == 2
-        ftstr = '.x.wav';
-    else
-        disp_msg('Error: no wav or xwav files')
+    % Ask the open file what it is, so an x.flac steps to the next x.flac.
+    ftstr = triton_extfilter(PARAMS.infile, PARAMS.ftype);
+    if isempty(ftstr)
+        disp_msg('Error: no wav, flac or xwav files')
         return
     end
     files = dir( [PARAMS.inpath '*' ftstr] );
@@ -197,12 +195,10 @@ elseif strcmp(action, 'prevfile')
     %     else
     %         filter = '.wav';
     %     end
-    if PARAMS.ftype == 1
-        ftstr = '.wav';
-    elseif PARAMS.ftype == 2
-        ftstr = '.x.wav';
-    else
-        disp_msg('Error: no wav or xwav files')
+    % Ask the open file what it is, so an x.flac steps to the next x.flac.
+    ftstr = triton_extfilter(PARAMS.infile, PARAMS.ftype);
+    if isempty(ftstr)
+        disp_msg('Error: no wav, flac or xwav files')
         return
     end
     files = dir( [PARAMS.inpath '*' ftstr] );
@@ -229,7 +225,7 @@ end;
                     set( HANDLES.fig.ctrl, 'Pointer', 'arrow' )
                 end
                 PARAMS.infile = files( y + direction ).name;
-                if strcmp(ftstr,'.wav') %need the start time for wav files
+                if PARAMS.ftype == 1 || PARAMS.ftype == 3 %need the start time for wav/flac files
                     %
                     % enter start date and time
                     %
@@ -275,7 +271,7 @@ end;
                 % initialize data format
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 initdata
-                if strcmp(ftstr, '.x.wav') && ~isempty( PARAMS.xhd.byte_length )
+                if PARAMS.ftype == 2 && ~isempty( PARAMS.xhd.byte_length )
                     PARAMS.plot.initbytel = PARAMS.xhd.byte_loc(1);
                 end
                 if isempty( DATA(:,PARAMS.ch) )

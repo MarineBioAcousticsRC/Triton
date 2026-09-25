@@ -88,6 +88,22 @@ elseif ~strcmp(PARAMS.xhd.hSubchunkID,'harp')
 end
 PARAMS.xhd.hSubchunkSize = fread(fid,1,'uint32');        % (Size of Subchunk - 8) includes write subchunk
 PARAMS.xhd.WavVersionNumber = fread(fid,1,'uchar');     % Version number of the "harp" header (0-255)
+% Two writers disagree about how to store this field, and both kinds of file are
+% in the archive. write_XWAVhead.m assigns the number 1, while mk_SpotCheck.m
+% assigns the character '1'; both are written with fwrite(...,'uchar'), which
+% converts a char to its code point, so the quotes are the whole difference. Of
+% 123 x.wav files in ExampleData, 112 carry 49 rather than 1.
+%
+% It has not bitten yet only because versions 0 and 1 share a layout and the
+% checks below ask == 2, which is false either way. It would bite hard on a v2
+% file written the same way: '2' is 50, the checks below would take the v0/v1
+% branch, and every byte_loc in the raw-file table would then be read from the
+% wrong offset -- after only the generic SubchunkSize warning. Normalising here
+% is the fix that protects existing files as well as future ones, since no real
+% header has a version of 48 or above.
+if PARAMS.xhd.WavVersionNumber >= 48 && PARAMS.xhd.WavVersionNumber <= 50
+    PARAMS.xhd.WavVersionNumber = PARAMS.xhd.WavVersionNumber - 48;
+end
 PARAMS.xhd.FirmwareVersionNumber = char(fread(fid,10,'uchar'))';  % HARP Firmware Vesion
 PARAMS.xhd.InstrumentID = char(fread(fid,4,'uchar'))';         % Instrument ID Number (0-255)
 PARAMS.xhd.SiteName = char(fread(fid,4,'uchar'))';             % Site Name, 4 alpha-numeric characters

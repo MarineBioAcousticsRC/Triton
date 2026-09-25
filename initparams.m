@@ -26,6 +26,17 @@ PARAMS.sgfax = 0;       %linear or log freq axis for specgram
 PARAMS.aptime = 0.25;		%  pause time, can set to zero but sometimes to fast
 PARAMS.bright = 0;			% shift in dB
 PARAMS.contrast = 100;		% amplify in % dB
+% Spectrogram colour limits. Empty means "derive from the first frame drawn";
+% plot_specgram fills it in once and then leaves it alone, so levels stay
+% comparable while an analyst scrolls. Cleared when a file is opened from the
+% File menu -- see filepd.m -- and deliberately not cleared when advancing to
+% the next file, which is the case where comparability matters most.
+PARAMS.specgram.clim = [];
+% Same for the LTSA, and for the same reason. The LTSA had been left recomputing
+% its range every frame when the spectrogram was made sticky, so brightness and
+% contrast changes did not survive scrolling -- reported by sfregosi-noaa in
+% PR #131.
+PARAMS.ltsa.clim = [];
 PARAMS.freq0 = 0;			% set frequency PARAMS lower limit
 PARAMS.freq1 = -1;          % set frequency PARAMS upper limit
 PARAMS.nfft = 1000;			% length of fft

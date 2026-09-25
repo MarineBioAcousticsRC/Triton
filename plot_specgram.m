@@ -22,10 +22,10 @@ if savalue && MultiCh_On
   PARAMS.ch = PARAMS.ch -1 ;
 end
 
-% ellipical filter
+% zero-phase FIR bandpass (see display_filter.m)
 if PARAMS.filter
-    [b,a] = ellip(4,0.1,40,[PARAMS.ff1 PARAMS.ff2]*2/PARAMS.fs);
-    DATA(:,PARAMS.ch) = filter(b,a,DATA(:,PARAMS.ch));
+    DATA(:,PARAMS.ch) = display_filter(DATA(:,PARAMS.ch), ...
+        PARAMS.fs, PARAMS.ff1, PARAMS.ff2);
 end
 
 
@@ -124,9 +124,11 @@ elseif PARAMS.sgfax == 1
 %     set(sgAx,'Ylim',[ PARAMS.freq0 PARAMS.freq1 ]);
 end
 
-% draw delimiter line if active and not wav file
+% draw delimiter line if the button is on and this is an x.wav or x.flac.
+% ftype == 2 rather than ~= 1: ftype 3 is a *plain* flac, which has no raw-file
+% structure and therefore no boundaries to delimit (sfregosi-noaa, PR #132).
 % draw delimiter line does NOT work for new log specgram/surf
-if PARAMS.ftype ~=1 && PARAMS.delimit.value && any(PARAMS.raw.delimit_time > 0)
+if PARAMS.ftype == 2 && PARAMS.delimit.value && any(PARAMS.raw.delimit_time > 0)
     for r=1:length(PARAMS.raw.delimit_time)
         y = [min(PARAMS.f),max(PARAMS.f)];
         x = [PARAMS.raw.delimit_time(r), PARAMS.raw.delimit_time(r)];
@@ -136,7 +138,7 @@ end
 
 % shade real recording gaps. The display copy has silence inserted here, so the
 % gap has real width on the axis -- this span is fabricated, not quiet water.
-if PARAMS.ftype ~= 1 && PARAMS.delimit.value && ...
+if PARAMS.ftype == 2 && PARAMS.delimit.value && ...
         isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
     y = [min(PARAMS.f), max(PARAMS.f)];
     for r = 1:size(PARAMS.raw.gap_time,1)
@@ -149,9 +151,39 @@ if PARAMS.ftype ~= 1 && PARAMS.delimit.value && ...
     end
 end
 
-% Make sure color range is fixed.
+% Colour range: derived from the data the first time a spectrogram is drawn
+% after a file is opened, then held.
+%
+% It used to be a fixed caxis([1,65]). Measured spectrogram power on real
+% recordings runs from about -108 dB to +49 dB depending on instrument, gain and
+% sample rate, so on many datasets the whole image fell below 1 dB and rendered
+% as one flat colour -- issue #111, reported as a blank white spectrogram. The
+% brightness and contrast controls could bring it into range, but nothing told
+% the user that.
+%
+% Held rather than recomputed per frame on purpose: a range that moved as the
+% analyst scrolled would make the same sound level look different from one
+% window to the next, which defeats the point of a spectrogram. Brightness and
+% contrast still apply on top, and their effect persists, because they are
+% baked into c above while these limits stay put.
 set(HANDLES.plt.specgram,'CDataMapping','scaled');
-caxis([1,65]);
+if ~isfield(PARAMS,'specgram') || ~isfield(PARAMS.specgram,'clim')
+    PARAMS.specgram.clim = [];
+end
+if isempty(PARAMS.specgram.clim)
+    cLim = c(isfinite(c));
+    if isempty(cLim)
+        PARAMS.specgram.clim = [1 65];      % no finite data; historical range
+    else
+        lo = min(cLim);
+        hi = max(cLim);
+        if hi <= lo                         % flat data; caxis needs lo < hi
+            hi = lo + 1;
+        end
+        PARAMS.specgram.clim = [lo hi];
+    end
+end
+caxis(PARAMS.specgram.clim);
 
 axis xy
 

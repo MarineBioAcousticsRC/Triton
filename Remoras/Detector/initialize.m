@@ -22,6 +22,9 @@ uimenu(REMORA.dt.menu, 'Label', 'STS --> Hi Res Proc Stream',...
 % batch processing stream: STS --> hi res (v2)
 uimenu(REMORA.dt.menu, 'Label', 'STS --> Hi Res Proc Stream V2',...
     'Callback', 'dtpd(''dt_procStreamv2'')');
+% convert detection files to DetEdit files
+uimenu(REMORA.dt.menu, 'Label', 'Convert detection to TPWS files',...
+    'Callback', 'dtpd(''make_TPWS'')');
 
 
 dt_initparams;  

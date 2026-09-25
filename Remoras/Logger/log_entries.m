@@ -41,14 +41,34 @@ row_groups = rows(groups);
 entries = cell(length(rows), length(effort.Headers));
 
 for gidx = 1:size(row_groups, 1)
-    range = effort.Sheet.Range(sprintf(...
-        'A%d:%s%d', row_groups(gidx, 1), lastCol, row_groups(gidx, 2)));
-    entries(groups(gidx,1):groups(gidx,2), :) = range.Value();
+    if ismac
+        effort.Sheet.StartTime = datestr(effort.Sheet.StartTime);
+        effort.Sheet.EndTime = datestr(effort.Sheet.EndTime);
+        effort.Sheet.InputFile = string(effort.Sheet.InputFile);
+        effort.Sheet.EventNumber = string(effort.Sheet.EventNumber);
+        effort.Sheet.SpeciesCode = string(effort.Sheet.SpeciesCode);
+        effort.Sheet.Call = string(effort.Sheet.Call);
+        effort.Sheet.Comments = string(effort.Sheet.Comments);
+        effort.Sheet.Image = string(effort.Sheet.Image);
+        effort.Sheet.Audio = string(effort.Sheet.Audio);
+        
+        entries(groups(gidx,1):groups(gidx,2),:) = table2cell(effort.Sheet(end,:));
+ 
+    else
+        range = effort.Sheet.Range(sprintf(...
+            'A%d:%s%d', row_groups(gidx, 1), lastCol, row_groups(gidx, 2)));
+        entries(groups(gidx,1):groups(gidx,2), :) = range.Value();
+    end
 end
 
 if commonnames
-    namecol = find(~cellfun(@isempty, ...
+    if ismac
+        namecol = find(~cellfun(@isempty, ...
+        strfind(effort.Headers, 'SpeciesCode')));
+    else    
+        namecol = find(~cellfun(@isempty, ...
         strfind(effort.Headers, 'Species Code')));
+    end
     for idx=1:size(entries, 1)
        codeidx = ~cellfun(@isempty, ...
            strfind(TREE.textW(:,2), entries{idx, namecol}));
@@ -60,12 +80,21 @@ end
 
            
 if format
-    UseCols = {
-        'Species Code', '%s'
-        'Call', '%s'
-        'Start time', 'date'
-        'End time', 'date'
-        };
+    if ismac
+        UseCols = {
+            'SpeciesCode', '%s'
+            'Call', '%s'
+            'StartTime', 'date'
+            'EndTime', 'date'
+            };
+    else
+        UseCols = {
+            'Species Code', '%s'
+            'Call', '%s'
+            'Start time', 'date'
+            'End time', 'date'
+            };
+    end
     formatted = cell(size(entries, 1), 1);
     for lidx=1:size(entries, 1)
         str = '';

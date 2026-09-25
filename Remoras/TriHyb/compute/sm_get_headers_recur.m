@@ -126,7 +126,7 @@ for k = 1:PARAMS.nxwav            % loop over all files in directory
 
         PARAMS.ltsahd.dnumStart(m) = datenum([double(PARAMS.ltsahd.year(m)) double(PARAMS.ltsahd.month(m))...
             double(PARAMS.ltsahd.day(m)) double(PARAMS.ltsahd.hour(m)) double(PARAMS.ltsahd.minute(m)) ...
-            double(PARAMS.ltsahd.secs(m))+double((PARAMS.ltsahd.ticks(m)/1000))]);
+            double(PARAMS.ltsahd.secs(m))+double(PARAMS.ltsahd.ticks(m))/1000]);
 
     end
     fclose(fid);

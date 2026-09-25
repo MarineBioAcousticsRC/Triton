@@ -36,9 +36,16 @@ SearchRecursiv = REMORA.pi.settings.recursSearch; % Setting to 1 searches throug
 
 currentPath = mfilename('fullpath');
 templateFilePath = fileparts(currentPath);
-template = fullfile(templateFilePath,'Bocaccio1_template.mat'); % Make sure that this line is correct for the input template folder!
-load(template)
-template=boc1;
+template = fullfile(templateFilePath,settings.templateFile);
+% Load whichever variable the template file holds rather than assuming a
+% name. The shipped Bocaccio templates store 'boc1'; templates prepared
+% elsewhere use other names, and settings.templateFile now selects the file.
+templateVars = load(template);
+templateFields = fieldnames(templateVars);
+if isempty(templateFields)
+    error('Template file %s contains no variables', template);
+end
+template = templateVars.(templateFields{1});
 
 pre_env_temp=hilbert(template.');
 env_temp=sqrt((real(pre_env_temp)).^2+(imag(pre_env_temp)).^2); % Au 1993, S.178, equation 9-4.
@@ -77,10 +84,10 @@ for fidx = 1:size(FileList,1)
     % t = 0:rawDur(1)/(step-1):rawDur(1);
     
     % Bandpass filter y.
-    Fc1 = 100;   % First Cutoff Frequency.
-    Fc2 = 450;  % Second Cutoff Frequency.
+    Fc1 = settings.Fc1;   % First Cutoff Frequency. Originally 200 Hz
+    Fc2 = settings.Fc2;  % Second Cutoff Frequency. Originally 2000 Hz
     
-    N = 10;     % Order.
+    N = 8;     % Order. Changed it from N = 10 because that gave issues with lower frequency bandpass filters (below 2000 Hz).
     [B,A] = butter(N/2, [Fc1 Fc2]/(fs/2));
     
     allSmpPts = [];

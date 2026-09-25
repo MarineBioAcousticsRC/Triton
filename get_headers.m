@@ -15,7 +15,7 @@ PARAMS.ltsa.nxwav = fnsz(1);           % number of xwav files
 PARAMS.ltsahd.fname = char(zeros(PARAMS.ltsa.nxwav,80));         % make empty matrix - filenames need to be 80 char or less
 for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
     
-    if PARAMS.ltsa.ftype == 1       % do the following for wav files
+    if PARAMS.ltsa.ftype == 1 || PARAMS.ltsa.ftype == 3     % do the following for wav or flac files
         m = m + 1;
         % check wav file goodness
 %         mm = [];
@@ -37,7 +37,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
             info = audioinfo(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
         catch ME
             disp(ME.message)
-            dmsg = sprintf('Is %s a real wave file?', ...
+            dmsg = sprintf('Is %s a real wave or flac file?', ...
                 fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
             disp(dmsg);
             PARAMS.ltsa.gen = 0; % need to cancel
@@ -54,7 +54,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         PARAMS.ltsahd.rfileid(m) = 1;                           % raw file id / number in this xwav file
         
         % timing stuff:
-        dnums = wavname2dnum(PARAMS.ltsa.fname(k,:));
+        dnums = wavname2dnum(PARAMS.ltsa.fname(k,:),0); % 0 toggles disp msg off
         if isempty(dnums)
             PARAMS.ltsahd.dnumStart(m) = datenum([0 1 1 0 0 0]);
         else
@@ -72,7 +72,18 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
         PARAMS.ltsahd.ticks(m) = 0;
         
     elseif PARAMS.ltsa.ftype == 2               % do the following for xwavs
-        fid = fopen(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)),'r');
+        % An x.flac is an xwav too: same harp header, stored inside the flac as
+        % preserved RIFF metadata. xwav_hdrfile hands back a file whose bytes
+        % are that header, so every fseek below is unchanged and there is only
+        % one copy of this parsing. For an x.wav it hands back the file itself.
+        try
+            [hdrFile, hdrKeeper] = xwav_hdrfile(fullfile(PARAMS.ltsa.indir,PARAMS.ltsa.fname(k,:)));
+        catch ME
+            disp(ME.message)
+            PARAMS.ltsa.gen = 0; % need to cancel
+            return
+        end
+        fid = fopen(hdrFile,'r');
         
         fseek(fid,22,'bof');
         PARAMS.ltsa.nch = fread(fid,1,'uint16');         % Number of Channels
@@ -118,6 +129,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all xwavs
             
         end
         fclose(fid);
+        clear hdrKeeper                 % deletes the temporary header, if any
     end
     
 end

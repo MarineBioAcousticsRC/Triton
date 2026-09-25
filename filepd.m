@@ -11,6 +11,9 @@ function filepd(action)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS HANDLES DATA
 if strcmp(action,'openltsa')
+    if ~isfield(PARAMS.ltsa,'inpath')
+        initparams
+    end
     ipnamesave = PARAMS.ltsa.inpath;
     ifnamesave = PARAMS.ltsa.infile;
     % user interface retrieve file to open through a dialog box
@@ -39,6 +42,7 @@ if strcmp(action,'openltsa')
     set(HANDLES.display.ltsa,'Visible','on')
     set(HANDLES.display.ltsa,'Value',1);
     set(HANDLES.ltsa.delimit.but,'Visible','on')
+    PARAMS.ltsa.clim = [];   % new file: re-derive the colour range
     control_ltsa('button')
     set([HANDLES.ltsa.motion.seekbof HANDLES.ltsa.motion.back HANDLES.ltsa.motion.autoback HANDLES.ltsa.motion.stop],...
         'Enable','off');
@@ -79,7 +83,53 @@ elseif strcmp(action,'openwav')
         cd(PARAMS.inpath)
     end
     set(HANDLES.fig.ctrl, 'Pointer', 'watch');
-    PARAMS.ftype = 1;
+    PARAMS.specgram.clim = [];   % new file: re-derive the colour range
+    % The open dialog has offered flac since 2022, but ftype was hardcoded to
+    % 1, so a flac file was read as a RIFF wav and failed. Pick the type from
+    % the extension. Both are read through audioread, which handles flac.
+    [~,~,fext] = fileparts(PARAMS.infile);
+    if strcmpi(fext,'.flac')
+        % *.flac in this dialog also matches *.x.flac, which is an xwav and
+        % must not be read as a plain flac: doing so would ignore the harp
+        % header and take the recording time from the file name instead, which
+        % is wrong by however much the deployment clock drifted, silently.
+        % Decide from the header rather than the name, since a file can be an
+        % xwav without being named .x.flac.
+        if ck_xflac_isxwav(fullfile(PARAMS.inpath,PARAMS.infile))
+            disp_msg('This flac carries a harp header - opening it as an XWAV')
+            PARAMS.ftype = 2;   % compressed xwav
+        else
+            PARAMS.ftype = 3;   % plain flac
+        end
+    else
+        PARAMS.ftype = 1;   % wav
+    end
+    if PARAMS.ftype == 2
+        initdata
+        if ~isempty(PARAMS.xhd.byte_length)
+            PARAMS.plot.initbytel = PARAMS.xhd.byte_loc(1);
+        end
+        if isempty(DATA)
+            set(HANDLES.display.timeseries,'Value',1);
+        end
+        readseg
+        plot_triton
+        control('timeon')
+        control('menuon')
+        control('button')
+        set([HANDLES.motion.seekbof HANDLES.motion.back HANDLES.motion.autoback ...
+            HANDLES.motion.stop],'Enable','off');
+        set(HANDLES.fig.ctrl, 'Pointer', 'arrow');
+        set(HANDLES.motioncontrols,'Visible','on')
+        set(HANDLES.delimit.but,'Visible','on')
+        if PARAMS.nch > 1
+            set(HANDLES.mc.on,'Visible','on');
+        elseif PARAMS.nch == 1
+            set(HANDLES.multi,'Visible','off');
+        end
+        init_tslider(0)
+        return
+    end
     % enter start date and time
     prompt={'Enter Start Date and Time'};
     dnums = wavname2dnum(PARAMS.infile);
@@ -125,7 +175,11 @@ elseif strcmp(action,'openwav')
 elseif strcmp(action,'openxwav')
     % user interface retrieve file to open through a dialog box
     boxTitle1 = 'Open XWAV File';
-    filterSpec1 = '*.x.wav';
+    % .x.flac is an xwav too, just compressed, so it is offered here rather
+    % than under the wav/flac dialog, which is for plain flacs with no header.
+    filterSpec1 = {'*.x.wav;*.x.flac', 'XWAV files (*.x.wav, *.x.flac)'; ...
+                   '*.x.wav',         'XWAV (*.x.wav)'; ...
+                   '*.x.flac',        'Compressed XWAV (*.x.flac)'};
     [ infile, inpath ]=uigetfile( filterSpec1, boxTitle1 );
     % if the cancel button is pushed, then no file is loaded so exit this script
     if strcmp( num2str( infile ), '0' )
@@ -140,6 +194,7 @@ elseif strcmp(action,'openxwav')
     end
     % calculate the number of blocks in the opened file
     set(HANDLES.fig.ctrl, 'Pointer', 'watch');
+    PARAMS.specgram.clim = [];   % new file: re-derive the colour range
     PARAMS.ftype = 2;
     initdata
     if ~isempty(PARAMS.xhd.byte_length)

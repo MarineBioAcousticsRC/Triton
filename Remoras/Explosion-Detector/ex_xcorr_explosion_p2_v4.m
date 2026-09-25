@@ -106,7 +106,12 @@ for fidx = 1:size(FileList,1)
             continue
         end
         
-        y = audioread(filepath,[rStart rStop]);
+        %Making sure audioread doesn't crash because of scientific notation
+        rStart2 = uint64(rStart);
+        rStop2 = uint64(rStop);
+        rStart3 = double(rStart2);
+        rStop3 = double(rStop2);
+        y = audioread(filepath,[rStart3 rStop3]);
         % Filter between 200 and 2000 Hz.
         yFilt = filtfilt(B,A,y); % Filter click.
         fprintf('max = %0.3f\n',max(yFilt))

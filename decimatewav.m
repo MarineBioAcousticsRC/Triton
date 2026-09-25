@@ -6,9 +6,12 @@ function decimatewav(wavType)
 % Decimate a wav, flac, or xwav file.
 %
 % Parameters:
-%       wavType - a string that is either 'wav' or 'xwav' depending on the
-%                       type of file you are decimating.
-%               - works with flac files, treated similar to 'wav' 
+%       wavType - 'wav' for plain recordings, 'x.wav' for XWAVs.
+%               - a plain flac is handled like a wav: no header, so nothing to
+%                 preserve but the samples.
+%               - an .x.flac is handled like an .x.wav, because that is what it
+%                 is. Its harp header is read, a new one written for the
+%                 decimated rate, and the output saved as .x.wav.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS
@@ -18,8 +21,8 @@ if strcmp(wavType, 'wav')
     filterSpec1 = ['*.wav;*.flac'];
     boxTitle1 = ['Open wav or flac file to Decimate'];
 else
-    filterSpec1 = ['*.',wavType];
-    boxTitle1 = ['Open ', wavType, ' file to Decimate'];
+    filterSpec1 = {'*.x.wav;*.x.flac', 'XWAV files (*.x.wav, *.x.flac)'};
+    boxTitle1 = 'Open XWAV file to Decimate';
 end
 % user interface retrieve file to open through a dialog box
 %[PARAMS.infile,PARAMS.inpath]=uigetfile(filterSpec1,boxTitle1);
@@ -38,8 +41,17 @@ else
     [~,~,ext] = fileparts(PARAMS.infile);
 end
 
-if strcmp(ext,'.flac')
-    wavType = 'flac'; % update wavType if flac file. 
+if strcmpi(ext,'.flac')
+    % A flac is only a plain flac if it has no harp header. One that has a
+    % header is a compressed XWAV, and decimating it as a plain flac would
+    % write an output with no raw-file directory and no recording times -- a
+    % permanent, silent loss. Decide from the file, not from its name.
+    if ck_xflac_isxwav([PARAMS.inpath PARAMS.infile])
+        disp_msg('This flac carries a harp header - decimating it as an XWAV')
+        wavType = 'x.wav';
+    else
+        wavType = 'flac';
+    end
 end
 
 if strcmp(wavType,'wav')
@@ -56,8 +68,16 @@ elseif strcmp(wavType, 'flac')
     PARAMS.fs = info.SampleRate;          % Sampling Rate(samples/second)
     
 else
-    PARAMS.ftype = 2;   % file is xwav
-    rdxwavhd        % get datafile info
+    PARAMS.ftype = 2;   % file is xwav, in either container
+    if strcmpi(ext,'.flac')
+        rdxflachd   % same header, read out of the flac's preserved metadata
+    else
+        rdxwavhd    % get datafile info
+    end
+    if ~isfield(PARAMS,'xhd') || isempty(PARAMS.xhd.byte_length)
+        disp_msg('Could not read the XWAV header - nothing decimated')
+        return
+    end
 end
 % get user input decimation factor
 PARAMS.df = 100; % initial decimation factor
@@ -86,18 +106,19 @@ end
 disp_msg(['Orginal Sample Rate: ',num2str(PARAMS.fs)])
 disp_msg(['Decimation Factor: ',num2str(PARAMS.df)])
 
-if strcmp(wavType,'wav')
-    extension_size = 4;
-elseif strcmp(wavType,'flac')
-    extension_size = 5;
-elseif strcmp(wavType, 'xwav')
-    extension_size = 6;
-end
+% Strip whichever extension the input has. This used to count characters from
+% a chain that tested for 'xwav' while every caller passes 'x.wav', so the
+% count was never set for XWAVs and naming the output failed with an
+% undefined-variable error -- Decimate Single XWAV File has been broken since
+% 2021. Matching the extension directly cannot drift like that.
+outbase = regexprep(PARAMS.infile, '\.(x\.wav|x\.flac|wav|flac)$', '', 'ignorecase');
+% A decimated XWAV is written uncompressed; compress it afterwards with
+% xwav2flac if you want it back as .x.flac.
+outext = wavType;
 
 % open new decimated output file
 % base name on input file
-PARAMS.outfile = [PARAMS.infile(1:length(PARAMS.infile)-extension_size),'.d',...
-    num2str(PARAMS.df),'.' wavType];
+PARAMS.outfile = [outbase,'.d',num2str(PARAMS.df),'.',outext];
 % PARAMS.outfile = strcat(PARAMS.infile(1:length(PARAMS.infile)-6),'.d',...
 %                                            num2str(PARAMS.df),'.',wavType);
 PARAMS.outpath = PARAMS.inpath;
@@ -231,9 +252,9 @@ switch wavType % maybe change this in the future to one for loop with one switch
             % jump over header and the number of decimations done so far...
             %             fseek(fid,PARAMS.xhd.byte_loc(1) +...
             %                 (di-1)*nsamp*PARAMS.nch*PARAMS.samp.byte,'bof');
-            fseek(fid,PARAMS.xhd.byte_loc(di),'bof');
-            % read the data
-            data = fread(fid,[PARAMS.nch,nsamp],'int16');
+            % xwav_read fetches from either container; for an .x.flac it
+            % turns this byte offset into a sample index.
+            data = xwav_read(PARAMS.xhd.byte_loc(di), nsamp)';
             %decimate and write
             if PARAMS.nch == 1
                 fwrite(fod,decimate(data,PARAMS.df),'int16');
