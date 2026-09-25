@@ -59,36 +59,78 @@ would lose the recording times.
 
 ---
 
-## Converting an existing archive
+## Converting a folder, either direction
 
-Always start with a dry run. It writes nothing and tells you what it would do:
+**Tools → Compress/Expand Audio Folders** does this from the menu: pick a source
+folder, pick a destination, and Triton shows you what it found and how much
+space it needs before anything is written.
 
-```matlab
-xwavdir2flac('E:\HARP\SiteA')
-```
-
-Then convert, keeping the originals:
+From the command line, the same thing:
 
 ```matlab
-xwavdir2flac('E:\HARP\SiteA', 'go', true)
+audiodir2flac('E:\HARP\SiteA', 'F:\ToPartner')              % dry run
+audiodir2flac('E:\HARP\SiteA', 'F:\ToPartner', 'go', true)  % convert
 ```
 
-Once you have spot-checked the results, convert and reclaim the space:
+and the reverse:
 
 ```matlab
-xwavdir2flac('E:\HARP\SiteA', 'go', true, 'keepXwav', false)
+flacdir2audio('F:\FromPartner', 'E:\HARP\SiteA', 'go', true)
 ```
 
-Nothing is deleted unless `'go'` is true **and** `'keepXwav'` is false. Every
-file is verified before its original is removed (see *Verification* below). A
-run that stops part-way leaves the converted files in place and the rest
-untouched; run it again and it picks up where it left off.
+A bare call is always a **dry run** — it writes nothing and reports what it
+would do. Both walk subfolders and reproduce the source layout at the
+destination, so a deployment folder with one subfolder per disk arrives looking
+the same. Source files are never deleted.
 
-Single file:
+`.wav` becomes `.flac`, `.x.wav` becomes `.x.flac`, and back again. Which one a
+file is gets read from the file itself, so an x.wav that was renamed to a plain
+`.wav` still comes out as `.x.flac` rather than quietly losing its header.
+
+Single files:
 
 ```matlab
-xwav2flac('E:\HARP\SiteA\file.x.wav', 'keepXwav', false)
+audio2flac('E:\HARP\SiteA\file.x.wav')
+flac2audio('E:\HARP\SiteA\file.x.flac')
 ```
+
+### Running out of room
+
+This is the failure the folder tools are built around, because it has bitten: a
+drive filling mid-transfer used to leave empty or truncated flac files that
+looked perfectly healthy.
+
+Before starting, the tool works out how much space the whole job needs and
+refuses if the destination cannot take it. **Expanding, that figure is exact** —
+every flac records the size of the file it came from, so there is no guessing
+involved. Compressing, it budgets the full input size, which the output never
+reaches.
+
+During the run every file is checked again, and each one is written under a
+temporary name and renamed into place only once it has been verified. A drive
+that fills therefore leaves an obviously-named orphan, never something that
+passes for a finished recording.
+
+If the destination does run short, the run **stops** rather than carrying on and
+failing on everything after it. Free some space and run it again: finished files
+are kept and re-checked, so it continues from where it stopped.
+
+Every run writes a CSV log to the destination listing every file and what
+happened to it. Its path is printed when the run *starts*, not when it ends, so
+an interrupted run still leaves a record.
+
+### Reclaiming space in place
+
+To convert an archive where it sits and remove the originals as you go:
+
+```matlab
+audio2flac('E:\HARP\SiteA\file.x.wav', 'keepInput', false)
+audiodir2flac('E:\HARP\SiteA', 'E:\HARP\SiteA', 'go', true)   % same folder
+```
+
+Nothing is deleted until the conversion has been verified. The older
+`xwavdir2flac` still works and does the same thing, but note it lives in
+`Extras/`, which is not on the MATLAB path on a normal install.
 
 ---
 
@@ -190,10 +232,13 @@ recorder's clock drifted, with nothing on screen to show it.
 |---|---|
 | `tests/triton_flac_parity.m` | Does the header still mean the same thing, and does the same time window give the same samples from both containers? |
 | `tests/triton_flac_ltsa_parity.m` | Is an LTSA generated from `.x.flac` identical to one generated from the `.x.wav`? |
+| `tests/triton_convert_dir.m` | Does a whole folder tree survive compression and expansion unchanged, and do the guards fire before anything is written? |
 | `Extras/ck_xflac_metadata.m` | Did any file in this folder lose its `harp` header? |
 
-Both parity tests need the flac tool. The LTSA test drives generation through
-`tests/triton_ltsa_baseline`, the same code the regression harness uses.
+All three need the flac tool. `triton_convert_dir` builds its own tree from the
+committed fixtures, so it runs on a fresh clone with no ExampleData; among other
+things it truncates a converted file and checks that a re-run notices and redoes
+it rather than skipping over it.
 
 ---
 

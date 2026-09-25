@@ -1,4 +1,4 @@
-function [exe, why] = flac_exe(preferred)
+function [exe, why, ver] = flac_exe(preferred)
 %FLAC_EXE  Locate the flac command-line tool.
 %
 %   exe = flac_exe()
@@ -20,8 +20,8 @@ function [exe, why] = flac_exe(preferred)
 %
 % See also XWAV2FLAC, RDXFLACHD.
 
-persistent cached
-exe = ''; why = '';
+persistent cached cachedVer
+exe = ''; why = ''; ver = '';
 
 candidates = {};
 if nargin >= 1 && ~isempty(preferred); candidates{end+1} = preferred; end
@@ -31,10 +31,14 @@ envPath = getenv('TRITON_FLAC');
 if ~isempty(envPath); candidates{end+1} = envPath; end
 
 for k = 1:numel(candidates)
-    if exist(candidates{k},'file')
-        exe = candidates{k};
-        cached = exe;
-        return
+    % isfile, not exist(...,'file'): exist returns 7 for a DIRECTORY, so a
+    % folder that happens to be called flac would be accepted as the program.
+    if isfile(candidates{k})
+        [ok, v] = local_version(candidates{k});
+        if ok
+            exe = candidates{k}; ver = v; cached = exe; cachedVer = v;
+            return
+        end
     end
 end
 
@@ -47,8 +51,9 @@ end
 if st == 0
     lines = strsplit(strtrim(out), newline);
     first = strtrim(lines{1});
-    if ~isempty(first) && exist(first,'file')
-        exe = first; cached = exe; return
+    if ~isempty(first) && isfile(first)
+        [ok, v] = local_version(first);
+        if ok; exe = first; ver = v; cached = exe; cachedVer = v; return; end
     end
 end
 
@@ -61,12 +66,32 @@ else
     guesses = { '/usr/bin/flac', '/usr/local/bin/flac', '/opt/homebrew/bin/flac' };
 end
 for k = 1:numel(guesses)
-    if exist(guesses{k},'file')
-        exe = guesses{k}; cached = exe; return
+    if isfile(guesses{k})
+        [ok, v] = local_version(guesses{k});
+        if ok; exe = guesses{k}; ver = v; cached = exe; cachedVer = v; return; end
     end
 end
 
-why = ['The flac command-line tool was not found. Install it from ' ...
-       'https://xiph.org/flac/ and either put it on the PATH or set the ' ...
-       'TRITON_FLAC environment variable to its full path.'];
+why = ['No usable flac command-line tool was found (version 1.4.0 or newer ' ...
+       'is required). Install it from https://xiph.org/flac/ and either put ' ...
+       'it on the PATH or set the TRITON_FLAC environment variable to its ' ...
+       'full path.'];
+end
+
+
+function [ok, ver] = local_version(exe)
+%LOCAL_VERSION  Ask the program its version, and whether it is new enough.
+%
+% 1.4.0 is the floor. Before it, --keep-foreign-metadata behaved differently
+% and --keep-foreign-metadata-if-present did not exist at all, so an older
+% binary fails on every file with a message about an unrecognised option --
+% which looks like a data problem and is not.
+ok = false; ver = '';
+[st, out] = system(['"' exe '" --version']);
+if st ~= 0; return; end
+t = regexp(strtrim(out), '(\d+)\.(\d+)(?:\.(\d+))?', 'tokens', 'once');
+if isempty(t); return; end
+ver = strtrim(out);
+major = str2double(t{1}); minor = str2double(t{2});
+ok = (major > 1) || (major == 1 && minor >= 4);
 end

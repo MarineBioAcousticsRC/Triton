@@ -147,13 +147,14 @@ no example data present. Pass `'fixtures',false` to skip them.
 
 ## Compressed XWAVs
 
-Two tests answer the two questions that matter about `.x.flac`. Both need the
-[flac](https://xiph.org/flac/) command-line tool. Neither is part of the baseline sweep -- they
-convert data and compare against themselves, so they pass or fail on their own.
+Three tests answer the questions that matter about `.x.flac`. All need the
+[flac](https://xiph.org/flac/) command-line tool. None is part of the baseline sweep -- they convert
+data and compare against themselves, so they pass or fail on their own.
 
 ```matlab
 triton_flac_parity('ExampleData/200kHz_xwavs/SOCAL_E_63_EN_180315_234230.x.wav')
 triton_flac_ltsa_parity('ExampleData/4Channel_100kHz_xwavs_and_LTSA')
+triton_convert_dir                       % builds its own data, no arguments
 ```
 
 **`triton_flac_parity`** -- *can Triton read it?* Converts one x.wav, then checks that every header
@@ -176,6 +177,19 @@ bytes of spectra identical.
 The stored *header* bytes differ between the two LTSAs, and should: they carry the input file names,
 and `x.flac` is a byte longer than `x.wav`. Everything the header is computed from is compared field
 by field instead.
+
+**`triton_convert_dir`** -- *does a whole folder tree survive the trip?* The one that needs no
+ExampleData: it builds a nested tree from the committed fixtures -- plain wavs in one subfolder,
+x.wavs in another, plus an xwav deliberately misnamed `.wav` -- compresses it to a second location,
+expands that back to a third, and requires every file byte-identical with the layout reproduced.
+
+It also pins the behaviours that are invisible when they break: the space guard refusing before
+anything is written, in-place conversion still working and a second pass converting nothing new,
+and -- the one worth knowing about -- that a **truncated output is redone rather than skipped**.
+A flac keeps its metadata at the start of the file, so one cut in half still has a perfect header
+and passes a header comparison; `xwav_convert` therefore also reads the last few samples back,
+which a truncated file cannot produce. That matters because a resumed run skips files that already
+exist, and after a drive fills those are precisely the corrupt ones. 16 checks.
 
 **The baseline sweep covers x.flac too.** `local_dirs_with` now recognises an `xflac` kind
 (`*.x.flac`, file type 2) alongside `xwav`, `wav` and `flac`. `*.flac` still deliberately matches

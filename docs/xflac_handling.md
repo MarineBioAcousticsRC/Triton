@@ -306,8 +306,14 @@ holds, and warns on a mismatch.
 | `xwav_read.m` | byte offset in, samples out; the conversion lives here |
 | `rdxflachd.m` | reads an `.x.flac` header into the same `PARAMS` an `.x.wav` gives |
 | `xflac_riff_chunks.m` | pulls the preserved RIFF chunks out of a flac |
-| `xwav2flac.m` | convert one file, with verification |
-| `Extras/xwavdir2flac.m` | convert a folder |
+| `audio2flac.m` / `flac2audio.m` | convert one file, either direction |
+| `audiodir2flac.m` / `flacdir2audio.m` | convert a folder tree, mirroring its structure |
+| `xwav_convert.m` | the one file-level worker: guard, temp file, verification |
+| `xwav_convert_plan.m` | works the whole job out before any of it is done |
+| `xwav_convert_dir.m` | executes a plan, with logging and progress |
+| `audio_file_kind.m` | what a file is, and how big it would decode to |
+| `disk_free.m` | space and limits of the destination volume |
+| `xwav2flac.m` | the older single-file name, kept working |
 | `Extras/ck_xflac_metadata.m` | audit a folder for lost headers |
 
 And the tests that hold it honest:
