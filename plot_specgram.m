@@ -28,13 +28,26 @@ if PARAMS.filter
         PARAMS.fs, PARAMS.ff1, PARAMS.ff2);
 end
 
-if PARAMS.nfft <= length(DATA)
+
+% ---- display-only gap padding ----------------------------------------------
+% readseg returns DATA spliced across real recording gaps: the samples either
+% side of a gap are adjacent, so plotted seconds and real elapsed seconds drift
+% apart by the gap length at every gap, and anything positioned by calendar
+% time (bounding boxes, delimiters, a pick read back through coorddisp) lands
+% in the wrong place. Pad a LOCAL copy so the picture's time axis is honest.
+% The global DATA is untouched -- no detector, Remora or LTSA sees these zeros.
+sgDATA = DATA;
+if PARAMS.ftype ~= 1 && isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
+    sgDATA = gap_pad_display(DATA, PARAMS.raw.gap_time, PARAMS.fs, PARAMS.tseg.samp);
+end
+
+if PARAMS.nfft <= length(sgDATA)
   % make spectrogram
-  mkspecgram
-elseif ~isempty(DATA(:,PARAMS.ch))
+  mkspecgram(sgDATA(:,PARAMS.ch))
+elseif ~isempty(sgDATA(:,PARAMS.ch))
     disp_msg('DATA Length less than FFT Length')
     disp_msg('Setting plot to DATA Length')
-    PARAMS.nfft = length(DATA(:,PARAMS.ch));
+    PARAMS.nfft = length(sgDATA(:,PARAMS.ch));
     set(HANDLES.specnfft.edtxt,'String', num2str(PARAMS.nfft))
     plot_triton
 else
@@ -115,11 +128,26 @@ end
 % ftype == 2 rather than ~= 1: ftype 3 is a *plain* flac, which has no raw-file
 % structure and therefore no boundaries to delimit (sfregosi-noaa, PR #132).
 % draw delimiter line does NOT work for new log specgram/surf
-if PARAMS.ftype == 2 && PARAMS.delimit.value && length(PARAMS.raw.delimit_time) ~= 1
+if PARAMS.ftype == 2 && PARAMS.delimit.value && any(PARAMS.raw.delimit_time > 0)
     for r=1:length(PARAMS.raw.delimit_time)
         y = [min(PARAMS.f),max(PARAMS.f)];
         x = [PARAMS.raw.delimit_time(r), PARAMS.raw.delimit_time(r)];
         HANDLES.delimit.sgline(r) = line(x,y,'Color','r','LineStyle','--','LineWidth',4);
+    end
+end
+
+% shade real recording gaps. The display copy has silence inserted here, so the
+% gap has real width on the axis -- this span is fabricated, not quiet water.
+if PARAMS.ftype == 2 && PARAMS.delimit.value && ...
+        isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
+    y = [min(PARAMS.f), max(PARAMS.f)];
+    for r = 1:size(PARAMS.raw.gap_time,1)
+        x0 = PARAMS.raw.gap_time(r,1);
+        x1 = x0 + PARAMS.raw.gap_time(r,2);
+        HANDLES.delimit.sggap(r) = patch('XData', [x0 x1 x1 x0], ...
+            'YData', [y(1) y(1) y(2) y(2)], 'FaceColor', [1 0.55 0], ...
+            'FaceAlpha', 0.25, 'EdgeColor', [1 0.55 0], 'LineStyle', ':', ...
+            'LineWidth', 1.5);
     end
 end
 
