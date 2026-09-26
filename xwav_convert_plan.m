@@ -93,6 +93,27 @@ if any(isTmp)
     listing = listing(~isTmp);
 end
 
+% Narrow to plausible candidates by extension BEFORE opening anything.
+%
+% Deciding what a file is still comes from its contents -- that is what catches
+% an xwav someone renamed to a plain .wav. But the source here is often a whole
+% drive, and a deployment drive also carries talks, videos, spreadsheets and
+% processing output. Opening every one of those to read four magic bytes turns
+% a scan into a wait, and on a removable drive it is the opens that dominate.
+%
+% The cost of the shortcut is that an audio file with neither a .wav nor a
+% .flac extension is not noticed. That is a fair trade: such a file would not
+% be found by any other Triton tool either, and it cannot be converted without
+% guessing what the user meant it to be called.
+nBefore = numel(listing);
+keep = false(1, nBefore);
+for k = 1:nBefore
+    [~,~,e] = fileparts(listing(k).name);
+    keep(k) = any(strcmpi(e, {'.wav','.flac'}));
+end
+nSkippedByName = nBefore - sum(keep);
+listing = listing(keep);
+
 nOther = 0;
 dsts = {};
 for k = 1:numel(listing)
@@ -167,7 +188,9 @@ end
 ready = strcmp({plan.files.status},'ready');
 plan.totals.nReady   = sum(ready);
 plan.totals.nProblem = sum(~ready);
-plan.totals.nOther   = nOther;
+% Everything not converted: the files whose name ruled them out without being
+% opened, plus the ones that were opened and turned out not to be for this job.
+plan.totals.nOther   = nOther + nSkippedByName;
 plan.totals.bytesIn  = sum([plan.files(ready).bytesIn]);
 pr = [plan.files(ready).predictedOut];
 plan.totals.predictedOut = sum(pr(~isnan(pr)));

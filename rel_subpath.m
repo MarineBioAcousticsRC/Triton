@@ -42,17 +42,33 @@ if local_same(root, child)
     return                          % child IS root: nothing below it
 end
 
-% Compare the child's leading characters against the root, then insist the next
-% character is a separator. Without that check 'E:\Site1' would look like a
+% Compare the child's leading characters against the root, then insist there is
+% a separator between the two. Without that check 'E:\Site1' would look like a
 % parent of 'E:\Site10'.
+%
+% Where that separator lives depends on the root. Most roots do not end in one,
+% so it is the character straight after them. A DRIVE ROOT already ends in one
+% -- 'E:\' -- and so does the POSIX root '/', and for those the separator is the
+% last character of the root itself rather than the first character beyond it.
+%
+% Getting this wrong is not subtle in its effect: pointing the folder tools at a
+% whole drive made every single file fail as "not inside E:\", so a deployment
+% spread over a dozen card folders looked like nothing to convert at all.
 n = numel(root);
-if numel(child) <= n || ~local_same(child(1:n), root) ...
-        || ~any(child(n+1) == '\/')
-    error('rel_subpath:notUnder', ...
-        '%s is not inside %s', child, root);
-end
+rootEndsSep = any(root(end) == '\/');
 
-rel = child(n+2:end);
+if rootEndsSep
+    if numel(child) <= n || ~local_same(child(1:n), root)
+        error('rel_subpath:notUnder','%s is not inside %s', child, root);
+    end
+    rel = child(n+1:end);
+else
+    if numel(child) <= n || ~local_same(child(1:n), root) ...
+            || ~any(child(n+1) == '\/')
+        error('rel_subpath:notUnder','%s is not inside %s', child, root);
+    end
+    rel = child(n+2:end);
+end
 end
 
 

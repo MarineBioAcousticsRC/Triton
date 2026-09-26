@@ -137,7 +137,61 @@ report = local_check(report, 'truncated output redone on resume', ...
     dn.bytes == d.bytes && r5.converted >= 1, ...
     sprintf('%d -> %d bytes, %d reconverted', floor(d.bytes/2), dn.bytes, r5.converted));
 
-%% ---- 7. nothing left behind
+%% ---- 7. a whole drive as the source
+% A deployment is usually one drive holding a dozen folders, one per SD card in
+% the instrument, and the drive root is what gets picked. A drive root ends in
+% a separator -- 'E:\' -- where an ordinary folder does not, and getting that
+% wrong made every file fail as "not inside E:\", so a deployment spread over
+% twelve folders looked like nothing to convert at all.
+roots = {'E:\', 'E:', 'E:\Site', 'E:\Site\'};
+kids  = {'E:\disk01', 'E:\disk01', 'E:\Site\disk01', 'E:\Site\disk01'};
+wants = {'disk01', 'disk01', 'disk01', 'disk01'};
+okRoot = true;
+for k = 1:numel(roots)
+    try
+        got = rel_subpath(roots{k}, kids{k});
+    catch
+        got = '<error>';
+    end
+    if ~strcmp(got, wants{k})
+        okRoot = false;
+        fprintf('    rel_subpath(''%s'',''%s'') gave ''%s'', wanted ''%s''\n', ...
+            roots{k}, kids{k}, got, wants{k});
+    end
+end
+report = local_check(report, 'drive root accepted as a source', okRoot, ...
+    sprintf('%d forms', numel(roots)));
+
+% and it must still refuse a path that only shares a prefix
+refused = false;
+try
+    rel_subpath('E:\Site1','E:\Site10\x');
+catch
+    refused = true;
+end
+report = local_check(report, 'prefix-only paths still refused', refused, ...
+    'E:\Site1 vs E:\Site10');
+
+% the real thing: a deployment-shaped tree of twelve card folders
+deploy = fullfile(work,'deployment');
+nCards = 12;
+for c = 1:nCards
+    cd_ = fullfile(deploy, sprintf('disk%02d', c));
+    mkdir(cd_);
+    copyfile(fullfile(fx,'pad_xwav','SYNTH_PADX_260101_000000.x.wav'), ...
+        fullfile(cd_, sprintf('card%02d.x.wav', c)));
+end
+rDep = xwav_convert_dir(deploy, fullfile(work,'deploy_out'), ...
+    'direction','compress', 'go',true, 'flac',opt.flac);
+nOut = numel(dir(fullfile(work,'deploy_out','**','*.x.flac')));
+report = local_check(report, 'twelve card folders all converted', ...
+    rDep.converted == nCards && nOut == nCards, ...
+    sprintf('%d converted, %d files out', rDep.converted, nOut));
+report = local_check(report, 'each card folder reproduced', ...
+    exist(fullfile(work,'deploy_out','disk01'),'dir') > 0 && ...
+    exist(fullfile(work,'deploy_out','disk12'),'dir') > 0, '');
+
+%% ---- 8. nothing left behind
 report = local_check(report, 'no __triton_tmp__ left', ...
     isempty(dir(fullfile(work,'**','__triton_tmp__*'))), '');
 
