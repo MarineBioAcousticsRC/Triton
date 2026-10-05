@@ -37,7 +37,7 @@ end
 % in the wrong place. Pad a LOCAL copy so the picture's time axis is honest.
 % The global DATA is untouched -- no detector, Remora or LTSA sees these zeros.
 sgDATA = DATA;
-if PARAMS.ftype ~= 1 && isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
+if PARAMS.ftype == 2 && isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
     sgDATA = gap_pad_display(DATA, PARAMS.raw.gap_time, PARAMS.fs, PARAMS.tseg.samp);
 end
 

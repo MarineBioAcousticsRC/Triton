@@ -132,7 +132,10 @@ Recorded so they are not relitigated.
 **`readseg` splices across recording gaps and always will.** It is the read path for every Remora,
 so changing what `DATA` contains would silently alter detector and soundscape results. Gap
 information travels separately, through a `PARAMS.raw` field the plotting code reads — the same way
-`PARAMS.raw.delimit_time` already carries raw-file boundaries. This is the open question on PR #128.
+`PARAMS.raw.delimit_time` already carries raw-file boundaries. Since PR #128, `readseg` reports gaps
+in `PARAMS.raw.gap_time` (one row per gap: `[position_sec, length_sec]`, cleared on every read), and
+`plot_specgram`/`plot_timeseries` pass a *local copy* through `gap_pad_display`, which inserts
+silence so the display's time axis is real elapsed time. Only that copy is padded; `DATA` is not.
 
 **flac is file type 3. A *compressed xwav* is file type 2.** `PARAMS.ftype` is 1 for wav, 2 for
 xwav, 3 for flac. Types 1 and 3 are read through `audioread`, which handles flac natively, so most

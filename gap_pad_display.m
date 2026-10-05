@@ -56,6 +56,12 @@ for r = 1:size(gap_time,1)
     idx  = round(gap_time(r,1) * fs);
     idx  = max(0, min(idx, size(D,1)));
     nPad = round(gap_time(r,2) * fs);
+    % Insert only as much of the gap as can still be seen. A duty-cycle off
+    % period can be hours long: at 200 kHz a 2-hour gap is 1.4e9 samples, an
+    % 11.5 GB array built on every redraw only to be trimmed away below.
+    if nargin > 3 && ~isempty(nWant)
+        nPad = min(nPad, max(0, nWant - idx));
+    end
 
     if nPad <= 0
         continue

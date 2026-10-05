@@ -34,7 +34,7 @@ end
 % recording gaps, so the plotted axis is short by the gap length after each one.
 % Pad a LOCAL copy for the picture; the global DATA is left as readseg gave it.
 tsDATA = DATA;
-if PARAMS.ftype ~= 1 && isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
+if PARAMS.ftype == 2 && isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
     tsDATA = gap_pad_display(DATA, PARAMS.raw.gap_time, PARAMS.fs, PARAMS.tseg.samp);
 end
 
@@ -68,7 +68,7 @@ if PARAMS.ftype == 2 && PARAMS.delimit.value && any(PARAMS.raw.delimit_time > 0)
 end
 
 % shade real recording gaps -- inserted silence, not quiet water
-if PARAMS.ftype ~= 1 && PARAMS.delimit.value && ...
+if PARAMS.ftype == 2 && PARAMS.delimit.value && ...
         isfield(PARAMS.raw,'gap_time') && ~isempty(PARAMS.raw.gap_time)
     y = [v(3), v(4)];
     for r = 1:size(PARAMS.raw.gap_time,1)

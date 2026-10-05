@@ -12,6 +12,10 @@ check_time      % check to see if ok plot start time (PARAMS.plot.dvec or
                 % PARAMS.plot.dnum)
 
 DATA = [];  % clear DATA vector
+% Cleared on every read, not only in the xwav branch that sets it: a plain wav
+% or flac has no raw files and so no gaps, and a value left over from the last
+% xwav opened would otherwise pad and shade this file's display.
+PARAMS.raw.gap_time = [];
 
 fullfname = fullfile(PARAMS.inpath,PARAMS.infile);
 
