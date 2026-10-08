@@ -208,26 +208,14 @@ return;
     % PARAMS.raw.delimit_time is the amount of time from plot origin to next
     % rawfile.  If one delimiter is shown, there will be two times in
     % variable, and so on
-    ndelim = length(PARAMS.raw.delimit_time) - 1;  % number of delimiters displayed
-    if ndelim == 0      % only one raw file selectable in display plot
-        time_vec = datevec(PARAMS.plot.dnum) + [0 0 0 0 0 x_coord];
-    else
-        I = []; J = [];
-        I = find(x_coord < PARAMS.raw.delimit_time, 1, 'first'); % figure out where pick is compared to delimiters
-        if ~isempty(I)
-            if I == 1                       % pick in first raw file displayed, same as no delimiters
-                x_delta = 0;
-                dnumStart =  PARAMS.plot.dnum;
-            else                            % pick after the first delimiter
-                x_delta = PARAMS.raw.delimit_time(I-1);
-                dnumStart = PARAMS.raw.dnumStart(PARAMS.raw.currentIndex + I-1) ;
-            end
-            x_rel = x_coord - x_delta;
-            time_vec = datevec(dnumStart) + [0 0 0 0 0 x_rel];
-        else
-            disp_msg('Error: pick time > all PARAMS.raw.delimit_time')
-        end
-    end
+    % 260922 - the plotted x axis is now real elapsed time. plot_specgram and
+    % plot_timeseries pad their display copy of DATA for every gap in
+    % PARAMS.raw.gap_time, so x seconds into the plot is x seconds after
+    % PARAMS.plot.dnum whether or not a raw file boundary or a recording gap
+    % falls in between. The old walk through PARAMS.raw.delimit_time corrected
+    % for a splice that is no longer present in the displayed data, which put
+    % any pick after a gap one gap-length late.
+    time_vec = datevec(PARAMS.plot.dnum) + [0 0 0 0 0 x_coord];
   end
 
   function info_struct = calc_and_disp_values(plot_clicked, time_vec, x_coord, y_coord )

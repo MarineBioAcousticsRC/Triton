@@ -1,4 +1,4 @@
-function mkspecgram
+function mkspecgram(X)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % mkspecgram.m
@@ -8,12 +8,20 @@ function mkspecgram
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global PARAMS DATA
 
+% X is the single channel of samples to transform. It defaults to the global
+% DATA, which is what every existing caller relies on. plot_specgram passes a
+% display copy that has silence inserted for real recording gaps, so that the
+% spectrogram's time axis is real elapsed time; see gap_pad_display.
+if nargin < 1 || isempty(X)
+    X = DATA(:,PARAMS.ch);
+end
+
    % some spectra stuff 
    window = hanning(PARAMS.nfft);
    noverlap = round((PARAMS.overlap/100)*PARAMS.nfft);
    % calculate spectrogram plot (need signal toolbox)
 %    [sg,f,PARAMS.t]=specgram(DATA(:,PARAMS.ch),PARAMS.nfft,PARAMS.fs,window,noverlap);
-    [~,f,PARAMS.t,sg]=spectrogram(DATA(:,PARAMS.ch),window,noverlap,PARAMS.nfft,PARAMS.fs);
+    [~,f,PARAMS.t,sg]=spectrogram(X,window,noverlap,PARAMS.nfft,PARAMS.fs);
    % produce image (gain) only within limits
 %    nf = length(f);
 
