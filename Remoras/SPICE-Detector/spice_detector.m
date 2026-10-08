@@ -40,6 +40,20 @@ else
     end
 end
 
+% Options added after many settings files were written. The GUI fills these
+% in (sp_dt_initcontrol) but a settings script run directly may not have
+% them, and the detector then stops with "Unrecognized field name" partway
+% through. Same defaults as the GUI.
+if ~isfield(detParams,'whiten')
+    detParams.whiten = 0;       % no spectral whitening
+end
+if ~isfield(detParams,'snrDet')
+    detParams.snrDet = 0;       % threshold on received level, not SNR
+end
+if ~isfield(detParams,'snrThresh')
+    detParams.snrThresh = 10;   % dB; used only when snrDet is on
+end
+
 if detParams.verbose
     % display settings variables
     disp(detParams)

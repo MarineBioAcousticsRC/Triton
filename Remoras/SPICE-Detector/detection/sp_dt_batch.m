@@ -37,8 +37,10 @@ parfor idx1 = 1:N % for each data file
     % read file header
     try
         hdr = sp_io_readXWAVHeader(fullFiles{idx1}, pTemp,'fType', fTypes(idx1));
-    catch
-        fprintf('Problem reading file %s\n',fullFiles{idx1})
+    catch ME
+        % Say why. Without the reason, a file name the date expression
+        % does not fit looks exactly like a corrupt file.
+        fprintf('Problem reading file %s:\n  %s\n',fullFiles{idx1},ME.message)
         hdr = [];
     end
    
