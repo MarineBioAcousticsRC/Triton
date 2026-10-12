@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<table>
+  <record>
+    <Title></Title>
+    <First_Name>Peter</First_Name>
+    <Family_Name>Lord</Family_Name>
+    <Company>Realweb Ltd.</Company>
+    <Email>lord@realweb</Email>
+    <Email2>peterlord@firstnet</Email2>
+    <Phone_1>08594 973284</Phone_1>
+    <Phone_2>08594 973285</Phone_2>
+    <Fax>08594 973286</Fax>
+    <mobile>016483 695473</mobile>
+    <Street>Rockstreet 34</Street>
+    <Zip_code>BT6 3DJ</Zip_code>
+    <City>Liverpool</City>
+    <Country>Great Britain</Country>
+    <State></State>
+    <Category>developer</Category>
+    <Remark></Remark>
+    <URL>www.real2web.co.aa</URL>
+    <Userdefined_1></Userdefined_1>
+    <Userdefined_2></Userdefined_2>
+  </record>
+  <record>
+    <Title></Title>
+    <First_Name>Robert</First_Name>
+    <Family_Name>Matin</Family_Name>
+    <Company>cable express</Company>
+    <Email>matin@cablxpres</Email>
+    <Email2>matin@2ndweb</Email2>
+    <Phone_1>01 35 84 28 00</Phone_1>
+    <Phone_2>01 35 84 28 23</Phone_2>
+    <Fax>01 35 84 28 99</Fax>
+    <mobile>01285 769040</mobile>
+    <Street>156 Rue de Monaco</Street>
+    <Zip_code>769473</Zip_code>
+    <City>Bordeaux</City>
+    <Country>France</Country>
+    <State></State>
+    <Category></Category>
+    <Remark></Remark>
+    <URL>cablexpress.aa</URL>
+    <Userdefined_1></Userdefined_1>
+    <Userdefined_2></Userdefined_2>
+  </record>
+  <record>
+    <Title></Title>
+    <First_Name>Alberto</First_Name>
+    <Family_Name>Sanchez</Family_Name>
+    <Company>pcnet</Company>
+    <Email>sanchez@pcnet</Email>
+    <Email2>alberto.sanchez@nextweb</Email2>
+    <Phone_1>+34 22 958 32 51</Phone_1>
+    <Phone_2>+34 22 958 32 58</Phone_2>
+    <Fax>+34 22 958 32 59</Fax>
+    <mobile>0135 05478 39874</mobile>
+    <Street>Calle do sul 86</Street>
+    <Zip_code>29001</Zip_code>
+    <City>Madrid</City>
+    <Country>Espana</Country>
+    <State></State>
+    <Category></Category>
+    <Remark></Remark>
+    <URL>pcnet.aa</URL>
+    <Userdefined_1></Userdefined_1>
+    <Userdefined_2></Userdefined_2>
+  </record>
+  <record>
+    <Title></Title>
+    <First_Name>Paul</First_Name>
+    <Family_Name>Smith</Family_Name>
+    <Company>Internet Enterprise Ltd.</Company>
+    <Email>pb@internet</Email>
+    <Email2></Email2>
+    <Phone_1>02694 468958</Phone_1>
+    <Phone_2>02694 468953</Phone_2>
+    <Fax>02694 468957</Fax>
+    <mobile>01854 358954</mobile>
+    <Street>Chandlerstreet 6</Street>
+    <Zip_code>QO6 2DT</Zip_code>
+    <City>Gavant, Hampshire</City>
+    <Country>Greta Britain</Country>
+    <State></State>
+    <Category></Category>
+    <Remark></Remark>
+    <URL>www.internet.co.aa</URL>
+    <Userdefined_1></Userdefined_1>
+    <Userdefined_2></Userdefined_2>
+  </record>
+  <record>
+    <Title></Title>
+    <First_Name>Andreas</First_Name>
+    <Family_Name>Zettel</Family_Name>
+    <Company>Zettelparadies</Company>
+    <Email>az@zettelparadies</Email>
+    <Email2>andreaszettel@1stweb</Email2>
+    <Phone_1>040-6947393</Phone_1>
+    <Phone_2>040-6947394</Phone_2>
+    <Fax>040-6947399</Fax>
+    <mobile>0172 967784038</mobile>
+    <Street>Bonner Platz 6</Street>
+    <Zip_code>23451</Zip_code>
+    <City>Hamburg</City>
+    <Country>Deutschland</Country>
+    <State></State>
+    <Category>Neukunde</Category>
+    <Remark></Remark>
+    <URL>www.zettelparadies.aa</URL>
+    <Userdefined_1></Userdefined_1>
+    <Userdefined_2></Userdefined_2>
+  </record>
+</table>
