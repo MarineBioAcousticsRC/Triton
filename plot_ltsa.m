@@ -152,7 +152,7 @@ else
 end
 difc = 2;
 set(PARAMS.ltsa.cbb,'CData',[minc:difc:maxc]')
-set(PARAMS.ltsa.cbb,'YData',[minp maxp])
+set(PARAMS.ltsa.cbb,'YData',[minp maxp]) %CMS - breaking here for BS_disk04, because minc and minp are neg. infinity
 %sets the tick mode for color bar to manual to fix printing error
 set(PARAMS.ltsa.cb,'YTickMode','manual')
 
