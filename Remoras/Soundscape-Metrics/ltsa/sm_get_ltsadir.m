@@ -25,7 +25,8 @@ elseif PARAMS.ltsa.ftype == 2
 end
 
 fn = char(d.name);      % file names in directory
-fd = char(d.folder);
+fd = char(d.folder);    % padded with trailing spaces when subfolder names differ
+                        % in length (indir with **), so deblank a row before use
 fnsz = size(fn);        % number of data files in directory
 nfiles = fnsz(1);
 disp_msg(' ')
@@ -56,8 +57,11 @@ if PARAMS.ltsa.ftype == 1
    
     % sort times
     [B,index] = sortrows(dnumStart');
-    % put file name in PARAMS
+    % put file name in PARAMS, and each file's folder in the same order --
+    % sm_get_headers, sm_ck_ltsaparams and sm_calc_ltsa read wav files
+    % through PARAMS.ltsa.fdir, so it is needed here as much as for xwavs
     PARAMS.ltsa.fname = fn(index,:);
+    PARAMS.ltsa.fdir = fd(index,:);
 elseif PARAMS.ltsa.ftype == 2
     % filenames
     PARAMS.ltsa.fname = fn;

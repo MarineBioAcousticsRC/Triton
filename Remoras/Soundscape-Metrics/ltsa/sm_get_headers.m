@@ -13,6 +13,7 @@ m = 0;                                  % total number of raw files used for lts
 fnsz = size(PARAMS.ltsa.fname);        % number of data files in directory
 PARAMS.ltsa.nxwav = fnsz(1);           % number of xwav files
 PARAMS.ltsahd.fname = char(zeros(PARAMS.ltsa.nxwav,80));         % make empty matrix - filenames need to be 80 char or less
+PARAMS.ltsahd.fdir = '';    % rebuilt below; a previous run's folders may be a different width
 for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
     
     if PARAMS.ltsa.ftype == 1       % do the following for wav files
@@ -34,11 +35,11 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
 %         PARAMS.ltsahd.nsamp(m) = siz(1);
 %         PARAMS.ltsa.nch(m) = siz(2);
         try
-            info = audioinfo(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
+            info = audioinfo(fullfile(deblank(PARAMS.ltsa.fdir(k,:)),PARAMS.ltsa.fname(k,:)));
         catch ME
             disp(ME.message)
             dmsg = sprintf('Is %s a real wave file?', ...
-                fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
+                fullfile(deblank(PARAMS.ltsa.fdir(k,:)),PARAMS.ltsa.fname(k,:)));
             disp(dmsg);
             PARAMS.ltsa.gen = 0; % need to cancel
             return 
@@ -51,7 +52,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
         bytespersample = floor(PARAMS.ltsa.nBits/8);
         
         PARAMS.ltsahd.fname(m,1:fnsz(2)) = PARAMS.ltsa.fname(k,:);        % xwav file name for this raw file header
-        PARAMS.ltsahd.fdir(m,1:fnsz(2)) = PARAMS.ltsa.fdir(k,:);
+        PARAMS.ltsahd.fdir(m,:) = PARAMS.ltsa.fdir(k,:);   % folder width, not file name width (fnsz)
         PARAMS.ltsahd.rfileid(m) = 1;                           % raw file id / number in this xwav file
         
         % timing stuff:
@@ -74,11 +75,11 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
         
     elseif PARAMS.ltsa.ftype == 2               % do the following for xwavs
         try
-            info = audioinfo(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
+            info = audioinfo(fullfile(deblank(PARAMS.ltsa.fdir(k,:)),PARAMS.ltsa.fname(k,:)));
         catch ME
             disp(ME.message)
             dmsg = sprintf('Is %s a real wave file?', ...
-                fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)));
+                fullfile(deblank(PARAMS.ltsa.fdir(k,:)),PARAMS.ltsa.fname(k,:)));
             disp(dmsg);
             PARAMS.ltsa.gen = 0; % need to cancel
             return 
@@ -86,7 +87,7 @@ for k = 1:PARAMS.ltsa.nxwav            % loop over all files in directory
         
         PARAMS.ltsahd.nsamp(k) = info.TotalSamples;
         
-        fid = fopen(fullfile(PARAMS.ltsa.fdir(k,:),PARAMS.ltsa.fname(k,:)),'r');
+        fid = fopen(fullfile(deblank(PARAMS.ltsa.fdir(k,:)),PARAMS.ltsa.fname(k,:)),'r');
         
         fseek(fid,22,'bof');
         PARAMS.ltsa.nch = fread(fid,1,'uint16');         % Number of Channels
