@@ -50,7 +50,7 @@ if PARAMS.ltsa.indir == 0	% if cancel button pushed
     return
 else
     PARAMS.ltsa.gen = 1;
-    PARAMS.ltsa.indir = [PARAMS.ltsa.indir,'\'];
+    PARAMS.ltsa.indir = [PARAMS.ltsa.indir, filesep];
 end
 
 %%%%%%%%%%%%%%%%%%%%%%
