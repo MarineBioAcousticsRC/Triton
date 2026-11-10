@@ -101,10 +101,29 @@ drive filling mid-transfer used to leave empty or truncated flac files that
 looked perfectly healthy.
 
 Before starting, the tool works out how much space the whole job needs and
-refuses if the destination cannot take it. **Expanding, that figure is exact** —
-every flac records the size of the file it came from, so there is no guessing
-involved. Compressing, it budgets the full input size, which the output never
-reaches.
+refuses if the destination cannot take it.
+
+**Expanding, that figure is exact** — every flac records the size of the file it
+came from, so there is no guessing involved.
+
+**Compressing, it is measured on your own data.** How well audio compresses
+depends on the audio, so the tool encodes twenty seconds from each of a handful
+of your files and uses what it finds, reporting the figure it arrived at:
+
+```
+needs about 3.52 TB at the destination
+  (measured on 5 file(s): about 34% of the source, budgeted at 37%)
+```
+
+That costs about a second and lands within roughly ten percent of the eventual
+total. The sample is taken from a quarter of the way into each file rather than
+the start, because the beginning of a deployment is often the quietest part and
+would flatter the result.
+
+It used to budget the whole input size instead. That was safe but about three
+times too much — real HARP recordings come out around a third of their original
+size — so a 9.9 TB deployment was reported as needing 10 TB when it wanted
+nearer 3.5, and people freed space they did not need to free.
 
 During the run every file is checked again, and each one is written under a
 temporary name and renamed into place only once it has been verified. A drive

@@ -15,6 +15,10 @@ function [ok, outFile, info] = xwav_convert(inFile, varargin)
 %   'keepInput'   keep the source after a verified conversion (default true)
 %   'verify'      verify before reporting success (default true)
 %   'minFree'     bytes to leave free on the destination (default 2 GiB)
+%   'ratio'       expected compressed size as a fraction of the input, used
+%                 for the space check when compressing. Defaults to 1, the
+%                 worst case; a folder run measures the real figure on a
+%                 sample of the data and passes it in.
 %   'overwrite'   what to do when the output already exists:
 %                 'verified' (default) keep it only if it passes the same check
 %                 a fresh conversion would; 'skip' keep it unexamined;
@@ -53,6 +57,7 @@ addParameter(p,'keepInput',true);
 addParameter(p,'verify',true);
 addParameter(p,'minFree',2*2^30);
 addParameter(p,'overwrite','verified');
+addParameter(p,'ratio',1);
 addParameter(p,'flac','');
 parse(p,varargin{:});
 opt = p.Results;
@@ -103,7 +108,7 @@ if ~exist(opt.outdir,'dir')
 end
 
 outFile = fullfile(opt.outdir, xwav_outname(inFile, kind, direction));
-info.predictedOut = local_predict(k, direction);
+info.predictedOut = local_predict(k, direction, opt.ratio);
 
 %% ---- is it already there
 if exist(outFile,'file')
@@ -188,6 +193,18 @@ end
 [st, out] = system(cmd);
 if st ~= 0 || ~exist(tmpFile,'file')
     info.why = sprintf('flac failed: %s', strtrim(out));
+    % Was that this file, or the drive? The compression estimate is measured
+    % rather than guaranteed, so a file can occasionally want more room than
+    % was budgeted for it. If the destination has since run down to its
+    % reserve, that is what happened -- and every file after this one would
+    % fail the same way, so say so and let the caller stop rather than
+    % grinding out a failure per file for the rest of the run.
+    u = disk_free(opt.outdir);
+    if ~isnan(u) && u < max(opt.minFree, 64*2^20)
+        info.stop = sprintf(['destination full: %.2f GB free after trying ' ...
+            'to write %s'], u/2^30, local_tail(inFile));
+        info.why = info.stop;
+    end
     outFile = ''; return
 end
 
@@ -228,11 +245,15 @@ end
 
 
 %% ================================================================== helpers
-function bytes = local_predict(k, direction)
+function bytes = local_predict(k, direction, ratio)
 if strcmp(direction,'expand')
     bytes = k.decodedBytes;         % exact, from the header
 else
-    bytes = k.bytes;                % upper bound; flac does not grow real PCM
+    % How well audio compresses depends on the audio, so this is an estimate
+    % either way. ratio defaults to 1 -- budget the whole input -- which is
+    % safe but around three times what real HARP data actually needs. A folder
+    % run measures the true figure on a sample and passes it in.
+    bytes = k.bytes * ratio;
 end
 end
 
@@ -376,6 +397,11 @@ function local_rm(f)
 try %#ok<TRYNC>
     if exist(f,'file'); delete(f); end
 end
+end
+
+
+function s = local_tail(p)
+[~,n,e] = fileparts(p); s = [n e];
 end
 
 

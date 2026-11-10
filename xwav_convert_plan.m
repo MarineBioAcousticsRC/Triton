@@ -45,6 +45,7 @@ plan = struct('files',struct('src',{},'dst',{},'kind',{},'bytesIn',{}, ...
                              'predictedOut',{},'status',{},'why',{}), ...
               'stoppers',{{}}, 'warnings',{{}}, 'direction',direction, ...
               'indir',indir, 'outdir',outdir, ...
+              'ratio',1, 'ratioNote','', 'ratioFiles',0, ...
               'totals',struct('nReady',0,'nProblem',0,'nOther',0, ...
                               'bytesIn',0,'predictedOut',0,'exact',true), ...
               'dest',struct('usable',NaN,'total',NaN,'fsType','','maxFileBytes',Inf));
@@ -146,7 +147,10 @@ for k = 1:numel(listing)
     rec.dst = fullfile(thisOut, xwav_outname(src, kind, direction));
 
     if strcmp(direction,'compress')
-        rec.predictedOut = info.bytes;          % upper bound
+        % Filled in below, once the ratio has been measured on a sample of the
+        % real data. Held as the input size for now so that a file which never
+        % gets a measured figure is still budgeted safely.
+        rec.predictedOut = info.bytes;
         plan.totals.exact = false;
     else
         rec.predictedOut = info.decodedBytes;   % exact, from the header
@@ -184,8 +188,31 @@ for k = 1:numel(listing)
     plan.files(end+1) = rec; %#ok<AGROW>
 end
 
-%% ---- totals
+%% ---- how well does THIS data compress?
+% Budgeting the full input size is safe and far too pessimistic: real HARP
+% recordings come out around a third of their original size, so a 9.9 TB
+% deployment gets reported as needing 10 TB when it wants nearer 3.5. People
+% then free space they did not need to, or decide a perfectly adequate drive is
+% too small. Measuring a few seconds from a handful of files costs a fraction
+% of a second and lands within a point or two of the truth.
 ready = strcmp({plan.files.status},'ready');
+if strcmp(direction,'compress') && any(ready)
+    [r, nS, note] = flac_sample_ratio({plan.files(ready).src}, exe);
+    if ~isnan(r)
+        plan.ratio = r;
+        plan.ratioNote = note;
+        plan.ratioFiles = nS;
+        for k = find(ready)
+            plan.files(k).predictedOut = plan.files(k).bytesIn * r;
+        end
+    else
+        plan.warnings{end+1} = ['Could not measure how well this data ' ...
+            'compresses, so the whole source size is being budgeted. The ' ...
+            'run will need less than that, probably much less.'];
+    end
+end
+
+%% ---- totals
 plan.totals.nReady   = sum(ready);
 plan.totals.nProblem = sum(~ready);
 % Everything not converted: the files whose name ruled them out without being

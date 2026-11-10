@@ -191,7 +191,32 @@ report = local_check(report, 'each card folder reproduced', ...
     exist(fullfile(work,'deploy_out','disk01'),'dir') > 0 && ...
     exist(fullfile(work,'deploy_out','disk12'),'dir') > 0, '');
 
-%% ---- 8. nothing left behind
+%% ---- 8. the space estimate tracks reality
+% Budgeting the whole input size is safe and about three times too much on
+% real recordings, which had a 9.9 TB deployment reported as needing 10 TB
+% when it wanted nearer 3.5. The ratio is now measured on a sample of the
+% actual data, so the estimate has to land near what the run produces -- and
+% must never land UNDER it, which would stop a run part way.
+est = fullfile(work,'estimate');
+copyfile(src, est);
+pEst = xwav_convert_plan(est, fullfile(work,'estimate_out'), ...
+    'direction','compress', 'flac',opt.flac);
+rEst = xwav_convert_dir(est, fullfile(work,'estimate_out'), ...
+    'direction','compress', 'go',true, 'plan',pEst, 'flac',opt.flac);
+if rEst.bytesOut > 0
+    overBy = pEst.totals.predictedOut / rEst.bytesOut;
+else
+    overBy = NaN;
+end
+report = local_check(report, 'estimate was measured, not assumed', ...
+    pEst.ratioFiles > 0 && pEst.ratio < 1, ...
+    sprintf('ratio %.2f from %d file(s)', pEst.ratio, pEst.ratioFiles));
+report = local_check(report, 'estimate is not under actual', ...
+    ~isnan(overBy) && overBy >= 1, sprintf('%.2fx', overBy));
+report = local_check(report, 'estimate is not wildly over actual', ...
+    ~isnan(overBy) && overBy < 2, sprintf('%.2fx (was ~2.75x budgeting input size)', overBy));
+
+%% ---- 9. nothing left behind
 report = local_check(report, 'no __triton_tmp__ left', ...
     isempty(dir(fullfile(work,'**','__triton_tmp__*'))), '');
 
